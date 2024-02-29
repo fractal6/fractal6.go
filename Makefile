@@ -66,6 +66,7 @@ gqlgen_schema:
 	make clean
 
 update_schema:
+	@# Send the schema to Dgraph
 	cd schema
 	make dgraph
 

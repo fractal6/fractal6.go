@@ -9,6 +9,7 @@ import (
 	"fractale/fractal6.go/graph/model"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -11200,7 +11201,7 @@ func (ec *executionContext) fieldContext_AddBlobPayload_blob(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddBlobPayload_blob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11303,7 +11304,7 @@ func (ec *executionContext) fieldContext_AddCommentPayload_comment(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddCommentPayload_comment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11432,7 +11433,7 @@ func (ec *executionContext) fieldContext_AddContractPayload_contract(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddContractPayload_contract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11527,7 +11528,7 @@ func (ec *executionContext) fieldContext_AddEventCountPayload_eventCount(ctx con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddEventCountPayload_eventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11622,7 +11623,7 @@ func (ec *executionContext) fieldContext_AddEventFragmentPayload_eventFragment(c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddEventFragmentPayload_eventFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11731,7 +11732,7 @@ func (ec *executionContext) fieldContext_AddEventPayload_event(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddEventPayload_event_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11838,7 +11839,7 @@ func (ec *executionContext) fieldContext_AddLabelPayload_label(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddLabelPayload_label_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11937,7 +11938,7 @@ func (ec *executionContext) fieldContext_AddMandatePayload_mandate(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddMandatePayload_mandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12052,7 +12053,7 @@ func (ec *executionContext) fieldContext_AddNodeFragmentPayload_nodeFragment(ctx
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddNodeFragmentPayload_nodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12229,7 +12230,7 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddNodePayload_node_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12334,7 +12335,7 @@ func (ec *executionContext) fieldContext_AddNotifPayload_notif(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddNotifPayload_notif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12443,7 +12444,7 @@ func (ec *executionContext) fieldContext_AddPendingUserPayload_pendingUser(ctx c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddPendingUserPayload_pendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12544,7 +12545,7 @@ func (ec *executionContext) fieldContext_AddProjectCardPayload_projectCard(ctx c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddProjectCardPayload_projectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12659,7 +12660,7 @@ func (ec *executionContext) fieldContext_AddProjectColumnPayload_projectColumn(c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddProjectColumnPayload_projectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12762,7 +12763,7 @@ func (ec *executionContext) fieldContext_AddProjectDraftPayload_projectDraft(ctx
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddProjectDraftPayload_projectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12859,7 +12860,7 @@ func (ec *executionContext) fieldContext_AddProjectFieldPayload_projectField(ctx
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddProjectFieldPayload_projectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12954,7 +12955,7 @@ func (ec *executionContext) fieldContext_AddProjectFieldValuePayload_projectFiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddProjectFieldValuePayload_projectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13079,7 +13080,7 @@ func (ec *executionContext) fieldContext_AddProjectPayload_project(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddProjectPayload_project_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13178,7 +13179,7 @@ func (ec *executionContext) fieldContext_AddReactionPayload_reaction(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddReactionPayload_reaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13289,7 +13290,7 @@ func (ec *executionContext) fieldContext_AddRoleExtPayload_roleExt(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddRoleExtPayload_roleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13442,7 +13443,7 @@ func (ec *executionContext) fieldContext_AddTensionPayload_tension(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddTensionPayload_tension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13541,7 +13542,7 @@ func (ec *executionContext) fieldContext_AddUserEventPayload_userEvent(ctx conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddUserEventPayload_userEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13696,7 +13697,7 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddUserPayload_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13797,7 +13798,7 @@ func (ec *executionContext) fieldContext_AddUserRightsPayload_userRights(ctx con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddUserRightsPayload_userRights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13904,7 +13905,7 @@ func (ec *executionContext) fieldContext_AddVotePayload_vote(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_AddVotePayload_vote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -14060,7 +14061,7 @@ func (ec *executionContext) fieldContext_Blob_tension(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Blob_tension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -14254,7 +14255,7 @@ func (ec *executionContext) fieldContext_Blob_node(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Blob_node_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -14453,7 +14454,7 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Blob_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -15166,7 +15167,7 @@ func (ec *executionContext) fieldContext_Comment_reactions(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Comment_reactions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -15327,7 +15328,7 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Comment_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -15471,7 +15472,7 @@ func (ec *executionContext) fieldContext_Comment_reactionsAggregate(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Comment_reactionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -15896,7 +15897,7 @@ func (ec *executionContext) fieldContext_Contract_tension(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_tension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16076,7 +16077,7 @@ func (ec *executionContext) fieldContext_Contract_event(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_event_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16148,7 +16149,7 @@ func (ec *executionContext) fieldContext_Contract_participants(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_participants_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16265,7 +16266,7 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_candidates_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16336,7 +16337,7 @@ func (ec *executionContext) fieldContext_Contract_pending_candidates(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_pending_candidates_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16401,7 +16402,7 @@ func (ec *executionContext) fieldContext_Contract_comments(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_comments_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16620,7 +16621,7 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16806,7 +16807,7 @@ func (ec *executionContext) fieldContext_Contract_participantsAggregate(ctx cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_participantsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16899,7 +16900,7 @@ func (ec *executionContext) fieldContext_Contract_candidatesAggregate(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_candidatesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16976,7 +16977,7 @@ func (ec *executionContext) fieldContext_Contract_pending_candidatesAggregate(ct
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_pending_candidatesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17041,7 +17042,7 @@ func (ec *executionContext) fieldContext_Contract_commentsAggregate(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Contract_commentsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17532,7 +17533,7 @@ func (ec *executionContext) fieldContext_DeleteBlobPayload_blob(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteBlobPayload_blob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17673,7 +17674,7 @@ func (ec *executionContext) fieldContext_DeleteCommentPayload_comment(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteCommentPayload_comment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17840,7 +17841,7 @@ func (ec *executionContext) fieldContext_DeleteContractPayload_contract(ctx cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteContractPayload_contract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17973,7 +17974,7 @@ func (ec *executionContext) fieldContext_DeleteEventCountPayload_eventCount(ctx 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteEventCountPayload_eventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -18106,7 +18107,7 @@ func (ec *executionContext) fieldContext_DeleteEventFragmentPayload_eventFragmen
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteEventFragmentPayload_eventFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -18253,7 +18254,7 @@ func (ec *executionContext) fieldContext_DeleteEventPayload_event(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteEventPayload_event_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -18398,7 +18399,7 @@ func (ec *executionContext) fieldContext_DeleteLabelPayload_label(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteLabelPayload_label_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -18535,7 +18536,7 @@ func (ec *executionContext) fieldContext_DeleteMandatePayload_mandate(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteMandatePayload_mandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -18688,7 +18689,7 @@ func (ec *executionContext) fieldContext_DeleteNodeFragmentPayload_nodeFragment(
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteNodeFragmentPayload_nodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -18903,7 +18904,7 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteNodePayload_node_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19046,7 +19047,7 @@ func (ec *executionContext) fieldContext_DeleteNotifPayload_notif(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteNotifPayload_notif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19193,7 +19194,7 @@ func (ec *executionContext) fieldContext_DeletePendingUserPayload_pendingUser(ct
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeletePendingUserPayload_pendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19330,7 +19331,7 @@ func (ec *executionContext) fieldContext_DeletePostPayload_post(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeletePostPayload_post_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19469,7 +19470,7 @@ func (ec *executionContext) fieldContext_DeleteProjectCardPayload_projectCard(ct
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteProjectCardPayload_projectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19622,7 +19623,7 @@ func (ec *executionContext) fieldContext_DeleteProjectColumnPayload_projectColum
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteProjectColumnPayload_projectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19763,7 +19764,7 @@ func (ec *executionContext) fieldContext_DeleteProjectDraftPayload_projectDraft(
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteProjectDraftPayload_projectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19898,7 +19899,7 @@ func (ec *executionContext) fieldContext_DeleteProjectFieldPayload_projectField(
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteProjectFieldPayload_projectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20031,7 +20032,7 @@ func (ec *executionContext) fieldContext_DeleteProjectFieldValuePayload_projectF
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteProjectFieldValuePayload_projectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20194,7 +20195,7 @@ func (ec *executionContext) fieldContext_DeleteProjectPayload_project(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteProjectPayload_project_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20331,7 +20332,7 @@ func (ec *executionContext) fieldContext_DeleteReactionPayload_reaction(ctx cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteReactionPayload_reaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20480,7 +20481,7 @@ func (ec *executionContext) fieldContext_DeleteRoleExtPayload_roleExt(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteRoleExtPayload_roleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20671,7 +20672,7 @@ func (ec *executionContext) fieldContext_DeleteTensionPayload_tension(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteTensionPayload_tension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20808,7 +20809,7 @@ func (ec *executionContext) fieldContext_DeleteUserEventPayload_userEvent(ctx co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteUserEventPayload_userEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21001,7 +21002,7 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteUserPayload_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21140,7 +21141,7 @@ func (ec *executionContext) fieldContext_DeleteUserRightsPayload_userRights(ctx 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteUserRightsPayload_userRights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21285,7 +21286,7 @@ func (ec *executionContext) fieldContext_DeleteVotePayload_vote(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_DeleteVotePayload_vote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21479,7 +21480,7 @@ func (ec *executionContext) fieldContext_Event_tension(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Event_tension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21635,7 +21636,7 @@ func (ec *executionContext) fieldContext_Event_mentioned(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Event_mentioned_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21872,7 +21873,7 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Event_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -23636,7 +23637,7 @@ func (ec *executionContext) fieldContext_Label_tensions(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Label_tensions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -23775,7 +23776,7 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Label_nodes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -23860,7 +23861,7 @@ func (ec *executionContext) fieldContext_Label_tensionsAggregate(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Label_tensionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -23949,7 +23950,7 @@ func (ec *executionContext) fieldContext_Label_nodesAggregate(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Label_nodesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -24929,7 +24930,7 @@ func (ec *executionContext) fieldContext_Mutation_addNode(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addNode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -24984,7 +24985,7 @@ func (ec *executionContext) fieldContext_Mutation_updateNode(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateNode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25041,7 +25042,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteNode(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteNode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25096,7 +25097,7 @@ func (ec *executionContext) fieldContext_Mutation_addNodeFragment(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addNodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25151,7 +25152,7 @@ func (ec *executionContext) fieldContext_Mutation_updateNodeFragment(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateNodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25208,7 +25209,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteNodeFragment(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteNodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25263,7 +25264,7 @@ func (ec *executionContext) fieldContext_Mutation_addMandate(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addMandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25318,7 +25319,7 @@ func (ec *executionContext) fieldContext_Mutation_updateMandate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateMandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25375,7 +25376,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteMandate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteMandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25450,7 +25451,7 @@ func (ec *executionContext) fieldContext_Mutation_addLabel(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addLabel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25525,7 +25526,7 @@ func (ec *executionContext) fieldContext_Mutation_updateLabel(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateLabel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25602,7 +25603,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteLabel(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteLabel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25677,7 +25678,7 @@ func (ec *executionContext) fieldContext_Mutation_addRoleExt(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addRoleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25752,7 +25753,7 @@ func (ec *executionContext) fieldContext_Mutation_updateRoleExt(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateRoleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25829,7 +25830,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteRoleExt(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteRoleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25904,7 +25905,7 @@ func (ec *executionContext) fieldContext_Mutation_addProject(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -25979,7 +25980,7 @@ func (ec *executionContext) fieldContext_Mutation_updateProject(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26056,7 +26057,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteProject(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26131,7 +26132,7 @@ func (ec *executionContext) fieldContext_Mutation_addProjectColumn(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addProjectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26206,7 +26207,7 @@ func (ec *executionContext) fieldContext_Mutation_updateProjectColumn(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateProjectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26283,7 +26284,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteProjectColumn(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteProjectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26358,7 +26359,7 @@ func (ec *executionContext) fieldContext_Mutation_addProjectCard(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26433,7 +26434,7 @@ func (ec *executionContext) fieldContext_Mutation_updateProjectCard(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26510,7 +26511,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteProjectCard(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26565,7 +26566,7 @@ func (ec *executionContext) fieldContext_Mutation_addProjectField(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26620,7 +26621,7 @@ func (ec *executionContext) fieldContext_Mutation_updateProjectField(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26677,7 +26678,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteProjectField(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26732,7 +26733,7 @@ func (ec *executionContext) fieldContext_Mutation_addProjectFieldValue(ctx conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26787,7 +26788,7 @@ func (ec *executionContext) fieldContext_Mutation_updateProjectFieldValue(ctx co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26844,7 +26845,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteProjectFieldValue(ctx co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26899,7 +26900,7 @@ func (ec *executionContext) fieldContext_Mutation_updatePost(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updatePost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -26956,7 +26957,7 @@ func (ec *executionContext) fieldContext_Mutation_deletePost(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deletePost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27031,7 +27032,7 @@ func (ec *executionContext) fieldContext_Mutation_addProjectDraft(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27106,7 +27107,7 @@ func (ec *executionContext) fieldContext_Mutation_updateProjectDraft(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27183,7 +27184,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteProjectDraft(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27258,7 +27259,7 @@ func (ec *executionContext) fieldContext_Mutation_addTension(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27333,7 +27334,7 @@ func (ec *executionContext) fieldContext_Mutation_updateTension(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27410,7 +27411,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteTension(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27485,7 +27486,7 @@ func (ec *executionContext) fieldContext_Mutation_addComment(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27560,7 +27561,7 @@ func (ec *executionContext) fieldContext_Mutation_updateComment(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27637,7 +27638,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteComment(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27712,7 +27713,7 @@ func (ec *executionContext) fieldContext_Mutation_addReaction(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27787,7 +27788,7 @@ func (ec *executionContext) fieldContext_Mutation_updateReaction(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27864,7 +27865,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteReaction(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27919,7 +27920,7 @@ func (ec *executionContext) fieldContext_Mutation_addBlob(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addBlob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -27974,7 +27975,7 @@ func (ec *executionContext) fieldContext_Mutation_updateBlob(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateBlob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28031,7 +28032,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteBlob(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteBlob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28086,7 +28087,7 @@ func (ec *executionContext) fieldContext_Mutation_addEvent(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28141,7 +28142,7 @@ func (ec *executionContext) fieldContext_Mutation_updateEvent(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28198,7 +28199,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteEvent(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28253,7 +28254,7 @@ func (ec *executionContext) fieldContext_Mutation_addEventFragment(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addEventFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28308,7 +28309,7 @@ func (ec *executionContext) fieldContext_Mutation_updateEventFragment(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateEventFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28365,7 +28366,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteEventFragment(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteEventFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28440,7 +28441,7 @@ func (ec *executionContext) fieldContext_Mutation_addContract(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addContract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28515,7 +28516,7 @@ func (ec *executionContext) fieldContext_Mutation_updateContract(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateContract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28592,7 +28593,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteContract(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteContract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28667,7 +28668,7 @@ func (ec *executionContext) fieldContext_Mutation_addVote(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addVote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28742,7 +28743,7 @@ func (ec *executionContext) fieldContext_Mutation_updateVote(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateVote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28819,7 +28820,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteVote(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteVote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28894,7 +28895,7 @@ func (ec *executionContext) fieldContext_Mutation_addUser(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -28969,7 +28970,7 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29046,7 +29047,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29101,7 +29102,7 @@ func (ec *executionContext) fieldContext_Mutation_addPendingUser(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addPendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29156,7 +29157,7 @@ func (ec *executionContext) fieldContext_Mutation_updatePendingUser(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updatePendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29213,7 +29214,7 @@ func (ec *executionContext) fieldContext_Mutation_deletePendingUser(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deletePendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29268,7 +29269,7 @@ func (ec *executionContext) fieldContext_Mutation_addUserRights(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addUserRights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29323,7 +29324,7 @@ func (ec *executionContext) fieldContext_Mutation_updateUserRights(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateUserRights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29380,7 +29381,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteUserRights(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteUserRights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29435,7 +29436,7 @@ func (ec *executionContext) fieldContext_Mutation_addUserEvent(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addUserEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29490,7 +29491,7 @@ func (ec *executionContext) fieldContext_Mutation_updateUserEvent(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateUserEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29547,7 +29548,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteUserEvent(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteUserEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29602,7 +29603,7 @@ func (ec *executionContext) fieldContext_Mutation_addNotif(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addNotif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29657,7 +29658,7 @@ func (ec *executionContext) fieldContext_Mutation_updateNotif(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateNotif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29714,7 +29715,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteNotif(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteNotif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29769,7 +29770,7 @@ func (ec *executionContext) fieldContext_Mutation_addEventCount(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_addEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29824,7 +29825,7 @@ func (ec *executionContext) fieldContext_Mutation_updateEventCount(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -29881,7 +29882,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteEventCount(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -30042,7 +30043,7 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -30276,7 +30277,7 @@ func (ec *executionContext) fieldContext_Node_source(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_source_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -30573,7 +30574,7 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_parent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -30729,7 +30730,7 @@ func (ec *executionContext) fieldContext_Node_tensions_out(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_tensions_out_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -30844,7 +30845,7 @@ func (ec *executionContext) fieldContext_Node_tensions_in(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_tensions_in_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -31239,7 +31240,7 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_watchers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -31378,7 +31379,7 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_children_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -31447,7 +31448,7 @@ func (ec *executionContext) fieldContext_Node_labels(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_labels_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -31520,7 +31521,7 @@ func (ec *executionContext) fieldContext_Node_roles(ctx context.Context, field g
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_roles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -31607,7 +31608,7 @@ func (ec *executionContext) fieldContext_Node_projects(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_projects_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -31722,7 +31723,7 @@ func (ec *executionContext) fieldContext_Node_pinned(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_pinned_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -31795,7 +31796,7 @@ func (ec *executionContext) fieldContext_Node_role_ext(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_role_ext_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -31988,7 +31989,7 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_first_link_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32057,7 +32058,7 @@ func (ec *executionContext) fieldContext_Node_contracts(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_contracts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32156,7 +32157,7 @@ func (ec *executionContext) fieldContext_Node_events_history(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_events_history_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32241,7 +32242,7 @@ func (ec *executionContext) fieldContext_Node_tensions_outAggregate(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_tensions_outAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32326,7 +32327,7 @@ func (ec *executionContext) fieldContext_Node_tensions_inAggregate(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_tensions_inAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32419,7 +32420,7 @@ func (ec *executionContext) fieldContext_Node_watchersAggregate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_watchersAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32508,7 +32509,7 @@ func (ec *executionContext) fieldContext_Node_childrenAggregate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_childrenAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32577,7 +32578,7 @@ func (ec *executionContext) fieldContext_Node_labelsAggregate(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_labelsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32646,7 +32647,7 @@ func (ec *executionContext) fieldContext_Node_rolesAggregate(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_rolesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32727,7 +32728,7 @@ func (ec *executionContext) fieldContext_Node_projectsAggregate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_projectsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32812,7 +32813,7 @@ func (ec *executionContext) fieldContext_Node_pinnedAggregate(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_pinnedAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32881,7 +32882,7 @@ func (ec *executionContext) fieldContext_Node_contractsAggregate(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_contractsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -32954,7 +32955,7 @@ func (ec *executionContext) fieldContext_Node_events_historyAggregate(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_events_historyAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -33892,7 +33893,7 @@ func (ec *executionContext) fieldContext_NodeFragment_mandate(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_NodeFragment_mandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -34805,7 +34806,7 @@ func (ec *executionContext) fieldContext_Notif_tension_(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Notif_tension__args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -34896,7 +34897,7 @@ func (ec *executionContext) fieldContext_Notif_contract(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Notif_contract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -35095,7 +35096,7 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Notif_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -36000,7 +36001,7 @@ func (ec *executionContext) fieldContext_PendingUser_contracts(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_PendingUser_contracts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -36111,7 +36112,7 @@ func (ec *executionContext) fieldContext_PendingUser_contractsAggregate(ctx cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_PendingUser_contractsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -36940,7 +36941,7 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Post_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -37484,7 +37485,7 @@ func (ec *executionContext) fieldContext_Project_createdBy(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -37886,7 +37887,7 @@ func (ec *executionContext) fieldContext_Project_columns(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_columns_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -37945,7 +37946,7 @@ func (ec *executionContext) fieldContext_Project_fields(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_fields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -38084,7 +38085,7 @@ func (ec *executionContext) fieldContext_Project_leaders(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_leaders_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -38223,7 +38224,7 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_nodes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -38296,7 +38297,7 @@ func (ec *executionContext) fieldContext_Project_columnsAggregate(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_columnsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -38349,7 +38350,7 @@ func (ec *executionContext) fieldContext_Project_fieldsAggregate(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_fieldsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -38438,7 +38439,7 @@ func (ec *executionContext) fieldContext_Project_leadersAggregate(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_leadersAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -38527,7 +38528,7 @@ func (ec *executionContext) fieldContext_Project_nodesAggregate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Project_nodesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -39231,7 +39232,7 @@ func (ec *executionContext) fieldContext_ProjectCard_card(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectCard_card_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -39311,7 +39312,7 @@ func (ec *executionContext) fieldContext_ProjectCard_pc(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectCard_pc_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -39368,7 +39369,7 @@ func (ec *executionContext) fieldContext_ProjectCard_values(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectCard_values_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -39433,7 +39434,7 @@ func (ec *executionContext) fieldContext_ProjectCard_valuesAggregate(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectCard_valuesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -39926,7 +39927,7 @@ func (ec *executionContext) fieldContext_ProjectColumn_cards(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_cards_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -40016,7 +40017,7 @@ func (ec *executionContext) fieldContext_ProjectColumn_project(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_project_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -40131,7 +40132,7 @@ func (ec *executionContext) fieldContext_ProjectColumn_tensions(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_tensions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -40196,7 +40197,7 @@ func (ec *executionContext) fieldContext_ProjectColumn_drafts(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_drafts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -40257,7 +40258,7 @@ func (ec *executionContext) fieldContext_ProjectColumn_cardsAggregate(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_cardsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -40342,7 +40343,7 @@ func (ec *executionContext) fieldContext_ProjectColumn_tensionsAggregate(ctx con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_tensionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -40411,7 +40412,7 @@ func (ec *executionContext) fieldContext_ProjectColumn_draftsAggregate(ctx conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectColumn_draftsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -40988,7 +40989,7 @@ func (ec *executionContext) fieldContext_ProjectDraft_project_status(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectDraft_project_status_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -41149,7 +41150,7 @@ func (ec *executionContext) fieldContext_ProjectDraft_createdBy(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectDraft_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -41709,7 +41710,7 @@ func (ec *executionContext) fieldContext_ProjectField_values(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectField_values_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -41774,7 +41775,7 @@ func (ec *executionContext) fieldContext_ProjectField_valuesAggregate(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectField_valuesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -41874,7 +41875,7 @@ func (ec *executionContext) fieldContext_ProjectFieldValue_field(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ProjectFieldValue_field_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42358,7 +42359,7 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getNode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42497,7 +42498,7 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryNode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42586,7 +42587,7 @@ func (ec *executionContext) fieldContext_Query_aggregateNode(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateNode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42663,7 +42664,7 @@ func (ec *executionContext) fieldContext_Query_getNodeFragment(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getNodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42740,7 +42741,7 @@ func (ec *executionContext) fieldContext_Query_queryNodeFragment(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryNodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42817,7 +42818,7 @@ func (ec *executionContext) fieldContext_Query_aggregateNodeFragment(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateNodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42878,7 +42879,7 @@ func (ec *executionContext) fieldContext_Query_getMandate(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getMandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42939,7 +42940,7 @@ func (ec *executionContext) fieldContext_Query_queryMandate(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryMandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43008,7 +43009,7 @@ func (ec *executionContext) fieldContext_Query_aggregateMandate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateMandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43077,7 +43078,7 @@ func (ec *executionContext) fieldContext_Query_getLabel(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getLabel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43146,7 +43147,7 @@ func (ec *executionContext) fieldContext_Query_queryLabel(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryLabel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43215,7 +43216,7 @@ func (ec *executionContext) fieldContext_Query_aggregateLabel(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateLabel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43288,7 +43289,7 @@ func (ec *executionContext) fieldContext_Query_getRoleExt(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getRoleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43361,7 +43362,7 @@ func (ec *executionContext) fieldContext_Query_queryRoleExt(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryRoleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43430,7 +43431,7 @@ func (ec *executionContext) fieldContext_Query_aggregateRoleExt(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateRoleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43517,7 +43518,7 @@ func (ec *executionContext) fieldContext_Query_getProject(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43604,7 +43605,7 @@ func (ec *executionContext) fieldContext_Query_queryProject(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43685,7 +43686,7 @@ func (ec *executionContext) fieldContext_Query_aggregateProject(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43762,7 +43763,7 @@ func (ec *executionContext) fieldContext_Query_getProjectColumn(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getProjectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43839,7 +43840,7 @@ func (ec *executionContext) fieldContext_Query_queryProjectColumn(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryProjectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43912,7 +43913,7 @@ func (ec *executionContext) fieldContext_Query_aggregateProjectColumn(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateProjectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -43975,7 +43976,7 @@ func (ec *executionContext) fieldContext_Query_getProjectCard(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44038,7 +44039,7 @@ func (ec *executionContext) fieldContext_Query_queryProjectCard(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44099,7 +44100,7 @@ func (ec *executionContext) fieldContext_Query_aggregateProjectCard(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateProjectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44158,7 +44159,7 @@ func (ec *executionContext) fieldContext_Query_queryProjectField(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44211,7 +44212,7 @@ func (ec *executionContext) fieldContext_Query_aggregateProjectField(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateProjectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44268,7 +44269,7 @@ func (ec *executionContext) fieldContext_Query_queryProjectFieldValue(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44333,7 +44334,7 @@ func (ec *executionContext) fieldContext_Query_aggregateProjectFieldValue(ctx co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateProjectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44394,7 +44395,7 @@ func (ec *executionContext) fieldContext_Query_getPost(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getPost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44455,7 +44456,7 @@ func (ec *executionContext) fieldContext_Query_queryPost(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryPost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44520,7 +44521,7 @@ func (ec *executionContext) fieldContext_Query_aggregatePost(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregatePost_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44585,7 +44586,7 @@ func (ec *executionContext) fieldContext_Query_getProjectDraft(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44650,7 +44651,7 @@ func (ec *executionContext) fieldContext_Query_queryProjectDraft(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44719,7 +44720,7 @@ func (ec *executionContext) fieldContext_Query_aggregateProjectDraft(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateProjectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44834,7 +44835,7 @@ func (ec *executionContext) fieldContext_Query_getTension(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -44949,7 +44950,7 @@ func (ec *executionContext) fieldContext_Query_queryTension(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45034,7 +45035,7 @@ func (ec *executionContext) fieldContext_Query_aggregateTension(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateTension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45099,7 +45100,7 @@ func (ec *executionContext) fieldContext_Query_getComment(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45164,7 +45165,7 @@ func (ec *executionContext) fieldContext_Query_queryComment(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45229,7 +45230,7 @@ func (ec *executionContext) fieldContext_Query_aggregateComment(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateComment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45290,7 +45291,7 @@ func (ec *executionContext) fieldContext_Query_getReaction(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45351,7 +45352,7 @@ func (ec *executionContext) fieldContext_Query_queryReaction(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45416,7 +45417,7 @@ func (ec *executionContext) fieldContext_Query_aggregateReaction(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateReaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45489,7 +45490,7 @@ func (ec *executionContext) fieldContext_Query_getBlob(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getBlob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45562,7 +45563,7 @@ func (ec *executionContext) fieldContext_Query_queryBlob(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryBlob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45639,7 +45640,7 @@ func (ec *executionContext) fieldContext_Query_aggregateBlob(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateBlob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45710,7 +45711,7 @@ func (ec *executionContext) fieldContext_Query_getEvent(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45781,7 +45782,7 @@ func (ec *executionContext) fieldContext_Query_queryEvent(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45854,7 +45855,7 @@ func (ec *executionContext) fieldContext_Query_aggregateEvent(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45911,7 +45912,7 @@ func (ec *executionContext) fieldContext_Query_queryEventFragment(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryEventFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -45972,7 +45973,7 @@ func (ec *executionContext) fieldContext_Query_aggregateEventFragment(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateEventFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46063,7 +46064,7 @@ func (ec *executionContext) fieldContext_Query_getContract(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getContract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46154,7 +46155,7 @@ func (ec *executionContext) fieldContext_Query_queryContract(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryContract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46227,7 +46228,7 @@ func (ec *executionContext) fieldContext_Query_aggregateContract(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateContract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46296,7 +46297,7 @@ func (ec *executionContext) fieldContext_Query_getVote(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getVote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46365,7 +46366,7 @@ func (ec *executionContext) fieldContext_Query_queryVote(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryVote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46434,7 +46435,7 @@ func (ec *executionContext) fieldContext_Query_aggregateVote(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateVote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46551,7 +46552,7 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46668,7 +46669,7 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46761,7 +46762,7 @@ func (ec *executionContext) fieldContext_Query_aggregateUser(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46832,7 +46833,7 @@ func (ec *executionContext) fieldContext_Query_getPendingUser(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getPendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46903,7 +46904,7 @@ func (ec *executionContext) fieldContext_Query_queryPendingUser(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryPendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -46980,7 +46981,7 @@ func (ec *executionContext) fieldContext_Query_aggregatePendingUser(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregatePendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47043,7 +47044,7 @@ func (ec *executionContext) fieldContext_Query_queryUserRights(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryUserRights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47112,7 +47113,7 @@ func (ec *executionContext) fieldContext_Query_aggregateUserRights(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateUserRights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47173,7 +47174,7 @@ func (ec *executionContext) fieldContext_Query_getUserEvent(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getUserEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47234,7 +47235,7 @@ func (ec *executionContext) fieldContext_Query_queryUserEvent(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryUserEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47291,7 +47292,7 @@ func (ec *executionContext) fieldContext_Query_aggregateUserEvent(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateUserEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47358,7 +47359,7 @@ func (ec *executionContext) fieldContext_Query_getNotif(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getNotif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47425,7 +47426,7 @@ func (ec *executionContext) fieldContext_Query_queryNotif(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryNotif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47494,7 +47495,7 @@ func (ec *executionContext) fieldContext_Query_aggregateNotif(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateNotif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47551,7 +47552,7 @@ func (ec *executionContext) fieldContext_Query_queryEventCount(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_queryEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47628,7 +47629,7 @@ func (ec *executionContext) fieldContext_Query_aggregateEventCount(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateEventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47699,7 +47700,7 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query___type_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -47953,7 +47954,7 @@ func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Reaction_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -48021,7 +48022,7 @@ func (ec *executionContext) fieldContext_Reaction_comment(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Reaction_comment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -48629,7 +48630,7 @@ func (ec *executionContext) fieldContext_RoleExt_mandate(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_RoleExt_mandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -48768,7 +48769,7 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_RoleExt_roles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -48907,7 +48908,7 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_RoleExt_nodes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -48996,7 +48997,7 @@ func (ec *executionContext) fieldContext_RoleExt_rolesAggregate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_RoleExt_rolesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -49085,7 +49086,7 @@ func (ec *executionContext) fieldContext_RoleExt_nodesAggregate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_RoleExt_nodesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -49569,7 +49570,7 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_emitter_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -49752,7 +49753,7 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_receiver_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50071,7 +50072,7 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_assignees_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50140,7 +50141,7 @@ func (ec *executionContext) fieldContext_Tension_labels(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_labels_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50205,7 +50206,7 @@ func (ec *executionContext) fieldContext_Tension_comments(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_comments_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50278,7 +50279,7 @@ func (ec *executionContext) fieldContext_Tension_blobs(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_blobs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50349,7 +50350,7 @@ func (ec *executionContext) fieldContext_Tension_history(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_history_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50420,7 +50421,7 @@ func (ec *executionContext) fieldContext_Tension_mentions(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_mentions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50511,7 +50512,7 @@ func (ec *executionContext) fieldContext_Tension_contracts(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_contracts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50628,7 +50629,7 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_subscribers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50705,7 +50706,7 @@ func (ec *executionContext) fieldContext_Tension_project_statuses(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_project_statuses_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -50904,7 +50905,7 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51114,7 +51115,7 @@ func (ec *executionContext) fieldContext_Tension_assigneesAggregate(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_assigneesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51183,7 +51184,7 @@ func (ec *executionContext) fieldContext_Tension_labelsAggregate(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_labelsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51248,7 +51249,7 @@ func (ec *executionContext) fieldContext_Tension_commentsAggregate(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_commentsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51325,7 +51326,7 @@ func (ec *executionContext) fieldContext_Tension_blobsAggregate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_blobsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51398,7 +51399,7 @@ func (ec *executionContext) fieldContext_Tension_historyAggregate(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_historyAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51471,7 +51472,7 @@ func (ec *executionContext) fieldContext_Tension_mentionsAggregate(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_mentionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51544,7 +51545,7 @@ func (ec *executionContext) fieldContext_Tension_contractsAggregate(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_contractsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51637,7 +51638,7 @@ func (ec *executionContext) fieldContext_Tension_subscribersAggregate(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_subscribersAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -51710,7 +51711,7 @@ func (ec *executionContext) fieldContext_Tension_project_statusesAggregate(ctx c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Tension_project_statusesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -52429,7 +52430,7 @@ func (ec *executionContext) fieldContext_UpdateBlobPayload_blob(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateBlobPayload_blob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -52532,7 +52533,7 @@ func (ec *executionContext) fieldContext_UpdateCommentPayload_comment(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateCommentPayload_comment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -52661,7 +52662,7 @@ func (ec *executionContext) fieldContext_UpdateContractPayload_contract(ctx cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateContractPayload_contract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -52756,7 +52757,7 @@ func (ec *executionContext) fieldContext_UpdateEventCountPayload_eventCount(ctx 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateEventCountPayload_eventCount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -52851,7 +52852,7 @@ func (ec *executionContext) fieldContext_UpdateEventFragmentPayload_eventFragmen
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateEventFragmentPayload_eventFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -52960,7 +52961,7 @@ func (ec *executionContext) fieldContext_UpdateEventPayload_event(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateEventPayload_event_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53067,7 +53068,7 @@ func (ec *executionContext) fieldContext_UpdateLabelPayload_label(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateLabelPayload_label_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53166,7 +53167,7 @@ func (ec *executionContext) fieldContext_UpdateMandatePayload_mandate(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateMandatePayload_mandate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53281,7 +53282,7 @@ func (ec *executionContext) fieldContext_UpdateNodeFragmentPayload_nodeFragment(
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateNodeFragmentPayload_nodeFragment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53458,7 +53459,7 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateNodePayload_node_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53563,7 +53564,7 @@ func (ec *executionContext) fieldContext_UpdateNotifPayload_notif(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateNotifPayload_notif_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53672,7 +53673,7 @@ func (ec *executionContext) fieldContext_UpdatePendingUserPayload_pendingUser(ct
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdatePendingUserPayload_pendingUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53771,7 +53772,7 @@ func (ec *executionContext) fieldContext_UpdatePostPayload_post(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdatePostPayload_post_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53872,7 +53873,7 @@ func (ec *executionContext) fieldContext_UpdateProjectCardPayload_projectCard(ct
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateProjectCardPayload_projectCard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -53987,7 +53988,7 @@ func (ec *executionContext) fieldContext_UpdateProjectColumnPayload_projectColum
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateProjectColumnPayload_projectColumn_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -54090,7 +54091,7 @@ func (ec *executionContext) fieldContext_UpdateProjectDraftPayload_projectDraft(
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateProjectDraftPayload_projectDraft_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -54187,7 +54188,7 @@ func (ec *executionContext) fieldContext_UpdateProjectFieldPayload_projectField(
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateProjectFieldPayload_projectField_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -54282,7 +54283,7 @@ func (ec *executionContext) fieldContext_UpdateProjectFieldValuePayload_projectF
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateProjectFieldValuePayload_projectFieldValue_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -54407,7 +54408,7 @@ func (ec *executionContext) fieldContext_UpdateProjectPayload_project(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateProjectPayload_project_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -54506,7 +54507,7 @@ func (ec *executionContext) fieldContext_UpdateReactionPayload_reaction(ctx cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateReactionPayload_reaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -54617,7 +54618,7 @@ func (ec *executionContext) fieldContext_UpdateRoleExtPayload_roleExt(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateRoleExtPayload_roleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -54770,7 +54771,7 @@ func (ec *executionContext) fieldContext_UpdateTensionPayload_tension(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateTensionPayload_tension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -54869,7 +54870,7 @@ func (ec *executionContext) fieldContext_UpdateUserEventPayload_userEvent(ctx co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateUserEventPayload_userEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -55024,7 +55025,7 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateUserPayload_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -55125,7 +55126,7 @@ func (ec *executionContext) fieldContext_UpdateUserRightsPayload_userRights(ctx 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateUserRightsPayload_userRights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -55232,7 +55233,7 @@ func (ec *executionContext) fieldContext_UpdateVotePayload_vote(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UpdateVotePayload_vote_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56001,7 +56002,7 @@ func (ec *executionContext) fieldContext_User_subscriptions(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_subscriptions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56160,7 +56161,7 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_watching_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56226,7 +56227,7 @@ func (ec *executionContext) fieldContext_User_rights(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_rights_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56365,7 +56366,7 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_roles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56500,7 +56501,7 @@ func (ec *executionContext) fieldContext_User_tensions_created(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_tensions_created_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56635,7 +56636,7 @@ func (ec *executionContext) fieldContext_User_tensions_assigned(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_tensions_assigned_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56746,7 +56747,7 @@ func (ec *executionContext) fieldContext_User_contracts(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_contracts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56807,7 +56808,7 @@ func (ec *executionContext) fieldContext_User_reactions(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_reactions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -56888,7 +56889,7 @@ func (ec *executionContext) fieldContext_User_events(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_events_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57011,7 +57012,7 @@ func (ec *executionContext) fieldContext_User_event_count(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_event_count_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57096,7 +57097,7 @@ func (ec *executionContext) fieldContext_User_subscriptionsAggregate(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_subscriptionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57185,7 +57186,7 @@ func (ec *executionContext) fieldContext_User_watchingAggregate(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_watchingAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57274,7 +57275,7 @@ func (ec *executionContext) fieldContext_User_rolesAggregate(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_rolesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57359,7 +57360,7 @@ func (ec *executionContext) fieldContext_User_tensions_createdAggregate(ctx cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_tensions_createdAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57444,7 +57445,7 @@ func (ec *executionContext) fieldContext_User_tensions_assignedAggregate(ctx con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_tensions_assignedAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57517,7 +57518,7 @@ func (ec *executionContext) fieldContext_User_contractsAggregate(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_contractsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57582,7 +57583,7 @@ func (ec *executionContext) fieldContext_User_reactionsAggregate(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_reactionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -57639,7 +57640,7 @@ func (ec *executionContext) fieldContext_User_eventsAggregate(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_eventsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -58680,7 +58681,7 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UserEvent_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -58729,7 +58730,7 @@ func (ec *executionContext) fieldContext_UserEvent_event(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_UserEvent_event_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -59566,7 +59567,7 @@ func (ec *executionContext) fieldContext_Vote_contract(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Vote_contract_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -59708,7 +59709,7 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Vote_node_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -59910,7 +59911,7 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Vote_createdBy_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -60393,16 +60394,13 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -60427,8 +60425,6 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -60459,8 +60455,6 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -60491,8 +60485,6 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -60521,45 +60513,40 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "blob_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blob_type"))
-			it.BlobType, err = ec.unmarshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
+			data, err := ec.unmarshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.BlobType = data
 		case "pushedFlag":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushedFlag"))
-			it.PushedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PushedFlag = data
 		case "archivedFlag":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archivedFlag"))
-			it.ArchivedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ArchivedFlag = data
 		case "node":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
-			it.Node, err = ec.unmarshalONodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
+			data, err := ec.unmarshalONodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Node = data
 		case "md":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("md"))
-			it.Md, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Md = data
 		}
 	}
 
@@ -60581,16 +60568,13 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -60615,8 +60599,6 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -60647,21 +60629,19 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "reactions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
-			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Reactions = data
 		}
 	}
 
@@ -60683,16 +60663,13 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -60717,8 +60694,6 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -60749,8 +60724,6 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -60781,16 +60754,13 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contractid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
-			it.Contractid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contractid = data
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -60819,64 +60789,55 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNContractStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
+			data, err := ec.unmarshalNContractStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "contract_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract_type"))
-			it.ContractType, err = ec.unmarshalNContractType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
+			data, err := ec.unmarshalNContractType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ContractType = data
 		case "closedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
-			it.ClosedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ClosedAt = data
 		case "event":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
-			it.Event, err = ec.unmarshalNEventFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
+			data, err := ec.unmarshalNEventFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Event = data
 		case "participants":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
-			it.Participants, err = ec.unmarshalNVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			data, err := ec.unmarshalNVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Participants = data
 		case "candidates":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("candidates"))
-			it.Candidates, err = ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Candidates = data
 		case "pending_candidates":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_candidates"))
-			it.PendingCandidates, err = ec.unmarshalOPendingUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
+			data, err := ec.unmarshalOPendingUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PendingCandidates = data
 		case "comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCommentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
@@ -60905,13 +60866,12 @@ func (ec *executionContext) unmarshalInputAddContractInput(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isValidator":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isValidator"))
-			it.IsValidator, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsValidator = data
 		}
 	}
 
@@ -60933,29 +60893,26 @@ func (ec *executionContext) unmarshalInputAddEventCountInput(ctx context.Context
 		}
 		switch k {
 		case "unread_events":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unread_events"))
-			it.UnreadEvents, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UnreadEvents = data
 		case "pending_contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_contracts"))
-			it.PendingContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PendingContracts = data
 		case "assigned_tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assigned_tensions"))
-			it.AssignedTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.AssignedTensions = data
 		}
 	}
 
@@ -60977,29 +60934,26 @@ func (ec *executionContext) unmarshalInputAddEventFragmentInput(ctx context.Cont
 		}
 		switch k {
 		case "event_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
-			it.EventType, err = ec.unmarshalNTensionEvent2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			data, err := ec.unmarshalNTensionEvent2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventType = data
 		case "old":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
-			it.Old, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Old = data
 		case "new":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
-			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.New = data
 		}
 	}
 
@@ -61021,16 +60975,13 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61055,8 +61006,6 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61087,8 +61036,6 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61119,8 +61066,6 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -61149,16 +61094,13 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "event_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
-			it.EventType, err = ec.unmarshalNTensionEvent2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			data, err := ec.unmarshalNTensionEvent2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventType = data
 		case "mentioned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentioned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -61187,21 +61129,19 @@ func (ec *executionContext) unmarshalInputAddEventInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "old":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
-			it.Old, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Old = data
 		case "new":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
-			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.New = data
 		}
 	}
 
@@ -61223,16 +61163,13 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 		}
 		switch k {
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61285,8 +61222,6 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61317,24 +61252,20 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
-			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Tensions = data
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -61393,37 +61324,33 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 		}
 		switch k {
 		case "purpose":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("purpose"))
-			it.Purpose, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Purpose = data
 		case "responsabilities":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responsabilities"))
-			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Responsabilities = data
 		case "domains":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("domains"))
-			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Domains = data
 		case "policies":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policies"))
-			it.Policies, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Policies = data
 		}
 	}
 
@@ -61445,8 +61372,6 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 		}
 		switch k {
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61473,8 +61398,6 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61505,8 +61428,6 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61537,77 +61458,68 @@ func (ec *executionContext) unmarshalInputAddNodeFragmentInput(ctx context.Conte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "mandate":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			data, err := ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mandate = data
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Skills = data
 		case "visibility":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
-			it.Visibility, err = ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			data, err := ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Visibility = data
 		case "mode":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			data, err := ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mode = data
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			data, err := ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "first_link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first_link"))
-			it.FirstLink, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FirstLink = data
 		case "role_ext":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
-			it.RoleExt, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleExt = data
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			it.RoleType, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleType = data
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		}
 	}
 
@@ -61629,216 +61541,188 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UpdatedAt = data
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
-			it.Nameid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Nameid = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "source":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
-			it.Source, err = ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
+			data, err := ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Source = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.About = data
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Skills = data
 		case "isRoot":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
-			it.IsRoot, err = ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsRoot = data
 		case "parent":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parent"))
-			it.Parent, err = ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			data, err := ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Parent = data
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalNNodeType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			data, err := ec.unmarshalNNodeType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "tensions_out":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_out"))
-			it.TensionsOut, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.TensionsOut = data
 		case "tensions_in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_in"))
-			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.TensionsIn = data
 		case "visibility":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
-			it.Visibility, err = ec.unmarshalNNodeVisibility2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			data, err := ec.unmarshalNNodeVisibility2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Visibility = data
 		case "mode":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalNNodeMode2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			data, err := ec.unmarshalNNodeMode2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mode = data
 		case "rights":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
-			it.Rights, err = ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rights = data
 		case "isArchived":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
-			it.IsArchived, err = ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsArchived = data
 		case "isPersonal":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPersonal"))
-			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsPersonal = data
 		case "userCanJoin":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
-			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UserCanJoin = data
 		case "guestCanCreateTension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanCreateTension"))
-			it.GuestCanCreateTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.GuestCanCreateTension = data
 		case "watchers":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
-			it.Watchers, err = ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Watchers = data
 		case "children":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("children"))
-			it.Children, err = ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			data, err := ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Children = data
 		case "labels":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
-			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			data, err := ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Labels = data
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
-			it.Roles, err = ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
+			data, err := ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Roles = data
 		case "projects":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
-			it.Projects, err = ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Projects = data
 		case "pinned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pinned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -61867,53 +61751,47 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_ext":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
-			it.RoleExt, err = ec.unmarshalORoleExtRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
+			data, err := ec.unmarshalORoleExtRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleExt = data
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			it.RoleType, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleType = data
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "first_link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first_link"))
-			it.FirstLink, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FirstLink = data
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
-			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			data, err := ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contracts = data
 		case "events_history":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events_history"))
-			it.EventsHistory, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventsHistory = data
 		}
 	}
 
@@ -61935,16 +61813,13 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -61969,8 +61844,6 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62001,8 +61874,6 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62033,29 +61904,26 @@ func (ec *executionContext) unmarshalInputAddNotifInput(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_"))
-			it.Tension, err = ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Tension = data
 		case "contract":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
-			it.Contract, err = ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			data, err := ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contract = data
 		case "link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
-			it.Link, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Link = data
 		}
 	}
 
@@ -62077,16 +61945,13 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 		}
 		switch k {
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UpdatedAt = data
 		case "username":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62111,16 +61976,13 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "password":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Password = data
 		case "email":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62145,37 +62007,33 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "email_token":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email_token"))
-			it.EmailToken, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EmailToken = data
 		case "token":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-			it.Token, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Token = data
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
-			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			data, err := ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contracts = data
 		case "subscribe":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribe"))
-			it.Subscribe, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Subscribe = data
 		}
 	}
 
@@ -62197,16 +62055,13 @@ func (ec *executionContext) unmarshalInputAddProjectCardInput(ctx context.Contex
 		}
 		switch k {
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Pos = data
 		case "card":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("card"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNCardKindRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindRef(ctx, v)
@@ -62235,8 +62090,6 @@ func (ec *executionContext) unmarshalInputAddProjectCardInput(ctx context.Contex
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "pc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
@@ -62265,13 +62118,12 @@ func (ec *executionContext) unmarshalInputAddProjectCardInput(ctx context.Contex
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "values":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
-			it.Values, err = ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Values = data
 		}
 	}
 
@@ -62293,16 +62145,13 @@ func (ec *executionContext) unmarshalInputAddProjectColumnInput(ctx context.Cont
 		}
 		switch k {
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62333,40 +62182,34 @@ func (ec *executionContext) unmarshalInputAddProjectColumnInput(ctx context.Cont
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Pos = data
 		case "col_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
-			it.ColType, err = ec.unmarshalNProjectColumnType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			data, err := ec.unmarshalNProjectColumnType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ColType = data
 		case "cards":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cards"))
-			it.Cards, err = ec.unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Cards = data
 		case "project":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
@@ -62395,21 +62238,19 @@ func (ec *executionContext) unmarshalInputAddProjectColumnInput(ctx context.Cont
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
-			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Tensions = data
 		case "drafts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("drafts"))
-			it.Drafts, err = ec.unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Drafts = data
 		}
 	}
 
@@ -62431,16 +62272,13 @@ func (ec *executionContext) unmarshalInputAddProjectDraftInput(ctx context.Conte
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62465,8 +62303,6 @@ func (ec *executionContext) unmarshalInputAddProjectDraftInput(ctx context.Conte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62497,29 +62333,26 @@ func (ec *executionContext) unmarshalInputAddProjectDraftInput(ctx context.Conte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "title":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Title = data
 		case "project_status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_status"))
-			it.ProjectStatus, err = ec.unmarshalNProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			data, err := ec.unmarshalNProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ProjectStatus = data
 		}
 	}
 
@@ -62541,29 +62374,26 @@ func (ec *executionContext) unmarshalInputAddProjectFieldInput(ctx context.Conte
 		}
 		switch k {
 		case "field_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field_type"))
-			it.FieldType, err = ec.unmarshalNProjectFieldType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, v)
+			data, err := ec.unmarshalNProjectFieldType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FieldType = data
 		case "isVisible":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isVisible"))
-			it.IsVisible, err = ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsVisible = data
 		case "values":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
-			it.Values, err = ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Values = data
 		}
 	}
 
@@ -62585,29 +62415,26 @@ func (ec *executionContext) unmarshalInputAddProjectFieldValueInput(ctx context.
 		}
 		switch k {
 		case "field":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalNProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, v)
+			data, err := ec.unmarshalNProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Field = data
 		case "value":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
-			it.Value, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Value = data
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Pos = data
 		}
 	}
 
@@ -62629,48 +62456,41 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			it.UpdatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UpdatedAt = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "parentnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parentnameid"))
-			it.Parentnameid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Parentnameid = data
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62723,8 +62543,6 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62767,8 +62585,6 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -62799,32 +62615,27 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNProjectStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			data, err := ec.unmarshalNProjectStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "columns":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("columns"))
-			it.Columns, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Columns = data
 		case "fields":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
-			it.Fields, err = ec.unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Fields = data
 		case "leaders":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("leaders"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -62853,8 +62664,6 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -62913,16 +62722,13 @@ func (ec *executionContext) unmarshalInputAddReactionInput(ctx context.Context, 
 		}
 		switch k {
 		case "reactionid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
-			it.Reactionid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Reactionid = data
 		case "user":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -62951,8 +62757,6 @@ func (ec *executionContext) unmarshalInputAddReactionInput(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comment":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
@@ -62981,13 +62785,12 @@ func (ec *executionContext) unmarshalInputAddReactionInput(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		}
 	}
 
@@ -63009,16 +62812,13 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 		}
 		switch k {
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -63071,8 +62871,6 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -63103,40 +62901,34 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			it.RoleType, err = ec.unmarshalNRoleType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalNRoleType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleType = data
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "mandate":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			data, err := ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mandate = data
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
-			it.Roles, err = ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			data, err := ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Roles = data
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -63195,16 +62987,13 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -63229,8 +63018,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -63261,8 +63048,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -63293,48 +63078,41 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "emitter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emitter"))
-			it.Emitter, err = ec.unmarshalNNodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			data, err := ec.unmarshalNNodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Emitter = data
 		case "emitterid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emitterid"))
-			it.Emitterid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Emitterid = data
 		case "receiver":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiver"))
-			it.Receiver, err = ec.unmarshalNNodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			data, err := ec.unmarshalNNodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Receiver = data
 		case "receiverid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverid"))
-			it.Receiverid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Receiverid = data
 		case "title":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Title = data
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNTensionType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
@@ -63361,24 +63139,20 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNTensionStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
+			data, err := ec.unmarshalNTensionStatus2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "action":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("action"))
-			it.Action, err = ec.unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
+			data, err := ec.unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Action = data
 		case "assignees":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -63421,8 +63195,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "labels":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
@@ -63465,8 +63237,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCommentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
@@ -63509,8 +63279,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "blobs":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blobs"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
@@ -63553,24 +63321,20 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "history":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
-			it.History, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.History = data
 		case "mentions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentions"))
-			it.Mentions, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mentions = data
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
@@ -63599,8 +63363,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "subscribers":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribers"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -63629,21 +63391,19 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "project_statuses":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_statuses"))
-			it.ProjectStatuses, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ProjectStatuses = data
 		case "n_comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_comments"))
-			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.NComments = data
 		}
 	}
 
@@ -63665,32 +63425,27 @@ func (ec *executionContext) unmarshalInputAddUserEventInput(ctx context.Context,
 		}
 		switch k {
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "isRead":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
-			it.IsRead, err = ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsRead = data
 		case "user":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
-			it.User, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.User = data
 		case "event":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOEventKindRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
@@ -63739,24 +63494,20 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		}
 		switch k {
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalNDateTime2string(ctx, v)
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "lastAck":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastAck"))
-			it.LastAck, err = ec.unmarshalNDateTime2string(ctx, v)
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.LastAck = data
 		case "username":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -63781,16 +63532,13 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "email":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -63815,16 +63563,13 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "password":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Password = data
 		case "bio":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bio"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -63855,56 +63600,48 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "location":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
-			it.Location, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Location = data
 		case "utc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("utc"))
-			it.Utc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Utc = data
 		case "links":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("links"))
-			it.Links, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Links = data
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Skills = data
 		case "notifyByEmail":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifyByEmail"))
-			it.NotifyByEmail, err = ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.NotifyByEmail = data
 		case "lang":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
-			it.Lang, err = ec.unmarshalNLang2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
+			data, err := ec.unmarshalNLang2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Lang = data
 		case "subscriptions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -63933,8 +63670,6 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "watching":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watching"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -63963,16 +63698,13 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rights":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
-			it.Rights, err = ec.unmarshalNUserRightsRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsRef(ctx, v)
+			data, err := ec.unmarshalNUserRightsRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rights = data
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -64001,8 +63733,6 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_created":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_created"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -64031,8 +63761,6 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_assigned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_assigned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -64061,8 +63789,6 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
@@ -64091,37 +63817,33 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "reactions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
-			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Reactions = data
 		case "events":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
-			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Events = data
 		case "markAllAsRead":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("markAllAsRead"))
-			it.MarkAllAsRead, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.MarkAllAsRead = data
 		case "event_count":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_count"))
-			it.EventCount, err = ec.unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx, v)
+			data, err := ec.unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventCount = data
 		}
 	}
 
@@ -64143,53 +63865,47 @@ func (ec *executionContext) unmarshalInputAddUserRightsInput(ctx context.Context
 		}
 		switch k {
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalNUserType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
+			data, err := ec.unmarshalNUserType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "canLogin":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canLogin"))
-			it.CanLogin, err = ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CanLogin = data
 		case "canCreateRoot":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canCreateRoot"))
-			it.CanCreateRoot, err = ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CanCreateRoot = data
 		case "maxPublicOrga":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPublicOrga"))
-			it.MaxPublicOrga, err = ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.MaxPublicOrga = data
 		case "maxPrivateOrga":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPrivateOrga"))
-			it.MaxPrivateOrga, err = ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.MaxPrivateOrga = data
 		case "hasEmailNotifications":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasEmailNotifications"))
-			it.HasEmailNotifications, err = ec.unmarshalNBoolean2bool(ctx, v)
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.HasEmailNotifications = data
 		}
 	}
 
@@ -64211,16 +63927,13 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalNUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNDateTime2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64245,8 +63958,6 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64277,8 +63988,6 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64309,16 +64018,13 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "voteid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
-			it.Voteid, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Voteid = data
 		case "contract":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
@@ -64347,8 +64053,6 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "node":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalNNodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -64377,13 +64081,12 @@ func (ec *executionContext) unmarshalInputAddVoteInput(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "data":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-			it.Data, err = ec.unmarshalNInt2ᚕintᚄ(ctx, v)
+			data, err := ec.unmarshalNInt2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Data = data
 		}
 	}
 
@@ -64405,37 +64108,33 @@ func (ec *executionContext) unmarshalInputAuthRule(ctx context.Context, obj inte
 		}
 		switch k {
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOAuthRule2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, v)
+			data, err := ec.unmarshalOAuthRule2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOAuthRule2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, v)
+			data, err := ec.unmarshalOAuthRule2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOAuthRule2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, v)
+			data, err := ec.unmarshalOAuthRule2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAuthRule(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		case "rule":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rule"))
-			it.Rule, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rule = data
 		}
 	}
 
@@ -64457,85 +64156,75 @@ func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "blob_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blob_type"))
-			it.BlobType, err = ec.unmarshalOBlobType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobTypeHash(ctx, v)
+			data, err := ec.unmarshalOBlobType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.BlobType = data
 		case "pushedFlag":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushedFlag"))
-			it.PushedFlag, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PushedFlag = data
 		case "archivedFlag":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archivedFlag"))
-			it.ArchivedFlag, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ArchivedFlag = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOBlobHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobHasFilter(ctx, v)
+			data, err := ec.unmarshalOBlobHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOBlobFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
+			data, err := ec.unmarshalOBlobFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOBlobFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
+			data, err := ec.unmarshalOBlobFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOBlobFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
+			data, err := ec.unmarshalOBlobFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -64557,29 +64246,26 @@ func (ec *executionContext) unmarshalInputBlobOrder(ctx context.Context, obj int
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOBlobOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrderable(ctx, v)
+			data, err := ec.unmarshalOBlobOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOBlobOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrderable(ctx, v)
+			data, err := ec.unmarshalOBlobOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOBlobOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrder(ctx, v)
+			data, err := ec.unmarshalOBlobOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -64601,8 +64287,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -64627,8 +64311,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64651,8 +64333,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64683,8 +64363,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64715,8 +64393,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -64741,8 +64417,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "blob_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blob_type"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
@@ -64767,8 +64441,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "pushedFlag":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushedFlag"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64791,8 +64463,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "archivedFlag":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archivedFlag"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64815,8 +64485,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "node":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
@@ -64841,8 +64509,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "md":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("md"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64885,24 +64551,20 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64929,8 +64591,6 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64961,8 +64621,6 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -64993,8 +64651,6 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -65023,45 +64679,40 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "blob_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blob_type"))
-			it.BlobType, err = ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
+			data, err := ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.BlobType = data
 		case "pushedFlag":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushedFlag"))
-			it.PushedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PushedFlag = data
 		case "archivedFlag":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archivedFlag"))
-			it.ArchivedFlag, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ArchivedFlag = data
 		case "node":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
-			it.Node, err = ec.unmarshalONodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
+			data, err := ec.unmarshalONodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Node = data
 		case "md":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("md"))
-			it.Md, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Md = data
 		}
 	}
 
@@ -65083,21 +64734,19 @@ func (ec *executionContext) unmarshalInputBlobType_hash(ctx context.Context, obj
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
+			data, err := ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOBlobType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
+			data, err := ec.unmarshalOBlobType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -65119,29 +64768,26 @@ func (ec *executionContext) unmarshalInputCardKindFilter(ctx context.Context, ob
 		}
 		switch k {
 		case "memberTypes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberTypes"))
-			it.MemberTypes, err = ec.unmarshalOCardKindType2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOCardKindType2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.MemberTypes = data
 		case "tensionFilter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensionFilter"))
-			it.TensionFilter, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
+			data, err := ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.TensionFilter = data
 		case "projectDraftFilter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectDraftFilter"))
-			it.ProjectDraftFilter, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			data, err := ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ProjectDraftFilter = data
 		}
 	}
 
@@ -65163,21 +64809,19 @@ func (ec *executionContext) unmarshalInputCardKindRef(ctx context.Context, obj i
 		}
 		switch k {
 		case "tensionRef":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensionRef"))
-			it.TensionRef, err = ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.TensionRef = data
 		case "projectDraftRef":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectDraftRef"))
-			it.ProjectDraftRef, err = ec.unmarshalOProjectDraftRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRef(ctx, v)
+			data, err := ec.unmarshalOProjectDraftRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ProjectDraftRef = data
 		}
 	}
 
@@ -65199,61 +64843,54 @@ func (ec *executionContext) unmarshalInputCommentFilter(ctx context.Context, obj
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOCommentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentHasFilter(ctx, v)
+			data, err := ec.unmarshalOCommentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOCommentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+			data, err := ec.unmarshalOCommentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOCommentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+			data, err := ec.unmarshalOCommentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOCommentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+			data, err := ec.unmarshalOCommentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -65275,29 +64912,26 @@ func (ec *executionContext) unmarshalInputCommentOrder(ctx context.Context, obj 
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOCommentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx, v)
+			data, err := ec.unmarshalOCommentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOCommentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx, v)
+			data, err := ec.unmarshalOCommentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOCommentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, v)
+			data, err := ec.unmarshalOCommentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -65319,8 +64953,6 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -65345,8 +64977,6 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -65369,8 +64999,6 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -65401,16 +65029,13 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "reactions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
@@ -65455,24 +65080,20 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -65499,8 +65120,6 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -65531,21 +65150,19 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "reactions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
-			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Reactions = data
 		}
 	}
 
@@ -65567,21 +65184,19 @@ func (ec *executionContext) unmarshalInputContainsFilter(ctx context.Context, ob
 		}
 		switch k {
 		case "point":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("point"))
-			it.Point, err = ec.unmarshalOPointRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointRef(ctx, v)
+			data, err := ec.unmarshalOPointRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Point = data
 		case "polygon":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("polygon"))
-			it.Polygon, err = ec.unmarshalOPolygonRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRef(ctx, v)
+			data, err := ec.unmarshalOPolygonRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Polygon = data
 		}
 	}
 
@@ -65603,93 +65218,82 @@ func (ec *executionContext) unmarshalInputContractFilter(ctx context.Context, ob
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "contractid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
-			it.Contractid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contractid = data
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOContractStatus_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatusHash(ctx, v)
+			data, err := ec.unmarshalOContractStatus_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatusHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "contract_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract_type"))
-			it.ContractType, err = ec.unmarshalOContractType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractTypeHash(ctx, v)
+			data, err := ec.unmarshalOContractType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ContractType = data
 		case "closedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
-			it.ClosedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ClosedAt = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOContractHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractHasFilter(ctx, v)
+			data, err := ec.unmarshalOContractHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOContractFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
+			data, err := ec.unmarshalOContractFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOContractFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
+			data, err := ec.unmarshalOContractFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
+			data, err := ec.unmarshalOContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -65711,29 +65315,26 @@ func (ec *executionContext) unmarshalInputContractOrder(ctx context.Context, obj
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOContractOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrderable(ctx, v)
+			data, err := ec.unmarshalOContractOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOContractOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrderable(ctx, v)
+			data, err := ec.unmarshalOContractOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOContractOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrder(ctx, v)
+			data, err := ec.unmarshalOContractOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -65755,8 +65356,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -65781,8 +65380,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -65805,8 +65402,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -65837,8 +65432,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -65869,8 +65462,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -65895,8 +65486,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
@@ -65921,8 +65510,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contract_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract_type"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
@@ -65947,8 +65534,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "closedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -65971,8 +65556,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "event":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOEventFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
@@ -65997,8 +65580,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "participants":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
@@ -66023,8 +65604,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "candidates":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("candidates"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -66049,8 +65628,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "pending_candidates":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_candidates"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOPendingUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
@@ -66075,8 +65652,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCommentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
@@ -66105,8 +65680,6 @@ func (ec *executionContext) unmarshalInputContractPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isValidator":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isValidator"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -66149,24 +65722,20 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -66193,8 +65762,6 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -66225,8 +65792,6 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -66257,16 +65822,13 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contractid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractid"))
-			it.Contractid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contractid = data
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -66295,64 +65857,55 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOContractStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
+			data, err := ec.unmarshalOContractStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "contract_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract_type"))
-			it.ContractType, err = ec.unmarshalOContractType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
+			data, err := ec.unmarshalOContractType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ContractType = data
 		case "closedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("closedAt"))
-			it.ClosedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ClosedAt = data
 		case "event":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
-			it.Event, err = ec.unmarshalOEventFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
+			data, err := ec.unmarshalOEventFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Event = data
 		case "participants":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("participants"))
-			it.Participants, err = ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			data, err := ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Participants = data
 		case "candidates":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("candidates"))
-			it.Candidates, err = ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Candidates = data
 		case "pending_candidates":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_candidates"))
-			it.PendingCandidates, err = ec.unmarshalOPendingUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
+			data, err := ec.unmarshalOPendingUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PendingCandidates = data
 		case "comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCommentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
@@ -66381,13 +65934,12 @@ func (ec *executionContext) unmarshalInputContractRef(ctx context.Context, obj i
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isValidator":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isValidator"))
-			it.IsValidator, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsValidator = data
 		}
 	}
 
@@ -66409,21 +65961,19 @@ func (ec *executionContext) unmarshalInputContractStatus_hash(ctx context.Contex
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOContractStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
+			data, err := ec.unmarshalOContractStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOContractStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
+			data, err := ec.unmarshalOContractStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -66445,21 +65995,19 @@ func (ec *executionContext) unmarshalInputContractType_hash(ctx context.Context,
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOContractType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
+			data, err := ec.unmarshalOContractType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOContractType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
+			data, err := ec.unmarshalOContractType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -66481,77 +66029,68 @@ func (ec *executionContext) unmarshalInputCustomHTTP(ctx context.Context, obj in
 		}
 		switch k {
 		case "url":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			it.URL, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.URL = data
 		case "method":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("method"))
-			it.Method, err = ec.unmarshalNHTTPMethod2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐHTTPMethod(ctx, v)
+			data, err := ec.unmarshalNHTTPMethod2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐHTTPMethod(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Method = data
 		case "body":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("body"))
-			it.Body, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Body = data
 		case "graphql":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("graphql"))
-			it.Graphql, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Graphql = data
 		case "mode":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalOMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMode(ctx, v)
+			data, err := ec.unmarshalOMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mode = data
 		case "forwardHeaders":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("forwardHeaders"))
-			it.ForwardHeaders, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ForwardHeaders = data
 		case "secretHeaders":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("secretHeaders"))
-			it.SecretHeaders, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.SecretHeaders = data
 		case "introspectionHeaders":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("introspectionHeaders"))
-			it.IntrospectionHeaders, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IntrospectionHeaders = data
 		case "skipIntrospection":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skipIntrospection"))
-			it.SkipIntrospection, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.SkipIntrospection = data
 		}
 	}
 
@@ -66573,61 +66112,54 @@ func (ec *executionContext) unmarshalInputDateTimeFilter(ctx context.Context, ob
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalODateTime2ᚕᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚕᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		case "le":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("le"))
-			it.Le, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Le = data
 		case "lt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lt"))
-			it.Lt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Lt = data
 		case "ge":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ge"))
-			it.Ge, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Ge = data
 		case "gt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gt"))
-			it.Gt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Gt = data
 		case "between":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("between"))
-			it.Between, err = ec.unmarshalODateTimeRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeRange(ctx, v)
+			data, err := ec.unmarshalODateTimeRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeRange(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Between = data
 		}
 	}
 
@@ -66649,21 +66181,19 @@ func (ec *executionContext) unmarshalInputDateTimeRange(ctx context.Context, obj
 		}
 		switch k {
 		case "min":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min"))
-			it.Min, err = ec.unmarshalNDateTime2string(ctx, v)
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Min = data
 		case "max":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
-			it.Max, err = ec.unmarshalNDateTime2string(ctx, v)
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Max = data
 		}
 	}
 
@@ -66685,37 +66215,33 @@ func (ec *executionContext) unmarshalInputEventCountFilter(ctx context.Context, 
 		}
 		switch k {
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOEventCountHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx, v)
+			data, err := ec.unmarshalOEventCountHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOEventCountFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
+			data, err := ec.unmarshalOEventCountFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOEventCountFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
+			data, err := ec.unmarshalOEventCountFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
+			data, err := ec.unmarshalOEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -66737,29 +66263,26 @@ func (ec *executionContext) unmarshalInputEventCountOrder(ctx context.Context, o
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOEventCountOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrderable(ctx, v)
+			data, err := ec.unmarshalOEventCountOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOEventCountOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrderable(ctx, v)
+			data, err := ec.unmarshalOEventCountOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOEventCountOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrder(ctx, v)
+			data, err := ec.unmarshalOEventCountOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -66781,8 +66304,6 @@ func (ec *executionContext) unmarshalInputEventCountPatch(ctx context.Context, o
 		}
 		switch k {
 		case "unread_events":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unread_events"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -66805,8 +66326,6 @@ func (ec *executionContext) unmarshalInputEventCountPatch(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "pending_contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -66829,8 +66348,6 @@ func (ec *executionContext) unmarshalInputEventCountPatch(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "assigned_tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assigned_tensions"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -66873,29 +66390,26 @@ func (ec *executionContext) unmarshalInputEventCountRef(ctx context.Context, obj
 		}
 		switch k {
 		case "unread_events":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unread_events"))
-			it.UnreadEvents, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UnreadEvents = data
 		case "pending_contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pending_contracts"))
-			it.PendingContracts, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PendingContracts = data
 		case "assigned_tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assigned_tensions"))
-			it.AssignedTensions, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.AssignedTensions = data
 		}
 	}
 
@@ -66917,69 +66431,61 @@ func (ec *executionContext) unmarshalInputEventFilter(ctx context.Context, obj i
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "event_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
-			it.EventType, err = ec.unmarshalOTensionEvent_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventHash(ctx, v)
+			data, err := ec.unmarshalOTensionEvent_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventType = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOEventHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventHasFilter(ctx, v)
+			data, err := ec.unmarshalOEventHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
+			data, err := ec.unmarshalOEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
+			data, err := ec.unmarshalOEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
+			data, err := ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -67001,45 +66507,40 @@ func (ec *executionContext) unmarshalInputEventFragmentFilter(ctx context.Contex
 		}
 		switch k {
 		case "event_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
-			it.EventType, err = ec.unmarshalOTensionEvent_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventHash(ctx, v)
+			data, err := ec.unmarshalOTensionEvent_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventType = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOEventFragmentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentHasFilter(ctx, v)
+			data, err := ec.unmarshalOEventFragmentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOEventFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
+			data, err := ec.unmarshalOEventFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOEventFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
+			data, err := ec.unmarshalOEventFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
+			data, err := ec.unmarshalOEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -67061,29 +66562,26 @@ func (ec *executionContext) unmarshalInputEventFragmentOrder(ctx context.Context
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOEventFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrderable(ctx, v)
+			data, err := ec.unmarshalOEventFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOEventFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrderable(ctx, v)
+			data, err := ec.unmarshalOEventFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrder(ctx, v)
+			data, err := ec.unmarshalOEventFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -67105,8 +66603,6 @@ func (ec *executionContext) unmarshalInputEventFragmentPatch(ctx context.Context
 		}
 		switch k {
 		case "event_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
@@ -67131,8 +66627,6 @@ func (ec *executionContext) unmarshalInputEventFragmentPatch(ctx context.Context
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "old":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67155,8 +66649,6 @@ func (ec *executionContext) unmarshalInputEventFragmentPatch(ctx context.Context
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "new":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67199,29 +66691,26 @@ func (ec *executionContext) unmarshalInputEventFragmentRef(ctx context.Context, 
 		}
 		switch k {
 		case "event_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
-			it.EventType, err = ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			data, err := ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventType = data
 		case "old":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
-			it.Old, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Old = data
 		case "new":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
-			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.New = data
 		}
 	}
 
@@ -67243,37 +66732,33 @@ func (ec *executionContext) unmarshalInputEventKindFilter(ctx context.Context, o
 		}
 		switch k {
 		case "memberTypes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberTypes"))
-			it.MemberTypes, err = ec.unmarshalOEventKindType2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOEventKindType2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.MemberTypes = data
 		case "eventFilter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eventFilter"))
-			it.EventFilter, err = ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
+			data, err := ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventFilter = data
 		case "contractFilter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractFilter"))
-			it.ContractFilter, err = ec.unmarshalOContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
+			data, err := ec.unmarshalOContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ContractFilter = data
 		case "notifFilter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifFilter"))
-			it.NotifFilter, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			data, err := ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.NotifFilter = data
 		}
 	}
 
@@ -67295,29 +66780,26 @@ func (ec *executionContext) unmarshalInputEventKindRef(ctx context.Context, obj 
 		}
 		switch k {
 		case "eventRef":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eventRef"))
-			it.EventRef, err = ec.unmarshalOEventRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx, v)
+			data, err := ec.unmarshalOEventRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventRef = data
 		case "contractRef":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractRef"))
-			it.ContractRef, err = ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			data, err := ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ContractRef = data
 		case "notifRef":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifRef"))
-			it.NotifRef, err = ec.unmarshalONotifRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifRef(ctx, v)
+			data, err := ec.unmarshalONotifRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.NotifRef = data
 		}
 	}
 
@@ -67339,29 +66821,26 @@ func (ec *executionContext) unmarshalInputEventOrder(ctx context.Context, obj in
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOEventOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrderable(ctx, v)
+			data, err := ec.unmarshalOEventOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOEventOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrderable(ctx, v)
+			data, err := ec.unmarshalOEventOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx, v)
+			data, err := ec.unmarshalOEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -67383,8 +66862,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -67409,8 +66886,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67433,8 +66908,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67465,8 +66938,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67497,8 +66968,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -67523,8 +66992,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "event_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
@@ -67549,8 +67016,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "mentioned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentioned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -67575,8 +67040,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "old":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67599,8 +67062,6 @@ func (ec *executionContext) unmarshalInputEventPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "new":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67643,24 +67104,20 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67687,8 +67144,6 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67719,8 +67174,6 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -67751,8 +67204,6 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -67781,16 +67232,13 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "event_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_type"))
-			it.EventType, err = ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			data, err := ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventType = data
 		case "mentioned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentioned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -67819,21 +67267,19 @@ func (ec *executionContext) unmarshalInputEventRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "old":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("old"))
-			it.Old, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Old = data
 		case "new":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new"))
-			it.New, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.New = data
 		}
 	}
 
@@ -67855,61 +67301,54 @@ func (ec *executionContext) unmarshalInputFloatFilter(ctx context.Context, obj i
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOFloat2ᚕᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚕᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		case "le":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("le"))
-			it.Le, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Le = data
 		case "lt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lt"))
-			it.Lt, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Lt = data
 		case "ge":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ge"))
-			it.Ge, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Ge = data
 		case "gt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gt"))
-			it.Gt, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Gt = data
 		case "between":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("between"))
-			it.Between, err = ec.unmarshalOFloatRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFloatRange(ctx, v)
+			data, err := ec.unmarshalOFloatRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFloatRange(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Between = data
 		}
 	}
 
@@ -67931,21 +67370,19 @@ func (ec *executionContext) unmarshalInputFloatRange(ctx context.Context, obj in
 		}
 		switch k {
 		case "min":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min"))
-			it.Min, err = ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Min = data
 		case "max":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
-			it.Max, err = ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Max = data
 		}
 	}
 
@@ -67967,29 +67404,26 @@ func (ec *executionContext) unmarshalInputGenerateMutationParams(ctx context.Con
 		}
 		switch k {
 		case "add":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("add"))
-			it.Add, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Add = data
 		case "update":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("update"))
-			it.Update, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Update = data
 		case "delete":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("delete"))
-			it.Delete, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Delete = data
 		}
 	}
 
@@ -68011,37 +67445,33 @@ func (ec *executionContext) unmarshalInputGenerateQueryParams(ctx context.Contex
 		}
 		switch k {
 		case "get":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("get"))
-			it.Get, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Get = data
 		case "query":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
-			it.Query, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Query = data
 		case "password":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Password = data
 		case "aggregate":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("aggregate"))
-			it.Aggregate, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Aggregate = data
 		}
 	}
 
@@ -68063,61 +67493,54 @@ func (ec *executionContext) unmarshalInputInt64Filter(ctx context.Context, obj i
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOInt642ᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt642ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOInt642ᚕᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt642ᚕᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		case "le":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("le"))
-			it.Le, err = ec.unmarshalOInt642ᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt642ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Le = data
 		case "lt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lt"))
-			it.Lt, err = ec.unmarshalOInt642ᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt642ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Lt = data
 		case "ge":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ge"))
-			it.Ge, err = ec.unmarshalOInt642ᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt642ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Ge = data
 		case "gt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gt"))
-			it.Gt, err = ec.unmarshalOInt642ᚖstring(ctx, v)
+			data, err := ec.unmarshalOInt642ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Gt = data
 		case "between":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("between"))
-			it.Between, err = ec.unmarshalOInt64Range2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐInt64Range(ctx, v)
+			data, err := ec.unmarshalOInt64Range2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐInt64Range(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Between = data
 		}
 	}
 
@@ -68139,21 +67562,19 @@ func (ec *executionContext) unmarshalInputInt64Range(ctx context.Context, obj in
 		}
 		switch k {
 		case "min":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min"))
-			it.Min, err = ec.unmarshalNInt642string(ctx, v)
+			data, err := ec.unmarshalNInt642string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Min = data
 		case "max":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
-			it.Max, err = ec.unmarshalNInt642string(ctx, v)
+			data, err := ec.unmarshalNInt642string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Max = data
 		}
 	}
 
@@ -68175,61 +67596,54 @@ func (ec *executionContext) unmarshalInputIntFilter(ctx context.Context, obj int
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOInt2ᚕᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚕᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		case "le":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("le"))
-			it.Le, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Le = data
 		case "lt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lt"))
-			it.Lt, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Lt = data
 		case "ge":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ge"))
-			it.Ge, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Ge = data
 		case "gt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gt"))
-			it.Gt, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Gt = data
 		case "between":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("between"))
-			it.Between, err = ec.unmarshalOIntRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐIntRange(ctx, v)
+			data, err := ec.unmarshalOIntRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐIntRange(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Between = data
 		}
 	}
 
@@ -68251,21 +67665,19 @@ func (ec *executionContext) unmarshalInputIntRange(ctx context.Context, obj inte
 		}
 		switch k {
 		case "min":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min"))
-			it.Min, err = ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Min = data
 		case "max":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
-			it.Max, err = ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Max = data
 		}
 	}
 
@@ -68287,21 +67699,19 @@ func (ec *executionContext) unmarshalInputIntersectsFilter(ctx context.Context, 
 		}
 		switch k {
 		case "polygon":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("polygon"))
-			it.Polygon, err = ec.unmarshalOPolygonRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRef(ctx, v)
+			data, err := ec.unmarshalOPolygonRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Polygon = data
 		case "multiPolygon":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("multiPolygon"))
-			it.MultiPolygon, err = ec.unmarshalOMultiPolygonRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMultiPolygonRef(ctx, v)
+			data, err := ec.unmarshalOMultiPolygonRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMultiPolygonRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.MultiPolygon = data
 		}
 	}
 
@@ -68323,24 +67733,20 @@ func (ec *executionContext) unmarshalInputLabelFilter(ctx context.Context, obj i
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOStringHashFilter_StringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringTermFilter(ctx, v)
@@ -68369,37 +67775,33 @@ func (ec *executionContext) unmarshalInputLabelFilter(ctx context.Context, obj i
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOLabelHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelHasFilter(ctx, v)
+			data, err := ec.unmarshalOLabelHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOLabelFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, v)
+			data, err := ec.unmarshalOLabelFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOLabelFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, v)
+			data, err := ec.unmarshalOLabelFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, v)
+			data, err := ec.unmarshalOLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -68421,29 +67823,26 @@ func (ec *executionContext) unmarshalInputLabelOrder(ctx context.Context, obj in
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOLabelOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelOrderable(ctx, v)
+			data, err := ec.unmarshalOLabelOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOLabelOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelOrderable(ctx, v)
+			data, err := ec.unmarshalOLabelOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOLabelOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelOrder(ctx, v)
+			data, err := ec.unmarshalOLabelOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -68465,8 +67864,6 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 		}
 		switch k {
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -68489,8 +67886,6 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -68545,8 +67940,6 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -68577,16 +67970,13 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -68611,8 +68001,6 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -68671,24 +68059,20 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -68743,8 +68127,6 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -68775,16 +68157,13 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -68809,8 +68188,6 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -68869,53 +68246,47 @@ func (ec *executionContext) unmarshalInputMandateFilter(ctx context.Context, obj
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "purpose":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("purpose"))
-			it.Purpose, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Purpose = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOMandateHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateHasFilter(ctx, v)
+			data, err := ec.unmarshalOMandateHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOMandateFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, v)
+			data, err := ec.unmarshalOMandateFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOMandateFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, v)
+			data, err := ec.unmarshalOMandateFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOMandateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, v)
+			data, err := ec.unmarshalOMandateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -68937,29 +68308,26 @@ func (ec *executionContext) unmarshalInputMandateOrder(ctx context.Context, obj 
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOMandateOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateOrderable(ctx, v)
+			data, err := ec.unmarshalOMandateOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOMandateOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateOrderable(ctx, v)
+			data, err := ec.unmarshalOMandateOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOMandateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateOrder(ctx, v)
+			data, err := ec.unmarshalOMandateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -68981,37 +68349,33 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 		}
 		switch k {
 		case "purpose":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("purpose"))
-			it.Purpose, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Purpose = data
 		case "responsabilities":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responsabilities"))
-			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Responsabilities = data
 		case "domains":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("domains"))
-			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Domains = data
 		case "policies":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policies"))
-			it.Policies, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Policies = data
 		}
 	}
 
@@ -69033,45 +68397,40 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "purpose":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("purpose"))
-			it.Purpose, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Purpose = data
 		case "responsabilities":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("responsabilities"))
-			it.Responsabilities, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Responsabilities = data
 		case "domains":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("domains"))
-			it.Domains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Domains = data
 		case "policies":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("policies"))
-			it.Policies, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Policies = data
 		}
 	}
 
@@ -69093,13 +68452,12 @@ func (ec *executionContext) unmarshalInputMultiPolygonRef(ctx context.Context, o
 		}
 		switch k {
 		case "polygons":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("polygons"))
-			it.Polygons, err = ec.unmarshalNPolygonRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRefᚄ(ctx, v)
+			data, err := ec.unmarshalNPolygonRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Polygons = data
 		}
 	}
 
@@ -69121,21 +68479,19 @@ func (ec *executionContext) unmarshalInputNearFilter(ctx context.Context, obj in
 		}
 		switch k {
 		case "distance":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("distance"))
-			it.Distance, err = ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Distance = data
 		case "coordinate":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coordinate"))
-			it.Coordinate, err = ec.unmarshalNPointRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointRef(ctx, v)
+			data, err := ec.unmarshalNPointRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Coordinate = data
 		}
 	}
 
@@ -69157,149 +68513,131 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
-			it.Nameid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Nameid = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.About = data
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
+			data, err := ec.unmarshalOStringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringTermFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Skills = data
 		case "isRoot":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
-			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsRoot = data
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalONodeType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeTypeHash(ctx, v)
+			data, err := ec.unmarshalONodeType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "visibility":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
-			it.Visibility, err = ec.unmarshalONodeVisibility_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibilityHash(ctx, v)
+			data, err := ec.unmarshalONodeVisibility_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibilityHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Visibility = data
 		case "mode":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalONodeMode_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeModeHash(ctx, v)
+			data, err := ec.unmarshalONodeMode_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeModeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mode = data
 		case "isArchived":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
-			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsArchived = data
 		case "isPersonal":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPersonal"))
-			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsPersonal = data
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			it.RoleType, err = ec.unmarshalORoleType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleTypeHash(ctx, v)
+			data, err := ec.unmarshalORoleType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleType = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalONodeHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeHasFilter(ctx, v)
+			data, err := ec.unmarshalONodeHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalONodeFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, v)
+			data, err := ec.unmarshalONodeFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalONodeFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, v)
+			data, err := ec.unmarshalONodeFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, v)
+			data, err := ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -69321,45 +68659,40 @@ func (ec *executionContext) unmarshalInputNodeFragmentFilter(ctx context.Context
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalONodeFragmentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentHasFilter(ctx, v)
+			data, err := ec.unmarshalONodeFragmentHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalONodeFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, v)
+			data, err := ec.unmarshalONodeFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalONodeFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, v)
+			data, err := ec.unmarshalONodeFragmentFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalONodeFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, v)
+			data, err := ec.unmarshalONodeFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -69381,29 +68714,26 @@ func (ec *executionContext) unmarshalInputNodeFragmentOrder(ctx context.Context,
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalONodeFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentOrderable(ctx, v)
+			data, err := ec.unmarshalONodeFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalONodeFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentOrderable(ctx, v)
+			data, err := ec.unmarshalONodeFragmentOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalONodeFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentOrder(ctx, v)
+			data, err := ec.unmarshalONodeFragmentOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -69425,8 +68755,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 		}
 		switch k {
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69449,8 +68777,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69481,8 +68807,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69513,24 +68837,20 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "mandate":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			data, err := ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mandate = data
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Skills = data
 		case "visibility":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
@@ -69555,8 +68875,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "mode":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
@@ -69581,8 +68899,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
@@ -69607,8 +68923,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "first_link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first_link"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69631,8 +68945,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_ext":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69655,8 +68967,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
@@ -69681,8 +68991,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69725,16 +69033,13 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69761,8 +69066,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69793,8 +69096,6 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -69825,77 +69126,68 @@ func (ec *executionContext) unmarshalInputNodeFragmentRef(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "mandate":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			data, err := ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mandate = data
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Skills = data
 		case "visibility":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
-			it.Visibility, err = ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			data, err := ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Visibility = data
 		case "mode":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			data, err := ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mode = data
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			data, err := ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "first_link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first_link"))
-			it.FirstLink, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FirstLink = data
 		case "role_ext":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
-			it.RoleExt, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleExt = data
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			it.RoleType, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleType = data
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		}
 	}
 
@@ -69917,21 +69209,19 @@ func (ec *executionContext) unmarshalInputNodeMode_hash(ctx context.Context, obj
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			data, err := ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalONodeMode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			data, err := ec.unmarshalONodeMode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -69953,29 +69243,26 @@ func (ec *executionContext) unmarshalInputNodeOrder(ctx context.Context, obj int
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalONodeOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrderable(ctx, v)
+			data, err := ec.unmarshalONodeOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalONodeOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrderable(ctx, v)
+			data, err := ec.unmarshalONodeOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalONodeOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, v)
+			data, err := ec.unmarshalONodeOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -69997,8 +69284,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -70023,8 +69308,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70047,8 +69330,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70071,8 +69352,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70095,8 +69374,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "source":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
@@ -70121,8 +69398,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70145,8 +69420,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70169,8 +69442,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70193,8 +69464,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isRoot":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70217,8 +69486,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "parent":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parent"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -70243,8 +69510,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
@@ -70269,8 +69534,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_out":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_out"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -70295,8 +69558,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_in"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -70321,8 +69582,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "visibility":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
@@ -70347,8 +69606,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "mode":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
@@ -70373,8 +69630,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rights":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70397,8 +69652,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isArchived":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70421,8 +69674,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isPersonal":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPersonal"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70445,8 +69696,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "userCanJoin":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70469,8 +69718,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "guestCanCreateTension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanCreateTension"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70493,8 +69740,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "watchers":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -70519,8 +69764,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "children":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("children"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -70545,8 +69788,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "labels":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
@@ -70571,8 +69812,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
@@ -70597,8 +69836,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "projects":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
@@ -70623,8 +69860,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "pinned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pinned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -70649,8 +69884,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_ext":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalORoleExtRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
@@ -70675,8 +69908,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
@@ -70701,8 +69932,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -70725,8 +69954,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "first_link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first_link"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -70751,8 +69978,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
@@ -70777,8 +70002,6 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "events_history":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events_history"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
@@ -70823,224 +70046,195 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UpdatedAt = data
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
-			it.Nameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Nameid = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "source":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
-			it.Source, err = ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
+			data, err := ec.unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Source = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
-			it.About, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.About = data
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Skills = data
 		case "isRoot":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRoot"))
-			it.IsRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsRoot = data
 		case "parent":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parent"))
-			it.Parent, err = ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			data, err := ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Parent = data
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			data, err := ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "tensions_out":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_out"))
-			it.TensionsOut, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.TensionsOut = data
 		case "tensions_in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_in"))
-			it.TensionsIn, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.TensionsIn = data
 		case "visibility":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visibility"))
-			it.Visibility, err = ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			data, err := ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Visibility = data
 		case "mode":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mode"))
-			it.Mode, err = ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
+			data, err := ec.unmarshalONodeMode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeMode(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mode = data
 		case "rights":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
-			it.Rights, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rights = data
 		case "isArchived":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isArchived"))
-			it.IsArchived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsArchived = data
 		case "isPersonal":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPersonal"))
-			it.IsPersonal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsPersonal = data
 		case "userCanJoin":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCanJoin"))
-			it.UserCanJoin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UserCanJoin = data
 		case "guestCanCreateTension":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanCreateTension"))
-			it.GuestCanCreateTension, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.GuestCanCreateTension = data
 		case "watchers":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
-			it.Watchers, err = ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Watchers = data
 		case "children":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("children"))
-			it.Children, err = ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			data, err := ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Children = data
 		case "labels":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
-			it.Labels, err = ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			data, err := ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Labels = data
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
-			it.Roles, err = ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
+			data, err := ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Roles = data
 		case "projects":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
-			it.Projects, err = ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Projects = data
 		case "pinned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pinned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -71069,53 +70263,47 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_ext":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
-			it.RoleExt, err = ec.unmarshalORoleExtRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
+			data, err := ec.unmarshalORoleExtRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleExt = data
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			it.RoleType, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleType = data
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "first_link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first_link"))
-			it.FirstLink, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FirstLink = data
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
-			it.Contracts, err = ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
+			data, err := ec.unmarshalOVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contracts = data
 		case "events_history":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events_history"))
-			it.EventsHistory, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventsHistory = data
 		}
 	}
 
@@ -71137,21 +70325,19 @@ func (ec *executionContext) unmarshalInputNodeType_hash(ctx context.Context, obj
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			data, err := ec.unmarshalONodeType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalONodeType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
+			data, err := ec.unmarshalONodeType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -71173,21 +70359,19 @@ func (ec *executionContext) unmarshalInputNodeVisibility_hash(ctx context.Contex
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			data, err := ec.unmarshalONodeVisibility2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalONodeVisibility2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
+			data, err := ec.unmarshalONodeVisibility2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeVisibility(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -71209,61 +70393,54 @@ func (ec *executionContext) unmarshalInputNotifFilter(ctx context.Context, obj i
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalONotifHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx, v)
+			data, err := ec.unmarshalONotifHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalONotifFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			data, err := ec.unmarshalONotifFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalONotifFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			data, err := ec.unmarshalONotifFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			data, err := ec.unmarshalONotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -71285,29 +70462,26 @@ func (ec *executionContext) unmarshalInputNotifOrder(ctx context.Context, obj in
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalONotifOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrderable(ctx, v)
+			data, err := ec.unmarshalONotifOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalONotifOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrderable(ctx, v)
+			data, err := ec.unmarshalONotifOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalONotifOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrder(ctx, v)
+			data, err := ec.unmarshalONotifOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -71329,8 +70503,6 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -71355,8 +70527,6 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71379,8 +70549,6 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71411,8 +70579,6 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71443,8 +70609,6 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
@@ -71469,8 +70633,6 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contract":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
@@ -71495,8 +70657,6 @@ func (ec *executionContext) unmarshalInputNotifPatch(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71539,24 +70699,20 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71583,8 +70739,6 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71615,8 +70769,6 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71647,29 +70799,26 @@ func (ec *executionContext) unmarshalInputNotifRef(ctx context.Context, obj inte
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tension_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_"))
-			it.Tension, err = ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Tension = data
 		case "contract":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
-			it.Contract, err = ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
+			data, err := ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contract = data
 		case "link":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("link"))
-			it.Link, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Link = data
 		}
 	}
 
@@ -71691,16 +70840,13 @@ func (ec *executionContext) unmarshalInputPendingUserFilter(ctx context.Context,
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "username":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
@@ -71729,8 +70875,6 @@ func (ec *executionContext) unmarshalInputPendingUserFilter(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "email":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
@@ -71759,53 +70903,47 @@ func (ec *executionContext) unmarshalInputPendingUserFilter(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "email_token":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email_token"))
-			it.EmailToken, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EmailToken = data
 		case "token":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-			it.Token, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Token = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOPendingUserHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx, v)
+			data, err := ec.unmarshalOPendingUserHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOPendingUserFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
+			data, err := ec.unmarshalOPendingUserFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOPendingUserFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
+			data, err := ec.unmarshalOPendingUserFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOPendingUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
+			data, err := ec.unmarshalOPendingUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -71827,29 +70965,26 @@ func (ec *executionContext) unmarshalInputPendingUserOrder(ctx context.Context, 
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOPendingUserOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrderable(ctx, v)
+			data, err := ec.unmarshalOPendingUserOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOPendingUserOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrderable(ctx, v)
+			data, err := ec.unmarshalOPendingUserOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOPendingUserOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, v)
+			data, err := ec.unmarshalOPendingUserOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -71871,8 +71006,6 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 		}
 		switch k {
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71895,8 +71028,6 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "password":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71919,8 +71050,6 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "email_token":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email_token"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71943,8 +71072,6 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "token":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -71967,8 +71094,6 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
@@ -71993,8 +71118,6 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "subscribe":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribe"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -72037,24 +71160,20 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UpdatedAt = data
 		case "username":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -72081,16 +71200,13 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "password":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Password = data
 		case "email":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -72117,37 +71233,33 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "email_token":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email_token"))
-			it.EmailToken, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EmailToken = data
 		case "token":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-			it.Token, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Token = data
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
-			it.Contracts, err = ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
+			data, err := ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contracts = data
 		case "subscribe":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribe"))
-			it.Subscribe, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Subscribe = data
 		}
 	}
 
@@ -72169,21 +71281,19 @@ func (ec *executionContext) unmarshalInputPointGeoFilter(ctx context.Context, ob
 		}
 		switch k {
 		case "near":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("near"))
-			it.Near, err = ec.unmarshalONearFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNearFilter(ctx, v)
+			data, err := ec.unmarshalONearFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNearFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Near = data
 		case "within":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("within"))
-			it.Within, err = ec.unmarshalOWithinFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐWithinFilter(ctx, v)
+			data, err := ec.unmarshalOWithinFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐWithinFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Within = data
 		}
 	}
 
@@ -72205,13 +71315,12 @@ func (ec *executionContext) unmarshalInputPointListRef(ctx context.Context, obj 
 		}
 		switch k {
 		case "points":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("points"))
-			it.Points, err = ec.unmarshalNPointRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointRefᚄ(ctx, v)
+			data, err := ec.unmarshalNPointRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Points = data
 		}
 	}
 
@@ -72233,21 +71342,19 @@ func (ec *executionContext) unmarshalInputPointRef(ctx context.Context, obj inte
 		}
 		switch k {
 		case "longitude":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("longitude"))
-			it.Longitude, err = ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Longitude = data
 		case "latitude":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("latitude"))
-			it.Latitude, err = ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Latitude = data
 		}
 	}
 
@@ -72269,37 +71376,33 @@ func (ec *executionContext) unmarshalInputPolygonGeoFilter(ctx context.Context, 
 		}
 		switch k {
 		case "near":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("near"))
-			it.Near, err = ec.unmarshalONearFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNearFilter(ctx, v)
+			data, err := ec.unmarshalONearFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNearFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Near = data
 		case "within":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("within"))
-			it.Within, err = ec.unmarshalOWithinFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐWithinFilter(ctx, v)
+			data, err := ec.unmarshalOWithinFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐWithinFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Within = data
 		case "contains":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contains"))
-			it.Contains, err = ec.unmarshalOContainsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContainsFilter(ctx, v)
+			data, err := ec.unmarshalOContainsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContainsFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Contains = data
 		case "intersects":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("intersects"))
-			it.Intersects, err = ec.unmarshalOIntersectsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐIntersectsFilter(ctx, v)
+			data, err := ec.unmarshalOIntersectsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐIntersectsFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Intersects = data
 		}
 	}
 
@@ -72321,13 +71424,12 @@ func (ec *executionContext) unmarshalInputPolygonRef(ctx context.Context, obj in
 		}
 		switch k {
 		case "coordinates":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coordinates"))
-			it.Coordinates, err = ec.unmarshalNPointListRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointListRefᚄ(ctx, v)
+			data, err := ec.unmarshalNPointListRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPointListRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Coordinates = data
 		}
 	}
 
@@ -72349,61 +71451,54 @@ func (ec *executionContext) unmarshalInputPostFilter(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOPostHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostHasFilter(ctx, v)
+			data, err := ec.unmarshalOPostHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOPostFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
+			data, err := ec.unmarshalOPostFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOPostFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
+			data, err := ec.unmarshalOPostFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOPostFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
+			data, err := ec.unmarshalOPostFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -72425,29 +71520,26 @@ func (ec *executionContext) unmarshalInputPostOrder(ctx context.Context, obj int
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOPostOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrderable(ctx, v)
+			data, err := ec.unmarshalOPostOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOPostOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrderable(ctx, v)
+			data, err := ec.unmarshalOPostOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOPostOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, v)
+			data, err := ec.unmarshalOPostOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -72469,8 +71561,6 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -72495,8 +71585,6 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -72519,8 +71607,6 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -72551,8 +71637,6 @@ func (ec *executionContext) unmarshalInputPostPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -72603,13 +71687,12 @@ func (ec *executionContext) unmarshalInputPostRef(ctx context.Context, obj inter
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		}
 	}
 
@@ -72631,45 +71714,40 @@ func (ec *executionContext) unmarshalInputProjectCardFilter(ctx context.Context,
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOProjectCardHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx, v)
+			data, err := ec.unmarshalOProjectCardHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProjectCardFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
+			data, err := ec.unmarshalOProjectCardFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProjectCardFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
+			data, err := ec.unmarshalOProjectCardFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
+			data, err := ec.unmarshalOProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -72691,29 +71769,26 @@ func (ec *executionContext) unmarshalInputProjectCardOrder(ctx context.Context, 
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOProjectCardOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectCardOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOProjectCardOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectCardOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx, v)
+			data, err := ec.unmarshalOProjectCardOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -72735,16 +71810,13 @@ func (ec *executionContext) unmarshalInputProjectCardPatch(ctx context.Context, 
 		}
 		switch k {
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Pos = data
 		case "card":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("card"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCardKindRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindRef(ctx, v)
@@ -72773,8 +71845,6 @@ func (ec *executionContext) unmarshalInputProjectCardPatch(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "pc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
@@ -72803,8 +71873,6 @@ func (ec *executionContext) unmarshalInputProjectCardPatch(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "values":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
@@ -72849,24 +71917,20 @@ func (ec *executionContext) unmarshalInputProjectCardRef(ctx context.Context, ob
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Pos = data
 		case "card":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("card"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCardKindRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKindRef(ctx, v)
@@ -72895,8 +71959,6 @@ func (ec *executionContext) unmarshalInputProjectCardRef(ctx context.Context, ob
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "pc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pc"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
@@ -72925,13 +71987,12 @@ func (ec *executionContext) unmarshalInputProjectCardRef(ctx context.Context, ob
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "values":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
-			it.Values, err = ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Values = data
 		}
 	}
 
@@ -72953,53 +72014,47 @@ func (ec *executionContext) unmarshalInputProjectColumnFilter(ctx context.Contex
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "col_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
-			it.ColType, err = ec.unmarshalOProjectColumnType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnTypeHash(ctx, v)
+			data, err := ec.unmarshalOProjectColumnType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ColType = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOProjectColumnHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnHasFilter(ctx, v)
+			data, err := ec.unmarshalOProjectColumnHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProjectColumnFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, v)
+			data, err := ec.unmarshalOProjectColumnFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProjectColumnFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, v)
+			data, err := ec.unmarshalOProjectColumnFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, v)
+			data, err := ec.unmarshalOProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -73021,29 +72076,26 @@ func (ec *executionContext) unmarshalInputProjectColumnOrder(ctx context.Context
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOProjectColumnOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectColumnOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOProjectColumnOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectColumnOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOProjectColumnOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnOrder(ctx, v)
+			data, err := ec.unmarshalOProjectColumnOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -73065,16 +72117,13 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 		}
 		switch k {
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -73105,32 +72154,27 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Pos = data
 		case "col_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
-			it.ColType, err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			data, err := ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ColType = data
 		case "cards":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cards"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx, v)
@@ -73155,8 +72199,6 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "project":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
@@ -73185,8 +72227,6 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -73211,8 +72251,6 @@ func (ec *executionContext) unmarshalInputProjectColumnPatch(ctx context.Context
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "drafts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("drafts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx, v)
@@ -73257,24 +72295,20 @@ func (ec *executionContext) unmarshalInputProjectColumnRef(ctx context.Context, 
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -73305,40 +72339,34 @@ func (ec *executionContext) unmarshalInputProjectColumnRef(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Pos = data
 		case "col_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("col_type"))
-			it.ColType, err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			data, err := ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ColType = data
 		case "cards":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cards"))
-			it.Cards, err = ec.unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectCardRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Cards = data
 		case "project":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRef(ctx, v)
@@ -73367,21 +72395,19 @@ func (ec *executionContext) unmarshalInputProjectColumnRef(ctx context.Context, 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions"))
-			it.Tensions, err = ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Tensions = data
 		case "drafts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("drafts"))
-			it.Drafts, err = ec.unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectDraftRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Drafts = data
 		}
 	}
 
@@ -73403,21 +72429,19 @@ func (ec *executionContext) unmarshalInputProjectColumnType_hash(ctx context.Con
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			data, err := ec.unmarshalOProjectColumnType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOProjectColumnType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
+			data, err := ec.unmarshalOProjectColumnType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -73439,61 +72463,54 @@ func (ec *executionContext) unmarshalInputProjectDraftFilter(ctx context.Context
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOProjectDraftHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx, v)
+			data, err := ec.unmarshalOProjectDraftHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProjectDraftFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			data, err := ec.unmarshalOProjectDraftFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProjectDraftFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			data, err := ec.unmarshalOProjectDraftFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			data, err := ec.unmarshalOProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -73515,29 +72532,26 @@ func (ec *executionContext) unmarshalInputProjectDraftOrder(ctx context.Context,
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOProjectDraftOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectDraftOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOProjectDraftOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectDraftOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx, v)
+			data, err := ec.unmarshalOProjectDraftOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -73559,8 +72573,6 @@ func (ec *executionContext) unmarshalInputProjectDraftPatch(ctx context.Context,
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -73585,8 +72597,6 @@ func (ec *executionContext) unmarshalInputProjectDraftPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -73609,8 +72619,6 @@ func (ec *executionContext) unmarshalInputProjectDraftPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -73641,24 +72649,20 @@ func (ec *executionContext) unmarshalInputProjectDraftPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "title":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Title = data
 		case "project_status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_status"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
@@ -73703,24 +72707,20 @@ func (ec *executionContext) unmarshalInputProjectDraftRef(ctx context.Context, o
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -73747,8 +72747,6 @@ func (ec *executionContext) unmarshalInputProjectDraftRef(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -73779,29 +72777,26 @@ func (ec *executionContext) unmarshalInputProjectDraftRef(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "title":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Title = data
 		case "project_status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_status"))
-			it.ProjectStatus, err = ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
+			data, err := ec.unmarshalOProjectColumnRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ProjectStatus = data
 		}
 	}
 
@@ -73823,37 +72818,33 @@ func (ec *executionContext) unmarshalInputProjectFieldFilter(ctx context.Context
 		}
 		switch k {
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOProjectFieldHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFieldHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProjectFieldFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFieldFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProjectFieldFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFieldFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -73875,8 +72866,6 @@ func (ec *executionContext) unmarshalInputProjectFieldPatch(ctx context.Context,
 		}
 		switch k {
 		case "field_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field_type"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectFieldType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, v)
@@ -73901,8 +72890,6 @@ func (ec *executionContext) unmarshalInputProjectFieldPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isVisible":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isVisible"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -73925,8 +72912,6 @@ func (ec *executionContext) unmarshalInputProjectFieldPatch(ctx context.Context,
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "values":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
@@ -73971,29 +72956,26 @@ func (ec *executionContext) unmarshalInputProjectFieldRef(ctx context.Context, o
 		}
 		switch k {
 		case "field_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field_type"))
-			it.FieldType, err = ec.unmarshalOProjectFieldType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, v)
+			data, err := ec.unmarshalOProjectFieldType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FieldType = data
 		case "isVisible":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isVisible"))
-			it.IsVisible, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsVisible = data
 		case "values":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
-			it.Values, err = ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Values = data
 		}
 	}
 
@@ -74015,37 +72997,33 @@ func (ec *executionContext) unmarshalInputProjectFieldValueFilter(ctx context.Co
 		}
 		switch k {
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOProjectFieldValueHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProjectFieldValueFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProjectFieldValueFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -74067,29 +73045,26 @@ func (ec *executionContext) unmarshalInputProjectFieldValueOrder(ctx context.Con
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOProjectFieldValueOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOProjectFieldValueOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValueOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -74111,8 +73086,6 @@ func (ec *executionContext) unmarshalInputProjectFieldValuePatch(ctx context.Con
 		}
 		switch k {
 		case "field":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, v)
@@ -74137,8 +73110,6 @@ func (ec *executionContext) unmarshalInputProjectFieldValuePatch(ctx context.Con
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "value":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74161,8 +73132,6 @@ func (ec *executionContext) unmarshalInputProjectFieldValuePatch(ctx context.Con
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74205,29 +73174,26 @@ func (ec *executionContext) unmarshalInputProjectFieldValueRef(ctx context.Conte
 		}
 		switch k {
 		case "field":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			it.Field, err = ec.unmarshalOProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, v)
+			data, err := ec.unmarshalOProjectFieldRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Field = data
 		case "value":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
-			it.Value, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Value = data
 		case "pos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pos"))
-			it.Pos, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Pos = data
 		}
 	}
 
@@ -74249,40 +73215,34 @@ func (ec *executionContext) unmarshalInputProjectFilter(ctx context.Context, obj
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "parentnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parentnameid"))
-			it.Parentnameid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Parentnameid = data
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
@@ -74311,53 +73271,47 @@ func (ec *executionContext) unmarshalInputProjectFilter(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProjectStatus_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatusHash(ctx, v)
+			data, err := ec.unmarshalOProjectStatus_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatusHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOProjectHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectHasFilter(ctx, v)
+			data, err := ec.unmarshalOProjectHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProjectFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProjectFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, v)
+			data, err := ec.unmarshalOProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -74379,29 +73333,26 @@ func (ec *executionContext) unmarshalInputProjectOrder(ctx context.Context, obj 
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOProjectOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOProjectOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrderable(ctx, v)
+			data, err := ec.unmarshalOProjectOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOProjectOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrder(ctx, v)
+			data, err := ec.unmarshalOProjectOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -74423,8 +73374,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -74449,8 +73398,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74473,8 +73420,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74497,8 +73442,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74521,8 +73464,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "parentnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parentnameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74545,8 +73486,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74601,8 +73540,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74647,8 +73584,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74679,24 +73614,20 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			data, err := ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "columns":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("columns"))
-			it.Columns, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Columns = data
 		case "fields":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx, v)
@@ -74721,8 +73652,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "leaders":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("leaders"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -74751,8 +73680,6 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -74811,56 +73738,48 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			it.UpdatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UpdatedAt = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "parentnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parentnameid"))
-			it.Parentnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Parentnameid = data
 		case "nameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74915,8 +73834,6 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74961,8 +73878,6 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "description":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -74993,32 +73908,27 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			data, err := ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "columns":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("columns"))
-			it.Columns, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Columns = data
 		case "fields":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fields"))
-			it.Fields, err = ec.unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectFieldRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Fields = data
 		case "leaders":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("leaders"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -75047,8 +73957,6 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -75107,21 +74015,19 @@ func (ec *executionContext) unmarshalInputProjectStatus_hash(ctx context.Context
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			data, err := ec.unmarshalOProjectStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOProjectStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
+			data, err := ec.unmarshalOProjectStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -75143,53 +74049,47 @@ func (ec *executionContext) unmarshalInputReactionFilter(ctx context.Context, ob
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "reactionid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
-			it.Reactionid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Reactionid = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOReactionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx, v)
+			data, err := ec.unmarshalOReactionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOReactionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
+			data, err := ec.unmarshalOReactionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOReactionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
+			data, err := ec.unmarshalOReactionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
+			data, err := ec.unmarshalOReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -75211,29 +74111,26 @@ func (ec *executionContext) unmarshalInputReactionOrder(ctx context.Context, obj
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOReactionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrderable(ctx, v)
+			data, err := ec.unmarshalOReactionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOReactionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrderable(ctx, v)
+			data, err := ec.unmarshalOReactionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, v)
+			data, err := ec.unmarshalOReactionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -75255,8 +74152,6 @@ func (ec *executionContext) unmarshalInputReactionPatch(ctx context.Context, obj
 		}
 		switch k {
 		case "user":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -75281,8 +74176,6 @@ func (ec *executionContext) unmarshalInputReactionPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comment":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
@@ -75307,8 +74200,6 @@ func (ec *executionContext) unmarshalInputReactionPatch(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -75351,24 +74242,20 @@ func (ec *executionContext) unmarshalInputReactionRef(ctx context.Context, obj i
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "reactionid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactionid"))
-			it.Reactionid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Reactionid = data
 		case "user":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -75397,8 +74284,6 @@ func (ec *executionContext) unmarshalInputReactionRef(ctx context.Context, obj i
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comment":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
@@ -75427,13 +74312,12 @@ func (ec *executionContext) unmarshalInputReactionRef(ctx context.Context, obj i
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		}
 	}
 
@@ -75455,24 +74339,20 @@ func (ec *executionContext) unmarshalInputRoleExtFilter(ctx context.Context, obj
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOStringHashFilter_StringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringTermFilter(ctx, v)
@@ -75501,37 +74381,33 @@ func (ec *executionContext) unmarshalInputRoleExtFilter(ctx context.Context, obj
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalORoleExtHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx, v)
+			data, err := ec.unmarshalORoleExtHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalORoleExtFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
+			data, err := ec.unmarshalORoleExtFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalORoleExtFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
+			data, err := ec.unmarshalORoleExtFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalORoleExtFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
+			data, err := ec.unmarshalORoleExtFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -75553,29 +74429,26 @@ func (ec *executionContext) unmarshalInputRoleExtOrder(ctx context.Context, obj 
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalORoleExtOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrderable(ctx, v)
+			data, err := ec.unmarshalORoleExtOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalORoleExtOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrderable(ctx, v)
+			data, err := ec.unmarshalORoleExtOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalORoleExtOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrder(ctx, v)
+			data, err := ec.unmarshalORoleExtOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -75597,8 +74470,6 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 		}
 		switch k {
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -75621,8 +74492,6 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -75677,8 +74546,6 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -75709,32 +74576,27 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			it.RoleType, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleType = data
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "mandate":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			data, err := ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mandate = data
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -75759,8 +74621,6 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -75819,24 +74679,20 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "rootnameid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
-			it.Rootnameid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rootnameid = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -75891,8 +74747,6 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "about":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -75923,32 +74777,27 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
-			it.RoleType, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.RoleType = data
 		case "color":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("color"))
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Color = data
 		case "mandate":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mandate"))
-			it.Mandate, err = ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
+			data, err := ec.unmarshalOMandateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mandate = data
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -75973,8 +74822,6 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nodes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -76033,21 +74880,19 @@ func (ec *executionContext) unmarshalInputRoleType_hash(ctx context.Context, obj
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalORoleType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalORoleType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
+			data, err := ec.unmarshalORoleType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -76069,61 +74914,54 @@ func (ec *executionContext) unmarshalInputStringExactFilter(ctx context.Context,
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOString2ᚕᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚕᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		case "le":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("le"))
-			it.Le, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Le = data
 		case "lt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lt"))
-			it.Lt, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Lt = data
 		case "ge":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ge"))
-			it.Ge, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Ge = data
 		case "gt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gt"))
-			it.Gt, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Gt = data
 		case "between":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("between"))
-			it.Between, err = ec.unmarshalOStringRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringRange(ctx, v)
+			data, err := ec.unmarshalOStringRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringRange(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Between = data
 		}
 	}
 
@@ -76145,21 +74983,19 @@ func (ec *executionContext) unmarshalInputStringFullTextFilter(ctx context.Conte
 		}
 		switch k {
 		case "alloftext":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alloftext"))
-			it.Alloftext, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Alloftext = data
 		case "anyoftext":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anyoftext"))
-			it.Anyoftext, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Anyoftext = data
 		}
 	}
 
@@ -76181,21 +75017,19 @@ func (ec *executionContext) unmarshalInputStringHashFilter(ctx context.Context, 
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOString2ᚕᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚕᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -76217,29 +75051,26 @@ func (ec *executionContext) unmarshalInputStringHashFilter_StringRegExpFilter(ct
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOString2ᚕᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚕᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		case "regexp":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regexp"))
-			it.Regexp, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Regexp = data
 		}
 	}
 
@@ -76261,37 +75092,33 @@ func (ec *executionContext) unmarshalInputStringHashFilter_StringTermFilter(ctx 
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOString2ᚕᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚕᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		case "allofterms":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("allofterms"))
-			it.Allofterms, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Allofterms = data
 		case "anyofterms":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anyofterms"))
-			it.Anyofterms, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Anyofterms = data
 		}
 	}
 
@@ -76313,21 +75140,19 @@ func (ec *executionContext) unmarshalInputStringRange(ctx context.Context, obj i
 		}
 		switch k {
 		case "min":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min"))
-			it.Min, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Min = data
 		case "max":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
-			it.Max, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Max = data
 		}
 	}
 
@@ -76349,13 +75174,12 @@ func (ec *executionContext) unmarshalInputStringRegExpFilter(ctx context.Context
 		}
 		switch k {
 		case "regexp":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regexp"))
-			it.Regexp, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Regexp = data
 		}
 	}
 
@@ -76377,21 +75201,19 @@ func (ec *executionContext) unmarshalInputStringTermFilter(ctx context.Context, 
 		}
 		switch k {
 		case "allofterms":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("allofterms"))
-			it.Allofterms, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Allofterms = data
 		case "anyofterms":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anyofterms"))
-			it.Anyofterms, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Anyofterms = data
 		}
 	}
 
@@ -76413,21 +75235,19 @@ func (ec *executionContext) unmarshalInputTensionEvent_hash(ctx context.Context,
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			data, err := ec.unmarshalOTensionEvent2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOTensionEvent2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
+			data, err := ec.unmarshalOTensionEvent2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEvent(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -76449,101 +75269,89 @@ func (ec *executionContext) unmarshalInputTensionFilter(ctx context.Context, obj
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "emitterid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emitterid"))
-			it.Emitterid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Emitterid = data
 		case "receiverid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverid"))
-			it.Receiverid, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Receiverid = data
 		case "title":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Title = data
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalOTensionType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTypeHash(ctx, v)
+			data, err := ec.unmarshalOTensionType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTypeHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOTensionStatus_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx, v)
+			data, err := ec.unmarshalOTensionStatus_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatusHash(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOTensionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionHasFilter(ctx, v)
+			data, err := ec.unmarshalOTensionHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOTensionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
+			data, err := ec.unmarshalOTensionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOTensionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
+			data, err := ec.unmarshalOTensionFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
+			data, err := ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -76565,29 +75373,26 @@ func (ec *executionContext) unmarshalInputTensionOrder(ctx context.Context, obj 
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOTensionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrderable(ctx, v)
+			data, err := ec.unmarshalOTensionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOTensionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrderable(ctx, v)
+			data, err := ec.unmarshalOTensionOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, v)
+			data, err := ec.unmarshalOTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -76609,8 +75414,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -76635,8 +75438,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -76659,8 +75460,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -76691,8 +75490,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -76723,8 +75520,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "emitter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emitter"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -76749,8 +75544,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "emitterid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emitterid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -76773,8 +75566,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "receiver":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiver"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -76799,8 +75590,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "receiverid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverid"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -76823,8 +75612,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "title":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -76847,8 +75634,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
@@ -76877,8 +75662,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
@@ -76903,8 +75686,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "action":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("action"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
@@ -76929,8 +75710,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "assignees":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -76973,8 +75752,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "labels":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
@@ -77017,8 +75794,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCommentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
@@ -77061,8 +75836,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "blobs":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blobs"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
@@ -77105,16 +75878,13 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "history":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
-			it.History, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.History = data
 		case "mentions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentions"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
@@ -77139,8 +75909,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
@@ -77165,8 +75933,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "subscribers":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribers"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -77191,8 +75957,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "project_statuses":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_statuses"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
@@ -77217,8 +75981,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "n_comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_comments"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -77261,24 +76023,20 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -77305,8 +76063,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -77337,8 +76093,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -77369,48 +76123,41 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "emitter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emitter"))
-			it.Emitter, err = ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			data, err := ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Emitter = data
 		case "emitterid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emitterid"))
-			it.Emitterid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Emitterid = data
 		case "receiver":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiver"))
-			it.Receiver, err = ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			data, err := ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Receiver = data
 		case "receiverid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverid"))
-			it.Receiverid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Receiverid = data
 		case "title":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Title = data
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
@@ -77439,24 +76186,20 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "status":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOTensionStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
+			data, err := ec.unmarshalOTensionStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Status = data
 		case "action":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("action"))
-			it.Action, err = ec.unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
+			data, err := ec.unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Action = data
 		case "assignees":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -77499,8 +76242,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "labels":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
@@ -77543,8 +76284,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOCommentRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRefᚄ(ctx, v)
@@ -77587,8 +76326,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "blobs":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blobs"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOBlobRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobRefᚄ(ctx, v)
@@ -77631,24 +76368,20 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "history":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("history"))
-			it.History, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.History = data
 		case "mentions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mentions"))
-			it.Mentions, err = ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Mentions = data
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
@@ -77677,8 +76410,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "subscribers":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscribers"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -77707,21 +76438,19 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "project_statuses":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_statuses"))
-			it.ProjectStatuses, err = ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectColumnRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ProjectStatuses = data
 		case "n_comments":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("n_comments"))
-			it.NComments, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.NComments = data
 		}
 	}
 
@@ -77743,21 +76472,19 @@ func (ec *executionContext) unmarshalInputTensionStatus_hash(ctx context.Context
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOTensionStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
+			data, err := ec.unmarshalOTensionStatus2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOTensionStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
+			data, err := ec.unmarshalOTensionStatus2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -77779,21 +76506,19 @@ func (ec *executionContext) unmarshalInputTensionType_hash(ctx context.Context, 
 		}
 		switch k {
 		case "eq":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			it.Eq, err = ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			data, err := ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Eq = data
 		case "in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			it.In, err = ec.unmarshalOTensionType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			data, err := ec.unmarshalOTensionType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.In = data
 		}
 	}
 
@@ -77815,29 +76540,26 @@ func (ec *executionContext) unmarshalInputUpdateBlobInput(ctx context.Context, o
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNBlobFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
+			data, err := ec.unmarshalNBlobFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOBlobPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobPatch(ctx, v)
+			data, err := ec.unmarshalOBlobPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOBlobPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobPatch(ctx, v)
+			data, err := ec.unmarshalOBlobPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -77859,29 +76581,26 @@ func (ec *executionContext) unmarshalInputUpdateCommentInput(ctx context.Context
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNCommentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
+			data, err := ec.unmarshalNCommentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOCommentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx, v)
+			data, err := ec.unmarshalOCommentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOCommentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx, v)
+			data, err := ec.unmarshalOCommentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -77903,29 +76622,26 @@ func (ec *executionContext) unmarshalInputUpdateContractInput(ctx context.Contex
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
+			data, err := ec.unmarshalNContractFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOContractPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractPatch(ctx, v)
+			data, err := ec.unmarshalOContractPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOContractPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractPatch(ctx, v)
+			data, err := ec.unmarshalOContractPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -77947,29 +76663,26 @@ func (ec *executionContext) unmarshalInputUpdateEventCountInput(ctx context.Cont
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
+			data, err := ec.unmarshalNEventCountFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOEventCountPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountPatch(ctx, v)
+			data, err := ec.unmarshalOEventCountPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOEventCountPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountPatch(ctx, v)
+			data, err := ec.unmarshalOEventCountPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -77991,29 +76704,26 @@ func (ec *executionContext) unmarshalInputUpdateEventFragmentInput(ctx context.C
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
+			data, err := ec.unmarshalNEventFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOEventFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentPatch(ctx, v)
+			data, err := ec.unmarshalOEventFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOEventFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentPatch(ctx, v)
+			data, err := ec.unmarshalOEventFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFragmentPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78035,29 +76745,26 @@ func (ec *executionContext) unmarshalInputUpdateEventInput(ctx context.Context, 
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
+			data, err := ec.unmarshalNEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOEventPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventPatch(ctx, v)
+			data, err := ec.unmarshalOEventPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOEventPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventPatch(ctx, v)
+			data, err := ec.unmarshalOEventPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78079,29 +76786,26 @@ func (ec *executionContext) unmarshalInputUpdateLabelInput(ctx context.Context, 
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, v)
+			data, err := ec.unmarshalNLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOLabelPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelPatch(ctx, v)
+			data, err := ec.unmarshalOLabelPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOLabelPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelPatch(ctx, v)
+			data, err := ec.unmarshalOLabelPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78123,29 +76827,26 @@ func (ec *executionContext) unmarshalInputUpdateMandateInput(ctx context.Context
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNMandateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, v)
+			data, err := ec.unmarshalNMandateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandateFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOMandatePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandatePatch(ctx, v)
+			data, err := ec.unmarshalOMandatePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandatePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOMandatePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandatePatch(ctx, v)
+			data, err := ec.unmarshalOMandatePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐMandatePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78167,29 +76868,26 @@ func (ec *executionContext) unmarshalInputUpdateNodeFragmentInput(ctx context.Co
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNNodeFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, v)
+			data, err := ec.unmarshalNNodeFragmentFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalONodeFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentPatch(ctx, v)
+			data, err := ec.unmarshalONodeFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalONodeFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentPatch(ctx, v)
+			data, err := ec.unmarshalONodeFragmentPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78211,29 +76909,26 @@ func (ec *executionContext) unmarshalInputUpdateNodeInput(ctx context.Context, o
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNNodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, v)
+			data, err := ec.unmarshalNNodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalONodePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodePatch(ctx, v)
+			data, err := ec.unmarshalONodePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalONodePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodePatch(ctx, v)
+			data, err := ec.unmarshalONodePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78255,29 +76950,26 @@ func (ec *executionContext) unmarshalInputUpdateNotifInput(ctx context.Context, 
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNNotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
+			data, err := ec.unmarshalNNotifFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalONotifPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifPatch(ctx, v)
+			data, err := ec.unmarshalONotifPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalONotifPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifPatch(ctx, v)
+			data, err := ec.unmarshalONotifPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNotifPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78299,29 +76991,26 @@ func (ec *executionContext) unmarshalInputUpdatePendingUserInput(ctx context.Con
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNPendingUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
+			data, err := ec.unmarshalNPendingUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOPendingUserPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserPatch(ctx, v)
+			data, err := ec.unmarshalOPendingUserPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOPendingUserPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserPatch(ctx, v)
+			data, err := ec.unmarshalOPendingUserPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPendingUserPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78343,29 +77032,26 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNPostFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
+			data, err := ec.unmarshalNPostFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOPostPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
+			data, err := ec.unmarshalOPostPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOPostPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
+			data, err := ec.unmarshalOPostPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPostPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78387,29 +77073,26 @@ func (ec *executionContext) unmarshalInputUpdateProjectCardInput(ctx context.Con
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
+			data, err := ec.unmarshalNProjectCardFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOProjectCardPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardPatch(ctx, v)
+			data, err := ec.unmarshalOProjectCardPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOProjectCardPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardPatch(ctx, v)
+			data, err := ec.unmarshalOProjectCardPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectCardPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78431,29 +77114,26 @@ func (ec *executionContext) unmarshalInputUpdateProjectColumnInput(ctx context.C
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, v)
+			data, err := ec.unmarshalNProjectColumnFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOProjectColumnPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnPatch(ctx, v)
+			data, err := ec.unmarshalOProjectColumnPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOProjectColumnPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnPatch(ctx, v)
+			data, err := ec.unmarshalOProjectColumnPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectColumnPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78475,29 +77155,26 @@ func (ec *executionContext) unmarshalInputUpdateProjectDraftInput(ctx context.Co
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
+			data, err := ec.unmarshalNProjectDraftFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOProjectDraftPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftPatch(ctx, v)
+			data, err := ec.unmarshalOProjectDraftPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOProjectDraftPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftPatch(ctx, v)
+			data, err := ec.unmarshalOProjectDraftPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectDraftPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78519,29 +77196,26 @@ func (ec *executionContext) unmarshalInputUpdateProjectFieldInput(ctx context.Co
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
+			data, err := ec.unmarshalNProjectFieldFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOProjectFieldPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldPatch(ctx, v)
+			data, err := ec.unmarshalOProjectFieldPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOProjectFieldPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldPatch(ctx, v)
+			data, err := ec.unmarshalOProjectFieldPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78563,29 +77237,26 @@ func (ec *executionContext) unmarshalInputUpdateProjectFieldValueInput(ctx conte
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
+			data, err := ec.unmarshalNProjectFieldValueFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValueFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOProjectFieldValuePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValuePatch(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValuePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValuePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOProjectFieldValuePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValuePatch(ctx, v)
+			data, err := ec.unmarshalOProjectFieldValuePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFieldValuePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78607,29 +77278,26 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, v)
+			data, err := ec.unmarshalNProjectFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOProjectPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectPatch(ctx, v)
+			data, err := ec.unmarshalOProjectPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOProjectPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectPatch(ctx, v)
+			data, err := ec.unmarshalOProjectPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78651,29 +77319,26 @@ func (ec *executionContext) unmarshalInputUpdateReactionInput(ctx context.Contex
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
+			data, err := ec.unmarshalNReactionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOReactionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionPatch(ctx, v)
+			data, err := ec.unmarshalOReactionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOReactionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionPatch(ctx, v)
+			data, err := ec.unmarshalOReactionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78695,29 +77360,26 @@ func (ec *executionContext) unmarshalInputUpdateRoleExtInput(ctx context.Context
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNRoleExtFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
+			data, err := ec.unmarshalNRoleExtFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalORoleExtPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtPatch(ctx, v)
+			data, err := ec.unmarshalORoleExtPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalORoleExtPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtPatch(ctx, v)
+			data, err := ec.unmarshalORoleExtPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78739,29 +77401,26 @@ func (ec *executionContext) unmarshalInputUpdateTensionInput(ctx context.Context
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
+			data, err := ec.unmarshalNTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOTensionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionPatch(ctx, v)
+			data, err := ec.unmarshalOTensionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOTensionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionPatch(ctx, v)
+			data, err := ec.unmarshalOTensionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78783,29 +77442,26 @@ func (ec *executionContext) unmarshalInputUpdateUserEventInput(ctx context.Conte
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNUserEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			data, err := ec.unmarshalNUserEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOUserEventPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventPatch(ctx, v)
+			data, err := ec.unmarshalOUserEventPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOUserEventPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventPatch(ctx, v)
+			data, err := ec.unmarshalOUserEventPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78827,29 +77483,26 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
+			data, err := ec.unmarshalNUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOUserPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserPatch(ctx, v)
+			data, err := ec.unmarshalOUserPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOUserPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserPatch(ctx, v)
+			data, err := ec.unmarshalOUserPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78871,29 +77524,26 @@ func (ec *executionContext) unmarshalInputUpdateUserRightsInput(ctx context.Cont
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNUserRightsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsFilter(ctx, v)
+			data, err := ec.unmarshalNUserRightsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOUserRightsPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsPatch(ctx, v)
+			data, err := ec.unmarshalOUserRightsPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOUserRightsPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsPatch(ctx, v)
+			data, err := ec.unmarshalOUserRightsPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsPatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78915,29 +77565,26 @@ func (ec *executionContext) unmarshalInputUpdateVoteInput(ctx context.Context, o
 		}
 		switch k {
 		case "filter":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNVoteFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, v)
+			data, err := ec.unmarshalNVoteFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Filter = data
 		case "set":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
-			it.Set, err = ec.unmarshalOVotePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVotePatch(ctx, v)
+			data, err := ec.unmarshalOVotePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVotePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Set = data
 		case "remove":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
-			it.Remove, err = ec.unmarshalOVotePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVotePatch(ctx, v)
+			data, err := ec.unmarshalOVotePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVotePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Remove = data
 		}
 	}
 
@@ -78959,61 +77606,54 @@ func (ec *executionContext) unmarshalInputUserEventFilter(ctx context.Context, o
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "isRead":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
-			it.IsRead, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsRead = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOUserEventHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx, v)
+			data, err := ec.unmarshalOUserEventHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOUserEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			data, err := ec.unmarshalOUserEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOUserEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			data, err := ec.unmarshalOUserEventFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOUserEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
+			data, err := ec.unmarshalOUserEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -79035,29 +77675,26 @@ func (ec *executionContext) unmarshalInputUserEventOrder(ctx context.Context, ob
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOUserEventOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrderable(ctx, v)
+			data, err := ec.unmarshalOUserEventOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOUserEventOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrderable(ctx, v)
+			data, err := ec.unmarshalOUserEventOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOUserEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, v)
+			data, err := ec.unmarshalOUserEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -79079,8 +77716,6 @@ func (ec *executionContext) unmarshalInputUserEventPatch(ctx context.Context, ob
 		}
 		switch k {
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79103,16 +77738,13 @@ func (ec *executionContext) unmarshalInputUserEventPatch(ctx context.Context, ob
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "isRead":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
-			it.IsRead, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsRead = data
 		case "user":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -79137,8 +77769,6 @@ func (ec *executionContext) unmarshalInputUserEventPatch(ctx context.Context, ob
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "event":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOEventKindRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
@@ -79183,40 +77813,34 @@ func (ec *executionContext) unmarshalInputUserEventRef(ctx context.Context, obj 
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "isRead":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRead"))
-			it.IsRead, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IsRead = data
 		case "user":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
-			it.User, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.User = data
 		case "event":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOEventKindRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventKindRefᚄ(ctx, v)
@@ -79265,69 +77889,61 @@ func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "username":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			it.Username, err = ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter_StringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Username = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOStringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringRegExpFilter(ctx, v)
+			data, err := ec.unmarshalOStringRegExpFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringRegExpFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Name = data
 		case "email":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			it.Email, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Email = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOUserHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserHasFilter(ctx, v)
+			data, err := ec.unmarshalOUserHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOUserFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
+			data, err := ec.unmarshalOUserFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOUserFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
+			data, err := ec.unmarshalOUserFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
+			data, err := ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -79349,29 +77965,26 @@ func (ec *executionContext) unmarshalInputUserOrder(ctx context.Context, obj int
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOUserOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrderable(ctx, v)
+			data, err := ec.unmarshalOUserOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOUserOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrderable(ctx, v)
+			data, err := ec.unmarshalOUserOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOUserOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrder(ctx, v)
+			data, err := ec.unmarshalOUserOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -79393,8 +78006,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		}
 		switch k {
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79417,8 +78028,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "lastAck":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastAck"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79441,8 +78050,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79465,8 +78072,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "password":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79489,8 +78094,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "bio":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bio"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79527,8 +78130,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "location":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79551,8 +78152,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "utc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("utc"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79575,8 +78174,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "links":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("links"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79599,8 +78196,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79623,8 +78218,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "notifyByEmail":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifyByEmail"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79647,8 +78240,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "lang":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
@@ -79673,8 +78264,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "subscriptions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -79709,8 +78298,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "watching":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watching"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -79745,8 +78332,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rights":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRightsRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsRef(ctx, v)
@@ -79771,8 +78356,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -79797,8 +78380,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_created":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_created"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -79823,8 +78404,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_assigned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_assigned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -79849,8 +78428,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
@@ -79875,24 +78452,20 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "reactions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
-			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Reactions = data
 		case "events":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
-			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Events = data
 		case "markAllAsRead":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("markAllAsRead"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -79923,8 +78496,6 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "event_count":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_count"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx, v)
@@ -79969,32 +78540,27 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "lastAck":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastAck"))
-			it.LastAck, err = ec.unmarshalODateTime2ᚖstring(ctx, v)
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.LastAck = data
 		case "username":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80021,8 +78587,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80045,8 +78609,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "email":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80073,16 +78635,13 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "password":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Password = data
 		case "bio":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bio"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80119,8 +78678,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "location":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80143,8 +78700,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "utc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("utc"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80167,8 +78722,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "links":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("links"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80191,8 +78744,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "skills":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80215,8 +78766,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "notifyByEmail":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notifyByEmail"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80239,8 +78788,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "lang":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
@@ -80265,8 +78812,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "subscriptions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptions"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -80301,8 +78846,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "watching":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watching"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -80337,16 +78880,13 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "rights":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
-			it.Rights, err = ec.unmarshalOUserRightsRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsRef(ctx, v)
+			data, err := ec.unmarshalOUserRightsRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Rights = data
 		case "roles":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
@@ -80375,8 +78915,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_created":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_created"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -80405,8 +78943,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "tensions_assigned":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tensions_assigned"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
@@ -80435,8 +78971,6 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contracts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contracts"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRefᚄ(ctx, v)
@@ -80465,24 +78999,20 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "reactions":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reactions"))
-			it.Reactions, err = ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
+			data, err := ec.unmarshalOReactionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐReactionRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Reactions = data
 		case "events":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("events"))
-			it.Events, err = ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
+			data, err := ec.unmarshalOUserEventRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserEventRefᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Events = data
 		case "markAllAsRead":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("markAllAsRead"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80513,13 +79043,12 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "event_count":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event_count"))
-			it.EventCount, err = ec.unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx, v)
+			data, err := ec.unmarshalOEventCountRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventCountRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.EventCount = data
 		}
 	}
 
@@ -80541,37 +79070,33 @@ func (ec *executionContext) unmarshalInputUserRightsFilter(ctx context.Context, 
 		}
 		switch k {
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOUserRightsHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsHasFilter(ctx, v)
+			data, err := ec.unmarshalOUserRightsHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOUserRightsFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsFilter(ctx, v)
+			data, err := ec.unmarshalOUserRightsFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOUserRightsFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsFilter(ctx, v)
+			data, err := ec.unmarshalOUserRightsFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOUserRightsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsFilter(ctx, v)
+			data, err := ec.unmarshalOUserRightsFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -80593,29 +79118,26 @@ func (ec *executionContext) unmarshalInputUserRightsOrder(ctx context.Context, o
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOUserRightsOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsOrderable(ctx, v)
+			data, err := ec.unmarshalOUserRightsOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOUserRightsOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsOrderable(ctx, v)
+			data, err := ec.unmarshalOUserRightsOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOUserRightsOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsOrder(ctx, v)
+			data, err := ec.unmarshalOUserRightsOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRightsOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -80637,8 +79159,6 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 		}
 		switch k {
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
@@ -80663,8 +79183,6 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "canLogin":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canLogin"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80687,8 +79205,6 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "canCreateRoot":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canCreateRoot"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80711,8 +79227,6 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "maxPublicOrga":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPublicOrga"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80735,8 +79249,6 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "maxPrivateOrga":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPrivateOrga"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80759,8 +79271,6 @@ func (ec *executionContext) unmarshalInputUserRightsPatch(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "hasEmailNotifications":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasEmailNotifications"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -80803,53 +79313,47 @@ func (ec *executionContext) unmarshalInputUserRightsRef(ctx context.Context, obj
 		}
 		switch k {
 		case "type_":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
-			it.Type, err = ec.unmarshalOUserType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
+			data, err := ec.unmarshalOUserType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserType(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "canLogin":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canLogin"))
-			it.CanLogin, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CanLogin = data
 		case "canCreateRoot":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canCreateRoot"))
-			it.CanCreateRoot, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CanCreateRoot = data
 		case "maxPublicOrga":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPublicOrga"))
-			it.MaxPublicOrga, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.MaxPublicOrga = data
 		case "maxPrivateOrga":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPrivateOrga"))
-			it.MaxPrivateOrga, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.MaxPrivateOrga = data
 		case "hasEmailNotifications":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasEmailNotifications"))
-			it.HasEmailNotifications, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.HasEmailNotifications = data
 		}
 	}
 
@@ -80871,69 +79375,61 @@ func (ec *executionContext) unmarshalInputVoteFilter(ctx context.Context, obj in
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			it.CreatedAt, err = ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-			it.Message, err = ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
+			data, err := ec.unmarshalOStringFullTextFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringFullTextFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Message = data
 		case "voteid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
-			it.Voteid, err = ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Voteid = data
 		case "has":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
-			it.Has, err = ec.unmarshalOVoteHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteHasFilter(ctx, v)
+			data, err := ec.unmarshalOVoteHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteHasFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Has = data
 		case "and":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOVoteFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, v)
+			data, err := ec.unmarshalOVoteFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.And = data
 		case "or":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOVoteFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, v)
+			data, err := ec.unmarshalOVoteFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Or = data
 		case "not":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOVoteFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, v)
+			data, err := ec.unmarshalOVoteFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Not = data
 		}
 	}
 
@@ -80955,29 +79451,26 @@ func (ec *executionContext) unmarshalInputVoteOrder(ctx context.Context, obj int
 		}
 		switch k {
 		case "asc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
-			it.Asc, err = ec.unmarshalOVoteOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteOrderable(ctx, v)
+			data, err := ec.unmarshalOVoteOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Asc = data
 		case "desc":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOVoteOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteOrderable(ctx, v)
+			data, err := ec.unmarshalOVoteOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteOrderable(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Desc = data
 		case "then":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
-			it.Then, err = ec.unmarshalOVoteOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteOrder(ctx, v)
+			data, err := ec.unmarshalOVoteOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteOrder(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Then = data
 		}
 	}
 
@@ -80999,8 +79492,6 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 		}
 		switch k {
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
@@ -81025,8 +79516,6 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -81049,8 +79538,6 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -81081,8 +79568,6 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -81113,8 +79598,6 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "contract":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
@@ -81139,8 +79622,6 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "node":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -81165,8 +79646,6 @@ func (ec *executionContext) unmarshalInputVotePatch(ctx context.Context, obj int
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "data":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚕintᚄ(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -81209,24 +79688,20 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "createdBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
-			it.CreatedBy, err = ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedBy = data
 		case "createdAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -81253,8 +79728,6 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "updatedAt":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -81285,8 +79758,6 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "message":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
@@ -81317,16 +79788,13 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "voteid":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("voteid"))
-			it.Voteid, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Voteid = data
 		case "contract":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contract"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalOContractRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐContractRef(ctx, v)
@@ -81355,8 +79823,6 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "node":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
 				return ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
@@ -81385,13 +79851,12 @@ func (ec *executionContext) unmarshalInputVoteRef(ctx context.Context, obj inter
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "data":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-			it.Data, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Data = data
 		}
 	}
 
@@ -81413,13 +79878,12 @@ func (ec *executionContext) unmarshalInputWithinFilter(ctx context.Context, obj 
 		}
 		switch k {
 		case "polygon":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("polygon"))
-			it.Polygon, err = ec.unmarshalNPolygonRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRef(ctx, v)
+			data, err := ec.unmarshalNPolygonRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐPolygonRef(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Polygon = data
 		}
 	}
 
@@ -81491,28 +79955,37 @@ var addBlobPayloadImplementors = []string{"AddBlobPayload"}
 
 func (ec *executionContext) _AddBlobPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddBlobPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addBlobPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddBlobPayload")
 		case "blob":
-
 			out.Values[i] = ec._AddBlobPayload_blob(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddBlobPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81520,28 +79993,37 @@ var addCommentPayloadImplementors = []string{"AddCommentPayload"}
 
 func (ec *executionContext) _AddCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddCommentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addCommentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddCommentPayload")
 		case "comment":
-
 			out.Values[i] = ec._AddCommentPayload_comment(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddCommentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81549,28 +80031,37 @@ var addContractPayloadImplementors = []string{"AddContractPayload"}
 
 func (ec *executionContext) _AddContractPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddContractPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addContractPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddContractPayload")
 		case "contract":
-
 			out.Values[i] = ec._AddContractPayload_contract(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddContractPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81578,28 +80069,37 @@ var addEventCountPayloadImplementors = []string{"AddEventCountPayload"}
 
 func (ec *executionContext) _AddEventCountPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddEventCountPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addEventCountPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddEventCountPayload")
 		case "eventCount":
-
 			out.Values[i] = ec._AddEventCountPayload_eventCount(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddEventCountPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81607,28 +80107,37 @@ var addEventFragmentPayloadImplementors = []string{"AddEventFragmentPayload"}
 
 func (ec *executionContext) _AddEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddEventFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addEventFragmentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddEventFragmentPayload")
 		case "eventFragment":
-
 			out.Values[i] = ec._AddEventFragmentPayload_eventFragment(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddEventFragmentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81636,28 +80145,37 @@ var addEventPayloadImplementors = []string{"AddEventPayload"}
 
 func (ec *executionContext) _AddEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addEventPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddEventPayload")
 		case "event":
-
 			out.Values[i] = ec._AddEventPayload_event(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddEventPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81665,28 +80183,37 @@ var addLabelPayloadImplementors = []string{"AddLabelPayload"}
 
 func (ec *executionContext) _AddLabelPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddLabelPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addLabelPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddLabelPayload")
 		case "label":
-
 			out.Values[i] = ec._AddLabelPayload_label(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddLabelPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81694,28 +80221,37 @@ var addMandatePayloadImplementors = []string{"AddMandatePayload"}
 
 func (ec *executionContext) _AddMandatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddMandatePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addMandatePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddMandatePayload")
 		case "mandate":
-
 			out.Values[i] = ec._AddMandatePayload_mandate(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddMandatePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81723,28 +80259,37 @@ var addNodeFragmentPayloadImplementors = []string{"AddNodeFragmentPayload"}
 
 func (ec *executionContext) _AddNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodeFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addNodeFragmentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddNodeFragmentPayload")
 		case "nodeFragment":
-
 			out.Values[i] = ec._AddNodeFragmentPayload_nodeFragment(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddNodeFragmentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81752,28 +80297,37 @@ var addNodePayloadImplementors = []string{"AddNodePayload"}
 
 func (ec *executionContext) _AddNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNodePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addNodePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddNodePayload")
 		case "node":
-
 			out.Values[i] = ec._AddNodePayload_node(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddNodePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81781,28 +80335,37 @@ var addNotifPayloadImplementors = []string{"AddNotifPayload"}
 
 func (ec *executionContext) _AddNotifPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddNotifPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addNotifPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddNotifPayload")
 		case "notif":
-
 			out.Values[i] = ec._AddNotifPayload_notif(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddNotifPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81810,28 +80373,37 @@ var addPendingUserPayloadImplementors = []string{"AddPendingUserPayload"}
 
 func (ec *executionContext) _AddPendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddPendingUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addPendingUserPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddPendingUserPayload")
 		case "pendingUser":
-
 			out.Values[i] = ec._AddPendingUserPayload_pendingUser(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddPendingUserPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81839,28 +80411,37 @@ var addProjectCardPayloadImplementors = []string{"AddProjectCardPayload"}
 
 func (ec *executionContext) _AddProjectCardPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectCardPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectCardPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddProjectCardPayload")
 		case "projectCard":
-
 			out.Values[i] = ec._AddProjectCardPayload_projectCard(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddProjectCardPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81868,28 +80449,37 @@ var addProjectColumnPayloadImplementors = []string{"AddProjectColumnPayload"}
 
 func (ec *executionContext) _AddProjectColumnPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectColumnPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectColumnPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddProjectColumnPayload")
 		case "projectColumn":
-
 			out.Values[i] = ec._AddProjectColumnPayload_projectColumn(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddProjectColumnPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81897,28 +80487,37 @@ var addProjectDraftPayloadImplementors = []string{"AddProjectDraftPayload"}
 
 func (ec *executionContext) _AddProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectDraftPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectDraftPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddProjectDraftPayload")
 		case "projectDraft":
-
 			out.Values[i] = ec._AddProjectDraftPayload_projectDraft(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddProjectDraftPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81926,28 +80525,37 @@ var addProjectFieldPayloadImplementors = []string{"AddProjectFieldPayload"}
 
 func (ec *executionContext) _AddProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectFieldPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectFieldPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddProjectFieldPayload")
 		case "projectField":
-
 			out.Values[i] = ec._AddProjectFieldPayload_projectField(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddProjectFieldPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81955,28 +80563,37 @@ var addProjectFieldValuePayloadImplementors = []string{"AddProjectFieldValuePayl
 
 func (ec *executionContext) _AddProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectFieldValuePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectFieldValuePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddProjectFieldValuePayload")
 		case "projectFieldValue":
-
 			out.Values[i] = ec._AddProjectFieldValuePayload_projectFieldValue(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddProjectFieldValuePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -81984,28 +80601,37 @@ var addProjectPayloadImplementors = []string{"AddProjectPayload"}
 
 func (ec *executionContext) _AddProjectPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddProjectPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addProjectPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddProjectPayload")
 		case "project":
-
 			out.Values[i] = ec._AddProjectPayload_project(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddProjectPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82013,28 +80639,37 @@ var addReactionPayloadImplementors = []string{"AddReactionPayload"}
 
 func (ec *executionContext) _AddReactionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddReactionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addReactionPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddReactionPayload")
 		case "reaction":
-
 			out.Values[i] = ec._AddReactionPayload_reaction(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddReactionPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82042,28 +80677,37 @@ var addRoleExtPayloadImplementors = []string{"AddRoleExtPayload"}
 
 func (ec *executionContext) _AddRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddRoleExtPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addRoleExtPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddRoleExtPayload")
 		case "roleExt":
-
 			out.Values[i] = ec._AddRoleExtPayload_roleExt(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddRoleExtPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82071,28 +80715,37 @@ var addTensionPayloadImplementors = []string{"AddTensionPayload"}
 
 func (ec *executionContext) _AddTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddTensionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addTensionPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddTensionPayload")
 		case "tension":
-
 			out.Values[i] = ec._AddTensionPayload_tension(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddTensionPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82100,28 +80753,37 @@ var addUserEventPayloadImplementors = []string{"AddUserEventPayload"}
 
 func (ec *executionContext) _AddUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addUserEventPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddUserEventPayload")
 		case "userEvent":
-
 			out.Values[i] = ec._AddUserEventPayload_userEvent(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddUserEventPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82129,28 +80791,37 @@ var addUserPayloadImplementors = []string{"AddUserPayload"}
 
 func (ec *executionContext) _AddUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addUserPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddUserPayload")
 		case "user":
-
 			out.Values[i] = ec._AddUserPayload_user(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddUserPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82158,28 +80829,37 @@ var addUserRightsPayloadImplementors = []string{"AddUserRightsPayload"}
 
 func (ec *executionContext) _AddUserRightsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserRightsPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addUserRightsPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddUserRightsPayload")
 		case "userRights":
-
 			out.Values[i] = ec._AddUserRightsPayload_userRights(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddUserRightsPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82187,28 +80867,37 @@ var addVotePayloadImplementors = []string{"AddVotePayload"}
 
 func (ec *executionContext) _AddVotePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddVotePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addVotePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddVotePayload")
 		case "vote":
-
 			out.Values[i] = ec._AddVotePayload_vote(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._AddVotePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82216,79 +80905,70 @@ var blobImplementors = []string{"Blob"}
 
 func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj *model.Blob) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, blobImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Blob")
 		case "tension":
-
 			out.Values[i] = ec._Blob_tension(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "blob_type":
-
 			out.Values[i] = ec._Blob_blob_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "pushedFlag":
-
 			out.Values[i] = ec._Blob_pushedFlag(ctx, field, obj)
-
 		case "archivedFlag":
-
 			out.Values[i] = ec._Blob_archivedFlag(ctx, field, obj)
-
 		case "node":
-
 			out.Values[i] = ec._Blob_node(ctx, field, obj)
-
 		case "md":
-
 			out.Values[i] = ec._Blob_md(ctx, field, obj)
-
 		case "id":
-
 			out.Values[i] = ec._Blob_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Blob_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Blob_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Blob_updatedAt(ctx, field, obj)
-
 		case "message":
-
 			out.Values[i] = ec._Blob_message(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82296,72 +80976,59 @@ var blobAggregateResultImplementors = []string{"BlobAggregateResult"}
 
 func (ec *executionContext) _BlobAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.BlobAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, blobAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("BlobAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._BlobAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._BlobAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._BlobAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._BlobAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._BlobAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._BlobAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._BlobAggregateResult_messageMax(ctx, field, obj)
-
 		case "pushedFlagMin":
-
 			out.Values[i] = ec._BlobAggregateResult_pushedFlagMin(ctx, field, obj)
-
 		case "pushedFlagMax":
-
 			out.Values[i] = ec._BlobAggregateResult_pushedFlagMax(ctx, field, obj)
-
 		case "archivedFlagMin":
-
 			out.Values[i] = ec._BlobAggregateResult_archivedFlagMin(ctx, field, obj)
-
 		case "archivedFlagMax":
-
 			out.Values[i] = ec._BlobAggregateResult_archivedFlagMax(ctx, field, obj)
-
 		case "mdMin":
-
 			out.Values[i] = ec._BlobAggregateResult_mdMin(ctx, field, obj)
-
 		case "mdMax":
-
 			out.Values[i] = ec._BlobAggregateResult_mdMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82369,60 +81036,59 @@ var commentImplementors = []string{"Comment"}
 
 func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, obj *model.Comment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, commentImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Comment")
 		case "message":
-
 			out.Values[i] = ec._Comment_message(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "reactions":
-
 			out.Values[i] = ec._Comment_reactions(ctx, field, obj)
-
 		case "id":
-
 			out.Values[i] = ec._Comment_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Comment_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Comment_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Comment_updatedAt(ctx, field, obj)
-
 		case "reactionsAggregate":
-
 			out.Values[i] = ec._Comment_reactionsAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82430,48 +81096,47 @@ var commentAggregateResultImplementors = []string{"CommentAggregateResult"}
 
 func (ec *executionContext) _CommentAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.CommentAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, commentAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CommentAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._CommentAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._CommentAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._CommentAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._CommentAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._CommentAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._CommentAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._CommentAggregateResult_messageMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82479,127 +81144,100 @@ var contractImplementors = []string{"Contract", "EventKind"}
 
 func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet, obj *model.Contract) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, contractImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Contract")
 		case "contractid":
-
 			out.Values[i] = ec._Contract_contractid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "tension":
-
 			out.Values[i] = ec._Contract_tension(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "status":
-
 			out.Values[i] = ec._Contract_status(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "contract_type":
-
 			out.Values[i] = ec._Contract_contract_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "closedAt":
-
 			out.Values[i] = ec._Contract_closedAt(ctx, field, obj)
-
 		case "event":
-
 			out.Values[i] = ec._Contract_event(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "participants":
-
 			out.Values[i] = ec._Contract_participants(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "candidates":
-
 			out.Values[i] = ec._Contract_candidates(ctx, field, obj)
-
 		case "pending_candidates":
-
 			out.Values[i] = ec._Contract_pending_candidates(ctx, field, obj)
-
 		case "comments":
-
 			out.Values[i] = ec._Contract_comments(ctx, field, obj)
-
 		case "isValidator":
-
 			out.Values[i] = ec._Contract_isValidator(ctx, field, obj)
-
 		case "id":
-
 			out.Values[i] = ec._Contract_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Contract_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Contract_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Contract_updatedAt(ctx, field, obj)
-
 		case "message":
-
 			out.Values[i] = ec._Contract_message(ctx, field, obj)
-
 		case "participantsAggregate":
-
 			out.Values[i] = ec._Contract_participantsAggregate(ctx, field, obj)
-
 		case "candidatesAggregate":
-
 			out.Values[i] = ec._Contract_candidatesAggregate(ctx, field, obj)
-
 		case "pending_candidatesAggregate":
-
 			out.Values[i] = ec._Contract_pending_candidatesAggregate(ctx, field, obj)
-
 		case "commentsAggregate":
-
 			out.Values[i] = ec._Contract_commentsAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82607,64 +81245,55 @@ var contractAggregateResultImplementors = []string{"ContractAggregateResult"}
 
 func (ec *executionContext) _ContractAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ContractAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, contractAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ContractAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._ContractAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._ContractAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._ContractAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._ContractAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._ContractAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._ContractAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._ContractAggregateResult_messageMax(ctx, field, obj)
-
 		case "contractidMin":
-
 			out.Values[i] = ec._ContractAggregateResult_contractidMin(ctx, field, obj)
-
 		case "contractidMax":
-
 			out.Values[i] = ec._ContractAggregateResult_contractidMax(ctx, field, obj)
-
 		case "closedAtMin":
-
 			out.Values[i] = ec._ContractAggregateResult_closedAtMin(ctx, field, obj)
-
 		case "closedAtMax":
-
 			out.Values[i] = ec._ContractAggregateResult_closedAtMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82672,32 +81301,39 @@ var deleteBlobPayloadImplementors = []string{"DeleteBlobPayload"}
 
 func (ec *executionContext) _DeleteBlobPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteBlobPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteBlobPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteBlobPayload")
 		case "blob":
-
 			out.Values[i] = ec._DeleteBlobPayload_blob(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteBlobPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteBlobPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82705,32 +81341,39 @@ var deleteCommentPayloadImplementors = []string{"DeleteCommentPayload"}
 
 func (ec *executionContext) _DeleteCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteCommentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteCommentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteCommentPayload")
 		case "comment":
-
 			out.Values[i] = ec._DeleteCommentPayload_comment(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteCommentPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteCommentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82738,32 +81381,39 @@ var deleteContractPayloadImplementors = []string{"DeleteContractPayload"}
 
 func (ec *executionContext) _DeleteContractPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteContractPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteContractPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteContractPayload")
 		case "contract":
-
 			out.Values[i] = ec._DeleteContractPayload_contract(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteContractPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteContractPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82771,32 +81421,39 @@ var deleteEventCountPayloadImplementors = []string{"DeleteEventCountPayload"}
 
 func (ec *executionContext) _DeleteEventCountPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventCountPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEventCountPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteEventCountPayload")
 		case "eventCount":
-
 			out.Values[i] = ec._DeleteEventCountPayload_eventCount(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteEventCountPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteEventCountPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82804,32 +81461,39 @@ var deleteEventFragmentPayloadImplementors = []string{"DeleteEventFragmentPayloa
 
 func (ec *executionContext) _DeleteEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEventFragmentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteEventFragmentPayload")
 		case "eventFragment":
-
 			out.Values[i] = ec._DeleteEventFragmentPayload_eventFragment(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteEventFragmentPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteEventFragmentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82837,32 +81501,39 @@ var deleteEventPayloadImplementors = []string{"DeleteEventPayload"}
 
 func (ec *executionContext) _DeleteEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEventPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteEventPayload")
 		case "event":
-
 			out.Values[i] = ec._DeleteEventPayload_event(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteEventPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteEventPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82870,32 +81541,39 @@ var deleteLabelPayloadImplementors = []string{"DeleteLabelPayload"}
 
 func (ec *executionContext) _DeleteLabelPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteLabelPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteLabelPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteLabelPayload")
 		case "label":
-
 			out.Values[i] = ec._DeleteLabelPayload_label(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteLabelPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteLabelPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82903,32 +81581,39 @@ var deleteMandatePayloadImplementors = []string{"DeleteMandatePayload"}
 
 func (ec *executionContext) _DeleteMandatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteMandatePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteMandatePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteMandatePayload")
 		case "mandate":
-
 			out.Values[i] = ec._DeleteMandatePayload_mandate(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteMandatePayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteMandatePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82936,32 +81621,39 @@ var deleteNodeFragmentPayloadImplementors = []string{"DeleteNodeFragmentPayload"
 
 func (ec *executionContext) _DeleteNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNodeFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteNodeFragmentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteNodeFragmentPayload")
 		case "nodeFragment":
-
 			out.Values[i] = ec._DeleteNodeFragmentPayload_nodeFragment(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteNodeFragmentPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteNodeFragmentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -82969,32 +81661,39 @@ var deleteNodePayloadImplementors = []string{"DeleteNodePayload"}
 
 func (ec *executionContext) _DeleteNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNodePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteNodePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteNodePayload")
 		case "node":
-
 			out.Values[i] = ec._DeleteNodePayload_node(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteNodePayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteNodePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83002,32 +81701,39 @@ var deleteNotifPayloadImplementors = []string{"DeleteNotifPayload"}
 
 func (ec *executionContext) _DeleteNotifPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteNotifPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteNotifPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteNotifPayload")
 		case "notif":
-
 			out.Values[i] = ec._DeleteNotifPayload_notif(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteNotifPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteNotifPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83035,32 +81741,39 @@ var deletePendingUserPayloadImplementors = []string{"DeletePendingUserPayload"}
 
 func (ec *executionContext) _DeletePendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeletePendingUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deletePendingUserPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeletePendingUserPayload")
 		case "pendingUser":
-
 			out.Values[i] = ec._DeletePendingUserPayload_pendingUser(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeletePendingUserPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeletePendingUserPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83068,32 +81781,39 @@ var deletePostPayloadImplementors = []string{"DeletePostPayload"}
 
 func (ec *executionContext) _DeletePostPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeletePostPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deletePostPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeletePostPayload")
 		case "post":
-
 			out.Values[i] = ec._DeletePostPayload_post(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeletePostPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeletePostPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83101,32 +81821,39 @@ var deleteProjectCardPayloadImplementors = []string{"DeleteProjectCardPayload"}
 
 func (ec *executionContext) _DeleteProjectCardPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectCardPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectCardPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteProjectCardPayload")
 		case "projectCard":
-
 			out.Values[i] = ec._DeleteProjectCardPayload_projectCard(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteProjectCardPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteProjectCardPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83134,32 +81861,39 @@ var deleteProjectColumnPayloadImplementors = []string{"DeleteProjectColumnPayloa
 
 func (ec *executionContext) _DeleteProjectColumnPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectColumnPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectColumnPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteProjectColumnPayload")
 		case "projectColumn":
-
 			out.Values[i] = ec._DeleteProjectColumnPayload_projectColumn(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteProjectColumnPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteProjectColumnPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83167,32 +81901,39 @@ var deleteProjectDraftPayloadImplementors = []string{"DeleteProjectDraftPayload"
 
 func (ec *executionContext) _DeleteProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectDraftPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectDraftPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteProjectDraftPayload")
 		case "projectDraft":
-
 			out.Values[i] = ec._DeleteProjectDraftPayload_projectDraft(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteProjectDraftPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteProjectDraftPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83200,32 +81941,39 @@ var deleteProjectFieldPayloadImplementors = []string{"DeleteProjectFieldPayload"
 
 func (ec *executionContext) _DeleteProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectFieldPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectFieldPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteProjectFieldPayload")
 		case "projectField":
-
 			out.Values[i] = ec._DeleteProjectFieldPayload_projectField(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteProjectFieldPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteProjectFieldPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83233,32 +81981,39 @@ var deleteProjectFieldValuePayloadImplementors = []string{"DeleteProjectFieldVal
 
 func (ec *executionContext) _DeleteProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectFieldValuePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectFieldValuePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteProjectFieldValuePayload")
 		case "projectFieldValue":
-
 			out.Values[i] = ec._DeleteProjectFieldValuePayload_projectFieldValue(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteProjectFieldValuePayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteProjectFieldValuePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83266,32 +82021,39 @@ var deleteProjectPayloadImplementors = []string{"DeleteProjectPayload"}
 
 func (ec *executionContext) _DeleteProjectPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteProjectPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteProjectPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteProjectPayload")
 		case "project":
-
 			out.Values[i] = ec._DeleteProjectPayload_project(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteProjectPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteProjectPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83299,32 +82061,39 @@ var deleteReactionPayloadImplementors = []string{"DeleteReactionPayload"}
 
 func (ec *executionContext) _DeleteReactionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteReactionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteReactionPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteReactionPayload")
 		case "reaction":
-
 			out.Values[i] = ec._DeleteReactionPayload_reaction(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteReactionPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteReactionPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83332,32 +82101,39 @@ var deleteRoleExtPayloadImplementors = []string{"DeleteRoleExtPayload"}
 
 func (ec *executionContext) _DeleteRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteRoleExtPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteRoleExtPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteRoleExtPayload")
 		case "roleExt":
-
 			out.Values[i] = ec._DeleteRoleExtPayload_roleExt(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteRoleExtPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteRoleExtPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83365,32 +82141,39 @@ var deleteTensionPayloadImplementors = []string{"DeleteTensionPayload"}
 
 func (ec *executionContext) _DeleteTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteTensionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteTensionPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteTensionPayload")
 		case "tension":
-
 			out.Values[i] = ec._DeleteTensionPayload_tension(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteTensionPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteTensionPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83398,32 +82181,39 @@ var deleteUserEventPayloadImplementors = []string{"DeleteUserEventPayload"}
 
 func (ec *executionContext) _DeleteUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserEventPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteUserEventPayload")
 		case "userEvent":
-
 			out.Values[i] = ec._DeleteUserEventPayload_userEvent(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteUserEventPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteUserEventPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83431,32 +82221,39 @@ var deleteUserPayloadImplementors = []string{"DeleteUserPayload"}
 
 func (ec *executionContext) _DeleteUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteUserPayload")
 		case "user":
-
 			out.Values[i] = ec._DeleteUserPayload_user(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteUserPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteUserPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83464,32 +82261,39 @@ var deleteUserRightsPayloadImplementors = []string{"DeleteUserRightsPayload"}
 
 func (ec *executionContext) _DeleteUserRightsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserRightsPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteUserRightsPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteUserRightsPayload")
 		case "userRights":
-
 			out.Values[i] = ec._DeleteUserRightsPayload_userRights(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteUserRightsPayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteUserRightsPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83497,32 +82301,39 @@ var deleteVotePayloadImplementors = []string{"DeleteVotePayload"}
 
 func (ec *executionContext) _DeleteVotePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteVotePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteVotePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteVotePayload")
 		case "vote":
-
 			out.Values[i] = ec._DeleteVotePayload_vote(ctx, field, obj)
-
 		case "msg":
-
 			out.Values[i] = ec._DeleteVotePayload_msg(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._DeleteVotePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83530,75 +82341,68 @@ var eventImplementors = []string{"Event", "EventKind"}
 
 func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, obj *model.Event) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Event")
 		case "tension":
-
 			out.Values[i] = ec._Event_tension(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "event_type":
-
 			out.Values[i] = ec._Event_event_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "mentioned":
-
 			out.Values[i] = ec._Event_mentioned(ctx, field, obj)
-
 		case "old":
-
 			out.Values[i] = ec._Event_old(ctx, field, obj)
-
 		case "new":
-
 			out.Values[i] = ec._Event_new(ctx, field, obj)
-
 		case "id":
-
 			out.Values[i] = ec._Event_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Event_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Event_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Event_updatedAt(ctx, field, obj)
-
 		case "message":
-
 			out.Values[i] = ec._Event_message(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83606,64 +82410,55 @@ var eventAggregateResultImplementors = []string{"EventAggregateResult"}
 
 func (ec *executionContext) _EventAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.EventAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._EventAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._EventAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._EventAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._EventAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._EventAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._EventAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._EventAggregateResult_messageMax(ctx, field, obj)
-
 		case "oldMin":
-
 			out.Values[i] = ec._EventAggregateResult_oldMin(ctx, field, obj)
-
 		case "oldMax":
-
 			out.Values[i] = ec._EventAggregateResult_oldMax(ctx, field, obj)
-
 		case "newMin":
-
 			out.Values[i] = ec._EventAggregateResult_newMin(ctx, field, obj)
-
 		case "newMax":
-
 			out.Values[i] = ec._EventAggregateResult_newMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83671,32 +82466,39 @@ var eventCountImplementors = []string{"EventCount"}
 
 func (ec *executionContext) _EventCount(ctx context.Context, sel ast.SelectionSet, obj *model.EventCount) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventCountImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventCount")
 		case "unread_events":
-
 			out.Values[i] = ec._EventCount_unread_events(ctx, field, obj)
-
 		case "pending_contracts":
-
 			out.Values[i] = ec._EventCount_pending_contracts(ctx, field, obj)
-
 		case "assigned_tensions":
-
 			out.Values[i] = ec._EventCount_assigned_tensions(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83704,72 +82506,59 @@ var eventCountAggregateResultImplementors = []string{"EventCountAggregateResult"
 
 func (ec *executionContext) _EventCountAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.EventCountAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventCountAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventCountAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._EventCountAggregateResult_count(ctx, field, obj)
-
 		case "unread_eventsMin":
-
 			out.Values[i] = ec._EventCountAggregateResult_unread_eventsMin(ctx, field, obj)
-
 		case "unread_eventsMax":
-
 			out.Values[i] = ec._EventCountAggregateResult_unread_eventsMax(ctx, field, obj)
-
 		case "unread_eventsSum":
-
 			out.Values[i] = ec._EventCountAggregateResult_unread_eventsSum(ctx, field, obj)
-
 		case "unread_eventsAvg":
-
 			out.Values[i] = ec._EventCountAggregateResult_unread_eventsAvg(ctx, field, obj)
-
 		case "pending_contractsMin":
-
 			out.Values[i] = ec._EventCountAggregateResult_pending_contractsMin(ctx, field, obj)
-
 		case "pending_contractsMax":
-
 			out.Values[i] = ec._EventCountAggregateResult_pending_contractsMax(ctx, field, obj)
-
 		case "pending_contractsSum":
-
 			out.Values[i] = ec._EventCountAggregateResult_pending_contractsSum(ctx, field, obj)
-
 		case "pending_contractsAvg":
-
 			out.Values[i] = ec._EventCountAggregateResult_pending_contractsAvg(ctx, field, obj)
-
 		case "assigned_tensionsMin":
-
 			out.Values[i] = ec._EventCountAggregateResult_assigned_tensionsMin(ctx, field, obj)
-
 		case "assigned_tensionsMax":
-
 			out.Values[i] = ec._EventCountAggregateResult_assigned_tensionsMax(ctx, field, obj)
-
 		case "assigned_tensionsSum":
-
 			out.Values[i] = ec._EventCountAggregateResult_assigned_tensionsSum(ctx, field, obj)
-
 		case "assigned_tensionsAvg":
-
 			out.Values[i] = ec._EventCountAggregateResult_assigned_tensionsAvg(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83777,35 +82566,42 @@ var eventFragmentImplementors = []string{"EventFragment"}
 
 func (ec *executionContext) _EventFragment(ctx context.Context, sel ast.SelectionSet, obj *model.EventFragment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventFragmentImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventFragment")
 		case "event_type":
-
 			out.Values[i] = ec._EventFragment_event_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "old":
-
 			out.Values[i] = ec._EventFragment_old(ctx, field, obj)
-
 		case "new":
-
 			out.Values[i] = ec._EventFragment_new(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83813,40 +82609,43 @@ var eventFragmentAggregateResultImplementors = []string{"EventFragmentAggregateR
 
 func (ec *executionContext) _EventFragmentAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.EventFragmentAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventFragmentAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventFragmentAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._EventFragmentAggregateResult_count(ctx, field, obj)
-
 		case "oldMin":
-
 			out.Values[i] = ec._EventFragmentAggregateResult_oldMin(ctx, field, obj)
-
 		case "oldMax":
-
 			out.Values[i] = ec._EventFragmentAggregateResult_oldMax(ctx, field, obj)
-
 		case "newMin":
-
 			out.Values[i] = ec._EventFragmentAggregateResult_newMin(ctx, field, obj)
-
 		case "newMax":
-
 			out.Values[i] = ec._EventFragmentAggregateResult_newMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83854,65 +82653,60 @@ var labelImplementors = []string{"Label"}
 
 func (ec *executionContext) _Label(ctx context.Context, sel ast.SelectionSet, obj *model.Label) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, labelImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Label")
 		case "id":
-
 			out.Values[i] = ec._Label_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "rootnameid":
-
 			out.Values[i] = ec._Label_rootnameid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "name":
-
 			out.Values[i] = ec._Label_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec._Label_description(ctx, field, obj)
-
 		case "color":
-
 			out.Values[i] = ec._Label_color(ctx, field, obj)
-
 		case "tensions":
-
 			out.Values[i] = ec._Label_tensions(ctx, field, obj)
-
 		case "nodes":
-
 			out.Values[i] = ec._Label_nodes(ctx, field, obj)
-
 		case "tensionsAggregate":
-
 			out.Values[i] = ec._Label_tensionsAggregate(ctx, field, obj)
-
 		case "nodesAggregate":
-
 			out.Values[i] = ec._Label_nodesAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83920,56 +82714,51 @@ var labelAggregateResultImplementors = []string{"LabelAggregateResult"}
 
 func (ec *executionContext) _LabelAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.LabelAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, labelAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("LabelAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._LabelAggregateResult_count(ctx, field, obj)
-
 		case "rootnameidMin":
-
 			out.Values[i] = ec._LabelAggregateResult_rootnameidMin(ctx, field, obj)
-
 		case "rootnameidMax":
-
 			out.Values[i] = ec._LabelAggregateResult_rootnameidMax(ctx, field, obj)
-
 		case "nameMin":
-
 			out.Values[i] = ec._LabelAggregateResult_nameMin(ctx, field, obj)
-
 		case "nameMax":
-
 			out.Values[i] = ec._LabelAggregateResult_nameMax(ctx, field, obj)
-
 		case "descriptionMin":
-
 			out.Values[i] = ec._LabelAggregateResult_descriptionMin(ctx, field, obj)
-
 		case "descriptionMax":
-
 			out.Values[i] = ec._LabelAggregateResult_descriptionMax(ctx, field, obj)
-
 		case "colorMin":
-
 			out.Values[i] = ec._LabelAggregateResult_colorMin(ctx, field, obj)
-
 		case "colorMax":
-
 			out.Values[i] = ec._LabelAggregateResult_colorMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -83977,46 +82766,49 @@ var mandateImplementors = []string{"Mandate"}
 
 func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, obj *model.Mandate) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, mandateImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mandate")
 		case "id":
-
 			out.Values[i] = ec._Mandate_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "purpose":
-
 			out.Values[i] = ec._Mandate_purpose(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "responsabilities":
-
 			out.Values[i] = ec._Mandate_responsabilities(ctx, field, obj)
-
 		case "domains":
-
 			out.Values[i] = ec._Mandate_domains(ctx, field, obj)
-
 		case "policies":
-
 			out.Values[i] = ec._Mandate_policies(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -84024,56 +82816,51 @@ var mandateAggregateResultImplementors = []string{"MandateAggregateResult"}
 
 func (ec *executionContext) _MandateAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.MandateAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, mandateAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MandateAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._MandateAggregateResult_count(ctx, field, obj)
-
 		case "purposeMin":
-
 			out.Values[i] = ec._MandateAggregateResult_purposeMin(ctx, field, obj)
-
 		case "purposeMax":
-
 			out.Values[i] = ec._MandateAggregateResult_purposeMax(ctx, field, obj)
-
 		case "responsabilitiesMin":
-
 			out.Values[i] = ec._MandateAggregateResult_responsabilitiesMin(ctx, field, obj)
-
 		case "responsabilitiesMax":
-
 			out.Values[i] = ec._MandateAggregateResult_responsabilitiesMax(ctx, field, obj)
-
 		case "domainsMin":
-
 			out.Values[i] = ec._MandateAggregateResult_domainsMin(ctx, field, obj)
-
 		case "domainsMax":
-
 			out.Values[i] = ec._MandateAggregateResult_domainsMax(ctx, field, obj)
-
 		case "policiesMin":
-
 			out.Values[i] = ec._MandateAggregateResult_policiesMin(ctx, field, obj)
-
 		case "policiesMax":
-
 			out.Values[i] = ec._MandateAggregateResult_policiesMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -84081,27 +82868,38 @@ var multiPolygonImplementors = []string{"MultiPolygon"}
 
 func (ec *executionContext) _MultiPolygon(ctx context.Context, sel ast.SelectionSet, obj *model.MultiPolygon) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, multiPolygonImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MultiPolygon")
 		case "polygons":
-
 			out.Values[i] = ec._MultiPolygon_polygons(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -84114,7 +82912,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -84125,475 +82923,333 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "addNode":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addNode(ctx, field)
 			})
-
 		case "updateNode":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateNode(ctx, field)
 			})
-
 		case "deleteNode":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteNode(ctx, field)
 			})
-
 		case "addNodeFragment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addNodeFragment(ctx, field)
 			})
-
 		case "updateNodeFragment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateNodeFragment(ctx, field)
 			})
-
 		case "deleteNodeFragment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteNodeFragment(ctx, field)
 			})
-
 		case "addMandate":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addMandate(ctx, field)
 			})
-
 		case "updateMandate":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateMandate(ctx, field)
 			})
-
 		case "deleteMandate":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteMandate(ctx, field)
 			})
-
 		case "addLabel":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addLabel(ctx, field)
 			})
-
 		case "updateLabel":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateLabel(ctx, field)
 			})
-
 		case "deleteLabel":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteLabel(ctx, field)
 			})
-
 		case "addRoleExt":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addRoleExt(ctx, field)
 			})
-
 		case "updateRoleExt":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateRoleExt(ctx, field)
 			})
-
 		case "deleteRoleExt":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteRoleExt(ctx, field)
 			})
-
 		case "addProject":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addProject(ctx, field)
 			})
-
 		case "updateProject":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateProject(ctx, field)
 			})
-
 		case "deleteProject":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProject(ctx, field)
 			})
-
 		case "addProjectColumn":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addProjectColumn(ctx, field)
 			})
-
 		case "updateProjectColumn":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateProjectColumn(ctx, field)
 			})
-
 		case "deleteProjectColumn":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProjectColumn(ctx, field)
 			})
-
 		case "addProjectCard":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addProjectCard(ctx, field)
 			})
-
 		case "updateProjectCard":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateProjectCard(ctx, field)
 			})
-
 		case "deleteProjectCard":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProjectCard(ctx, field)
 			})
-
 		case "addProjectField":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addProjectField(ctx, field)
 			})
-
 		case "updateProjectField":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateProjectField(ctx, field)
 			})
-
 		case "deleteProjectField":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProjectField(ctx, field)
 			})
-
 		case "addProjectFieldValue":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addProjectFieldValue(ctx, field)
 			})
-
 		case "updateProjectFieldValue":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateProjectFieldValue(ctx, field)
 			})
-
 		case "deleteProjectFieldValue":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProjectFieldValue(ctx, field)
 			})
-
 		case "updatePost":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updatePost(ctx, field)
 			})
-
 		case "deletePost":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deletePost(ctx, field)
 			})
-
 		case "addProjectDraft":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addProjectDraft(ctx, field)
 			})
-
 		case "updateProjectDraft":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateProjectDraft(ctx, field)
 			})
-
 		case "deleteProjectDraft":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProjectDraft(ctx, field)
 			})
-
 		case "addTension":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addTension(ctx, field)
 			})
-
 		case "updateTension":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateTension(ctx, field)
 			})
-
 		case "deleteTension":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteTension(ctx, field)
 			})
-
 		case "addComment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addComment(ctx, field)
 			})
-
 		case "updateComment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateComment(ctx, field)
 			})
-
 		case "deleteComment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteComment(ctx, field)
 			})
-
 		case "addReaction":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addReaction(ctx, field)
 			})
-
 		case "updateReaction":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateReaction(ctx, field)
 			})
-
 		case "deleteReaction":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteReaction(ctx, field)
 			})
-
 		case "addBlob":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addBlob(ctx, field)
 			})
-
 		case "updateBlob":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateBlob(ctx, field)
 			})
-
 		case "deleteBlob":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteBlob(ctx, field)
 			})
-
 		case "addEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addEvent(ctx, field)
 			})
-
 		case "updateEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateEvent(ctx, field)
 			})
-
 		case "deleteEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteEvent(ctx, field)
 			})
-
 		case "addEventFragment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addEventFragment(ctx, field)
 			})
-
 		case "updateEventFragment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateEventFragment(ctx, field)
 			})
-
 		case "deleteEventFragment":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteEventFragment(ctx, field)
 			})
-
 		case "addContract":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addContract(ctx, field)
 			})
-
 		case "updateContract":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateContract(ctx, field)
 			})
-
 		case "deleteContract":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteContract(ctx, field)
 			})
-
 		case "addVote":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addVote(ctx, field)
 			})
-
 		case "updateVote":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateVote(ctx, field)
 			})
-
 		case "deleteVote":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteVote(ctx, field)
 			})
-
 		case "addUser":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addUser(ctx, field)
 			})
-
 		case "updateUser":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateUser(ctx, field)
 			})
-
 		case "deleteUser":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteUser(ctx, field)
 			})
-
 		case "addPendingUser":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addPendingUser(ctx, field)
 			})
-
 		case "updatePendingUser":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updatePendingUser(ctx, field)
 			})
-
 		case "deletePendingUser":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deletePendingUser(ctx, field)
 			})
-
 		case "addUserRights":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addUserRights(ctx, field)
 			})
-
 		case "updateUserRights":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateUserRights(ctx, field)
 			})
-
 		case "deleteUserRights":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteUserRights(ctx, field)
 			})
-
 		case "addUserEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addUserEvent(ctx, field)
 			})
-
 		case "updateUserEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateUserEvent(ctx, field)
 			})
-
 		case "deleteUserEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteUserEvent(ctx, field)
 			})
-
 		case "addNotif":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addNotif(ctx, field)
 			})
-
 		case "updateNotif":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateNotif(ctx, field)
 			})
-
 		case "deleteNotif":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteNotif(ctx, field)
 			})
-
 		case "addEventCount":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addEventCount(ctx, field)
 			})
-
 		case "updateEventCount":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateEventCount(ctx, field)
 			})
-
 		case "deleteEventCount":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteEventCount(ctx, field)
 			})
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -84601,232 +83257,157 @@ var nodeImplementors = []string{"Node"}
 
 func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj *model.Node) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, nodeImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Node")
 		case "id":
-
 			out.Values[i] = ec._Node_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Node_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Node_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Node_updatedAt(ctx, field, obj)
-
 		case "nameid":
-
 			out.Values[i] = ec._Node_nameid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "rootnameid":
-
 			out.Values[i] = ec._Node_rootnameid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "source":
-
 			out.Values[i] = ec._Node_source(ctx, field, obj)
-
 		case "name":
-
 			out.Values[i] = ec._Node_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "about":
-
 			out.Values[i] = ec._Node_about(ctx, field, obj)
-
 		case "skills":
-
 			out.Values[i] = ec._Node_skills(ctx, field, obj)
-
 		case "isRoot":
-
 			out.Values[i] = ec._Node_isRoot(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "parent":
-
 			out.Values[i] = ec._Node_parent(ctx, field, obj)
-
 		case "type_":
-
 			out.Values[i] = ec._Node_type_(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "tensions_out":
-
 			out.Values[i] = ec._Node_tensions_out(ctx, field, obj)
-
 		case "tensions_in":
-
 			out.Values[i] = ec._Node_tensions_in(ctx, field, obj)
-
 		case "visibility":
-
 			out.Values[i] = ec._Node_visibility(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "mode":
-
 			out.Values[i] = ec._Node_mode(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "rights":
-
 			out.Values[i] = ec._Node_rights(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "isArchived":
-
 			out.Values[i] = ec._Node_isArchived(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "isPersonal":
-
 			out.Values[i] = ec._Node_isPersonal(ctx, field, obj)
-
 		case "userCanJoin":
-
 			out.Values[i] = ec._Node_userCanJoin(ctx, field, obj)
-
 		case "guestCanCreateTension":
-
 			out.Values[i] = ec._Node_guestCanCreateTension(ctx, field, obj)
-
 		case "watchers":
-
 			out.Values[i] = ec._Node_watchers(ctx, field, obj)
-
 		case "children":
-
 			out.Values[i] = ec._Node_children(ctx, field, obj)
-
 		case "labels":
-
 			out.Values[i] = ec._Node_labels(ctx, field, obj)
-
 		case "roles":
-
 			out.Values[i] = ec._Node_roles(ctx, field, obj)
-
 		case "projects":
-
 			out.Values[i] = ec._Node_projects(ctx, field, obj)
-
 		case "pinned":
-
 			out.Values[i] = ec._Node_pinned(ctx, field, obj)
-
 		case "role_ext":
-
 			out.Values[i] = ec._Node_role_ext(ctx, field, obj)
-
 		case "role_type":
-
 			out.Values[i] = ec._Node_role_type(ctx, field, obj)
-
 		case "color":
-
 			out.Values[i] = ec._Node_color(ctx, field, obj)
-
 		case "first_link":
-
 			out.Values[i] = ec._Node_first_link(ctx, field, obj)
-
 		case "contracts":
-
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
-
 		case "events_history":
-
 			out.Values[i] = ec._Node_events_history(ctx, field, obj)
-
 		case "tensions_outAggregate":
-
 			out.Values[i] = ec._Node_tensions_outAggregate(ctx, field, obj)
-
 		case "tensions_inAggregate":
-
 			out.Values[i] = ec._Node_tensions_inAggregate(ctx, field, obj)
-
 		case "watchersAggregate":
-
 			out.Values[i] = ec._Node_watchersAggregate(ctx, field, obj)
-
 		case "childrenAggregate":
-
 			out.Values[i] = ec._Node_childrenAggregate(ctx, field, obj)
-
 		case "labelsAggregate":
-
 			out.Values[i] = ec._Node_labelsAggregate(ctx, field, obj)
-
 		case "rolesAggregate":
-
 			out.Values[i] = ec._Node_rolesAggregate(ctx, field, obj)
-
 		case "projectsAggregate":
-
 			out.Values[i] = ec._Node_projectsAggregate(ctx, field, obj)
-
 		case "pinnedAggregate":
-
 			out.Values[i] = ec._Node_pinnedAggregate(ctx, field, obj)
-
 		case "contractsAggregate":
-
 			out.Values[i] = ec._Node_contractsAggregate(ctx, field, obj)
-
 		case "events_historyAggregate":
-
 			out.Values[i] = ec._Node_events_historyAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -84834,96 +83415,71 @@ var nodeAggregateResultImplementors = []string{"NodeAggregateResult"}
 
 func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.NodeAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, nodeAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("NodeAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._NodeAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._NodeAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._NodeAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._NodeAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._NodeAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "nameidMin":
-
 			out.Values[i] = ec._NodeAggregateResult_nameidMin(ctx, field, obj)
-
 		case "nameidMax":
-
 			out.Values[i] = ec._NodeAggregateResult_nameidMax(ctx, field, obj)
-
 		case "rootnameidMin":
-
 			out.Values[i] = ec._NodeAggregateResult_rootnameidMin(ctx, field, obj)
-
 		case "rootnameidMax":
-
 			out.Values[i] = ec._NodeAggregateResult_rootnameidMax(ctx, field, obj)
-
 		case "nameMin":
-
 			out.Values[i] = ec._NodeAggregateResult_nameMin(ctx, field, obj)
-
 		case "nameMax":
-
 			out.Values[i] = ec._NodeAggregateResult_nameMax(ctx, field, obj)
-
 		case "aboutMin":
-
 			out.Values[i] = ec._NodeAggregateResult_aboutMin(ctx, field, obj)
-
 		case "aboutMax":
-
 			out.Values[i] = ec._NodeAggregateResult_aboutMax(ctx, field, obj)
-
 		case "rightsMin":
-
 			out.Values[i] = ec._NodeAggregateResult_rightsMin(ctx, field, obj)
-
 		case "rightsMax":
-
 			out.Values[i] = ec._NodeAggregateResult_rightsMax(ctx, field, obj)
-
 		case "rightsSum":
-
 			out.Values[i] = ec._NodeAggregateResult_rightsSum(ctx, field, obj)
-
 		case "rightsAvg":
-
 			out.Values[i] = ec._NodeAggregateResult_rightsAvg(ctx, field, obj)
-
 		case "colorMin":
-
 			out.Values[i] = ec._NodeAggregateResult_colorMin(ctx, field, obj)
-
 		case "colorMax":
-
 			out.Values[i] = ec._NodeAggregateResult_colorMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -84931,75 +83487,62 @@ var nodeFragmentImplementors = []string{"NodeFragment"}
 
 func (ec *executionContext) _NodeFragment(ctx context.Context, sel ast.SelectionSet, obj *model.NodeFragment) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, nodeFragmentImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("NodeFragment")
 		case "id":
-
 			out.Values[i] = ec._NodeFragment_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "nameid":
-
 			out.Values[i] = ec._NodeFragment_nameid(ctx, field, obj)
-
 		case "name":
-
 			out.Values[i] = ec._NodeFragment_name(ctx, field, obj)
-
 		case "about":
-
 			out.Values[i] = ec._NodeFragment_about(ctx, field, obj)
-
 		case "mandate":
-
 			out.Values[i] = ec._NodeFragment_mandate(ctx, field, obj)
-
 		case "skills":
-
 			out.Values[i] = ec._NodeFragment_skills(ctx, field, obj)
-
 		case "visibility":
-
 			out.Values[i] = ec._NodeFragment_visibility(ctx, field, obj)
-
 		case "mode":
-
 			out.Values[i] = ec._NodeFragment_mode(ctx, field, obj)
-
 		case "type_":
-
 			out.Values[i] = ec._NodeFragment_type_(ctx, field, obj)
-
 		case "first_link":
-
 			out.Values[i] = ec._NodeFragment_first_link(ctx, field, obj)
-
 		case "role_ext":
-
 			out.Values[i] = ec._NodeFragment_role_ext(ctx, field, obj)
-
 		case "role_type":
-
 			out.Values[i] = ec._NodeFragment_role_type(ctx, field, obj)
-
 		case "color":
-
 			out.Values[i] = ec._NodeFragment_color(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85007,72 +83550,59 @@ var nodeFragmentAggregateResultImplementors = []string{"NodeFragmentAggregateRes
 
 func (ec *executionContext) _NodeFragmentAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.NodeFragmentAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, nodeFragmentAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("NodeFragmentAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_count(ctx, field, obj)
-
 		case "nameidMin":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_nameidMin(ctx, field, obj)
-
 		case "nameidMax":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_nameidMax(ctx, field, obj)
-
 		case "nameMin":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_nameMin(ctx, field, obj)
-
 		case "nameMax":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_nameMax(ctx, field, obj)
-
 		case "aboutMin":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_aboutMin(ctx, field, obj)
-
 		case "aboutMax":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_aboutMax(ctx, field, obj)
-
 		case "first_linkMin":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_first_linkMin(ctx, field, obj)
-
 		case "first_linkMax":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_first_linkMax(ctx, field, obj)
-
 		case "role_extMin":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_role_extMin(ctx, field, obj)
-
 		case "role_extMax":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_role_extMax(ctx, field, obj)
-
 		case "colorMin":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_colorMin(ctx, field, obj)
-
 		case "colorMax":
-
 			out.Values[i] = ec._NodeFragmentAggregateResult_colorMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85080,61 +83610,58 @@ var notifImplementors = []string{"Notif", "EventKind"}
 
 func (ec *executionContext) _Notif(ctx context.Context, sel ast.SelectionSet, obj *model.Notif) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notifImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Notif")
 		case "tension_":
-
 			out.Values[i] = ec._Notif_tension_(ctx, field, obj)
-
 		case "contract":
-
 			out.Values[i] = ec._Notif_contract(ctx, field, obj)
-
 		case "link":
-
 			out.Values[i] = ec._Notif_link(ctx, field, obj)
-
 		case "id":
-
 			out.Values[i] = ec._Notif_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Notif_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Notif_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Notif_updatedAt(ctx, field, obj)
-
 		case "message":
-
 			out.Values[i] = ec._Notif_message(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85142,56 +83669,51 @@ var notifAggregateResultImplementors = []string{"NotifAggregateResult"}
 
 func (ec *executionContext) _NotifAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.NotifAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notifAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("NotifAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._NotifAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._NotifAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._NotifAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._NotifAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._NotifAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._NotifAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._NotifAggregateResult_messageMax(ctx, field, obj)
-
 		case "linkMin":
-
 			out.Values[i] = ec._NotifAggregateResult_linkMin(ctx, field, obj)
-
 		case "linkMax":
-
 			out.Values[i] = ec._NotifAggregateResult_linkMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85199,69 +83721,62 @@ var pendingUserImplementors = []string{"PendingUser"}
 
 func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionSet, obj *model.PendingUser) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, pendingUserImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PendingUser")
 		case "id":
-
 			out.Values[i] = ec._PendingUser_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._PendingUser_updatedAt(ctx, field, obj)
-
 		case "username":
-
 			out.Values[i] = ec._PendingUser_username(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "password":
-
 			out.Values[i] = ec._PendingUser_password(ctx, field, obj)
-
 		case "email":
-
 			out.Values[i] = ec._PendingUser_email(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "email_token":
-
 			out.Values[i] = ec._PendingUser_email_token(ctx, field, obj)
-
 		case "token":
-
 			out.Values[i] = ec._PendingUser_token(ctx, field, obj)
-
 		case "contracts":
-
 			out.Values[i] = ec._PendingUser_contracts(ctx, field, obj)
-
 		case "subscribe":
-
 			out.Values[i] = ec._PendingUser_subscribe(ctx, field, obj)
-
 		case "contractsAggregate":
-
 			out.Values[i] = ec._PendingUser_contractsAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85269,72 +83784,59 @@ var pendingUserAggregateResultImplementors = []string{"PendingUserAggregateResul
 
 func (ec *executionContext) _PendingUserAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.PendingUserAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, pendingUserAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PendingUserAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._PendingUserAggregateResult_count(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._PendingUserAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._PendingUserAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "usernameMin":
-
 			out.Values[i] = ec._PendingUserAggregateResult_usernameMin(ctx, field, obj)
-
 		case "usernameMax":
-
 			out.Values[i] = ec._PendingUserAggregateResult_usernameMax(ctx, field, obj)
-
 		case "passwordMin":
-
 			out.Values[i] = ec._PendingUserAggregateResult_passwordMin(ctx, field, obj)
-
 		case "passwordMax":
-
 			out.Values[i] = ec._PendingUserAggregateResult_passwordMax(ctx, field, obj)
-
 		case "emailMin":
-
 			out.Values[i] = ec._PendingUserAggregateResult_emailMin(ctx, field, obj)
-
 		case "emailMax":
-
 			out.Values[i] = ec._PendingUserAggregateResult_emailMax(ctx, field, obj)
-
 		case "email_tokenMin":
-
 			out.Values[i] = ec._PendingUserAggregateResult_email_tokenMin(ctx, field, obj)
-
 		case "email_tokenMax":
-
 			out.Values[i] = ec._PendingUserAggregateResult_email_tokenMax(ctx, field, obj)
-
 		case "tokenMin":
-
 			out.Values[i] = ec._PendingUserAggregateResult_tokenMin(ctx, field, obj)
-
 		case "tokenMax":
-
 			out.Values[i] = ec._PendingUserAggregateResult_tokenMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85342,34 +83844,43 @@ var pointImplementors = []string{"Point"}
 
 func (ec *executionContext) _Point(ctx context.Context, sel ast.SelectionSet, obj *model.Point) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, pointImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Point")
 		case "longitude":
-
 			out.Values[i] = ec._Point_longitude(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "latitude":
-
 			out.Values[i] = ec._Point_latitude(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85377,27 +83888,38 @@ var pointListImplementors = []string{"PointList"}
 
 func (ec *executionContext) _PointList(ctx context.Context, sel ast.SelectionSet, obj *model.PointList) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, pointListImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PointList")
 		case "points":
-
 			out.Values[i] = ec._PointList_points(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85405,27 +83927,38 @@ var polygonImplementors = []string{"Polygon"}
 
 func (ec *executionContext) _Polygon(ctx context.Context, sel ast.SelectionSet, obj *model.Polygon) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, polygonImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Polygon")
 		case "coordinates":
-
 			out.Values[i] = ec._Polygon_coordinates(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85433,49 +83966,52 @@ var postImplementors = []string{"Post"}
 
 func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj *model.Post) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, postImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Post")
 		case "id":
-
 			out.Values[i] = ec._Post_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Post_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Post_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Post_updatedAt(ctx, field, obj)
-
 		case "message":
-
 			out.Values[i] = ec._Post_message(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85483,48 +84019,47 @@ var postAggregateResultImplementors = []string{"PostAggregateResult"}
 
 func (ec *executionContext) _PostAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.PostAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, postAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PostAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._PostAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._PostAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._PostAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._PostAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._PostAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._PostAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._PostAggregateResult_messageMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85532,119 +84067,96 @@ var projectImplementors = []string{"Project"}
 
 func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, obj *model.Project) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Project")
 		case "id":
-
 			out.Values[i] = ec._Project_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Project_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Project_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Project_updatedAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "rootnameid":
-
 			out.Values[i] = ec._Project_rootnameid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "parentnameid":
-
 			out.Values[i] = ec._Project_parentnameid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "nameid":
-
 			out.Values[i] = ec._Project_nameid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "name":
-
 			out.Values[i] = ec._Project_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec._Project_description(ctx, field, obj)
-
 		case "status":
-
 			out.Values[i] = ec._Project_status(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "columns":
-
 			out.Values[i] = ec._Project_columns(ctx, field, obj)
-
 		case "fields":
-
 			out.Values[i] = ec._Project_fields(ctx, field, obj)
-
 		case "leaders":
-
 			out.Values[i] = ec._Project_leaders(ctx, field, obj)
-
 		case "nodes":
-
 			out.Values[i] = ec._Project_nodes(ctx, field, obj)
-
 		case "columnsAggregate":
-
 			out.Values[i] = ec._Project_columnsAggregate(ctx, field, obj)
-
 		case "fieldsAggregate":
-
 			out.Values[i] = ec._Project_fieldsAggregate(ctx, field, obj)
-
 		case "leadersAggregate":
-
 			out.Values[i] = ec._Project_leadersAggregate(ctx, field, obj)
-
 		case "nodesAggregate":
-
 			out.Values[i] = ec._Project_nodesAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85652,80 +84164,63 @@ var projectAggregateResultImplementors = []string{"ProjectAggregateResult"}
 
 func (ec *executionContext) _ProjectAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._ProjectAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._ProjectAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._ProjectAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._ProjectAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._ProjectAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "rootnameidMin":
-
 			out.Values[i] = ec._ProjectAggregateResult_rootnameidMin(ctx, field, obj)
-
 		case "rootnameidMax":
-
 			out.Values[i] = ec._ProjectAggregateResult_rootnameidMax(ctx, field, obj)
-
 		case "parentnameidMin":
-
 			out.Values[i] = ec._ProjectAggregateResult_parentnameidMin(ctx, field, obj)
-
 		case "parentnameidMax":
-
 			out.Values[i] = ec._ProjectAggregateResult_parentnameidMax(ctx, field, obj)
-
 		case "nameidMin":
-
 			out.Values[i] = ec._ProjectAggregateResult_nameidMin(ctx, field, obj)
-
 		case "nameidMax":
-
 			out.Values[i] = ec._ProjectAggregateResult_nameidMax(ctx, field, obj)
-
 		case "nameMin":
-
 			out.Values[i] = ec._ProjectAggregateResult_nameMin(ctx, field, obj)
-
 		case "nameMax":
-
 			out.Values[i] = ec._ProjectAggregateResult_nameMax(ctx, field, obj)
-
 		case "descriptionMin":
-
 			out.Values[i] = ec._ProjectAggregateResult_descriptionMin(ctx, field, obj)
-
 		case "descriptionMax":
-
 			out.Values[i] = ec._ProjectAggregateResult_descriptionMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85733,56 +84228,57 @@ var projectCardImplementors = []string{"ProjectCard"}
 
 func (ec *executionContext) _ProjectCard(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectCard) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectCardImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectCard")
 		case "id":
-
 			out.Values[i] = ec._ProjectCard_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "pos":
-
 			out.Values[i] = ec._ProjectCard_pos(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "card":
-
 			out.Values[i] = ec._ProjectCard_card(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "pc":
-
 			out.Values[i] = ec._ProjectCard_pc(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "values":
-
 			out.Values[i] = ec._ProjectCard_values(ctx, field, obj)
-
 		case "valuesAggregate":
-
 			out.Values[i] = ec._ProjectCard_valuesAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85790,40 +84286,43 @@ var projectCardAggregateResultImplementors = []string{"ProjectCardAggregateResul
 
 func (ec *executionContext) _ProjectCardAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectCardAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectCardAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectCardAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._ProjectCardAggregateResult_count(ctx, field, obj)
-
 		case "posMin":
-
 			out.Values[i] = ec._ProjectCardAggregateResult_posMin(ctx, field, obj)
-
 		case "posMax":
-
 			out.Values[i] = ec._ProjectCardAggregateResult_posMax(ctx, field, obj)
-
 		case "posSum":
-
 			out.Values[i] = ec._ProjectCardAggregateResult_posSum(ctx, field, obj)
-
 		case "posAvg":
-
 			out.Values[i] = ec._ProjectCardAggregateResult_posAvg(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85831,87 +84330,74 @@ var projectColumnImplementors = []string{"ProjectColumn"}
 
 func (ec *executionContext) _ProjectColumn(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectColumn) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectColumnImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectColumn")
 		case "id":
-
 			out.Values[i] = ec._ProjectColumn_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "name":
-
 			out.Values[i] = ec._ProjectColumn_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec._ProjectColumn_description(ctx, field, obj)
-
 		case "color":
-
 			out.Values[i] = ec._ProjectColumn_color(ctx, field, obj)
-
 		case "pos":
-
 			out.Values[i] = ec._ProjectColumn_pos(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "col_type":
-
 			out.Values[i] = ec._ProjectColumn_col_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "cards":
-
 			out.Values[i] = ec._ProjectColumn_cards(ctx, field, obj)
-
 		case "project":
-
 			out.Values[i] = ec._ProjectColumn_project(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "tensions":
-
 			out.Values[i] = ec._ProjectColumn_tensions(ctx, field, obj)
-
 		case "drafts":
-
 			out.Values[i] = ec._ProjectColumn_drafts(ctx, field, obj)
-
 		case "cardsAggregate":
-
 			out.Values[i] = ec._ProjectColumn_cardsAggregate(ctx, field, obj)
-
 		case "tensionsAggregate":
-
 			out.Values[i] = ec._ProjectColumn_tensionsAggregate(ctx, field, obj)
-
 		case "draftsAggregate":
-
 			out.Values[i] = ec._ProjectColumn_draftsAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85919,64 +84405,55 @@ var projectColumnAggregateResultImplementors = []string{"ProjectColumnAggregateR
 
 func (ec *executionContext) _ProjectColumnAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectColumnAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectColumnAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectColumnAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_count(ctx, field, obj)
-
 		case "nameMin":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_nameMin(ctx, field, obj)
-
 		case "nameMax":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_nameMax(ctx, field, obj)
-
 		case "descriptionMin":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_descriptionMin(ctx, field, obj)
-
 		case "descriptionMax":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_descriptionMax(ctx, field, obj)
-
 		case "colorMin":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_colorMin(ctx, field, obj)
-
 		case "colorMax":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_colorMax(ctx, field, obj)
-
 		case "posMin":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_posMin(ctx, field, obj)
-
 		case "posMax":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_posMax(ctx, field, obj)
-
 		case "posSum":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_posSum(ctx, field, obj)
-
 		case "posAvg":
-
 			out.Values[i] = ec._ProjectColumnAggregateResult_posAvg(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -85984,63 +84461,62 @@ var projectDraftImplementors = []string{"ProjectDraft", "CardKind"}
 
 func (ec *executionContext) _ProjectDraft(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectDraft) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectDraftImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectDraft")
 		case "title":
-
 			out.Values[i] = ec._ProjectDraft_title(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "message":
-
 			out.Values[i] = ec._ProjectDraft_message(ctx, field, obj)
-
 		case "project_status":
-
 			out.Values[i] = ec._ProjectDraft_project_status(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "id":
-
 			out.Values[i] = ec._ProjectDraft_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._ProjectDraft_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._ProjectDraft_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._ProjectDraft_updatedAt(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -86048,56 +84524,51 @@ var projectDraftAggregateResultImplementors = []string{"ProjectDraftAggregateRes
 
 func (ec *executionContext) _ProjectDraftAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectDraftAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectDraftAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectDraftAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_messageMax(ctx, field, obj)
-
 		case "titleMin":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_titleMin(ctx, field, obj)
-
 		case "titleMax":
-
 			out.Values[i] = ec._ProjectDraftAggregateResult_titleMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -86105,42 +84576,47 @@ var projectFieldImplementors = []string{"ProjectField"}
 
 func (ec *executionContext) _ProjectField(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectField) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectFieldImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectField")
 		case "field_type":
-
 			out.Values[i] = ec._ProjectField_field_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "isVisible":
-
 			out.Values[i] = ec._ProjectField_isVisible(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "values":
-
 			out.Values[i] = ec._ProjectField_values(ctx, field, obj)
-
 		case "valuesAggregate":
-
 			out.Values[i] = ec._ProjectField_valuesAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -86148,24 +84624,35 @@ var projectFieldAggregateResultImplementors = []string{"ProjectFieldAggregateRes
 
 func (ec *executionContext) _ProjectFieldAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectFieldAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectFieldAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectFieldAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._ProjectFieldAggregateResult_count(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -86173,38 +84660,45 @@ var projectFieldValueImplementors = []string{"ProjectFieldValue"}
 
 func (ec *executionContext) _ProjectFieldValue(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectFieldValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectFieldValueImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectFieldValue")
 		case "field":
-
 			out.Values[i] = ec._ProjectFieldValue_field(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "value":
-
 			out.Values[i] = ec._ProjectFieldValue_value(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "pos":
-
 			out.Values[i] = ec._ProjectFieldValue_pos(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -86212,48 +84706,47 @@ var projectFieldValueAggregateResultImplementors = []string{"ProjectFieldValueAg
 
 func (ec *executionContext) _ProjectFieldValueAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectFieldValueAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectFieldValueAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProjectFieldValueAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._ProjectFieldValueAggregateResult_count(ctx, field, obj)
-
 		case "valueMin":
-
 			out.Values[i] = ec._ProjectFieldValueAggregateResult_valueMin(ctx, field, obj)
-
 		case "valueMax":
-
 			out.Values[i] = ec._ProjectFieldValueAggregateResult_valueMax(ctx, field, obj)
-
 		case "posMin":
-
 			out.Values[i] = ec._ProjectFieldValueAggregateResult_posMin(ctx, field, obj)
-
 		case "posMax":
-
 			out.Values[i] = ec._ProjectFieldValueAggregateResult_posMax(ctx, field, obj)
-
 		case "posSum":
-
 			out.Values[i] = ec._ProjectFieldValueAggregateResult_posSum(ctx, field, obj)
-
 		case "posAvg":
-
 			out.Values[i] = ec._ProjectFieldValueAggregateResult_posAvg(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -86266,7 +84759,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -86279,7 +84772,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		case "getNode":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86290,16 +84783,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryNode":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86310,16 +84802,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateNode":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86330,16 +84821,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getNodeFragment":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86350,16 +84840,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryNodeFragment":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86370,16 +84859,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateNodeFragment":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86390,16 +84878,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getMandate":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86410,16 +84897,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryMandate":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86430,16 +84916,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateMandate":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86450,16 +84935,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getLabel":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86470,16 +84954,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryLabel":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86490,16 +84973,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateLabel":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86510,16 +84992,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getRoleExt":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86530,16 +85011,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryRoleExt":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86550,16 +85030,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateRoleExt":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86570,16 +85049,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getProject":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86590,16 +85068,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryProject":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86610,16 +85087,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateProject":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86630,16 +85106,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getProjectColumn":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86650,16 +85125,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryProjectColumn":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86670,16 +85144,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateProjectColumn":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86690,16 +85163,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getProjectCard":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86710,16 +85182,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryProjectCard":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86730,16 +85201,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateProjectCard":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86750,16 +85220,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryProjectField":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86770,16 +85239,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateProjectField":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86790,16 +85258,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryProjectFieldValue":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86810,16 +85277,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateProjectFieldValue":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86830,16 +85296,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getPost":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86850,16 +85315,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryPost":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86870,16 +85334,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregatePost":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86890,16 +85353,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getProjectDraft":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86910,16 +85372,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryProjectDraft":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86930,16 +85391,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateProjectDraft":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86950,16 +85410,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getTension":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86970,16 +85429,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryTension":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -86990,16 +85448,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateTension":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87010,16 +85467,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getComment":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87030,16 +85486,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryComment":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87050,16 +85505,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateComment":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87070,16 +85524,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getReaction":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87090,16 +85543,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryReaction":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87110,16 +85562,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateReaction":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87130,16 +85581,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getBlob":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87150,16 +85600,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryBlob":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87170,16 +85619,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateBlob":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87190,16 +85638,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getEvent":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87210,16 +85657,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryEvent":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87230,16 +85676,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateEvent":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87250,16 +85695,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryEventFragment":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87270,16 +85714,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateEventFragment":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87290,16 +85733,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getContract":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87310,16 +85752,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryContract":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87330,16 +85771,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateContract":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87350,16 +85790,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getVote":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87370,16 +85809,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryVote":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87390,16 +85828,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateVote":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87410,16 +85847,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getUser":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87430,16 +85866,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryUser":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87450,16 +85885,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateUser":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87470,16 +85904,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getPendingUser":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87490,16 +85923,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryPendingUser":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87510,16 +85942,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregatePendingUser":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87530,16 +85961,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryUserRights":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87550,16 +85980,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateUserRights":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87570,16 +85999,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getUserEvent":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87590,16 +86018,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryUserEvent":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87610,16 +86037,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateUserEvent":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87630,16 +86056,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getNotif":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87650,16 +86075,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryNotif":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87670,16 +86094,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateNotif":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87690,16 +86113,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "queryEventCount":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87710,16 +86132,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "aggregateEventCount":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -87730,32 +86151,39 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
 			})
-
 		case "__schema":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -87763,55 +86191,58 @@ var reactionImplementors = []string{"Reaction"}
 
 func (ec *executionContext) _Reaction(ctx context.Context, sel ast.SelectionSet, obj *model.Reaction) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, reactionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Reaction")
 		case "id":
-
 			out.Values[i] = ec._Reaction_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "reactionid":
-
 			out.Values[i] = ec._Reaction_reactionid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "user":
-
 			out.Values[i] = ec._Reaction_user(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "comment":
-
 			out.Values[i] = ec._Reaction_comment(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "type_":
-
 			out.Values[i] = ec._Reaction_type_(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -87819,48 +86250,47 @@ var reactionAggregateResultImplementors = []string{"ReactionAggregateResult"}
 
 func (ec *executionContext) _ReactionAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ReactionAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, reactionAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ReactionAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._ReactionAggregateResult_count(ctx, field, obj)
-
 		case "reactionidMin":
-
 			out.Values[i] = ec._ReactionAggregateResult_reactionidMin(ctx, field, obj)
-
 		case "reactionidMax":
-
 			out.Values[i] = ec._ReactionAggregateResult_reactionidMax(ctx, field, obj)
-
 		case "type_Min":
-
 			out.Values[i] = ec._ReactionAggregateResult_type_Min(ctx, field, obj)
-
 		case "type_Max":
-
 			out.Values[i] = ec._ReactionAggregateResult_type_Max(ctx, field, obj)
-
 		case "type_Sum":
-
 			out.Values[i] = ec._ReactionAggregateResult_type_Sum(ctx, field, obj)
-
 		case "type_Avg":
-
 			out.Values[i] = ec._ReactionAggregateResult_type_Avg(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -87868,76 +86298,67 @@ var roleExtImplementors = []string{"RoleExt"}
 
 func (ec *executionContext) _RoleExt(ctx context.Context, sel ast.SelectionSet, obj *model.RoleExt) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, roleExtImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("RoleExt")
 		case "id":
-
 			out.Values[i] = ec._RoleExt_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "rootnameid":
-
 			out.Values[i] = ec._RoleExt_rootnameid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "name":
-
 			out.Values[i] = ec._RoleExt_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "about":
-
 			out.Values[i] = ec._RoleExt_about(ctx, field, obj)
-
 		case "role_type":
-
 			out.Values[i] = ec._RoleExt_role_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "color":
-
 			out.Values[i] = ec._RoleExt_color(ctx, field, obj)
-
 		case "mandate":
-
 			out.Values[i] = ec._RoleExt_mandate(ctx, field, obj)
-
 		case "roles":
-
 			out.Values[i] = ec._RoleExt_roles(ctx, field, obj)
-
 		case "nodes":
-
 			out.Values[i] = ec._RoleExt_nodes(ctx, field, obj)
-
 		case "rolesAggregate":
-
 			out.Values[i] = ec._RoleExt_rolesAggregate(ctx, field, obj)
-
 		case "nodesAggregate":
-
 			out.Values[i] = ec._RoleExt_nodesAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -87945,56 +86366,51 @@ var roleExtAggregateResultImplementors = []string{"RoleExtAggregateResult"}
 
 func (ec *executionContext) _RoleExtAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.RoleExtAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, roleExtAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("RoleExtAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._RoleExtAggregateResult_count(ctx, field, obj)
-
 		case "rootnameidMin":
-
 			out.Values[i] = ec._RoleExtAggregateResult_rootnameidMin(ctx, field, obj)
-
 		case "rootnameidMax":
-
 			out.Values[i] = ec._RoleExtAggregateResult_rootnameidMax(ctx, field, obj)
-
 		case "nameMin":
-
 			out.Values[i] = ec._RoleExtAggregateResult_nameMin(ctx, field, obj)
-
 		case "nameMax":
-
 			out.Values[i] = ec._RoleExtAggregateResult_nameMax(ctx, field, obj)
-
 		case "aboutMin":
-
 			out.Values[i] = ec._RoleExtAggregateResult_aboutMin(ctx, field, obj)
-
 		case "aboutMax":
-
 			out.Values[i] = ec._RoleExtAggregateResult_aboutMax(ctx, field, obj)
-
 		case "colorMin":
-
 			out.Values[i] = ec._RoleExtAggregateResult_colorMin(ctx, field, obj)
-
 		case "colorMax":
-
 			out.Values[i] = ec._RoleExtAggregateResult_colorMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88002,178 +86418,127 @@ var tensionImplementors = []string{"Tension", "CardKind"}
 
 func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, obj *model.Tension) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, tensionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Tension")
 		case "emitter":
-
 			out.Values[i] = ec._Tension_emitter(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "emitterid":
-
 			out.Values[i] = ec._Tension_emitterid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "receiver":
-
 			out.Values[i] = ec._Tension_receiver(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "receiverid":
-
 			out.Values[i] = ec._Tension_receiverid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "title":
-
 			out.Values[i] = ec._Tension_title(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "type_":
-
 			out.Values[i] = ec._Tension_type_(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "status":
-
 			out.Values[i] = ec._Tension_status(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "action":
-
 			out.Values[i] = ec._Tension_action(ctx, field, obj)
-
 		case "assignees":
-
 			out.Values[i] = ec._Tension_assignees(ctx, field, obj)
-
 		case "labels":
-
 			out.Values[i] = ec._Tension_labels(ctx, field, obj)
-
 		case "comments":
-
 			out.Values[i] = ec._Tension_comments(ctx, field, obj)
-
 		case "blobs":
-
 			out.Values[i] = ec._Tension_blobs(ctx, field, obj)
-
 		case "history":
-
 			out.Values[i] = ec._Tension_history(ctx, field, obj)
-
 		case "mentions":
-
 			out.Values[i] = ec._Tension_mentions(ctx, field, obj)
-
 		case "contracts":
-
 			out.Values[i] = ec._Tension_contracts(ctx, field, obj)
-
 		case "subscribers":
-
 			out.Values[i] = ec._Tension_subscribers(ctx, field, obj)
-
 		case "project_statuses":
-
 			out.Values[i] = ec._Tension_project_statuses(ctx, field, obj)
-
 		case "n_comments":
-
 			out.Values[i] = ec._Tension_n_comments(ctx, field, obj)
-
 		case "id":
-
 			out.Values[i] = ec._Tension_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Tension_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Tension_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Tension_updatedAt(ctx, field, obj)
-
 		case "message":
-
 			out.Values[i] = ec._Tension_message(ctx, field, obj)
-
 		case "assigneesAggregate":
-
 			out.Values[i] = ec._Tension_assigneesAggregate(ctx, field, obj)
-
 		case "labelsAggregate":
-
 			out.Values[i] = ec._Tension_labelsAggregate(ctx, field, obj)
-
 		case "commentsAggregate":
-
 			out.Values[i] = ec._Tension_commentsAggregate(ctx, field, obj)
-
 		case "blobsAggregate":
-
 			out.Values[i] = ec._Tension_blobsAggregate(ctx, field, obj)
-
 		case "historyAggregate":
-
 			out.Values[i] = ec._Tension_historyAggregate(ctx, field, obj)
-
 		case "mentionsAggregate":
-
 			out.Values[i] = ec._Tension_mentionsAggregate(ctx, field, obj)
-
 		case "contractsAggregate":
-
 			out.Values[i] = ec._Tension_contractsAggregate(ctx, field, obj)
-
 		case "subscribersAggregate":
-
 			out.Values[i] = ec._Tension_subscribersAggregate(ctx, field, obj)
-
 		case "project_statusesAggregate":
-
 			out.Values[i] = ec._Tension_project_statusesAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88181,88 +86546,67 @@ var tensionAggregateResultImplementors = []string{"TensionAggregateResult"}
 
 func (ec *executionContext) _TensionAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.TensionAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, tensionAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TensionAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._TensionAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._TensionAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._TensionAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._TensionAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._TensionAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._TensionAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._TensionAggregateResult_messageMax(ctx, field, obj)
-
 		case "emitteridMin":
-
 			out.Values[i] = ec._TensionAggregateResult_emitteridMin(ctx, field, obj)
-
 		case "emitteridMax":
-
 			out.Values[i] = ec._TensionAggregateResult_emitteridMax(ctx, field, obj)
-
 		case "receiveridMin":
-
 			out.Values[i] = ec._TensionAggregateResult_receiveridMin(ctx, field, obj)
-
 		case "receiveridMax":
-
 			out.Values[i] = ec._TensionAggregateResult_receiveridMax(ctx, field, obj)
-
 		case "titleMin":
-
 			out.Values[i] = ec._TensionAggregateResult_titleMin(ctx, field, obj)
-
 		case "titleMax":
-
 			out.Values[i] = ec._TensionAggregateResult_titleMax(ctx, field, obj)
-
 		case "n_commentsMin":
-
 			out.Values[i] = ec._TensionAggregateResult_n_commentsMin(ctx, field, obj)
-
 		case "n_commentsMax":
-
 			out.Values[i] = ec._TensionAggregateResult_n_commentsMax(ctx, field, obj)
-
 		case "n_commentsSum":
-
 			out.Values[i] = ec._TensionAggregateResult_n_commentsSum(ctx, field, obj)
-
 		case "n_commentsAvg":
-
 			out.Values[i] = ec._TensionAggregateResult_n_commentsAvg(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88270,28 +86614,37 @@ var updateBlobPayloadImplementors = []string{"UpdateBlobPayload"}
 
 func (ec *executionContext) _UpdateBlobPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateBlobPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateBlobPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateBlobPayload")
 		case "blob":
-
 			out.Values[i] = ec._UpdateBlobPayload_blob(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateBlobPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88299,28 +86652,37 @@ var updateCommentPayloadImplementors = []string{"UpdateCommentPayload"}
 
 func (ec *executionContext) _UpdateCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateCommentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateCommentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateCommentPayload")
 		case "comment":
-
 			out.Values[i] = ec._UpdateCommentPayload_comment(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateCommentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88328,28 +86690,37 @@ var updateContractPayloadImplementors = []string{"UpdateContractPayload"}
 
 func (ec *executionContext) _UpdateContractPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateContractPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateContractPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateContractPayload")
 		case "contract":
-
 			out.Values[i] = ec._UpdateContractPayload_contract(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateContractPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88357,28 +86728,37 @@ var updateEventCountPayloadImplementors = []string{"UpdateEventCountPayload"}
 
 func (ec *executionContext) _UpdateEventCountPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateEventCountPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateEventCountPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateEventCountPayload")
 		case "eventCount":
-
 			out.Values[i] = ec._UpdateEventCountPayload_eventCount(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateEventCountPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88386,28 +86766,37 @@ var updateEventFragmentPayloadImplementors = []string{"UpdateEventFragmentPayloa
 
 func (ec *executionContext) _UpdateEventFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateEventFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateEventFragmentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateEventFragmentPayload")
 		case "eventFragment":
-
 			out.Values[i] = ec._UpdateEventFragmentPayload_eventFragment(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateEventFragmentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88415,28 +86804,37 @@ var updateEventPayloadImplementors = []string{"UpdateEventPayload"}
 
 func (ec *executionContext) _UpdateEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateEventPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateEventPayload")
 		case "event":
-
 			out.Values[i] = ec._UpdateEventPayload_event(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateEventPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88444,28 +86842,37 @@ var updateLabelPayloadImplementors = []string{"UpdateLabelPayload"}
 
 func (ec *executionContext) _UpdateLabelPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateLabelPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateLabelPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateLabelPayload")
 		case "label":
-
 			out.Values[i] = ec._UpdateLabelPayload_label(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateLabelPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88473,28 +86880,37 @@ var updateMandatePayloadImplementors = []string{"UpdateMandatePayload"}
 
 func (ec *executionContext) _UpdateMandatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateMandatePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateMandatePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateMandatePayload")
 		case "mandate":
-
 			out.Values[i] = ec._UpdateMandatePayload_mandate(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateMandatePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88502,28 +86918,37 @@ var updateNodeFragmentPayloadImplementors = []string{"UpdateNodeFragmentPayload"
 
 func (ec *executionContext) _UpdateNodeFragmentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateNodeFragmentPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateNodeFragmentPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateNodeFragmentPayload")
 		case "nodeFragment":
-
 			out.Values[i] = ec._UpdateNodeFragmentPayload_nodeFragment(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateNodeFragmentPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88531,28 +86956,37 @@ var updateNodePayloadImplementors = []string{"UpdateNodePayload"}
 
 func (ec *executionContext) _UpdateNodePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateNodePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateNodePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateNodePayload")
 		case "node":
-
 			out.Values[i] = ec._UpdateNodePayload_node(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateNodePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88560,28 +86994,37 @@ var updateNotifPayloadImplementors = []string{"UpdateNotifPayload"}
 
 func (ec *executionContext) _UpdateNotifPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateNotifPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateNotifPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateNotifPayload")
 		case "notif":
-
 			out.Values[i] = ec._UpdateNotifPayload_notif(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateNotifPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88589,28 +87032,37 @@ var updatePendingUserPayloadImplementors = []string{"UpdatePendingUserPayload"}
 
 func (ec *executionContext) _UpdatePendingUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdatePendingUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updatePendingUserPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdatePendingUserPayload")
 		case "pendingUser":
-
 			out.Values[i] = ec._UpdatePendingUserPayload_pendingUser(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdatePendingUserPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88618,28 +87070,37 @@ var updatePostPayloadImplementors = []string{"UpdatePostPayload"}
 
 func (ec *executionContext) _UpdatePostPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdatePostPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updatePostPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdatePostPayload")
 		case "post":
-
 			out.Values[i] = ec._UpdatePostPayload_post(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdatePostPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88647,28 +87108,37 @@ var updateProjectCardPayloadImplementors = []string{"UpdateProjectCardPayload"}
 
 func (ec *executionContext) _UpdateProjectCardPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectCardPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectCardPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateProjectCardPayload")
 		case "projectCard":
-
 			out.Values[i] = ec._UpdateProjectCardPayload_projectCard(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateProjectCardPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88676,28 +87146,37 @@ var updateProjectColumnPayloadImplementors = []string{"UpdateProjectColumnPayloa
 
 func (ec *executionContext) _UpdateProjectColumnPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectColumnPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectColumnPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateProjectColumnPayload")
 		case "projectColumn":
-
 			out.Values[i] = ec._UpdateProjectColumnPayload_projectColumn(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateProjectColumnPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88705,28 +87184,37 @@ var updateProjectDraftPayloadImplementors = []string{"UpdateProjectDraftPayload"
 
 func (ec *executionContext) _UpdateProjectDraftPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectDraftPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectDraftPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateProjectDraftPayload")
 		case "projectDraft":
-
 			out.Values[i] = ec._UpdateProjectDraftPayload_projectDraft(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateProjectDraftPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88734,28 +87222,37 @@ var updateProjectFieldPayloadImplementors = []string{"UpdateProjectFieldPayload"
 
 func (ec *executionContext) _UpdateProjectFieldPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectFieldPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectFieldPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateProjectFieldPayload")
 		case "projectField":
-
 			out.Values[i] = ec._UpdateProjectFieldPayload_projectField(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateProjectFieldPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88763,28 +87260,37 @@ var updateProjectFieldValuePayloadImplementors = []string{"UpdateProjectFieldVal
 
 func (ec *executionContext) _UpdateProjectFieldValuePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectFieldValuePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectFieldValuePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateProjectFieldValuePayload")
 		case "projectFieldValue":
-
 			out.Values[i] = ec._UpdateProjectFieldValuePayload_projectFieldValue(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateProjectFieldValuePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88792,28 +87298,37 @@ var updateProjectPayloadImplementors = []string{"UpdateProjectPayload"}
 
 func (ec *executionContext) _UpdateProjectPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateProjectPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateProjectPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateProjectPayload")
 		case "project":
-
 			out.Values[i] = ec._UpdateProjectPayload_project(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateProjectPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88821,28 +87336,37 @@ var updateReactionPayloadImplementors = []string{"UpdateReactionPayload"}
 
 func (ec *executionContext) _UpdateReactionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateReactionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateReactionPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateReactionPayload")
 		case "reaction":
-
 			out.Values[i] = ec._UpdateReactionPayload_reaction(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateReactionPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88850,28 +87374,37 @@ var updateRoleExtPayloadImplementors = []string{"UpdateRoleExtPayload"}
 
 func (ec *executionContext) _UpdateRoleExtPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateRoleExtPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateRoleExtPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateRoleExtPayload")
 		case "roleExt":
-
 			out.Values[i] = ec._UpdateRoleExtPayload_roleExt(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateRoleExtPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88879,28 +87412,37 @@ var updateTensionPayloadImplementors = []string{"UpdateTensionPayload"}
 
 func (ec *executionContext) _UpdateTensionPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateTensionPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateTensionPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateTensionPayload")
 		case "tension":
-
 			out.Values[i] = ec._UpdateTensionPayload_tension(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateTensionPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88908,28 +87450,37 @@ var updateUserEventPayloadImplementors = []string{"UpdateUserEventPayload"}
 
 func (ec *executionContext) _UpdateUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserEventPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserEventPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateUserEventPayload")
 		case "userEvent":
-
 			out.Values[i] = ec._UpdateUserEventPayload_userEvent(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateUserEventPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88937,28 +87488,37 @@ var updateUserPayloadImplementors = []string{"UpdateUserPayload"}
 
 func (ec *executionContext) _UpdateUserPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateUserPayload")
 		case "user":
-
 			out.Values[i] = ec._UpdateUserPayload_user(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateUserPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88966,28 +87526,37 @@ var updateUserRightsPayloadImplementors = []string{"UpdateUserRightsPayload"}
 
 func (ec *executionContext) _UpdateUserRightsPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateUserRightsPayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserRightsPayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateUserRightsPayload")
 		case "userRights":
-
 			out.Values[i] = ec._UpdateUserRightsPayload_userRights(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateUserRightsPayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -88995,28 +87564,37 @@ var updateVotePayloadImplementors = []string{"UpdateVotePayload"}
 
 func (ec *executionContext) _UpdateVotePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateVotePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateVotePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateVotePayload")
 		case "vote":
-
 			out.Values[i] = ec._UpdateVotePayload_vote(ctx, field, obj)
-
 		case "numUids":
-
 			out.Values[i] = ec._UpdateVotePayload_numUids(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -89024,179 +87602,126 @@ var userImplementors = []string{"User"}
 
 func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("User")
 		case "id":
-
 			out.Values[i] = ec._User_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._User_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "lastAck":
-
 			out.Values[i] = ec._User_lastAck(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "username":
-
 			out.Values[i] = ec._User_username(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "name":
-
 			out.Values[i] = ec._User_name(ctx, field, obj)
-
 		case "email":
-
 			out.Values[i] = ec._User_email(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "password":
-
 			out.Values[i] = ec._User_password(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "bio":
-
 			out.Values[i] = ec._User_bio(ctx, field, obj)
-
 		case "location":
-
 			out.Values[i] = ec._User_location(ctx, field, obj)
-
 		case "utc":
-
 			out.Values[i] = ec._User_utc(ctx, field, obj)
-
 		case "links":
-
 			out.Values[i] = ec._User_links(ctx, field, obj)
-
 		case "skills":
-
 			out.Values[i] = ec._User_skills(ctx, field, obj)
-
 		case "notifyByEmail":
-
 			out.Values[i] = ec._User_notifyByEmail(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "lang":
-
 			out.Values[i] = ec._User_lang(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "subscriptions":
-
 			out.Values[i] = ec._User_subscriptions(ctx, field, obj)
-
 		case "watching":
-
 			out.Values[i] = ec._User_watching(ctx, field, obj)
-
 		case "rights":
-
 			out.Values[i] = ec._User_rights(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "roles":
-
 			out.Values[i] = ec._User_roles(ctx, field, obj)
-
 		case "tensions_created":
-
 			out.Values[i] = ec._User_tensions_created(ctx, field, obj)
-
 		case "tensions_assigned":
-
 			out.Values[i] = ec._User_tensions_assigned(ctx, field, obj)
-
 		case "contracts":
-
 			out.Values[i] = ec._User_contracts(ctx, field, obj)
-
 		case "reactions":
-
 			out.Values[i] = ec._User_reactions(ctx, field, obj)
-
 		case "events":
-
 			out.Values[i] = ec._User_events(ctx, field, obj)
-
 		case "markAllAsRead":
-
 			out.Values[i] = ec._User_markAllAsRead(ctx, field, obj)
-
 		case "event_count":
-
 			out.Values[i] = ec._User_event_count(ctx, field, obj)
-
 		case "subscriptionsAggregate":
-
 			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
-
 		case "watchingAggregate":
-
 			out.Values[i] = ec._User_watchingAggregate(ctx, field, obj)
-
 		case "rolesAggregate":
-
 			out.Values[i] = ec._User_rolesAggregate(ctx, field, obj)
-
 		case "tensions_createdAggregate":
-
 			out.Values[i] = ec._User_tensions_createdAggregate(ctx, field, obj)
-
 		case "tensions_assignedAggregate":
-
 			out.Values[i] = ec._User_tensions_assignedAggregate(ctx, field, obj)
-
 		case "contractsAggregate":
-
 			out.Values[i] = ec._User_contractsAggregate(ctx, field, obj)
-
 		case "reactionsAggregate":
-
 			out.Values[i] = ec._User_reactionsAggregate(ctx, field, obj)
-
 		case "eventsAggregate":
-
 			out.Values[i] = ec._User_eventsAggregate(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -89204,104 +87729,75 @@ var userAggregateResultImplementors = []string{"UserAggregateResult"}
 
 func (ec *executionContext) _UserAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.UserAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._UserAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._UserAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._UserAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "lastAckMin":
-
 			out.Values[i] = ec._UserAggregateResult_lastAckMin(ctx, field, obj)
-
 		case "lastAckMax":
-
 			out.Values[i] = ec._UserAggregateResult_lastAckMax(ctx, field, obj)
-
 		case "usernameMin":
-
 			out.Values[i] = ec._UserAggregateResult_usernameMin(ctx, field, obj)
-
 		case "usernameMax":
-
 			out.Values[i] = ec._UserAggregateResult_usernameMax(ctx, field, obj)
-
 		case "nameMin":
-
 			out.Values[i] = ec._UserAggregateResult_nameMin(ctx, field, obj)
-
 		case "nameMax":
-
 			out.Values[i] = ec._UserAggregateResult_nameMax(ctx, field, obj)
-
 		case "emailMin":
-
 			out.Values[i] = ec._UserAggregateResult_emailMin(ctx, field, obj)
-
 		case "emailMax":
-
 			out.Values[i] = ec._UserAggregateResult_emailMax(ctx, field, obj)
-
 		case "passwordMin":
-
 			out.Values[i] = ec._UserAggregateResult_passwordMin(ctx, field, obj)
-
 		case "passwordMax":
-
 			out.Values[i] = ec._UserAggregateResult_passwordMax(ctx, field, obj)
-
 		case "bioMin":
-
 			out.Values[i] = ec._UserAggregateResult_bioMin(ctx, field, obj)
-
 		case "bioMax":
-
 			out.Values[i] = ec._UserAggregateResult_bioMax(ctx, field, obj)
-
 		case "locationMin":
-
 			out.Values[i] = ec._UserAggregateResult_locationMin(ctx, field, obj)
-
 		case "locationMax":
-
 			out.Values[i] = ec._UserAggregateResult_locationMax(ctx, field, obj)
-
 		case "utcMin":
-
 			out.Values[i] = ec._UserAggregateResult_utcMin(ctx, field, obj)
-
 		case "utcMax":
-
 			out.Values[i] = ec._UserAggregateResult_utcMax(ctx, field, obj)
-
 		case "markAllAsReadMin":
-
 			out.Values[i] = ec._UserAggregateResult_markAllAsReadMin(ctx, field, obj)
-
 		case "markAllAsReadMax":
-
 			out.Values[i] = ec._UserAggregateResult_markAllAsReadMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -89309,52 +87805,55 @@ var userEventImplementors = []string{"UserEvent"}
 
 func (ec *executionContext) _UserEvent(ctx context.Context, sel ast.SelectionSet, obj *model.UserEvent) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userEventImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserEvent")
 		case "id":
-
 			out.Values[i] = ec._UserEvent_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._UserEvent_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "isRead":
-
 			out.Values[i] = ec._UserEvent_isRead(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "user":
-
 			out.Values[i] = ec._UserEvent_user(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "event":
-
 			out.Values[i] = ec._UserEvent_event(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -89362,32 +87861,39 @@ var userEventAggregateResultImplementors = []string{"UserEventAggregateResult"}
 
 func (ec *executionContext) _UserEventAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.UserEventAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userEventAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserEventAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._UserEventAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._UserEventAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._UserEventAggregateResult_createdAtMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -89395,62 +87901,63 @@ var userRightsImplementors = []string{"UserRights"}
 
 func (ec *executionContext) _UserRights(ctx context.Context, sel ast.SelectionSet, obj *model.UserRights) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userRightsImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserRights")
 		case "type_":
-
 			out.Values[i] = ec._UserRights_type_(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "canLogin":
-
 			out.Values[i] = ec._UserRights_canLogin(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "canCreateRoot":
-
 			out.Values[i] = ec._UserRights_canCreateRoot(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "maxPublicOrga":
-
 			out.Values[i] = ec._UserRights_maxPublicOrga(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "maxPrivateOrga":
-
 			out.Values[i] = ec._UserRights_maxPrivateOrga(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "hasEmailNotifications":
-
 			out.Values[i] = ec._UserRights_hasEmailNotifications(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -89458,56 +87965,51 @@ var userRightsAggregateResultImplementors = []string{"UserRightsAggregateResult"
 
 func (ec *executionContext) _UserRightsAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.UserRightsAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userRightsAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UserRightsAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._UserRightsAggregateResult_count(ctx, field, obj)
-
 		case "maxPublicOrgaMin":
-
 			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaMin(ctx, field, obj)
-
 		case "maxPublicOrgaMax":
-
 			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaMax(ctx, field, obj)
-
 		case "maxPublicOrgaSum":
-
 			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaSum(ctx, field, obj)
-
 		case "maxPublicOrgaAvg":
-
 			out.Values[i] = ec._UserRightsAggregateResult_maxPublicOrgaAvg(ctx, field, obj)
-
 		case "maxPrivateOrgaMin":
-
 			out.Values[i] = ec._UserRightsAggregateResult_maxPrivateOrgaMin(ctx, field, obj)
-
 		case "maxPrivateOrgaMax":
-
 			out.Values[i] = ec._UserRightsAggregateResult_maxPrivateOrgaMax(ctx, field, obj)
-
 		case "maxPrivateOrgaSum":
-
 			out.Values[i] = ec._UserRightsAggregateResult_maxPrivateOrgaSum(ctx, field, obj)
-
 		case "maxPrivateOrgaAvg":
-
 			out.Values[i] = ec._UserRightsAggregateResult_maxPrivateOrgaAvg(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -89515,77 +88017,72 @@ var voteImplementors = []string{"Vote"}
 
 func (ec *executionContext) _Vote(ctx context.Context, sel ast.SelectionSet, obj *model.Vote) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, voteImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Vote")
 		case "voteid":
-
 			out.Values[i] = ec._Vote_voteid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "contract":
-
 			out.Values[i] = ec._Vote_contract(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "node":
-
 			out.Values[i] = ec._Vote_node(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "data":
-
 			out.Values[i] = ec._Vote_data(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "id":
-
 			out.Values[i] = ec._Vote_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdBy":
-
 			out.Values[i] = ec._Vote_createdBy(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createdAt":
-
 			out.Values[i] = ec._Vote_createdAt(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updatedAt":
-
 			out.Values[i] = ec._Vote_updatedAt(ctx, field, obj)
-
 		case "message":
-
 			out.Values[i] = ec._Vote_message(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -89593,56 +88090,51 @@ var voteAggregateResultImplementors = []string{"VoteAggregateResult"}
 
 func (ec *executionContext) _VoteAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.VoteAggregateResult) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, voteAggregateResultImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("VoteAggregateResult")
 		case "count":
-
 			out.Values[i] = ec._VoteAggregateResult_count(ctx, field, obj)
-
 		case "createdAtMin":
-
 			out.Values[i] = ec._VoteAggregateResult_createdAtMin(ctx, field, obj)
-
 		case "createdAtMax":
-
 			out.Values[i] = ec._VoteAggregateResult_createdAtMax(ctx, field, obj)
-
 		case "updatedAtMin":
-
 			out.Values[i] = ec._VoteAggregateResult_updatedAtMin(ctx, field, obj)
-
 		case "updatedAtMax":
-
 			out.Values[i] = ec._VoteAggregateResult_updatedAtMax(ctx, field, obj)
-
 		case "messageMin":
-
 			out.Values[i] = ec._VoteAggregateResult_messageMin(ctx, field, obj)
-
 		case "messageMax":
-
 			out.Values[i] = ec._VoteAggregateResult_messageMax(ctx, field, obj)
-
 		case "voteidMin":
-
 			out.Values[i] = ec._VoteAggregateResult_voteidMin(ctx, field, obj)
-
 		case "voteidMax":
-
 			out.Values[i] = ec._VoteAggregateResult_voteidMax(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
