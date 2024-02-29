@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2023 Fractale Co
+ * Copyright (C) 2024 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -98,23 +98,21 @@ func (Jwt) New() *Jwt {
 
 // Generate Api and Dgraph JWT token for debug purpose
 func GenToken(username string) {
+	var uctx model.UserCtx
 	if username == "" {
-		username = "root"
+		uctx = db.DB.GetRootUctx()
+	} else {
+		userCtx, err := db.GetDB().GetUctx("username", username)
+		if err != nil {
+			panic(err)
+		}
+		uctx = *userCtx
 	}
 
 	tk := tkMaster
-	// Api debug token
-	uctx := model.UserCtx{
-		Username: username,
-		Rights:   model.UserRights{CanLogin: false, CanCreateRoot: true, Type: model.UserTypeRegular},
-		Hit:      1,
-	}
-	o := model.RoleTypeOwner
-	uctx.Roles = []*model.Node{&model.Node{Nameid: "f6", RoleType: &o}}
 	apiToken, _ := tk.issue(uctx, time.Hour*48)
 
 	// Dgraph token
-	uctx = db.DB.GetRootUctx()
 	dgraphToken := db.GetDB().BuildGqlToken(uctx, time.Hour*48)
 
 	// Log

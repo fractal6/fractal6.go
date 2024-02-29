@@ -2,7 +2,7 @@
 # * fractal6.go/graph/tension_auth/EMAP: propagated fields
 # * fractal6.go/graph/tensions_op: Each event need to be individually processed in `TensionEventHook`
 # * fractal6-ui.elm: query and case on enum object
-# * fractal6-db/script: hardcoded spec
+# * db/script: hardcoded spec
 # * fractal6.go/db/api: hardcoded query, mutation and delete (fields)
 
 # <!> Generation Warning <!>

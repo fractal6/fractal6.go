@@ -1241,6 +1241,9 @@ type MultiPolygonRef struct {
 	Polygons []*PolygonRef `json:"polygons"`
 }
 
+type Mutation struct {
+}
+
 type NearFilter struct {
 	Distance   float64   `json:"distance"`
 	Coordinate *PointRef `json:"coordinate"`
@@ -2065,6 +2068,9 @@ type ProjectRef struct {
 type ProjectStatusHash struct {
 	Eq *ProjectStatus   `json:"eq,omitempty"`
 	In []*ProjectStatus `json:"in,omitempty"`
+}
+
+type Query struct {
 }
 
 type Reaction struct {
