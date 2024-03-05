@@ -266,7 +266,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 				// (except if the user has subscrided to the anchor tensionn which is unlikelly).
 				return nil
 			} else {
-				auto_msg = fmt.Sprintf(`%s joined this organization in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+				auto_msg = fmt.Sprintf(`%s joined this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
 			}
 
 		} else if notif.HasEvent(model.TensionEventUserLeft) {
@@ -276,7 +276,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			}
 			anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
 			if anchorTid != nil && anchorTid.(string) == notif.Tid {
-				auto_msg = fmt.Sprintf(`%s left this organization in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+				auto_msg = fmt.Sprintf(`%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
 			} else {
 				auto_msg = fmt.Sprintf(`%s left his role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
 			}
@@ -300,9 +300,9 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
 			if anchorTid != nil && anchorTid.(string) == notif.Tid {
 				if itsYou {
-					auto_msg = fmt.Sprintf(`You have been removed from this organization in <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
+					auto_msg = fmt.Sprintf(`You have been removed from this organisation in <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
 				} else {
-					auto_msg = fmt.Sprintf(`%s has been removed from this organization in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+					auto_msg = fmt.Sprintf(`%s has been removed from this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
 				}
 			} else {
 				if itsYou {
@@ -346,10 +346,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		payload += fmt.Sprintf(`, reply to this email directly, or <a href="%s">unsubscribe</a>.</div>`, url_unsubscribe)
 	} else if ui.Reason == model.ReasonIsAnnouncement {
 		url_unsubscribe = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s?unwatch=email", notif.Rootnameid, notif.Tid)
-		payload += fmt.Sprintf(`, or <a href="%s">unsubscribe</a> from all announcements for this organization.</div>`, url_unsubscribe)
+		payload += fmt.Sprintf(`, or <a href="%s">unsubscribe</a> from all announcements for this organisation.</div>`, url_unsubscribe)
 	} else if ui.Reason == model.ReasonIsAlert {
 		url_leave = fmt.Sprintf("https://"+DOMAIN+"/m/%s", notif.Rootnameid)
-		payload += fmt.Sprintf(`, reply to this email directly or <a href="%s">leave this organization</a> to stop receiving these alerts.</div>`, url_leave)
+		payload += fmt.Sprintf(`, reply to this email directly or <a href="%s">leave this organisation</a> to stop receiving these alerts.</div>`, url_leave)
 	} else {
 		payload += " or reply to this email directly.</div>"
 	}
@@ -455,8 +455,8 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 				} else {
 					orga_name = x.(string)
 				}
-				subject = fmt.Sprintf("[%s] You are invited to this organization", recv)
-				payload = fmt.Sprintf(`Hi%s,<br><br> You are kindly invited by %s to join the organization <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
+				subject = fmt.Sprintf("[%s] You are invited to this organisation", recv)
+				payload = fmt.Sprintf(`Hi%s,<br><br> You are kindly invited by %s to join the organisation <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
                 You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, recv, orga_name, url_redirect, url_redirect)
 			} else if ui.Reason == model.ReasonIsLinkCandidate {
 				subject = fmt.Sprintf("[%s] You have a new role invitation", recv)

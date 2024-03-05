@@ -966,7 +966,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 	// * [x] Unlink his roles
 	// * [x] Delete his membership
 	// * [x] Delete his reactions
-	// * [x] Delete his watched organizations
+	// * [x] Delete his watched organisations
 	// * [x] Remove his contracts (candidates)
 	// * [x] Delete his UserEvents (subDelete Notif!)
 	"deleteUser": QueryMut{

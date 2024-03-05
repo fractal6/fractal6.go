@@ -2,11 +2,11 @@
 
 Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 
-**Fractale** is a platform for self-organisation. It is designed around the concept that an organization can be represented as a tree and should follow principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both, circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done through **Tensions**, and make the link between users and organizations. You can think of a tension as an email, but more structured and more powerful.
+**Fractale** is a platform for self-organisation. It is designed around the concept that an organisation can be represented as a tree and should follow principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organisation divides in **Circles** that can have **Roles**. Both, circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organisation is done through **Tensions**, and make the link between users and organisations. You can think of a tension as an email, but more structured and more powerful.
 
-Using Fractale for your organization offers the following capabilities and features:
+Using Fractale for your organisation offers the following capabilities and features:
 * Interactive tree and graph packing organisation chart
-* Organization visibility defined at circles level
+* organisation visibility defined at circles level
 * ACL based on member roles and circle governance rules
 * Ticketing management through Tensions
 * Discussion thread and subscription by tension

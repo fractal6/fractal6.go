@@ -75,7 +75,7 @@ const (
 func (n NotifReason) ToText() string {
 	switch n {
 	case ReasonIsInvited:
-		return `you are invited to join an organization on <a href="https://fractale.co">Fractale</a>`
+		return `you are invited to join an organisation on <a href="https://fractale.co">Fractale</a>`
 	case ReasonIsLinkCandidate:
 		return "you are invited to play a role"
 	case ReasonIsCandidate:

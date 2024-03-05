@@ -216,7 +216,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 					Uctx: notif.Uctx,
 					Tid:  &notif.Tid,
 					Cid:  nil,
-					Msg:  "You have been removed from this organization",
+					Msg:  "You have been removed from this organisation",
 					To:   []string{u},
 				}, false)
 			}
@@ -450,7 +450,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 					Uctx:   notif.Uctx,
 					Tid:    &notif.Tid,
 					Cid:    &notif.Contract.ID,
-					Msg:    "You've joined a new organization.",
+					Msg:    "You've joined a new organisation.",
 					To:     []string{c.Username},
 					IsRead: isRead,
 				}, true)

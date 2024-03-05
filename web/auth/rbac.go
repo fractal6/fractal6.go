@@ -76,7 +76,7 @@ func UserPlaysRole(uctx *model.UserCtx, nameid string) int {
 	return -1
 }
 
-// UserIsOwner returns true if user is Owner in the given organization
+// UserIsOwner returns true if user is Owner in the given organisation
 func UserIsOwner(uctx *model.UserCtx, nameid string) int {
 	uctx, e := MaybeRefresh(uctx)
 	if e != nil {

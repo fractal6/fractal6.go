@@ -107,18 +107,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### New
 - Count user notification and asssigned tension with getUserCount.
-- Remove assigned tensions of an user that leaves an organization.
+- Remove assigned tensions of an user that leaves an organisation.
 - build: add dgraph service files.
 
 ### Fixed
 - mailer: footpage for Announcement tension with link to unsubscribe.
-- mailer: footpage for Alert tension with link to leave organization.
+- mailer: footpage for Alert tension with link to leave organisation.
 - mailer: mail subject is now quoted to escape special character.
 - Make a user watch an organisation when they creates it.
 - add some tests/
 - fix cookie Expires date and token validity time.
 - allow Label edition for labels defined in multiple circles (only editable from the root circle).
-- fix bug that prevented user to leave an organization due a bad nameid check.
+- fix bug that prevented user to leave an organisation due a bad nameid check.
 - fix duplicate email sent for mention user and ref tension.
 - fix wrong notification message sent when comments where sent in a short timestamp.
 
