@@ -148,7 +148,7 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
 				return err
 			}
 
-			// User is leaving an organization: Remove user assignement from tensions in organization
+			// User is leaving an organisation: Remove user assignement from tensions in organisation
 			_, err = db.GetDB().Meta("removeAssignedTension", map[string]string{"username": username, "rootnameid": rootnameid})
 		}
 		return err

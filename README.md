@@ -6,7 +6,7 @@ Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 
 Using Fractale for your organisation offers the following capabilities and features:
 * Interactive tree and graph packing organisation chart
-* organisation visibility defined at circles level
+* Organisation visibility defined at circles level
 * ACL based on member roles and circle governance rules
 * Ticketing management through Tensions
 * Discussion thread and subscription by tension
