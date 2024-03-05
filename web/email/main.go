@@ -371,6 +371,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
         }
     }`, author, email, tools.CleanString(subject, true), tools.CleanString(content, true), notif.Tid, notif.Tid)
 	// @TODO; "List-Unsubscribe": "<%s>"
+	// see https://github.com/postalserver/postal/issues/2788
 	// Other fields: http://apiv1.postalserver.io/controllers/send/message
 
 	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))

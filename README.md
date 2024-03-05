@@ -1,8 +1,8 @@
-# Fractale - self-organization for humans
+# Fractale - self-organisation for humans
 
 Backend, API, Business-logic layer for [Fractale](https://fractale.co).
 
-**Fractale** is a platform for self-organization. It is designed around the concept that an organization can be represented as a tree and should follow principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both, circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done through **Tensions**, and make the link between users and organizations. You can think of a tension as an email, but more structured and more powerful.
+**Fractale** is a platform for self-organisation. It is designed around the concept that an organization can be represented as a tree and should follow principles of transparency, governance decentralization and authority distribution. A tree divides in branches and form leaves, likewise an organization divides in **Circles** that can have **Roles**. Both, circles and roles have an associated descriptive document, called **Mandate**, intended to define its purpose and operating rules. Finally, the communication inside the organization is done through **Tensions**, and make the link between users and organizations. You can think of a tension as an email, but more structured and more powerful.
 
 Using Fractale for your organization offers the following capabilities and features:
 * Interactive tree and graph packing organisation chart
