@@ -245,37 +245,35 @@ func updateProjectColumnHook(ctx context.Context, obj interface{}, next graphql.
 	ExtractInput(ctx, &input)
 	isMoved := false
 	oldColumn := ProjectColumnLoc{}
-	if input.Set != nil && len(input.Filter.ID) == 1 {
-		id := input.Filter.ID[0]
-		projectid := ""
-		if input.Set.Pos != nil {
-			// Extract the value before moving
-			isMoved = true
-			err := db.GetDB().Gamma1(QueryColumnLoc, map[string]string{"colid": id}, &oldColumn)
-			if err != nil {
-				return nil, err
-			}
-			projectid = oldColumn.Projectid
-		} else {
-			x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
-			if err != nil {
-				return nil, err
-			}
-			projectid = x.(string)
-		}
-
-		// Check project auth
-		if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
-			return nil, err
-		}
-
-	} else {
+	if input.Set == nil || len(input.Filter.ID) != 1 {
 		// Review Auth + auto increment
 		return nil, fmt.Errorf("Not implemented")
 	}
-
 	if input.Remove != nil {
 		return nil, fmt.Errorf("remove is not allowed for this mutation")
+	}
+
+	// Extract data identifiers the value before moving
+	id := input.Filter.ID[0]
+	projectid := ""
+	if input.Set.Pos != nil {
+		isMoved = true
+		err := db.GetDB().Gamma1(QueryColumnLoc, map[string]string{"colid": id}, &oldColumn)
+		if err != nil {
+			return nil, err
+		}
+		projectid = oldColumn.Projectid
+	} else {
+		x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
+		if err != nil {
+			return nil, err
+		}
+		projectid = x.(string)
+	}
+
+	// Check project auth
+	if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
+		return nil, err
 	}
 
 	// Forward query
