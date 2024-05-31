@@ -17,6 +17,10 @@
 # - Tension receiver/emitter == receiverid/emmiterid
 # - Node parent.nameid == Node.rootnameid
 
+type BuildInfo {
+  client_version: String!
+}
+
 #
 # Node Interface (Role and Circle)
 #

@@ -19,6 +19,9 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type MutationResolver interface {
+	AddBuildInfo(ctx context.Context, input []*model.AddBuildInfoInput) (*model.AddBuildInfoPayload, error)
+	UpdateBuildInfo(ctx context.Context, input model.UpdateBuildInfoInput) (*model.UpdateBuildInfoPayload, error)
+	DeleteBuildInfo(ctx context.Context, filter model.BuildInfoFilter) (*model.DeleteBuildInfoPayload, error)
 	AddNode(ctx context.Context, input []*model.AddNodeInput, upsert *bool) (*model.AddNodePayload, error)
 	UpdateNode(ctx context.Context, input model.UpdateNodeInput) (*model.UpdateNodePayload, error)
 	DeleteNode(ctx context.Context, filter model.NodeFilter) (*model.DeleteNodePayload, error)
@@ -98,6 +101,8 @@ type MutationResolver interface {
 	DeleteEventCount(ctx context.Context, filter model.EventCountFilter) (*model.DeleteEventCountPayload, error)
 }
 type QueryResolver interface {
+	QueryBuildInfo(ctx context.Context, filter *model.BuildInfoFilter, order *model.BuildInfoOrder, first *int, offset *int) ([]*model.BuildInfo, error)
+	AggregateBuildInfo(ctx context.Context, filter *model.BuildInfoFilter) (*model.BuildInfoAggregateResult, error)
 	GetNode(ctx context.Context, id *string, nameid *string) (*model.Node, error)
 	QueryNode(ctx context.Context, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) ([]*model.Node, error)
 	AggregateNode(ctx context.Context, filter *model.NodeFilter) (*model.NodeAggregateResult, error)
@@ -790,6 +795,48 @@ func (ec *executionContext) field_AddBlobPayload_blob_args(ctx context.Context, 
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOBlobOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_AddBuildInfoPayload_buildInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.BuildInfoFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.BuildInfoOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOBuildInfoOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2247,6 +2294,48 @@ func (ec *executionContext) field_DeleteBlobPayload_blob_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteBuildInfoPayload_buildInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.BuildInfoFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.BuildInfoOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOBuildInfoOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteCommentPayload_comment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3462,6 +3551,21 @@ func (ec *executionContext) field_Mutation_addBlob_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addBuildInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddBuildInfoInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddBuildInfoInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBuildInfoInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4095,6 +4199,21 @@ func (ec *executionContext) field_Mutation_deleteBlob_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteBuildInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.BuildInfoFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNBuildInfoFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4657,6 +4776,21 @@ func (ec *executionContext) field_Mutation_updateBlob_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdateBlobInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateBlobInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateBuildInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateBuildInfoInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateBuildInfoInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateBuildInfoInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -6636,6 +6770,21 @@ func (ec *executionContext) field_Query_aggregateBlob_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateBuildInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.BuildInfoFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateComment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7414,6 +7563,48 @@ func (ec *executionContext) field_Query_queryBlob_args(ctx context.Context, rawA
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOBlobOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryBuildInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.BuildInfoFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.BuildInfoOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOBuildInfoOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -9444,6 +9635,48 @@ func (ec *executionContext) field_UpdateBlobPayload_blob_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_UpdateBuildInfoPayload_buildInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.BuildInfoFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.BuildInfoOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOBuildInfoOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateCommentPayload_comment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11234,6 +11467,97 @@ func (ec *executionContext) _AddBlobPayload_numUids(ctx context.Context, field g
 func (ec *executionContext) fieldContext_AddBlobPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AddBlobPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddBuildInfoPayload_buildInfo(ctx context.Context, field graphql.CollectedField, obj *model.AddBuildInfoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddBuildInfoPayload_buildInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BuildInfo, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.BuildInfo)
+	fc.Result = res
+	return ec.marshalOBuildInfo2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddBuildInfoPayload_buildInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddBuildInfoPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "client_version":
+				return ec.fieldContext_BuildInfo_client_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BuildInfo", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddBuildInfoPayload_buildInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddBuildInfoPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddBuildInfoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddBuildInfoPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddBuildInfoPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddBuildInfoPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -15070,6 +15394,161 @@ func (ec *executionContext) fieldContext_BlobAggregateResult_mdMax(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _BuildInfo_client_version(ctx context.Context, field graphql.CollectedField, obj *model.BuildInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BuildInfo_client_version(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClientVersion, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BuildInfo_client_version(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BuildInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BuildInfoAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.BuildInfoAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BuildInfoAggregateResult_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BuildInfoAggregateResult_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BuildInfoAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BuildInfoAggregateResult_client_versionMin(ctx context.Context, field graphql.CollectedField, obj *model.BuildInfoAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BuildInfoAggregateResult_client_versionMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClientVersionMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BuildInfoAggregateResult_client_versionMin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BuildInfoAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BuildInfoAggregateResult_client_versionMax(ctx context.Context, field graphql.CollectedField, obj *model.BuildInfoAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BuildInfoAggregateResult_client_versionMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClientVersionMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BuildInfoAggregateResult_client_versionMax(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BuildInfoAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comment_message(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comment_message(ctx, field)
 	if err != nil {
@@ -17604,6 +18083,135 @@ func (ec *executionContext) _DeleteBlobPayload_numUids(ctx context.Context, fiel
 func (ec *executionContext) fieldContext_DeleteBlobPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteBlobPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteBuildInfoPayload_buildInfo(ctx context.Context, field graphql.CollectedField, obj *model.DeleteBuildInfoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteBuildInfoPayload_buildInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BuildInfo, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.BuildInfo)
+	fc.Result = res
+	return ec.marshalOBuildInfo2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteBuildInfoPayload_buildInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteBuildInfoPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "client_version":
+				return ec.fieldContext_BuildInfo_client_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BuildInfo", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteBuildInfoPayload_buildInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteBuildInfoPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteBuildInfoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteBuildInfoPayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteBuildInfoPayload_msg(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteBuildInfoPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteBuildInfoPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteBuildInfoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteBuildInfoPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteBuildInfoPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteBuildInfoPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -24876,6 +25484,173 @@ func (ec *executionContext) fieldContext_MultiPolygon_polygons(ctx context.Conte
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Polygon", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addBuildInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addBuildInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddBuildInfo(rctx, fc.Args["input"].([]*model.AddBuildInfoInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddBuildInfoPayload)
+	fc.Result = res
+	return ec.marshalOAddBuildInfoPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBuildInfoPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addBuildInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "buildInfo":
+				return ec.fieldContext_AddBuildInfoPayload_buildInfo(ctx, field)
+			case "numUids":
+				return ec.fieldContext_AddBuildInfoPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AddBuildInfoPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addBuildInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateBuildInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateBuildInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateBuildInfo(rctx, fc.Args["input"].(model.UpdateBuildInfoInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateBuildInfoPayload)
+	fc.Result = res
+	return ec.marshalOUpdateBuildInfoPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateBuildInfoPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateBuildInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "buildInfo":
+				return ec.fieldContext_UpdateBuildInfoPayload_buildInfo(ctx, field)
+			case "numUids":
+				return ec.fieldContext_UpdateBuildInfoPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateBuildInfoPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateBuildInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteBuildInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteBuildInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteBuildInfo(rctx, fc.Args["filter"].(model.BuildInfoFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteBuildInfoPayload)
+	fc.Result = res
+	return ec.marshalODeleteBuildInfoPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteBuildInfoPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteBuildInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "buildInfo":
+				return ec.fieldContext_DeleteBuildInfoPayload_buildInfo(ctx, field)
+			case "msg":
+				return ec.fieldContext_DeleteBuildInfoPayload_msg(ctx, field)
+			case "numUids":
+				return ec.fieldContext_DeleteBuildInfoPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteBuildInfoPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteBuildInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -42225,6 +43000,116 @@ func (ec *executionContext) fieldContext_ProjectFieldValueAggregateResult_posAvg
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_queryBuildInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryBuildInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryBuildInfo(rctx, fc.Args["filter"].(*model.BuildInfoFilter), fc.Args["order"].(*model.BuildInfoOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.BuildInfo)
+	fc.Result = res
+	return ec.marshalOBuildInfo2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryBuildInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "client_version":
+				return ec.fieldContext_BuildInfo_client_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BuildInfo", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryBuildInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateBuildInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateBuildInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateBuildInfo(rctx, fc.Args["filter"].(*model.BuildInfoFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.BuildInfoAggregateResult)
+	fc.Result = res
+	return ec.marshalOBuildInfoAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateBuildInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_BuildInfoAggregateResult_count(ctx, field)
+			case "client_versionMin":
+				return ec.fieldContext_BuildInfoAggregateResult_client_versionMin(ctx, field)
+			case "client_versionMax":
+				return ec.fieldContext_BuildInfoAggregateResult_client_versionMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BuildInfoAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_aggregateBuildInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getNode(ctx, field)
 	if err != nil {
@@ -52473,6 +53358,97 @@ func (ec *executionContext) fieldContext_UpdateBlobPayload_numUids(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateBuildInfoPayload_buildInfo(ctx context.Context, field graphql.CollectedField, obj *model.UpdateBuildInfoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateBuildInfoPayload_buildInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BuildInfo, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.BuildInfo)
+	fc.Result = res
+	return ec.marshalOBuildInfo2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateBuildInfoPayload_buildInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateBuildInfoPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "client_version":
+				return ec.fieldContext_BuildInfo_client_version(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BuildInfo", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateBuildInfoPayload_buildInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateBuildInfoPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateBuildInfoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateBuildInfoPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateBuildInfoPayload_numUids(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateBuildInfoPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateCommentPayload_comment(ctx context.Context, field graphql.CollectedField, obj *model.UpdateCommentPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateCommentPayload_comment(ctx, field)
 	if err != nil {
@@ -60553,6 +61529,33 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddBuildInfoInput(ctx context.Context, obj interface{}) (model.AddBuildInfoInput, error) {
+	var it model.AddBuildInfoInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"client_version"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "client_version":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("client_version"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClientVersion = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, obj interface{}) (model.AddCommentInput, error) {
 	var it model.AddCommentInput
 	asMap := map[string]interface{}{}
@@ -64747,6 +65750,164 @@ func (ec *executionContext) unmarshalInputBlobType_hash(ctx context.Context, obj
 				return it, err
 			}
 			it.In = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputBuildInfoFilter(ctx context.Context, obj interface{}) (model.BuildInfoFilter, error) {
+	var it model.BuildInfoFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "has":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			data, err := ec.unmarshalOBuildInfoHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Has = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOBuildInfoFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOBuildInfoFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputBuildInfoOrder(ctx context.Context, obj interface{}) (model.BuildInfoOrder, error) {
+	var it model.BuildInfoOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "asc":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			data, err := ec.unmarshalOBuildInfoOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Asc = data
+		case "desc":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			data, err := ec.unmarshalOBuildInfoOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Desc = data
+		case "then":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			data, err := ec.unmarshalOBuildInfoOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Then = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputBuildInfoPatch(ctx context.Context, obj interface{}) (model.BuildInfoPatch, error) {
+	var it model.BuildInfoPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"client_version"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "client_version":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("client_version"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.ClientVersion = data
+			} else if tmp == nil {
+				it.ClientVersion = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputBuildInfoRef(ctx context.Context, obj interface{}) (model.BuildInfoRef, error) {
+	var it model.BuildInfoRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"client_version"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "client_version":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("client_version"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClientVersion = data
 		}
 	}
 
@@ -76566,6 +77727,47 @@ func (ec *executionContext) unmarshalInputUpdateBlobInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateBuildInfoInput(ctx context.Context, obj interface{}) (model.UpdateBuildInfoInput, error) {
+	var it model.UpdateBuildInfoInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			data, err := ec.unmarshalNBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Filter = data
+		case "set":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			data, err := ec.unmarshalOBuildInfoPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Set = data
+		case "remove":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			data, err := ec.unmarshalOBuildInfoPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Remove = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateCommentInput(ctx context.Context, obj interface{}) (model.UpdateCommentInput, error) {
 	var it model.UpdateCommentInput
 	asMap := map[string]interface{}{}
@@ -79989,6 +81191,44 @@ func (ec *executionContext) _AddBlobPayload(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var addBuildInfoPayloadImplementors = []string{"AddBuildInfoPayload"}
+
+func (ec *executionContext) _AddBuildInfoPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddBuildInfoPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addBuildInfoPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddBuildInfoPayload")
+		case "buildInfo":
+			out.Values[i] = ec._AddBuildInfoPayload_buildInfo(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddBuildInfoPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var addCommentPayloadImplementors = []string{"AddCommentPayload"}
 
 func (ec *executionContext) _AddCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddCommentPayload) graphql.Marshaler {
@@ -81032,6 +82272,85 @@ func (ec *executionContext) _BlobAggregateResult(ctx context.Context, sel ast.Se
 	return out
 }
 
+var buildInfoImplementors = []string{"BuildInfo"}
+
+func (ec *executionContext) _BuildInfo(ctx context.Context, sel ast.SelectionSet, obj *model.BuildInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, buildInfoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BuildInfo")
+		case "client_version":
+			out.Values[i] = ec._BuildInfo_client_version(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var buildInfoAggregateResultImplementors = []string{"BuildInfoAggregateResult"}
+
+func (ec *executionContext) _BuildInfoAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.BuildInfoAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, buildInfoAggregateResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BuildInfoAggregateResult")
+		case "count":
+			out.Values[i] = ec._BuildInfoAggregateResult_count(ctx, field, obj)
+		case "client_versionMin":
+			out.Values[i] = ec._BuildInfoAggregateResult_client_versionMin(ctx, field, obj)
+		case "client_versionMax":
+			out.Values[i] = ec._BuildInfoAggregateResult_client_versionMax(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var commentImplementors = []string{"Comment"}
 
 func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, obj *model.Comment) graphql.Marshaler {
@@ -81314,6 +82633,46 @@ func (ec *executionContext) _DeleteBlobPayload(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._DeleteBlobPayload_msg(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._DeleteBlobPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteBuildInfoPayloadImplementors = []string{"DeleteBuildInfoPayload"}
+
+func (ec *executionContext) _DeleteBuildInfoPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteBuildInfoPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteBuildInfoPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteBuildInfoPayload")
+		case "buildInfo":
+			out.Values[i] = ec._DeleteBuildInfoPayload_buildInfo(ctx, field, obj)
+		case "msg":
+			out.Values[i] = ec._DeleteBuildInfoPayload_msg(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._DeleteBuildInfoPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -82922,6 +84281,18 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "addBuildInfo":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addBuildInfo(ctx, field)
+			})
+		case "updateBuildInfo":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateBuildInfo(ctx, field)
+			})
+		case "deleteBuildInfo":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteBuildInfo(ctx, field)
+			})
 		case "addNode":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addNode(ctx, field)
@@ -84769,6 +86140,44 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "queryBuildInfo":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryBuildInfo(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "aggregateBuildInfo":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateBuildInfo(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getNode":
 			field := field
 
@@ -86648,6 +88057,44 @@ func (ec *executionContext) _UpdateBlobPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var updateBuildInfoPayloadImplementors = []string{"UpdateBuildInfoPayload"}
+
+func (ec *executionContext) _UpdateBuildInfoPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateBuildInfoPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateBuildInfoPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateBuildInfoPayload")
+		case "buildInfo":
+			out.Values[i] = ec._UpdateBuildInfoPayload_buildInfo(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._UpdateBuildInfoPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var updateCommentPayloadImplementors = []string{"UpdateCommentPayload"}
 
 func (ec *executionContext) _UpdateCommentPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateCommentPayload) graphql.Marshaler {
@@ -88164,6 +89611,28 @@ func (ec *executionContext) unmarshalNAddBlobInput2ᚖfractaleᚋfractal6ᚗgo�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddBuildInfoInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBuildInfoInputᚄ(ctx context.Context, v interface{}) ([]*model.AddBuildInfoInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddBuildInfoInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddBuildInfoInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBuildInfoInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddBuildInfoInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBuildInfoInput(ctx context.Context, v interface{}) (*model.AddBuildInfoInput, error) {
+	res, err := ec.unmarshalInputAddBuildInfoInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddCommentInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentInputᚄ(ctx context.Context, v interface{}) ([]*model.AddCommentInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -88725,6 +90194,16 @@ func (ec *executionContext) unmarshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraph�
 
 func (ec *executionContext) marshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, sel ast.SelectionSet, v model.BlobType) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNBuildInfoFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx context.Context, v interface{}) (model.BuildInfoFilter, error) {
+	res, err := ec.unmarshalInputBuildInfoFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx context.Context, v interface{}) (*model.BuildInfoFilter, error) {
+	res, err := ec.unmarshalInputBuildInfoFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNCardKind2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCardKind(ctx context.Context, sel ast.SelectionSet, v model.CardKind) graphql.Marshaler {
@@ -89640,6 +91119,11 @@ func (ec *executionContext) unmarshalNUpdateBlobInput2fractaleᚋfractal6ᚗgo�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNUpdateBuildInfoInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateBuildInfoInput(ctx context.Context, v interface{}) (model.UpdateBuildInfoInput, error) {
+	res, err := ec.unmarshalInputUpdateBuildInfoInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateCommentInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentInput(ctx context.Context, v interface{}) (model.UpdateCommentInput, error) {
 	res, err := ec.unmarshalInputUpdateCommentInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -89941,6 +91425,13 @@ func (ec *executionContext) marshalOAddBlobPayload2ᚖfractaleᚋfractal6ᚗgo�
 		return graphql.Null
 	}
 	return ec._AddBlobPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddBuildInfoPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBuildInfoPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddBuildInfoPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddBuildInfoPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddCommentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddCommentPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddCommentPayload) graphql.Marshaler {
@@ -90488,6 +91979,198 @@ func (ec *executionContext) unmarshalOBlobType_hash2ᚖfractaleᚋfractal6ᚗgo�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputBlobType_hash(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOBuildInfo2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfo(ctx context.Context, sel ast.SelectionSet, v []*model.BuildInfo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOBuildInfo2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfo(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOBuildInfo2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfo(ctx context.Context, sel ast.SelectionSet, v *model.BuildInfo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._BuildInfo(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOBuildInfoAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.BuildInfoAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._BuildInfoAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOBuildInfoFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx context.Context, v interface{}) ([]*model.BuildInfoFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.BuildInfoFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOBuildInfoFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx context.Context, v interface{}) (*model.BuildInfoFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputBuildInfoFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOBuildInfoHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoHasFilter(ctx context.Context, v interface{}) ([]*model.BuildInfoHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.BuildInfoHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOBuildInfoHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOBuildInfoHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.BuildInfoHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOBuildInfoHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOBuildInfoHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoHasFilter(ctx context.Context, v interface{}) (*model.BuildInfoHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.BuildInfoHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOBuildInfoHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.BuildInfoHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOBuildInfoOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrder(ctx context.Context, v interface{}) (*model.BuildInfoOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputBuildInfoOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOBuildInfoOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrderable(ctx context.Context, v interface{}) (*model.BuildInfoOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.BuildInfoOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOBuildInfoOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoOrderable(ctx context.Context, sel ast.SelectionSet, v *model.BuildInfoOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOBuildInfoPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoPatch(ctx context.Context, v interface{}) (*model.BuildInfoPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputBuildInfoPatch(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -91363,6 +93046,13 @@ func (ec *executionContext) marshalODeleteBlobPayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._DeleteBlobPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteBuildInfoPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteBuildInfoPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteBuildInfoPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteBuildInfoPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteCommentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteCommentPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteCommentPayload) graphql.Marshaler {
@@ -97433,6 +99123,13 @@ func (ec *executionContext) marshalOUpdateBlobPayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._UpdateBlobPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateBuildInfoPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateBuildInfoPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateBuildInfoPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateBuildInfoPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateCommentPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateCommentPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateCommentPayload) graphql.Marshaler {

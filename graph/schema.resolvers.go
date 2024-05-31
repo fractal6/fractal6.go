@@ -9,7 +9,23 @@ import (
 	"fmt"
 	"fractale/fractal6.go/graph/generated"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/web/auth"
 )
+
+// AddBuildInfo is the resolver for the addBuildInfo field.
+func (r *mutationResolver) AddBuildInfo(ctx context.Context, input []*model.AddBuildInfoInput) (*model.AddBuildInfoPayload, error) {
+	panic(fmt.Errorf("not implemented: AddBuildInfo - addBuildInfo"))
+}
+
+// UpdateBuildInfo is the resolver for the updateBuildInfo field.
+func (r *mutationResolver) UpdateBuildInfo(ctx context.Context, input model.UpdateBuildInfoInput) (*model.UpdateBuildInfoPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateBuildInfo - updateBuildInfo"))
+}
+
+// DeleteBuildInfo is the resolver for the deleteBuildInfo field.
+func (r *mutationResolver) DeleteBuildInfo(ctx context.Context, filter model.BuildInfoFilter) (*model.DeleteBuildInfoPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteBuildInfo - deleteBuildInfo"))
+}
 
 // AddNode is the resolver for the addNode field.
 func (r *mutationResolver) AddNode(ctx context.Context, input []*model.AddNodeInput, upsert *bool) (data *model.AddNodePayload, errors error) {
@@ -418,6 +434,16 @@ func (r *mutationResolver) UpdateEventCount(ctx context.Context, input model.Upd
 // DeleteEventCount is the resolver for the deleteEventCount field.
 func (r *mutationResolver) DeleteEventCount(ctx context.Context, filter model.EventCountFilter) (data *model.DeleteEventCountPayload, errors error) {
 	panic(fmt.Errorf("not implemented: DeleteEventCount - deleteEventCount"))
+}
+
+// QueryBuildInfo is the resolver for the queryBuildInfo field.
+func (r *queryResolver) QueryBuildInfo(ctx context.Context, filter *model.BuildInfoFilter, order *model.BuildInfoOrder, first *int, offset *int) ([]*model.BuildInfo, error) {
+	return []*model.BuildInfo{{ClientVersion: auth.ClientVersion}}, nil
+}
+
+// AggregateBuildInfo is the resolver for the aggregateBuildInfo field.
+func (r *queryResolver) AggregateBuildInfo(ctx context.Context, filter *model.BuildInfoFilter) (*model.BuildInfoAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateBuildInfo - aggregateBuildInfo"))
 }
 
 // GetNode is the resolver for the getNode field.
