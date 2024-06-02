@@ -56,6 +56,28 @@ func GetRoles(uctx *model.UserCtx, nameid string) []*model.Node {
 	return roles
 }
 
+// GetRoles returns the membership role of an organisation
+func GetMembershipRole(uctx *model.UserCtx, nameid string) *model.Node {
+	uctx, e := MaybeRefresh(uctx)
+	if e != nil {
+		panic(e)
+	}
+	rootnameid, e := codec.Nid2rootid(nameid)
+	if e != nil {
+		panic(e)
+	}
+
+	for _, r := range uctx.Roles {
+		if rid, err := codec.Nid2rootid(r.Nameid); err != nil {
+			panic(err.Error())
+		} else if rid == rootnameid && codec.IsMembershipRoleType(*r.RoleType) {
+			return r
+		}
+	}
+
+	return nil
+}
+
 // UserPlaysRole return true if the user play the given role (Nameid)
 func UserPlaysRole(uctx *model.UserCtx, nameid string) int {
 	uctx, e := MaybeRefresh(uctx)

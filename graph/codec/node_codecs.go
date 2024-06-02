@@ -78,6 +78,35 @@ func VoteIdCodec(contractid string, rootnameid, username string) string {
 	return nameid
 }
 
+// IsMembershipRoleType return true if a role type is special/protect membership type
+// the firstlink should be automatically rootid##@{username} in this case.
+func IsMembershipRoleType(roleType model.RoleType) bool {
+	var result bool
+	switch roleType {
+	case model.RoleTypeRetired, model.RoleTypePending, model.RoleTypeGuest, model.RoleTypeMember, model.RoleTypeOwner:
+		result = true
+	default:
+		result = false
+	}
+	return result
+}
+
+// IsMembershipNameid return true if a role type is special/protect membership type
+// It corresponf to the membership roltype detecter IsMembershipRoleType.
+func IsMembershipNameid(nid string) bool {
+	if IsRole(nid) {
+		parts := strings.Split(nid, "#")
+		if parts[len(parts)-1][0] == '@' {
+			return true
+		}
+	}
+	return false
+}
+
+//
+// string nameid codec heuristics
+//
+
 func Cid2Tid(contractid string) string {
 	parts := strings.Split(contractid, "#")
 	if len(parts) > 0 {

@@ -158,6 +158,9 @@ func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model
 		if !model.RoleType(value).IsValid() {
 			return false, fmt.Errorf("Bad value for role_type.")
 		}
+		if codec.IsMembershipRoleType(model.RoleType(value)) {
+			return false, fmt.Errorf("Membership roles are protected and cannot be created like this.")
+		}
 		err = db.DB.SetFieldByEq("Node.nameid", nameid, "Node.role_type", value)
 		if err != nil {
 			return false, err
@@ -225,7 +228,7 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 	var nameid string
 	parentid := tension.Receiver.Nameid
 
-	// unsafe is used to Guest user to be unlink,
+	// unsafe is used to allow Guest user to be unlinked,
 	// as the nameid include a "@" char.
 	if unsafe {
 		nameid = *node.Nameid
@@ -280,26 +283,29 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 }
 
 // NodeCheck validate and type checks.
-// @obsolete with NodeIdCodec
 func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, action *model.TensionAction) (bool, error) {
 	var ok bool = false
 	var err error
 
-	name := *node.Name
+	// Validate nameid
+	// @obsolete with NodeIdCodec ?
 	rootnameid, err := codec.Nid2rootid(nameid)
 	if err != nil {
 		return ok, err
 	}
-
 	err = auth.ValidateNameid(nameid, rootnameid)
 	if err != nil {
 		return ok, err
 	}
+
+	// Validate Name
+	name := *node.Name
 	err = auth.ValidateName(name)
 	if err != nil {
 		return ok, err
 	}
 
+	// Validate Tension action
 	if *action == model.TensionActionNewRole {
 		// RoleType Hook
 		nodeType := *node.Type
@@ -312,6 +318,11 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
 		} else if nodeType == model.NodeTypeCircle {
 			//pass
 		}
+	}
+
+	// Validate special role-type from being created
+	if node.RoleType != nil && codec.IsMembershipRoleType(*node.RoleType) {
+		return false, fmt.Errorf("Membership roles are protected and cannot be created like this.")
 	}
 
 	ok = true

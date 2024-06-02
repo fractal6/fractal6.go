@@ -643,9 +643,9 @@ var dqlQueries map[string]string = map[string]string{
             assigned_tensions: sum(val(t))
 		}
     }`,
-	"getMembers": `{
-        all(func: eq(Node.nameid, "{{.nameid}}")) @filter({{.nameids}}) @normalize {
-            Node.children @filter(eq(Node.role_type, "Owner") OR eq(Node.role_type, "Member") OR eq(Node.role_type, "Guest")) {
+	"getOwners": `{
+        all(func: eq(Node.nameid, "{{.nameid}}")) @normalize {
+            Node.children @filter(eq(Node.role_type, "Owner")) {
                 Node.first_link {
                     username: User.username
                 }
@@ -1168,6 +1168,8 @@ func (dg Dgraph) CountHas2(fieldName, f2, v2 string) int {
 }
 
 func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{}, error) {
+	// Execute a DQL request from the given defined query template
+	// Returns: array
 	var res *api.Response
 	var err error
 
@@ -1206,17 +1208,19 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{
 }
 
 func (dg Dgraph) Meta1(f string, maps map[string]string, data interface{}) error {
-	x, err := dg.Meta(f, maps)
-	if err != nil {
+	// Execute a DQL request from the given defined query template
+	// Returns: interface
+	if x, err := dg.Meta(f, maps); err != nil {
 		return err
-	}
-	if len(x) > 0 {
+	} else if len(x) > 0 {
 		Map2Struct(x[0], data)
 	}
 	return nil
 }
 
 func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]interface{}, error) {
+	// Send Custom DQL request
+	// Returns: array
 	var res *api.Response
 	var err error
 
@@ -1245,11 +1249,11 @@ func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]interfa
 }
 
 func (dg Dgraph) Gamma1(q QueryMut, maps map[string]string, data interface{}) error {
-	x, err := dg.Gamma(q, maps)
-	if err != nil {
+	// Send Custom DQL request
+	// Returns: interface
+	if x, err := dg.Gamma(q, maps); err != nil {
 		return err
-	}
-	if len(x) > 0 {
+	} else if len(x) > 0 {
 		Map2Struct(x[0], data)
 	}
 	return nil
