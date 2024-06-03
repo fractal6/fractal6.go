@@ -119,7 +119,7 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
 		return nil, err
 	}
 	if data.(*model.AddContractPayload) == nil {
-		return nil, LogErr("add contract", fmt.Errorf("no contract added."))
+		return nil, LogErr("add contract", fmt.Errorf("silent error: no contract added."))
 	}
 	id := data.(*model.AddContractPayload).Contract[0].ID
 	tid := *input.Tension.ID
@@ -371,7 +371,7 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
 	}
 	data := d.(*model.AddVotePayload)
 	if data == nil {
-		return nil, LogErr("add vote", fmt.Errorf("no vote added."))
+		return nil, LogErr("add vote", fmt.Errorf("silent error: no vote added."))
 	}
 
 	// Post process vote

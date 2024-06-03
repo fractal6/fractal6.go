@@ -1,12 +1,13 @@
 # <!> Schema Dependencies <!>
-# * fractal6.go/graph/tension_auth/EMAP: propagated fields
-# * fractal6.go/graph/tensions_op: Each event need to be individually processed in `TensionEventHook`
-# * fractal6-ui.elm: query and case on enum object
-# * db/script: hardcoded spec
-# * fractal6.go/db/api: hardcoded query, mutation and delete (fields)
+# - fractal6.go/graph/tension_auth/EMAP: propagated fields
+# - fractal6.go/graph/tensions_op: Each event need to be individually processed in `TensionEventHook`
+# - fractal6-ui.elm: query and case on enum object
+# - db/script: hardcoded spec
+# - fractal6.go/db/api: hardcoded query, mutation and delete (fields)
 
 # <!> Generation Warning <!>
-# interface must be defined before their implementation (or gqlast will crash)
+# - interface must be defined before their implementation (or gqlast will crash)
+# - Warning: dgraph-alpha graphql:config=true confug is important ot get duplication err result not filtered.
 
 # <!> Security Notes <!>
 # Schema authorization is a mix between the Dgraph authorization rules (RBAC and GBAC),

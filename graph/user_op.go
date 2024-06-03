@@ -66,7 +66,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 
 	// Type check
 	if node.RoleType == nil {
-		return false, fmt.Errorf("Node needs a role type for this action.")
+		return false, LogErr("access denied", fmt.Errorf("Node needs a role type for this action."))
 	}
 
 	// Special case for membership role
@@ -78,11 +78,11 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 			return false, err
 		}
 		if len(auth.GetRoles(uctx, nameid)) > 1 && *node.RoleType != model.RoleTypeOwner {
-			return false, fmt.Errorf("Doh, you have active roles in this organisation. Please leave your roles first.")
+			return false, LogErr("access denied", fmt.Errorf("Doh, you have active roles in this organisation. Please leave your roles first."))
 		} else if *node.RoleType == model.RoleTypePending {
-			return false, fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation.")
+			return false, LogErr("access denied", fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation."))
 		} else if *node.RoleType == model.RoleTypePending {
-			return false, fmt.Errorf("You are already retired from this role.")
+			return false, LogErr("access denied", fmt.Errorf("You are already retired from this role."))
 		} else if *node.RoleType == model.RoleTypeOwner {
 			// Owner can leave if not alone
 			// --
@@ -97,7 +97,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 			}
 			// If owner is alone, prevent orphan organization
 			if len(owners) < 2 {
-				return false, fmt.Errorf("An organization need at least one Owner. Please contact us if you need to transfer ownership.")
+				return false, LogErr("access denied", fmt.Errorf("An organization need at least one Owner. Please contact us if you need to transfer ownership."))
 			}
 
 			// Downgrade Owner to Member
@@ -115,7 +115,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 
 	// If user doesn't play role, return error
 	if i := auth.UserPlaysRole(uctx, nameid); i < 0 {
-		return false, fmt.Errorf("Role already left or not played.")
+		return false, LogErr("access denied", fmt.Errorf("Role already left or not played."))
 	}
 
 	err = UnlinkUser(rootnameid, nameid, uctx.Username)

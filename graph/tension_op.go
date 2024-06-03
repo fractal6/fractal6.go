@@ -455,7 +455,7 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 		var nf model.NodeFragment
 		StructMap(n, &nf)
 		if *nf.RoleType != model.RoleTypeGuest {
-			return false, LogErr("Value error", fmt.Errorf("You cannot detach this role (%s) like this.", string(*nf.RoleType)))
+			return false, LogErr("access denied", fmt.Errorf("You cannot detach this role (%s) like this.", string(*nf.RoleType)))
 		}
 		nf.FirstLink = event.Old
 		node = &nf
@@ -472,7 +472,7 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 		return false, fmt.Errorf("old and new event data must be defined.")
 	}
 	if *event.Old != tension.Receiver.Nameid {
-		return false, fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid)
+		return false, LogErr("access denied", fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid))
 	}
 
 	var err error
@@ -609,7 +609,7 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
 		var membershipNode = auth.GetMembershipRole(uctx, tension.Emitter.Nameid)
 		var nf model.NodeFragment
 		if roleType != *membershipNode.RoleType {
-			return false, fmt.Errorf("You must have the same membership as the one given in the event.")
+			return false, LogErr("access denied", fmt.Errorf("You must have the same membership as the one given in the event."))
 		}
 		StructMap(membershipNode, &nf)
 		nf.FirstLink = &uctx.Username

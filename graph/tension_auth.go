@@ -264,7 +264,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 			if r != nil && r.(bool) {
 				return true, err
 			} else {
-				return false, fmt.Errorf("Sorry, Guest cannot create tension in this organisation at the moment.")
+				return false, LogErr("access denied", fmt.Errorf("Sorry, Guest cannot create tension in this organisation at the moment."))
 			}
 		} else if auth.UserIsMember(uctx, tension.Receiver.Nameid) >= 0 {
 			return true, err

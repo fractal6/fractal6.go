@@ -456,16 +456,17 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 					orga_name = x.(string)
 				}
 				subject = fmt.Sprintf("[%s] You are invited to this organisation", recv)
-				payload = fmt.Sprintf(`Hi%s,<br><br> You are kindly invited by %s to join the organisation <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
-                You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, recv, orga_name, url_redirect, url_redirect)
+				payload = fmt.Sprintf(`Hi%s,<br><br> You have been invited by %s to join the organisation <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
+                Please click the link below to accept or reject the invitation:<br><a href="%s">%s</a>`, rcpt_name, author, recv, orga_name, url_redirect, url_redirect)
 			} else if ui.Reason == model.ReasonIsLinkCandidate {
 				subject = fmt.Sprintf("[%s] You have a new role invitation", recv)
-				payload = fmt.Sprintf(`Hi%s,<br><br> You are kindly invited to take a new role by %s.<br><br>
-                You can see this invitation and accept or reject it by clicking on the following link:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
+				payload = fmt.Sprintf(`Hi%s,<br><br> You have been invited by %s to take a new role.<br><br>
+                Please click the link below to accept or reject the invitation:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
 			} else {
 				subject = fmt.Sprintf("[%s][%s] A pending contract needs your attention", recv, e.ToContractText())
 				payload = fmt.Sprintf(`Hi%s,<br><br>
-                A vote is needed to process the following contract:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
+                A vote is needed to process a pending contract.<br><br>
+                Please click the link below to accept or reject the proposition:<br><a href="%s">%s</a>`, rcpt_name, url_redirect, url_redirect)
 			}
 		case model.ContractStatusCanceled:
 			// notify only participant

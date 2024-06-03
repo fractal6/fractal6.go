@@ -99,7 +99,7 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 	}
 	d := data.(*model.AddProjectCardPayload)
 	if d == nil {
-		return nil, LogErr("add ProjectCard", fmt.Errorf("no card added"))
+		return nil, LogErr("add ProjectCard", fmt.Errorf("silent error: no card added"))
 	}
 
 	// Post-processing:
@@ -159,7 +159,7 @@ func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 	}
 	d := data.(*model.DeleteProjectCardPayload)
 	if d == nil {
-		return nil, LogErr("delete ProjectCard", fmt.Errorf("no card deleted"))
+		return nil, LogErr("delete ProjectCard", fmt.Errorf("silent error: no card deleted"))
 	}
 
 	// Post-processing:

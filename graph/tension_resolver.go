@@ -122,7 +122,7 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 		return data, err
 	}
 	if data.(*model.AddTensionPayload) == nil {
-		return nil, LogErr("add tension", fmt.Errorf("no tension added."))
+		return nil, LogErr("add tension", fmt.Errorf("silent error: no tension added."))
 	}
 	tension := data.(*model.AddTensionPayload).Tension[0]
 	id := tension.ID

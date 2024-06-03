@@ -145,7 +145,7 @@ func addProjectColumnHook(ctx context.Context, obj interface{}, next graphql.Res
 	}
 	d := data.(*model.AddProjectColumnPayload)
 	if d == nil {
-		return nil, LogErr("add ProjectColumn", fmt.Errorf("no col added"))
+		return nil, LogErr("add ProjectColumn", fmt.Errorf("silent error: no col added"))
 	}
 
 	// Post-processing:
@@ -197,7 +197,7 @@ func deleteProjectColumnHook(ctx context.Context, obj interface{}, next graphql.
 	}
 	d := data.(*model.DeleteProjectColumnPayload)
 	if d == nil {
-		return nil, LogErr("delete ProjectColumn", fmt.Errorf("no column deleted"))
+		return nil, LogErr("delete ProjectColumn", fmt.Errorf("silent error: no column deleted"))
 	}
 
 	// Post-processing:
