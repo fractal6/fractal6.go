@@ -137,7 +137,7 @@ type ContractNotif struct {
 	Tid           string        `json:"tid"`
 	Contract      *Contract     `json:"contract"`
 	ContractEvent ContractEvent `json:"contract_event"`
-	// The following are get after the the cache publication
+	// The following are get after the publication to the cache
 	// to keep the messaging system as fast as possible.
 	Rootnameid string `json:"rootnameid"`
 	Receiverid string `json:"receiverid"`
@@ -285,6 +285,17 @@ func (notif EventNotif) GetExUser() string {
 		if *e.EventType == TensionEventUserLeft || *e.EventType == TensionEventMemberUnlinked {
 			if e.Old != nil {
 				return *e.Old
+			}
+		}
+	}
+	return ""
+}
+
+func (notif EventNotif) GetExRoleType() string {
+	for _, e := range notif.History {
+		if *e.EventType == TensionEventUserLeft || *e.EventType == TensionEventMemberUnlinked {
+			if e.New != nil {
+				return *e.New
 			}
 		}
 	}

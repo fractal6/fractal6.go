@@ -67,6 +67,10 @@ func init() {
 	maintainerEmail = viper.GetString("mailer.admin_email")
 }
 
+//
+// System Email
+//
+
 // Send an email with a http request to the email server API to the admin email.
 func SendMaintainerEmail(subject, body string) error {
 	if maintainerEmail == "" {
@@ -99,6 +103,10 @@ func SendMaintainerEmail(subject, body string) error {
 
 	return nil
 }
+
+//
+// Login Email
+//
 
 // Send an verification email for signup
 func SendVerificationEmail(email, token string) error {
@@ -180,6 +188,62 @@ func SendResetEmail(email, token string) error {
 
 	return nil
 }
+
+//
+// REST API Email
+//
+
+func SendOwnerGrantedEmail(username, nameid, orgName string) error {
+	var email string
+	if x, err := db.GetDB().GetFieldByEq("User.username", username, "User.email"); err != nil {
+		return err
+	} else {
+		email = x.(string)
+	}
+	orgUrl := fmt.Sprintf("https://"+DOMAIN+"/o/%s", nameid)
+	memberUrl := fmt.Sprintf("https://"+DOMAIN+"/m/%s", nameid)
+
+	content := fmt.Sprintf(`<html>
+	<head>
+	<meta charset="utf-8">
+	</head>
+	<body>
+    <br>
+    <p>You have been granted owner of the <a href="%s">%s (%s)</a> organisation.</p><br>
+
+    If this was a mistake you can <a href="%s">leave this role</a>.<br><br>
+
+    <i>The Fractale Team</i>
+	</body>
+    </html>`, orgUrl, orgName, nameid, memberUrl)
+
+	body := fmt.Sprintf(`{
+        "from": "Fractale <noreply@`+DOMAIN+`>",
+        "to": ["%s"],
+        "subject": "Ownership of %s was granted",
+        "html_body": "%s"
+    }`, email, tools.CleanString(content, true))
+
+	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Server-API-Key", emailSecret)
+
+	customTransport := http.DefaultTransport.(*http.Transport).Clone()
+	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	client := &http.Client{Transport: customTransport}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+
+}
+
+//
+// Graph/Structured email
+//
 
 func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) error {
 	// Get inputs
@@ -276,7 +340,14 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			}
 			anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
 			if anchorTid != nil && anchorTid.(string) == notif.Tid {
-				auto_msg = fmt.Sprintf(`%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+				switch model.RoleType(notif.GetExRoleType()) {
+				case model.RoleTypeGuest:
+					auto_msg = fmt.Sprintf(`%s left this organisation in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+				case model.RoleTypeOwner:
+					auto_msg = fmt.Sprintf(`%s left his owner role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
+				default:
+					panic("Not implemented Role Type on UserLeft event notif/email.")
+				}
 			} else {
 				auto_msg = fmt.Sprintf(`%s left his role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
 			}
