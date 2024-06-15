@@ -119,7 +119,7 @@ type Node @auth(
   events_history: [Event!] @meta(f:"getNodeHistory", k:"nameid")
 
   # Dgraph directive
-  cascade_directive: Bool
+  cascade_directive: Boolean
 }
 
 type NodeFragment {

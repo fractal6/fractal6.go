@@ -93,22 +93,6 @@ func (r *mutationResolver) DgraphDeleteBridge(ctx context.Context, filter interf
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
-/* Raw bridges pass the raw query from the request context to Dgraph.
- * @warning: It looses transformation that eventually happen in the resolvers/directives.
- * @warning: It is hard to modify the query with this approache
- * @deprecated
- */
-
-func (r *queryResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
-	err := DgraphQueryResolverRaw(ctx, r.db, data)
-	return postGqlProcess(ctx, r.db, data, err)
-}
-
-func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
-	err := DgraphQueryResolverRaw(ctx, r.db, data)
-	return postGqlProcess(ctx, r.db, data, err)
-}
-
 func getUserQueryType(ctx context.Context) (*model.UserCtx, string, error) {
 	_, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -123,6 +107,9 @@ func getUserQueryType(ctx context.Context) (*model.UserCtx, string, error) {
 	return uctx, typeName, err
 }
 
+// postGqlProcess postprocess output data and error:
+// - ignore error if data are returned (cause by @auth rules filtering).
+// - handle meta query passed with redis.
 func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors error) error {
 	if data != nil && errors != nil {
 		// Gqlgen ignore the data if there is an error returned
@@ -168,6 +155,22 @@ func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors
 	}
 
 	return errors
+}
+
+/* Raw bridges pass the raw query from the request context to Dgraph.
+ * @warning: It looses transformation that eventually happen in the resolvers/directives.
+ * @warning: It is hard to modify the query with this approache
+ * @deprecated
+ */
+
+func (r *queryResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
+	err := DgraphQueryResolverRaw(ctx, r.db, data)
+	return postGqlProcess(ctx, r.db, data, err)
+}
+
+func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
+	err := DgraphQueryResolverRaw(ctx, r.db, data)
+	return postGqlProcess(ctx, r.db, data, err)
 }
 
 // @deprecated: Follow the Gql request to Dgraph.

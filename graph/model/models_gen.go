@@ -198,6 +198,7 @@ type AddNodeInput struct {
 	FirstLink             *UserRef       `json:"first_link,omitempty"`
 	Contracts             []*VoteRef     `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef    `json:"events_history,omitempty"`
+	CascadeDirective      *bool          `json:"cascade_directive,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -1330,6 +1331,7 @@ type Node struct {
 	FirstLink              *User                   `json:"first_link,omitempty"`
 	Contracts              []*Vote                 `json:"contracts,omitempty"`
 	EventsHistory          []*Event                `json:"events_history,omitempty"`
+	CascadeDirective       *bool                   `json:"cascade_directive,omitempty"`
 	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
 	TensionsInAggregate    *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
 	WatchersAggregate      *UserAggregateResult    `json:"watchersAggregate,omitempty"`
@@ -1506,6 +1508,7 @@ type NodePatch struct {
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
+	CascadeDirective      *bool           `json:"cascade_directive,omitempty"`
 }
 
 type NodeRef struct {
@@ -1543,6 +1546,7 @@ type NodeRef struct {
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
+	CascadeDirective      *bool           `json:"cascade_directive,omitempty"`
 }
 
 type NodeTypeHash struct {
@@ -4470,6 +4474,7 @@ const (
 	NodeHasFilterFirstLink             NodeHasFilter = "first_link"
 	NodeHasFilterContracts             NodeHasFilter = "contracts"
 	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
+	NodeHasFilterCascadeDirective      NodeHasFilter = "cascade_directive"
 )
 
 var AllNodeHasFilter = []NodeHasFilter{
@@ -4506,11 +4511,12 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterFirstLink,
 	NodeHasFilterContracts,
 	NodeHasFilterEventsHistory,
+	NodeHasFilterCascadeDirective,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterCascadeDirective:
 		return true
 	}
 	return false

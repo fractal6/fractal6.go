@@ -344,15 +344,16 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
 
 // GetDirectives return the list of directives to apply to the given query
 // by looking for the pressence of special attributes in the payload graph.
-func GetDirectives(pg string) string {
+func GetDirectives(pg string) (string, string) {
 	directives := []string{}
 	words := strings.Fields(pg)
 	for _, word := range words {
 		if word == "cascade_directive" {
 			directives = append(directives, "@cascade")
+			pg = strings.ReplaceAll(pg, "cascade_directive", "")
 		}
 	}
-	return strings.Join(directives, " ")
+	return pg, strings.Join(directives, " ")
 }
 
 // Query codec, to be used in the resolver functions
@@ -375,6 +376,8 @@ func (dg Dgraph) QueryExtra(uctx model.UserCtx, vertex string, filter any, order
 	}{filter, order, first, offset}
 	varmap, _ := MarshalWithoutNil(filter_)
 
+	qg, directives := GetDirectives(qg)
+
 	// Build the request template map
 	reqInput := map[string]string{
 		"QueryName":  queryName,               // Query name (e.g addUser)
@@ -383,7 +386,7 @@ func (dg Dgraph) QueryExtra(uctx model.UserCtx, vertex string, filter any, order
 		"QueryInput": QuoteString(queryInput), // inputs data
 		"QueryGraph": CleanString(qg, true),   // output data
 		"VarMap":     string(varmap),          // inputs data
-		"Directives": GetDirectives(qg),
+		"Directives": directives,
 	}
 
 	// Send request

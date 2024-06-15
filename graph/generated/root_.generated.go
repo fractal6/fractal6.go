@@ -754,6 +754,7 @@ type ComplexityRoot struct {
 
 	Node struct {
 		About                  func(childComplexity int) int
+		CascadeDirective       func(childComplexity int) int
 		Children               func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		ChildrenAggregate      func(childComplexity int, filter *model.NodeFilter) int
 		Color                  func(childComplexity int) int
@@ -4861,6 +4862,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.About(childComplexity), true
+
+	case "Node.cascade_directive":
+		if e.complexity.Node.CascadeDirective == nil {
+			break
+		}
+
+		return e.complexity.Node.CascadeDirective(childComplexity), true
 
 	case "Node.children":
 		if e.complexity.Node.Children == nil {
@@ -10233,6 +10241,7 @@ type Node {
   first_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
+  cascade_directive: Boolean
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
@@ -10761,33 +10770,33 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
 directive @cascade(fields: [String]) on FIELD
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
+directive @id on FIELD_DEFINITION
+
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
@@ -10973,6 +10982,7 @@ input AddNodeInput {
   first_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
+  cascade_directive: Boolean
 }
 
 type AddNodePayload {
@@ -12409,6 +12419,7 @@ enum NodeHasFilter {
   first_link
   contracts
   events_history
+  cascade_directive
 }
 
 input NodeMode_hash {
@@ -12466,6 +12477,7 @@ input NodePatch {
   first_link: UserRef @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
+  cascade_directive: Boolean @x_patch_ro
 }
 
 input NodeRef {
@@ -12503,6 +12515,7 @@ input NodeRef {
   first_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
+  cascade_directive: Boolean
 }
 
 input NodeType_hash {
