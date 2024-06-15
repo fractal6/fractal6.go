@@ -42,6 +42,8 @@ func init() {
 
 /* Raw bridges pass the raw query from the request context to Dgraph.
  * @Warning: It looses transformation that eventually happen in the resolvers/directives.
+ * @Warning: It is hard to modify the query with this approache
+ * @deprecated
  */
 
 func (r *queryResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
@@ -56,7 +58,7 @@ func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data interface{}
 
 /* Those bridges rebuild the query from the request context preloads, and uses the input
  * parameters from the gqlgen resolvers which reflext the modifications in the resolvers/directives.
- * @Warning: It looses eventual directive in the query graph (@cascade, @skip etc)
+ * @Warning: It looses eventual directive in the query graph (@cascade, @skip, @include...)
  */
 
 func (r *queryResolver) DgraphGetBridge(ctx context.Context, maps map[string]interface{}, data interface{}) error {
@@ -133,8 +135,55 @@ func DgraphDeleteResolver(ctx context.Context, db *db.Dgraph, input interface{},
 	return err
 }
 
+func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors error) error {
+	if data != nil && errors != nil {
+		// Gqlgen ignore the data if there is an error returned
+		// see https://github.com/99designs/gqlgen/issues/1191
+		//graphql.AddErrorf(ctx, errors.Error())
+
+		// Nodes query can return null field if Node are hidden
+		// but children are not. The source ends up to be a tension where
+		// the receiver is the parent wich is hidden ;)
+		//
+		d, _ := json.Marshal(data)
+		if string(d) == "null" {
+			// If there is really no data, show the graphql error
+			// otherwise, fail silently.
+			return errors
+		}
+		fmt.Println("Dgraph Error Ignored: ", errors.Error())
+		return nil
+	} else if errors != nil || data == nil {
+		return errors
+	}
+
+	uctx := auth.GetUserContextOrEmpty(ctx)
+	if uctx.Username == "" {
+		return errors
+	}
+	// Post processing (@meta_patch) / Post hook operation.
+	// If the query go trough the validation stack, execute.
+	//if f, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_f"); f != nil {
+	//    k, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_k")
+	//    v, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_v")
+	//    maps := map[string]string{fmt.Sprintf("%s", k): fmt.Sprintf("%s", v)}
+	//    db.Meta(fmt.Sprintf("%s", f), maps)
+	//}
+	if f, err := cache.GetDel(ctx, uctx.Username+"meta_patch_f").Result(); f != "" && err == nil {
+		k, _ := cache.GetDel(ctx, uctx.Username+"meta_patch_k").Result()
+		v, _ := cache.GetDel(ctx, uctx.Username+"meta_patch_v").Result()
+		maps := map[string]string{k: v}
+		db.Meta(f, maps)
+	} else if err != nil {
+		// ignore "redis: nil" error as it is always return because we call Result() ..
+		//fmt.Println("Redis error: ", err)
+	}
+
+	return errors
+}
+
 // @deprecated: Follow the Gql request to Dgraph.
-// This use raw query from the request context and thus won't propage change
+// This use raw query from the request context and thus won't propagate change
 // of the input that may happend in the resolvers.
 func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data interface{}) error {
 	// How to get the query args ? https://github.com/99designs/gqlgen/issues/1144
@@ -187,51 +236,4 @@ func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data interface{}
 	uctx := auth.GetUserContextOrEmpty(ctx)
 	err = db.QueryGql(uctx, "rawQuery", reqInput, data)
 	return err
-}
-
-func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors error) error {
-	if data != nil && errors != nil {
-		// Gqlgen ignore the data if there is an error returned
-		// see https://github.com/99designs/gqlgen/issues/1191
-		//graphql.AddErrorf(ctx, errors.Error())
-
-		// Nodes query can return null field if Node are hidden
-		// but children are not. The source ends up to be a tension where
-		// the receiver is the parent wich is hidden ;)
-		//
-		d, _ := json.Marshal(data)
-		if string(d) == "null" {
-			// If there is really no data, show the graphql error
-			// otherwise, fail silently.
-			return errors
-		}
-		fmt.Println("Dgraph Error Ignored: ", errors.Error())
-		return nil
-	} else if errors != nil || data == nil {
-		return errors
-	}
-
-	uctx := auth.GetUserContextOrEmpty(ctx)
-	if uctx.Username == "" {
-		return errors
-	}
-	// Post processing (@meta_patch) / Post hook operation.
-	// If the query go trough the validation stack, execute.
-	//if f, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_f"); f != nil {
-	//    k, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_k")
-	//    v, _ := cache.Do("GETDEL", uctx.Username + "meta_patch_v")
-	//    maps := map[string]string{fmt.Sprintf("%s", k): fmt.Sprintf("%s", v)}
-	//    db.Meta(fmt.Sprintf("%s", f), maps)
-	//}
-	if f, err := cache.GetDel(ctx, uctx.Username+"meta_patch_f").Result(); f != "" && err == nil {
-		k, _ := cache.GetDel(ctx, uctx.Username+"meta_patch_k").Result()
-		v, _ := cache.GetDel(ctx, uctx.Username+"meta_patch_v").Result()
-		maps := map[string]string{k: v}
-		db.Meta(f, maps)
-	} else if err != nil {
-		// ignore "redis: nil" error as it is always return because we call Result() ..
-		//fmt.Println("Redis error: ", err)
-	}
-
-	return errors
 }

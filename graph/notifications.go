@@ -489,6 +489,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 }
 
 // Notify users for Notif events.
+// No email sent here.
 func PushNotifNotifications(notif model.NotifNotif, selfNotify bool) error {
 	// Only the event with an ID will be notified.
 	var eventBatch []*model.EventKindRef

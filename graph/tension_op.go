@@ -254,7 +254,6 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 		}
 
 		// Assumes contract is either closed or cancelled.
-		// @DEBUG: wouldn't it be a bettter way to work with voteid & contractid ?
 		err = db.GetDB().RewriteContractId(contract.ID)
 		if err != nil {
 			return false, contract, err

@@ -368,7 +368,7 @@ type Contract implements Post @auth(
   closedAt: DateTime           @search
   event: EventFragment!
   participants: [Vote!]!       @hasInverse(field: contract)   # only user node (@...)
-  candidates: [User!]          @hasInverse(field: contracts)
+  candidates: [User!]          @hasInverse(field: contracts) @x_add(r:"ref")
   pending_candidates: [PendingUser!]
   comments: [Comment!]         @x_alter(r:"oneByOne")
   isValidator: Boolean         @isContractValidator
@@ -381,7 +381,7 @@ type Vote implements Post @auth(
   voteid: String!     @id # {contractid}#{nameid}
   contract: Contract! @x_add(r:"ref")
   node: Node!         @x_add(r:"ref") # Named Role (@...)
-  data: [Int!]! # Vote results. Maximum len equal len of candidates.
+  data: [Int!]! # Vote results. Maximum len equal len of candidates - for multiple choice/preferential vote system
 }
 
 #

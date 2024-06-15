@@ -682,13 +682,30 @@ var dqlQueries map[string]string = map[string]string{
 	"deleteContract": `{
         id as var(func: uid({{.id}})) {
           rid as Contract.tension
+          candidates as Contract.candidates
+          user_pending as Contract.pending_candidates
           a as Contract.event
-          b as Contract.participants
+          votes as Contract.participants {
+            nodes as Vote.node {
+                Node.parent {
+                    Node.children @filter(eq(Node.type_, "Role")) {
+                        members as Node.first_link
+                    }
+                }
+            }
+          }
           c as Contract.comments {
             r as Comment.reactions
           }
         }
-        all(func: uid(id,a,b,c,r)) {
+
+        var(func:uid(members)) @cascade {
+            desync_events as User.events {
+              UserEvent.event @filter(uid({{.id}}))
+            }
+        }
+
+        all(func: uid(id,a,votes,c,r)) {
             all_ids as uid
         }
     }`,
@@ -2716,6 +2733,9 @@ func (dg Dgraph) RewriteContractId(cid string) error {
         uid(cuid) <Contract.contractid> "" .
         uid(vuid) <Vote.voteid> "" .
     `
+	// do not work see issue #gil
+	//uid(cuid) <Contract.contractid> val(cuid) .
+	//uid(vuid) <Vote.voteid> val(vuid) .
 
 	mutation := &api.Mutation{
 		SetNquads: []byte(mu),
@@ -2728,7 +2748,8 @@ func (dg Dgraph) RewriteContractId(cid string) error {
 // Deletions
 
 // DeepDelete delete edges recursively for type {t} and id {id}.
-// If {rid} is given, it represents the reverse node that should be cleaned up.
+// Reverse edges need to be deleted manuall since they are defined in graphql and not in DQL.
+// Note: If reverse are forgotten, empty redisual nodes will accumulates.
 func (dg Dgraph) DeepDelete(t string, id string) error {
 	var reverse string
 	var query string
@@ -2740,7 +2761,14 @@ func (dg Dgraph) DeepDelete(t string, id string) error {
             uid(rid_receiver) <Node.tensions_in> uid(id) .
         `)
 	case "contract":
-		reverse = fmt.Sprintf(`uid(rid) <Tension.contracts> uid(id) .`)
+		reverse = fmt.Sprintf(`
+            uid(rid) <Tension.contracts> uid(id) .
+            uid(candidates) <User.contracts> uid(id) .
+            uid(user_pending) <PendingUser.contracts> uid(id) .
+            uid(nodes) <Node.contracts> uid(votes) .
+            uid(members) <User.events> uid(desync_events) .
+            uid(desync_events) * * .
+        `)
 	default:
 		return fmt.Errorf("delete query not implemented for this type %s", t)
 	}
