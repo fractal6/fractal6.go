@@ -117,6 +117,9 @@ type Node @auth(
 
   # Aggregators
   events_history: [Event!] @meta(f:"getNodeHistory", k:"nameid")
+
+  # Dgraph directive
+  cascade_directive: Bool
 }
 
 type NodeFragment {

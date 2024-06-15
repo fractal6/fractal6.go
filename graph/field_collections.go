@@ -222,7 +222,7 @@ func PayloadContains(ctx context.Context, field string) bool {
 }
 
 // PayloadContains return true if the query payload contains the given field,
-// by looking the reflected Go varaible. It is used for input hook when
+// by looking the reflected Go variable. It is used for input hook when
 // the payload is not available in the context.
 func PayloadContainsGo(obj interface{}, field string) bool {
 	n := reflect.ValueOf(obj).Elem().FieldByName(field).String()

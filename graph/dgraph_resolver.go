@@ -30,10 +30,17 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/web/sessions"
 )
+
+/*
+ *
+ * Dgraph-Gqlgen bridge logic
+ *
+ */
 
 var cache *sessions.Session
 
@@ -41,9 +48,54 @@ func init() {
 	cache = sessions.GetCache()
 }
 
+/* Those bridges rebuild the query from the request context preloads, and uses the input
+ * parameters from the gqlgen resolvers which reflext the modifications in the resolvers/directives.
+ * @warning: It looses eventual directive in the query graph (@cascade, @skip, @include...)
+ */
+
+func (r *queryResolver) DgraphGetBridge(ctx context.Context, maps map[string]interface{}, data interface{}) error {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) DgraphQueryBridge(ctx context.Context, filter any, order any, first *int, offset *int, data any) error {
+	uctx, typeName, err := getUserQueryType(ctx)
+	if err != nil {
+		return err
+	}
+	err = r.db.QueryExtra(*uctx, typeName, filter, order, first, offset, GetQueryGraph(ctx), data)
+	return postGqlProcess(ctx, r.db, data, err)
+}
+
+func (r *mutationResolver) DgraphAddBridge(ctx context.Context, input interface{}, upsert *bool, data interface{}) error {
+	uctx, typeName, err := getUserQueryType(ctx)
+	if err != nil {
+		return err
+	}
+	err = r.db.AddExtra(*uctx, typeName, input, upsert, GetQueryGraph(ctx), data)
+	return postGqlProcess(ctx, r.db, data, err)
+}
+
+func (r *mutationResolver) DgraphUpdateBridge(ctx context.Context, input interface{}, data interface{}) error {
+	uctx, typeName, err := getUserQueryType(ctx)
+	if err != nil {
+		return err
+	}
+	err = r.db.UpdateExtra(*uctx, typeName, input, GetQueryGraph(ctx), data)
+	return postGqlProcess(ctx, r.db, data, err)
+}
+
+func (r *mutationResolver) DgraphDeleteBridge(ctx context.Context, filter interface{}, data interface{}) error {
+	uctx, typeName, err := getUserQueryType(ctx)
+	if err != nil {
+		return err
+	}
+	err = r.db.DeleteExtra(*uctx, typeName, filter, GetQueryGraph(ctx), data)
+	return postGqlProcess(ctx, r.db, data, err)
+}
+
 /* Raw bridges pass the raw query from the request context to Dgraph.
- * @Warning: It looses transformation that eventually happen in the resolvers/directives.
- * @Warning: It is hard to modify the query with this approache
+ * @warning: It looses transformation that eventually happen in the resolvers/directives.
+ * @warning: It is hard to modify the query with this approache
  * @deprecated
  */
 
@@ -57,83 +109,18 @@ func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data interface{}
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
-/* Those bridges rebuild the query from the request context preloads, and uses the input
- * parameters from the gqlgen resolvers which reflext the modifications in the resolvers/directives.
- * @Warning: It looses eventual directive in the query graph (@cascade, @skip, @include...)
- */
-
-func (r *queryResolver) DgraphGetBridge(ctx context.Context, maps map[string]interface{}, data interface{}) error {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) DgraphQueryBridge(ctx context.Context, maps map[string]interface{}, data interface{}) error {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DgraphAddBridge(ctx context.Context, input interface{}, upsert *bool, data interface{}) error {
-	err := DgraphAddResolver(ctx, r.db, input, upsert, data)
-	return postGqlProcess(ctx, r.db, data, err)
-}
-
-func (r *mutationResolver) DgraphUpdateBridge(ctx context.Context, input interface{}, data interface{}) error {
-	err := DgraphUpdateResolver(ctx, r.db, input, data)
-	return postGqlProcess(ctx, r.db, data, err)
-}
-
-func (r *mutationResolver) DgraphDeleteBridge(ctx context.Context, filter interface{}, data interface{}) error {
-	err := DgraphDeleteResolver(ctx, r.db, filter, data)
-	return postGqlProcess(ctx, r.db, data, err)
-}
-
-/*
-*
-* Dgraph-Gqlgen bridge logic
-*
- */
-
-func DgraphAddResolver(ctx context.Context, db *db.Dgraph, input interface{}, upsert *bool, data interface{}) error {
+func getUserQueryType(ctx context.Context) (*model.UserCtx, string, error) {
 	_, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
-		return tools.LogErr("Access denied", err)
+		return nil, "", tools.LogErr("Access denied", err)
 	}
 
 	_, typeName, _, err := queryTypeFromGraphqlContext(ctx)
 	if err != nil {
-		return tools.LogErr("DgraphQueryResolver", err)
+		return nil, "", tools.LogErr("DgraphResolver", err)
 	}
 
-	err = db.AddExtra(*uctx, typeName, input, upsert, GetQueryGraph(ctx), data)
-	return err
-}
-
-func DgraphUpdateResolver(ctx context.Context, db *db.Dgraph, input interface{}, data interface{}) error {
-	_, uctx, err := auth.GetUserContext(ctx)
-	if err != nil {
-		return tools.LogErr("Access denied", err)
-	}
-
-	_, typeName, _, err := queryTypeFromGraphqlContext(ctx)
-	if err != nil {
-		return tools.LogErr("DgraphQueryResolver", err)
-	}
-
-	err = db.UpdateExtra(*uctx, typeName, input, GetQueryGraph(ctx), data)
-	return err
-}
-
-func DgraphDeleteResolver(ctx context.Context, db *db.Dgraph, input interface{}, data interface{}) error {
-	_, uctx, err := auth.GetUserContext(ctx)
-	if err != nil {
-		return tools.LogErr("Access denied", err)
-	}
-
-	_, typeName, _, err := queryTypeFromGraphqlContext(ctx)
-	if err != nil {
-		return tools.LogErr("DgraphQueryResolver", err)
-	}
-
-	err = db.DeleteExtra(*uctx, typeName, input, GetQueryGraph(ctx), data)
-	return err
+	return uctx, typeName, err
 }
 
 func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors error) error {
@@ -194,7 +181,7 @@ func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data interface{}
 	gc := graphql.GetRequestContext(ctx)
 	queryType, typeName, queryName, err := queryTypeFromGraphqlContext(ctx)
 	if err != nil {
-		return tools.LogErr("DgraphQueryResolver", err)
+		return tools.LogErr("DgraphRawResolver", err)
 	}
 
 	// Return error if jwt token error (particularly when has expired)

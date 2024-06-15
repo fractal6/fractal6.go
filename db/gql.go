@@ -83,8 +83,16 @@ var gqlQueries map[string]string = map[string]string{
         }
     }`,
 	// Extra - Bridge
+	"queryExtra": `{
+        "query": "query {{.QueryName}}($filter:{{.FilterType}}, $order:{{.OrderType}}, $first:Int, $offset:Int) {
+            {{.QueryName}}{{.QueryInput}} {{.Directives}} {
+                {{.QueryGraph}}
+            }
+        }",
+        "variables": {{.VarMap}}
+    }`,
 	"addExtra": `{
-        "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!){
+        "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) {
             {{.QueryName}}{{.QueryInput}} {
                 {{.QueryGraph}}
             }
@@ -94,7 +102,7 @@ var gqlQueries map[string]string = map[string]string{
         }
     }`,
 	"mutationExtra": `{
-        "query": "mutation {{.QueryName}}($input:{{.InputType}}!){
+        "query": "mutation {{.QueryName}}($input:{{.InputType}}!) {
             {{.QueryName}}{{.QueryInput}} {
                 {{.QueryGraph}}
             }
@@ -330,9 +338,58 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
 	return err
 }
 
-//
-// Bridge queries
-//
+/*
+ *  Bridge queries
+ */
+
+// GetDirectives return the list of directives to apply to the given query
+// by looking for the pressence of special attributes in the payload graph.
+func GetDirectives(pg string) string {
+	directives := []string{}
+	words := strings.Fields(pg)
+	for _, word := range words {
+		if word == "cascade_directive" {
+			directives = append(directives, "@cascade")
+		}
+	}
+	return strings.Join(directives, " ")
+}
+
+// Query codec, to be used in the resolver functions
+func (dg Dgraph) QueryExtra(uctx model.UserCtx, vertex string, filter any, order any, first *int, offset *int, qg string, data any) error {
+	Vertex := strings.Title(vertex)
+	queryName := "query" + Vertex
+	filterType := Vertex + "Filter"
+	orderType := Vertex + "Order"
+
+	// Build the string request
+	var queryInput string
+	queryInput = `(filter: $filter, order: $order, first: $first, offset: $offset)`
+
+	// Marshal the inputs
+	filter_ := struct {
+		Filter any  `json:"filter"`
+		Order  any  `json:"order"`
+		First  *int `json:"first"`
+		Offset *int `json:"offset"`
+	}{filter, order, first, offset}
+	varmap, _ := MarshalWithoutNil(filter_)
+
+	// Build the request template map
+	reqInput := map[string]string{
+		"QueryName":  queryName,               // Query name (e.g addUser)
+		"FilterType": filterType,              // input type name (e.g AddUserInput)
+		"OrderType":  orderType,               // input type name (e.g AddUserInput)
+		"QueryInput": QuoteString(queryInput), // inputs data
+		"QueryGraph": CleanString(qg, true),   // output data
+		"VarMap":     string(varmap),          // inputs data
+		"Directives": GetDirectives(qg),
+	}
+
+	// Send request
+	err := dg.QueryGql(uctx, "queryExtra", reqInput, data)
+	return err
+}
 
 // Add codec, to be used in the resolver functions
 func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, upsert *bool, qg string, data interface{}) error {
