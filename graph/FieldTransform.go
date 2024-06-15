@@ -23,8 +23,9 @@ package graph
 import (
 	"context"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql"
 	"strings"
+
+	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/tools"
@@ -33,12 +34,10 @@ import (
 var FieldTransformFunc map[string]func(context.Context, graphql.Resolver) (interface{}, error)
 
 func init() {
-
 	FieldTransformFunc = map[string]func(context.Context, graphql.Resolver) (interface{}, error){
 		"lower": lower,
 		"now":   now,
 	}
-
 }
 
 // need https://github.com/golang/go/issues/51977

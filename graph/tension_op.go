@@ -30,8 +30,10 @@ import (
 	"fractale/fractal6.go/web/auth"
 )
 
-var EMAP EventsMap
-var SubscribingEvents map[model.TensionEvent]bool
+var (
+	EMAP              EventsMap
+	SubscribingEvents map[model.TensionEvent]bool
+)
 
 func init() {
 	EMAP = EventsMap{
@@ -191,7 +193,7 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 	if addSubscriber && ok && err == nil {
 		err = db.GetDB().Update(*uctx, "tension", &model.UpdateTensionInput{
 			Filter: &model.TensionFilter{ID: []string{tension.ID}},
-			Set:    &model.TensionPatch{Subscribers: []*model.UserRef{&model.UserRef{Username: &uctx.Username}}},
+			Set:    &model.TensionPatch{Subscribers: []*model.UserRef{{Username: &uctx.Username}}},
 		})
 	}
 
@@ -199,7 +201,8 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 }
 
 func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, blob *model.BlobRef, contract *model.Contract,
-	doCheck, doProcess bool) (bool, *model.Contract, error) {
+	doCheck, doProcess bool,
+) (bool, *model.Contract, error) {
 	var ok bool
 	var err error
 
@@ -573,8 +576,8 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 	// @debug: this should be done before the contract creation.
 	guestid := codec.MemberIdCodec(rootid, username)
 	// Pending node as been created at invitation
-	//ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
-	//if err != nil { return ok, err }
+	// ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
+	// if err != nil { return ok, err }
 	err = LinkUser(rootid, guestid, username)
 	if err != nil {
 		return ok, err
@@ -583,7 +586,7 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 	// Make user watch that organisation.
 	err = db.GetDB().Update(*uctx, "user", &model.UpdateUserInput{
 		Filter: &model.UserFilter{Username: &model.StringHashFilterStringRegExpFilter{Eq: &username}},
-		Set:    &model.UserPatch{Watching: []*model.NodeRef{&model.NodeRef{Nameid: &rootid}}},
+		Set:    &model.UserPatch{Watching: []*model.NodeRef{{Nameid: &rootid}}},
 	})
 
 	return true, err
@@ -605,7 +608,7 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
 	roleType := model.RoleType(*event.New)
 	if codec.IsMembershipRoleType(roleType) {
 		uctx.NoCache = true
-		var membershipNode = auth.GetMembershipRole(uctx, tension.Emitter.Nameid)
+		membershipNode := auth.GetMembershipRole(uctx, tension.Emitter.Nameid)
 		var nf model.NodeFragment
 		if roleType != *membershipNode.RoleType {
 			return false, LogErr("access denied", fmt.Errorf("You must have the same membership as the one given in the event."))
@@ -628,7 +631,7 @@ func PinTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventR
 	nodeInput := model.UpdateNodeInput{
 		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
 		Set: &model.NodePatch{
-			Pinned: []*model.TensionRef{&model.TensionRef{ID: &tid}},
+			Pinned: []*model.TensionRef{{ID: &tid}},
 		},
 	}
 	// update node
@@ -643,7 +646,7 @@ func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 	nodeInput := model.UpdateNodeInput{
 		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
 		Remove: &model.NodePatch{
-			Pinned: []*model.TensionRef{&model.TensionRef{ID: &tid}},
+			Pinned: []*model.TensionRef{{ID: &tid}},
 		},
 	}
 	// update node
@@ -663,7 +666,7 @@ func CheckEvent(t *model.Tension, e *model.EventRef) (string, error) {
 	}
 
 	b := GetBlob(t)
-	var v = *e.New
+	v := *e.New
 	var err error
 
 	switch *e.EventType {

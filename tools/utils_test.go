@@ -28,7 +28,6 @@ import (
 )
 
 func TestStructMap(t *testing.T) {
-
 	var nodeFragment *model.NodeFragment
 	var nodeInput model.AddNodeInput
 

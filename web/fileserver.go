@@ -22,8 +22,6 @@ package web
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"golang.org/x/text/language"
 	"net/http"
 	"os"
 	"path"
@@ -32,13 +30,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+	"golang.org/x/text/language"
+
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/web/auth"
 )
 
-var DEFAULT_LANG string = "en"
-var langsAvailable string = "en_fr" // Replaced at build time. See Makefile
-var langsD map[string]bool
+var (
+	DEFAULT_LANG   string = "en"
+	langsAvailable string = "en_fr" // Replaced at build time. See Makefile
+	langsD         map[string]bool
+)
 
 func init() {
 	langsD = make(map[string]bool)
@@ -54,7 +57,6 @@ func init() {
 // static files from a http.FileSystem.
 // FileServer is serving static files
 func FileServer(r chi.Router, publicUri string, location string, maxage string) {
-
 	if strings.ContainsAny(publicUri, "{}*") {
 		panic("FileServer does not permit URL parameters.")
 	}
@@ -136,6 +138,5 @@ func FileServer(r chi.Router, publicUri string, location string, maxage string) 
 
 			http.ServeFile(w, r, path.Join(root, fn))
 		}
-
 	}))
 }

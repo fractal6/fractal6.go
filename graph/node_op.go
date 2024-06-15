@@ -316,7 +316,7 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
 				err = fmt.Errorf("role must have a RoleType.")
 			}
 		} else if nodeType == model.NodeTypeCircle {
-			//pass
+			// pass
 		}
 	}
 
@@ -381,7 +381,7 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
 	nodeInput := model.UpdateNodeInput{
 		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
 		Set:    &nodePatch,
-		//Remove: &delNodePatch, // @debug: omitempty issues
+		// Remove: &delNodePatch, // @debug: omitempty issues
 	}
 	// Update the node in database
 	err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
@@ -429,12 +429,12 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *strin
 		Receiverid: rootnameid,
 		Action:     &action,
 		History: []*model.EventRef{
-			&model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt1},
-			&model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt2},
-			&model.EventRef{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt3},
+			{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt1},
+			{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt2},
+			{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt3},
 		},
 		Blobs:       []*model.BlobRef{&blob},
-		Comments:    []*model.CommentRef{&model.CommentRef{CreatedAt: &now, CreatedBy: &createdBy, Message: nil}},
+		Comments:    []*model.CommentRef{{CreatedAt: &now, CreatedBy: &createdBy, Message: nil}},
 		Subscribers: []*model.UserRef{&createdBy},
 	}
 	return tension

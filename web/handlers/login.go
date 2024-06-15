@@ -23,10 +23,11 @@ package handlers
 import (
 	//"fmt"
 	"encoding/json"
-	"github.com/steambap/captcha"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/steambap/captcha"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
@@ -322,7 +323,7 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 	oldUctx, err := auth.GetUserContextLight(r.Context())
 	if err != nil {
 		// User authentication error
-		//w.WriteHeader(http.StatusUnauthorized)
+		// w.WriteHeader(http.StatusUnauthorized)
 		http.Error(w, err.Error(), 401)
 		return
 	}
@@ -331,7 +332,7 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 	uctx, err := auth.GetAuthUserFromCtx(*oldUctx)
 	if err != nil {
 		// Credentials validation error
-		//w.WriteHeader(http.StatusUnauthorized)
+		// w.WriteHeader(http.StatusUnauthorized)
 		http.Error(w, err.Error(), 401)
 		return
 	}
@@ -340,7 +341,7 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 	httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
-		//w.WriteHeader(http.StatusInternalServerError)
+		// w.WriteHeader(http.StatusInternalServerError)
 		http.Error(w, err.Error(), 500)
 		return
 	}
@@ -386,7 +387,7 @@ func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
 	data, _ := captcha.New(150, 50, func(options *captcha.Options) {
 		options.CharPreset = "abcdefghkmnpqrstuvwxyz0123456789"
 	})
-	//data, _ := captcha.NewMathExpr(150, 50)
+	// data, _ := captcha.NewMathExpr(150, 50)
 
 	// Save the token and challenge result in cache
 	// with timeout to clear it.
@@ -444,7 +445,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	token := c.Value
 
 	// Get the challenge from cache
-	//expected, err := redis.String(cache.Do("GET", token))
+	// expected, err := redis.String(cache.Do("GET", token))
 	expected, err := cache.Get(ctx, token).Result()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -545,7 +546,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 	httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
-		//w.WriteHeader(http.StatusInternalServerError)
+		// w.WriteHeader(http.StatusInternalServerError)
 		http.Error(w, err.Error(), 500)
 		return
 	}
@@ -636,7 +637,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
-		//w.WriteHeader(http.StatusInternalServerError)
+		// w.WriteHeader(http.StatusInternalServerError)
 		http.Error(w, err.Error(), 500)
 		return
 	}

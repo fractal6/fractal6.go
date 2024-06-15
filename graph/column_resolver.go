@@ -68,7 +68,7 @@ var DecrementColumnPos db.QueryMut = db.QueryMut{
                 }
             }
         }`,
-	M: []db.X{db.X{
+	M: []db.X{{
 		S: `uid(decrme) <ProjectColumn.pos> val(new_pos_decr) . `,
 	}},
 }
@@ -89,7 +89,7 @@ var MoveColumnPosUp db.QueryMut = db.QueryMut{
             }
         }`,
 	M: []db.X{
-		db.X{
+		{
 			S: `uid(incrme) <ProjectColumn.pos> val(new_pos_incr) . `,
 		},
 	},
@@ -111,7 +111,7 @@ var MoveColumnPosDown db.QueryMut = db.QueryMut{
             }
         }`,
 	M: []db.X{
-		db.X{
+		{
 			S: `uid(decrme) <ProjectColumn.pos> val(new_pos_decr) . `,
 		},
 	},

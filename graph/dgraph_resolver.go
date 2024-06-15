@@ -24,9 +24,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql"
 	"regexp"
 	"strings"
+
+	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/tools"
@@ -139,7 +140,7 @@ func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors
 	if data != nil && errors != nil {
 		// Gqlgen ignore the data if there is an error returned
 		// see https://github.com/99designs/gqlgen/issues/1191
-		//graphql.AddErrorf(ctx, errors.Error())
+		// graphql.AddErrorf(ctx, errors.Error())
 
 		// Nodes query can return null field if Node are hidden
 		// but children are not. The source ends up to be a tension where
@@ -176,7 +177,7 @@ func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors
 		db.Meta(f, maps)
 	} else if err != nil {
 		// ignore "redis: nil" error as it is always return because we call Result() ..
-		//fmt.Println("Redis error: ", err)
+		// fmt.Println("Redis error: ", err)
 	}
 
 	return errors

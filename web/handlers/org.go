@@ -104,7 +104,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 		Type:       model.NodeTypeCircle,
 		IsRoot:     true,
 		IsPersonal: &isPersonal,
-		Watchers:   []*model.UserRef{&model.UserRef{Username: &uctx.Username}},
+		Watchers:   []*model.UserRef{{Username: &uctx.Username}},
 		// Permission
 		Visibility:            visibility,
 		Mode:                  mode,

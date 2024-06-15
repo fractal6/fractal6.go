@@ -23,6 +23,7 @@ package graph
 import (
 	"context"
 	"fmt"
+
 	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
@@ -41,7 +42,7 @@ func tensionInputHook(ctx context.Context, obj interface{}, next graphql.Resolve
 		return data, err
 	}
 
-	//newData := data.([]*model.AddContractInput)
+	// newData := data.([]*model.AddContractInput)
 
 	// Set BlobType -- based on Blob.
 	b2i := map[bool]int{false: 0, true: 1}
@@ -193,7 +194,7 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
 			return data, err
 		} else if contract != nil {
 			var t model.UpdateTensionPayload
-			t.Tension = []*model.Tension{&model.Tension{
+			t.Tension = []*model.Tension{{
 				Contracts: []*model.Contract{contract},
 			}}
 			return &t, err

@@ -21,11 +21,12 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"net/http"
 
 	"fractale/fractal6.go/graph"
 	gen "fractale/fractal6.go/graph/generated"
@@ -61,7 +62,6 @@ func GraphqlHandler(c map[string]interface{}) http.HandlerFunc {
 	h.SetRecoverFunc(middleware.GqlRecover)
 
 	return h.ServeHTTP
-
 }
 
 // Defining the Playground handler

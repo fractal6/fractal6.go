@@ -23,12 +23,13 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"runtime/debug"
+
 	"fractale/fractal6.go/web/email"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
-	"net/http"
-	"runtime/debug"
 )
 
 // Notifier recoverer
@@ -64,7 +65,7 @@ func GqlRecover(ctx context.Context, err interface{}) error {
 	}
 
 	// Log error
-	//fmt.Printf("panic on `%s`:\n%s\n", qn, string(debug.Stack()))
+	// fmt.Printf("panic on `%s`:\n%s\n", qn, string(debug.Stack()))
 	middleware.PrintPrettyStack(err)
 
 	return gqlerror.Errorf("Internal error on '%s': %v", qn, err)

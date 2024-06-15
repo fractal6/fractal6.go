@@ -50,9 +50,7 @@ func TestValidatePostalSignature(t *testing.T) {
 	hash := sha1.Sum(body)
 
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA1, hash[:], signature)
-
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
 }

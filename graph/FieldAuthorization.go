@@ -23,6 +23,7 @@ package graph
 import (
 	"context"
 	"fmt"
+
 	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
@@ -35,7 +36,6 @@ import (
 var FieldAuthorizationFunc map[string]func(context.Context, interface{}, graphql.Resolver, *string, []model.TensionEvent, *int) (interface{}, error)
 
 func init() {
-
 	FieldAuthorizationFunc = map[string]func(context.Context, interface{}, graphql.Resolver, *string, []model.TensionEvent, *int) (interface{}, error){
 		"isOwner":          isOwner,
 		"unique":           unique,
@@ -46,7 +46,6 @@ func init() {
 		"minLen":           minLength,
 		"maxLen":           maxLength,
 	}
-
 }
 
 // isOwner Check that object is own by the user.
@@ -108,7 +107,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
 		s := obj.(model.JsonAtom)[*f]
 		if s != nil {
 			// *f is present in the inut
-			//pass
+			// pass
 		} else if ctx.Value("id") != nil {
 			s, err = db.GetDB().GetFieldById(ctx.Value("id").(string), filterName)
 			if err != nil || s == nil {

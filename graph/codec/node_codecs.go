@@ -154,6 +154,7 @@ func IsCircle(nid string) bool {
 	parts := strings.Split(nid, "#")
 	return len(parts) == 1 || len(parts) == 2
 }
+
 func IsRole(nid string) bool {
 	parts := strings.Split(nid, "#")
 	return len(parts) == 3

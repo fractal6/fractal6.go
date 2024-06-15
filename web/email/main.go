@@ -24,14 +24,15 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"net/http"
+	"os"
+	"strings"
+
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/spf13/viper"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
-	"net/http"
-	"os"
-	"strings"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
@@ -45,10 +46,12 @@ var md goldmark.Markdown = goldmark.New(
 	),
 )
 
-var emailSecret string
-var emailUrl string
-var maintainerEmail string
-var DOMAIN string
+var (
+	emailSecret     string
+	emailUrl        string
+	maintainerEmail string
+	DOMAIN          string
+)
 
 func init() {
 	emailUrl = viper.GetString("mailer.email_api_url")
@@ -238,7 +241,6 @@ func SendOwnerGrantedEmail(username, nameid, orgName string) error {
 	defer resp.Body.Close()
 
 	return nil
-
 }
 
 //

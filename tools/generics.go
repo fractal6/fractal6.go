@@ -14,8 +14,8 @@ func ExtractSlice[T any](a interface{}, data *[]T) error {
 	}
 
 	for _, e := range elements {
-		//temp := new(T)
-		//StructMap(e, temp)
+		// temp := new(T)
+		// StructMap(e, temp)
 		raw, err := json.Marshal(e)
 		if err != nil {
 			return err

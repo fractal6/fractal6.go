@@ -283,7 +283,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 		if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
 			if eid == "" {
 				// @deprected warning: unnecessary/noisy
-				//log.Printf("Notification Error: an event is emailable but not notifiable !")
+				// log.Printf("Notification Error: an event is emailable but not notifiable !")
 				return nil
 			}
 			ui.Eid = eid
@@ -410,7 +410,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 			// Link contract for future push
 			err = db.GetDB().Update(db.GetDB().GetRootUctx(), "pendingUser", &model.UpdatePendingUserInput{
 				Filter: &model.PendingUserFilter{Email: &model.StringHashFilter{Eq: &u}},
-				Set:    &model.PendingUserPatch{Contracts: []*model.ContractRef{&model.ContractRef{ID: &notif.Contract.ID}}},
+				Set:    &model.PendingUserPatch{Contracts: []*model.ContractRef{{ID: &notif.Contract.ID}}},
 			})
 			if err != nil {
 				return err

@@ -24,11 +24,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/dgraph-io/dgo/v200/protos/api"
-	"github.com/mitchellh/mapstructure"
 	"log"
 	"reflect"
 	"strings"
+
+	"github.com/dgraph-io/dgo/v200/protos/api"
+	"github.com/mitchellh/mapstructure"
 
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/tools"
@@ -68,6 +69,7 @@ var tensionHookPayload string = `
     Node.userCanJoin
   }
 `
+
 var tensionBlobHookPayload string = `
   Tension.blobs %s {
     uid
@@ -713,7 +715,7 @@ var dqlQueries map[string]string = map[string]string{
 
 var dqlMutations map[string]QueryMut = map[string]QueryMut{
 	// Set
-	"markAllAsRead": QueryMut{
+	"markAllAsRead": {
 		Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
                 uids as User.events @filter(eq(UserEvent.isRead, "false")) @cascade {
@@ -721,11 +723,11 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `uid(uids) <UserEvent.isRead> "true" .`,
 		}},
 	},
-	"markContractAsRead": QueryMut{
+	"markContractAsRead": {
 		Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
                 uids as User.events @filter(eq(UserEvent.isRead, "false")) @cascade {
@@ -733,21 +735,21 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `uid(uids) <UserEvent.isRead> "true" .`,
 		}},
 	},
-	"setPendingUserToken": QueryMut{
+	"setPendingUserToken": {
 		Q: `query {
             var(func: eq(PendingUser.email, "{{.email}}")) @filter(NOT has(PendingUser.token)) {
                 u as uid
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `uid(u) <PendingUser.token> "{{.token}}" .`,
 		}},
 	},
-	"setNodeVisibility": QueryMut{
+	"setNodeVisibility": {
 		Q: `query {
             var(func: eq(Node.nameid, "{{.nameid}}")) {
                 n as uid
@@ -756,13 +758,13 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `uid(n) <Node.visibility> "{{.value}}" .
                 uid(nf) <NodeFragment.visibility> "{{.value}}" .
                 `,
 		}},
 	},
-	"movePinnedTension": QueryMut{
+	"movePinnedTension": {
 		Q: `query {
             var(func: eq(Node.nameid, "{{.nameid_old}}")) {
                 n_old as uid
@@ -773,12 +775,12 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 
             n_new as var(func: eq(Node.nameid, "{{.nameid_new}}"))
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `uid(n_new) <Node.pinned> uid(t) . `,
 			D: `uid(n_old) <Node.pinned> uid(t) . `,
 		}},
 	},
-	"rewriteLabelEvents": QueryMut{
+	"rewriteLabelEvents": {
 		Q: `query {
             var(func: eq(Node.rootnameid, "{{.rootnameid}}")) {
                 Node.tensions_in {
@@ -794,13 +796,13 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
 
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `uid(e_added) <Event.new> "{{.new_name}}" .
                 uid(e_removed) <Event.old> "{{.new_name}}" .
                 `,
 		}},
 	},
-	"incrementCardPos": QueryMut{
+	"incrementCardPos": {
 		Q: `query {
             var(func: uid({{.cardid}})) {
                 pos as ProjectCard.pos
@@ -821,7 +823,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
                 uid(colid) <ProjectColumn.tensions> uid(tid) .
                 uid(tid) <Tension.project_statuses> uid(colid) .
@@ -829,7 +831,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 `,
 		}},
 	},
-	"decrementCardPos": QueryMut{
+	"decrementCardPos": {
 		Q: `query {
             var(func: uid({{.colid}})) {
                 ProjectColumn.cards @filter(gt(ProjectCard.pos, {{.pos}})) {
@@ -839,14 +841,14 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `uid(decrme) <ProjectCard.pos> val(new_pos_decr) . `,
 			D: `<{{.colid}}> <ProjectColumn.tensions> <{{.tid}}> .
                 <{{.tid}}> <Tension.project_statuses> <{{.colid}}> .
                 `,
 		}},
 	},
-	"moveCardPos": QueryMut{
+	"moveCardPos": {
 		Q: `query {
             var(func: uid({{.cardid}})) {
                 pos as ProjectCard.pos
@@ -878,7 +880,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
         }`,
 		M: []X{
-			X{
+			{
 				S: `uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
                     uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
                     uid(projectid) <Project.updatedAt> "{{.now}}" .
@@ -895,7 +897,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 			},
 		},
 	},
-	"moveCardPosUp": QueryMut{
+	"moveCardPosUp": {
 		Q: `query {
             var(func: uid({{.cardid}})) {
                 pos as ProjectCard.pos
@@ -914,14 +916,14 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
         }`,
 		M: []X{
-			X{
+			{
 				S: `uid(incrme) <ProjectCard.pos> val(new_pos_incr) .
                     uid(projectid) <Project.updatedAt> "{{.now}}" .
                 `,
 			},
 		},
 	},
-	"moveCardPosDown": QueryMut{
+	"moveCardPosDown": {
 		Q: `query {
             var(func: uid({{.cardid}})) {
                 pos as ProjectCard.pos
@@ -940,7 +942,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             }
         }`,
 		M: []X{
-			X{
+			{
 				S: `uid(decrme) <ProjectCard.pos> val(new_pos_decr) .
                     uid(projectid) <Project.updatedAt> "{{.now}}" .
                 `,
@@ -948,7 +950,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 		},
 	},
 	// Delete
-	"removeAssignedTension": QueryMut{
+	"removeAssignedTension": {
 		Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
                 u as uid
@@ -957,13 +959,13 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			D: `uid(u) <User.tensions_assigned> uid(t) .
                 uid(t) <Tension.assignees> uid(u) .
                 `,
 		}},
 	},
-	"deleteCardDraft": QueryMut{
+	"deleteCardDraft": {
 		Q: `query {
             var(func: uid({{.cardid}})) {
                 c as uid
@@ -971,7 +973,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 v as ProjectCard.values
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			D: `uid(v) * *  .
                 uid(cc) * * .
                 uid(c) * * .
@@ -986,7 +988,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 	// * [x] Delete his watched organisations
 	// * [x] Remove his contracts (candidates)
 	// * [x] Delete his UserEvents (subDelete Notif!)
-	"deleteUser": QueryMut{
+	"deleteUser": {
 		Q: `query {
             var(func: eq(User.username, "{{.username}}")) {
                 u as uid
@@ -1018,7 +1020,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 Project.createdBy @filter(eq(User.username, "{{.username}}"))
             }
         }`,
-		M: []X{X{
+		M: []X{{
 			S: `
         uid(posts) <Post.createdBy> <{{.ghostid}}> .
         uid(node_created) <Node.createdBy> <{{.ghostid}}> .
@@ -1080,6 +1082,7 @@ func (dg Dgraph) Count(id string, fieldName string) int {
 
 	return values[0]
 }
+
 func (dg Dgraph) Count2(f1, v1, f2, v2, fieldName string) int {
 	// Format Query
 	maps := map[string]string{
@@ -1149,6 +1152,7 @@ func (dg Dgraph) CountHas(fieldName string) int {
 
 	return values[0]
 }
+
 func (dg Dgraph) CountHas2(fieldName, f2, v2 string) int {
 	// Format Query
 	maps := map[string]string{
@@ -2734,8 +2738,8 @@ func (dg Dgraph) RewriteContractId(cid string) error {
         uid(vuid) <Vote.voteid> "" .
     `
 	// do not work see issue #gil
-	//uid(cuid) <Contract.contractid> val(cuid) .
-	//uid(vuid) <Vote.voteid> val(vuid) .
+	// uid(cuid) <Contract.contractid> val(cuid) .
+	// uid(vuid) <Vote.voteid> val(vuid) .
 
 	mutation := &api.Mutation{
 		SetNquads: []byte(mu),

@@ -25,12 +25,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-chi/jwtauth/v5"
-	"github.com/lestrrat-go/jwx/v2/jwt"
-	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/lestrrat-go/jwx/v2/jwt"
+	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
@@ -38,12 +39,14 @@ import (
 	"fractale/fractal6.go/web/sessions"
 )
 
-var buildMode string
-var cache *sessions.Session
-var tkMaster *Jwt
-var jwtSecret string
-var tokenValidityTime time.Duration
-var isCookieSecured bool
+var (
+	buildMode         string
+	cache             *sessions.Session
+	tkMaster          *Jwt
+	jwtSecret         string
+	tokenValidityTime time.Duration
+	isCookieSecured   bool
+)
 
 func init() {
 	// Get env mode
@@ -57,7 +60,7 @@ func init() {
 	} else {
 		isCookieSecured = false
 		tokenValidityTime = time.Hour * 12
-		//tokenValidityTime = time.Second*60
+		// tokenValidityTime = time.Second*60
 	}
 
 	// Initializa cache
@@ -119,7 +122,6 @@ func GenToken(username string) {
 	fmt.Println("Api token:", Unpack64(apiToken))
 	fmt.Println("---")
 	fmt.Println("Dgraph token:", dgraphToken)
-
 }
 
 func (tk Jwt) GetAuth() *jwtauth.JWTAuth {
@@ -199,7 +201,7 @@ func ClearUserCookie() *http.Cookie {
 func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
 	token, claims, err := jwtauth.FromContext(ctx)
 	if err != nil {
-		//errMsg := fmt.Errorf("%v", err)
+		// errMsg := fmt.Errorf("%v", err)
 		switch err {
 		case jwtauth.ErrUnauthorized:
 		case jwtauth.ErrExpired:
@@ -208,8 +210,8 @@ func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
 		case jwtauth.ErrNoTokenFound:
 		case jwtauth.ErrAlgoInvalid:
 		}
-		//http.Error(w, http.StatusText(401), 401)
-		//return
+		// http.Error(w, http.StatusText(401), 401)
+		// return
 	} else if token == nil || jwt.Validate(token) != nil {
 		err = errors.New("jwtauth: token is invalid")
 	} else if claims[tkMaster.tokenClaim] == nil {
@@ -231,12 +233,12 @@ func ContextWithUserCtx(ctx context.Context) (context.Context, error) {
 
 	// Set the Iat
 	if claims["iat"] != nil {
-		//iat := claims["iat"].(int64)
-		//return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339)), err
+		// iat := claims["iat"].(int64)
+		// return context.WithValue(ctx, "iat", time.Unix(iat, 0).Format(time.RFC3339)), err
 		iat := claims["iat"].(time.Time)
 		return context.WithValue(ctx, "iat", iat.Format(time.RFC3339)), err
 	}
-	//LogErr("jwt error", fmt.Errorf("Can't set the iat jwt claims. This would breaks the user context synchronisation logics."))
+	// LogErr("jwt error", fmt.Errorf("Can't set the iat jwt claims. This would breaks the user context synchronisation logics."))
 	return ctx, err
 }
 
@@ -329,7 +331,7 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
 		if e != nil {
 			return uctx, e
 		}
-		//return nil, fmt.Errorf("refresh token")
+		// return nil, fmt.Errorf("refresh token")
 	}
 	uctx.Hit++
 	uctx.CheckedNameid = append(uctx.CheckedNameid, nid)
@@ -343,16 +345,16 @@ func MaybeRefresh(uctx *model.UserCtx) (*model.UserCtx, error) {
 	var key string = uctx.Username + "roles"
 
 	if uctx.Hit > 0 {
-		//1. Is fresh data
+		// 1. Is fresh data
 		return uctx, nil
 	} else if d, err := cache.Get(ctx, key).Bytes(); err == nil && len(d) != 0 && !uctx.NoCache {
-		//2. Check the cache
+		// 2. Check the cache
 		err = json.Unmarshal(d, &roles)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		//3. Query the database
+		// 3. Query the database
 		roles, err = db.GetDB().GetUserRoles(uctx.Username)
 		if err != nil {
 			return nil, err

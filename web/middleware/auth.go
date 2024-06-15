@@ -24,9 +24,10 @@ import (
 	//"fmt"
 	"bytes"
 	"encoding/json"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/spf13/viper"
 	//"fractale/fractal6.go/db"
 	//"fractale/fractal6.go/web/auth"
 )
@@ -50,9 +51,9 @@ func CheckBearer(next http.Handler) http.Handler {
 // a the body is expected to be string/nameid.
 func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//ctx := r.Context()
-		//uctx := auth.GetUserContextOrEmpty(r.Context())
-		//var q string
+		// ctx := r.Context()
+		// uctx := auth.GetUserContextOrEmpty(r.Context())
+		// var q string
 
 		//// Keep this to reset the body reader later
 		//body, _ := ioutil.ReadAll(r.Body)
@@ -80,7 +81,7 @@ func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 		//    return
 		//}
 
-		//next.ServeHTTP(w, r.WithContext(ctx))
+		// next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
@@ -89,7 +90,7 @@ func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 func CheckTensionQueryRights(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		//uctx := auth.GetUserContextOrEmpty(r.Context())
+		// uctx := auth.GetUserContextOrEmpty(r.Context())
 		var q struct{ Nameids []string }
 
 		// Keep this to reset the body reader later

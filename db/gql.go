@@ -311,7 +311,7 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
 
 	switch vertex {
 	case "tension":
-		//field := ToGoNameFormat(k)
+		// field := ToGoNameFormat(k)
 		// pass
 
 	default:
@@ -339,7 +339,7 @@ func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, 
 	Vertex := strings.Title(vertex)
 	queryName := "add" + Vertex
 	inputType := "Add" + Vertex + "Input"
-	//queryGraph := vertex + " {" + qgraph + "}"
+	// queryGraph := vertex + " {" + qgraph + "}"
 
 	// Build the string request
 	var queryInput string
@@ -381,7 +381,7 @@ func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input interface{
 	Vertex := strings.Title(vertex)
 	queryName := "update" + Vertex
 	inputType := "Update" + Vertex + "Input"
-	//queryGraph := vertex + " {" + qgraph + "}"
+	// queryGraph := vertex + " {" + qgraph + "}"
 
 	// Build the string request
 	var queryInput string = "(input: $input)"
@@ -417,7 +417,7 @@ func (dg Dgraph) DeleteExtra(uctx model.UserCtx, vertex string, input interface{
 	Vertex := strings.Title(vertex)
 	queryName := "delete" + Vertex
 	inputType := Vertex + "Filter"
-	//queryGraph := vertex + " {" + qgraph + "}"
+	// queryGraph := vertex + " {" + qgraph + "}"
 
 	// Build the string request
 	var queryInput string = "(filter: $input)"
@@ -457,7 +457,7 @@ func (dg Dgraph) AddUserRole(username, nameid string) error {
 	userInput := model.UpdateUserInput{
 		Filter: &model.UserFilter{Username: &model.StringHashFilterStringRegExpFilter{Eq: &username}},
 		Set: &model.UserPatch{
-			Roles: []*model.NodeRef{&model.NodeRef{Nameid: &nameid}},
+			Roles: []*model.NodeRef{{Nameid: &nameid}},
 		},
 	}
 	err := dg.Update(dg.GetRootUctx(), "user", userInput)
@@ -469,7 +469,7 @@ func (dg Dgraph) RemoveUserRole(username, nameid string) error {
 	userInput := model.UpdateUserInput{
 		Filter: &model.UserFilter{Username: &model.StringHashFilterStringRegExpFilter{Eq: &username}},
 		Remove: &model.UserPatch{
-			Roles: []*model.NodeRef{&model.NodeRef{Nameid: &nameid}},
+			Roles: []*model.NodeRef{{Nameid: &nameid}},
 		},
 	}
 	err := dg.Update(dg.GetRootUctx(), "user", userInput)

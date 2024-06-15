@@ -127,7 +127,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 	if node.ID != "" {
 		// @debug: should delete instead...DelFieldById => `<x> <x> * .`
 		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
-		//err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
+		// err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
 	}
 
 	return true, err
@@ -221,7 +221,7 @@ func SyncPendingUser(username, email string) error {
 				User:      &model.UserRef{Email: &email},
 				IsRead:    false,
 				CreatedAt: createdAt,
-				Event:     []*model.EventKindRef{&model.EventKindRef{ContractRef: &model.ContractRef{ID: &cid}}},
+				Event:     []*model.EventKindRef{{ContractRef: &model.ContractRef{ID: &cid}}},
 			})
 
 			// Fetch contract
@@ -236,7 +236,7 @@ func SyncPendingUser(username, email string) error {
 			// Set event type
 			StructMap(contract.Event, &contractPatch.Event)
 			// Set candidate
-			contractPatch.Candidates = []*model.UserRef{&model.UserRef{Email: &email}}
+			contractPatch.Candidates = []*model.UserRef{{Email: &email}}
 			emailPart := strings.Split(email, "@")[0]
 			if contract.Event.Old != nil && strings.HasPrefix(*contract.Event.Old, emailPart) {
 				contractPatch.Event.Old = &username

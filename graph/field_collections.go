@@ -23,10 +23,11 @@ package graph
 import (
 	"context"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/vektah/gqlparser/v2/ast"
 	"reflect"
 	"strings"
+
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/vektah/gqlparser/v2/ast"
 
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/tools"
@@ -169,12 +170,12 @@ func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedFi
 			}
 		}
 
-		//prefixColumn := GetPreloadString(prefix, f.Name)
+		// prefixColumn := GetPreloadString(prefix, f.Name)
 		prefixColumn := f.Name
 		preloads = append(preloads, prefixColumn)
 		// <!> UNION <!>
 		if f.ObjectDefinition.Kind == ast.Union {
-			//unionTypes = f.ObjectDefinition.Types
+			// unionTypes = f.ObjectDefinition.Types
 			// f.Name == "__typename"
 			inEnum = true
 			continue

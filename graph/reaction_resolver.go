@@ -23,10 +23,11 @@ package graph
 import (
 	//"fmt"
 	"context"
-	"fractale/fractal6.go/graph/model"
-	"github.com/99designs/gqlgen/graphql"
 	"strconv"
 	"strings"
+
+	"fractale/fractal6.go/graph/model"
+	"github.com/99designs/gqlgen/graphql"
 
 	. "fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/auth"

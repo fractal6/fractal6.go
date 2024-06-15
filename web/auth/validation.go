@@ -24,22 +24,25 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/viper"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/tools"
 )
 
-var ClientVersion string
-var ReservedUsername map[string]bool
-var MAX_PUBLIC_ORGA int
-var MAX_PRIVATE_ORGA int
-var MAX_ORGA_REG int
-var MAX_ORGA_PRO int
+var (
+	ClientVersion    string
+	ReservedUsername map[string]bool
+	MAX_PUBLIC_ORGA  int
+	MAX_PRIVATE_ORGA int
+	MAX_ORGA_REG     int
+	MAX_ORGA_PRO     int
+)
 
 func init() {
 	var err error

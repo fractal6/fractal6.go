@@ -1,0 +1,4 @@
+# role to be defined.
+linters-settings:
+  lll:
+    line-length: 120  # Set your desired maximum line length here

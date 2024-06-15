@@ -152,14 +152,16 @@ var (
     }`)
 )
 
-var stripReg *re.Regexp
-var specialReg *re.Regexp
-var specialSoftReg *re.Regexp
-var reservedURIReg *re.Regexp
-var numReg *re.Regexp
-var letterReg *re.Regexp
-var safeWordReg *re.Regexp
-var emailReg *re.Regexp
+var (
+	stripReg       *re.Regexp
+	specialReg     *re.Regexp
+	specialSoftReg *re.Regexp
+	reservedURIReg *re.Regexp
+	numReg         *re.Regexp
+	letterReg      *re.Regexp
+	safeWordReg    *re.Regexp
+	emailReg       *re.Regexp
+)
 
 func init() {
 	reservedURI := `\(\)\?\|\&\=\+\/\[\[` + `\s`

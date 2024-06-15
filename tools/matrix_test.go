@@ -22,13 +22,16 @@ package tools
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"testing"
+
+	"github.com/spf13/viper"
 )
 
-var matrixPostalRoom string
-var matrixToken string
-var DOMAIN string
+var (
+	matrixPostalRoom string
+	matrixToken      string
+	DOMAIN           string
+)
 
 func init() {
 	InitViper()
