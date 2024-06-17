@@ -83,7 +83,7 @@ func MakeOwner(w http.ResponseWriter, r *http.Request) {
 	} else {
 		orgName = x.(string)
 	}
-	if x, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", "f6", "Node.source", "Blob.tension", "uid"); err != nil {
+	if x, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", form.Nameid, "Node.source", "Blob.tension", "uid"); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	} else {

@@ -97,7 +97,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 			}
 			// If owner is alone, prevent orphan organization
 			if len(owners) < 2 {
-				return false, LogErr("access denied", fmt.Errorf("An organization need at least one Owner. Please contact us if you need to transfer ownership."))
+				return false, LogErr("access denied", fmt.Errorf("An organization needs at least one Owner. Please contact us if you need to transfer ownership."))
 			}
 
 			// Downgrade Owner to Member

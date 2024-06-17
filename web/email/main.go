@@ -225,7 +225,7 @@ func SendOwnerGrantedEmail(username, nameid, orgName string) error {
         "to": ["%s"],
         "subject": "Ownership of %s was granted",
         "html_body": "%s"
-    }`, email, tools.CleanString(content, true))
+    }`, email, orgName, tools.CleanString(content, true))
 
 	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
 	req.Header.Set("Content-Type", "application/json")
