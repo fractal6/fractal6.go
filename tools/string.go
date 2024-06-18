@@ -92,7 +92,7 @@ func RemoveCodeBlocks(msg string) string {
 }
 
 func FindUsernames(msg string) []string {
-	//r := re.MustCompile(`(^|\s|[^\w\[\` + "`" + `])@([\w\-\.]+)\b`)
+	// r := re.MustCompile(`(^|\s|[^\w\[\` + "`" + `])@([\w\-\.]+)\b`)
 	r := re.MustCompile(`(^|\s|[^\w\[])@([\w\-\.]+)\b`)
 	all := r.FindAllStringSubmatch(msg, -1)
 	match := []string{}

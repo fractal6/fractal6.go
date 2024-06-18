@@ -23,8 +23,9 @@ package graph
 import (
 	"context"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql"
 	"strings"
+
+	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
@@ -119,7 +120,7 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
 		return nil, err
 	}
 	if data.(*model.AddContractPayload) == nil {
-		return nil, LogErr("add contract", fmt.Errorf("no contract added."))
+		return nil, LogErr("add contract", fmt.Errorf("silent error: no contract added."))
 	}
 	id := data.(*model.AddContractPayload).Contract[0].ID
 	tid := *input.Tension.ID
@@ -280,22 +281,16 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 		}
 	}
 
-	// Notify user of the cancel
-	msg := fmt.Sprintf("Contract %s has been cancelled.", contract.ID)
-	var to []string
-	for _, p := range contract.Participants {
-		to = append(to, p.Node.FirstLink.Username)
-	}
-	PublishNotifEvent(model.NotifNotif{Uctx: uctx, Tid: &contract.Tension.ID, Cid: &contract.ID, Msg: msg, To: to})
-
 	// Deep delete
 	err = db.GetDB().DeepDelete("contract", ids[0])
 	if err != nil {
 		return nil, LogErr("Delete contract error", err)
 	}
 
+	// We do not notify of the deletion to avoid anoying notifications.
+
 	var d model.DeleteContractPayload
-	d.Contract = []*model.Contract{&model.Contract{ID: ids[0]}}
+	d.Contract = []*model.Contract{{ID: ids[0]}}
 	return &d, err
 }
 
@@ -352,7 +347,7 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
 	input := inputs[0]
 	cid := *input.Contract.Contractid
 	nameid := *input.Node.Nameid
-	//vote := input.Data[0]
+	// vote := input.Data[0]
 
 	// Ensure the vote ID
 	if input.Voteid != cid+"#"+nameid {
@@ -371,7 +366,7 @@ func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (i
 	}
 	data := d.(*model.AddVotePayload)
 	if data == nil {
-		return nil, LogErr("add vote", fmt.Errorf("no vote added."))
+		return nil, LogErr("add vote", fmt.Errorf("silent error: no vote added."))
 	}
 
 	// Post process vote

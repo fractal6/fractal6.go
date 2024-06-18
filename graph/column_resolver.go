@@ -68,7 +68,7 @@ var DecrementColumnPos db.QueryMut = db.QueryMut{
                 }
             }
         }`,
-	M: []db.X{db.X{
+	M: []db.X{{
 		S: `uid(decrme) <ProjectColumn.pos> val(new_pos_decr) . `,
 	}},
 }
@@ -89,7 +89,7 @@ var MoveColumnPosUp db.QueryMut = db.QueryMut{
             }
         }`,
 	M: []db.X{
-		db.X{
+		{
 			S: `uid(incrme) <ProjectColumn.pos> val(new_pos_incr) . `,
 		},
 	},
@@ -111,7 +111,7 @@ var MoveColumnPosDown db.QueryMut = db.QueryMut{
             }
         }`,
 	M: []db.X{
-		db.X{
+		{
 			S: `uid(decrme) <ProjectColumn.pos> val(new_pos_decr) . `,
 		},
 	},
@@ -145,7 +145,7 @@ func addProjectColumnHook(ctx context.Context, obj interface{}, next graphql.Res
 	}
 	d := data.(*model.AddProjectColumnPayload)
 	if d == nil {
-		return nil, LogErr("add ProjectColumn", fmt.Errorf("no col added"))
+		return nil, LogErr("add ProjectColumn", fmt.Errorf("silent error: no col added"))
 	}
 
 	// Post-processing:
@@ -197,7 +197,7 @@ func deleteProjectColumnHook(ctx context.Context, obj interface{}, next graphql.
 	}
 	d := data.(*model.DeleteProjectColumnPayload)
 	if d == nil {
-		return nil, LogErr("delete ProjectColumn", fmt.Errorf("no column deleted"))
+		return nil, LogErr("delete ProjectColumn", fmt.Errorf("silent error: no column deleted"))
 	}
 
 	// Post-processing:
@@ -245,37 +245,35 @@ func updateProjectColumnHook(ctx context.Context, obj interface{}, next graphql.
 	ExtractInput(ctx, &input)
 	isMoved := false
 	oldColumn := ProjectColumnLoc{}
-	if input.Set != nil && len(input.Filter.ID) == 1 {
-		id := input.Filter.ID[0]
-		projectid := ""
-		if input.Set.Pos != nil {
-			// Extract the value before moving
-			isMoved = true
-			err := db.GetDB().Gamma1(QueryColumnLoc, map[string]string{"colid": id}, &oldColumn)
-			if err != nil {
-				return nil, err
-			}
-			projectid = oldColumn.Projectid
-		} else {
-			x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
-			if err != nil {
-				return nil, err
-			}
-			projectid = x.(string)
-		}
-
-		// Check project auth
-		if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
-			return nil, err
-		}
-
-	} else {
+	if input.Set == nil || len(input.Filter.ID) != 1 {
 		// Review Auth + auto increment
 		return nil, fmt.Errorf("Not implemented")
 	}
-
 	if input.Remove != nil {
 		return nil, fmt.Errorf("remove is not allowed for this mutation")
+	}
+
+	// Extract data identifiers the value before moving
+	id := input.Filter.ID[0]
+	projectid := ""
+	if input.Set.Pos != nil {
+		isMoved = true
+		err := db.GetDB().Gamma1(QueryColumnLoc, map[string]string{"colid": id}, &oldColumn)
+		if err != nil {
+			return nil, err
+		}
+		projectid = oldColumn.Projectid
+	} else {
+		x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
+		if err != nil {
+			return nil, err
+		}
+		projectid = x.(string)
+	}
+
+	// Check project auth
+	if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
+		return nil, err
 	}
 
 	// Forward query

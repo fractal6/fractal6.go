@@ -45,8 +45,8 @@ func TestUserCreds(t *testing.T) {
 	}
 
 	for _, test := range testcases {
-		//t.Logf("testcase %d", i)
-		//b, _ := json.Marshal(test.input)
+		// t.Logf("testcase %d", i)
+		// b, _ := json.Marshal(test.input)
 		b := []byte(test.input)
 
 		var got UserCreds

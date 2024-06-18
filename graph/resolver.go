@@ -28,9 +28,10 @@ package graph
 import (
 	"context"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql"
 	"reflect"
 	"time"
+
+	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
 	gen "fractale/fractal6.go/graph/generated"
@@ -50,7 +51,6 @@ type Resolver struct {
 
 // Init initialize shema config and Directives...
 func Init() gen.Config {
-
 	c := gen.Config{
 		Resolvers: &Resolver{db: db.GetDB()},
 	}
@@ -91,7 +91,7 @@ func Init() gen.Config {
 	// Hook
 	//
 
-	//User
+	// User
 	c.Directives.Hook_getUserInput = setContextWithID   // used by @private
 	c.Directives.Hook_queryUserInput = setContextWithID // used by @private
 	c.Directives.Hook_addUserInput = nothing
@@ -101,7 +101,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addUser = nothing
 	c.Directives.Hook_updateUser = nothing
 	c.Directives.Hook_deleteUser = nothing
-	//RoleExt
+	// RoleExt
 	c.Directives.Hook_getRoleExtInput = nothing
 	c.Directives.Hook_queryRoleExtInput = nothing
 	c.Directives.Hook_addRoleExtInput = nothing
@@ -111,7 +111,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addRoleExt = addNodeArtefactHook
 	c.Directives.Hook_updateRoleExt = updateNodeArtefactHook
 	c.Directives.Hook_deleteRoleExt = nothing
-	//Label
+	// Label
 	c.Directives.Hook_getLabelInput = nothing
 	c.Directives.Hook_queryLabelInput = nothing
 	c.Directives.Hook_addLabelInput = nothing
@@ -121,7 +121,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addLabel = addNodeArtefactHook
 	c.Directives.Hook_updateLabel = updateNodeArtefactHook
 	c.Directives.Hook_deleteLabel = nothing
-	//Project
+	// Project
 	c.Directives.Hook_getProjectInput = nothing
 	c.Directives.Hook_queryProjectInput = nothing
 	c.Directives.Hook_addProjectInput = nothing
@@ -131,7 +131,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addProject = addNodeArtefactHook
 	c.Directives.Hook_updateProject = updateNodeArtefactHook
 	c.Directives.Hook_deleteProject = nothing
-	//ProjectColumn
+	// ProjectColumn
 	c.Directives.Hook_getProjectColumnInput = nothing
 	c.Directives.Hook_queryProjectColumnInput = nothing
 	c.Directives.Hook_addProjectColumnInput = nothing
@@ -141,7 +141,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addProjectColumn = addProjectColumnHook
 	c.Directives.Hook_updateProjectColumn = updateProjectColumnHook
 	c.Directives.Hook_deleteProjectColumn = deleteProjectColumnHook
-	//ProjectCard
+	// ProjectCard
 	c.Directives.Hook_getProjectCardInput = nothing
 	c.Directives.Hook_queryProjectCardInput = nothing
 	c.Directives.Hook_addProjectCardInput = nothing
@@ -151,10 +151,10 @@ func Init() gen.Config {
 	c.Directives.Hook_addProjectCard = addProjectCardHook
 	c.Directives.Hook_updateProjectCard = updateProjectCardHook
 	c.Directives.Hook_deleteProjectCard = deleteProjectCardHook
-	//Tension
+	// Tension
 	c.Directives.Hook_getTensionInput = nothing
 	c.Directives.Hook_queryTensionInput = nothing
-	//ProjectDraft
+	// ProjectDraft
 	c.Directives.Hook_getProjectDraftInput = nothing
 	c.Directives.Hook_queryProjectDraftInput = nothing
 	c.Directives.Hook_addProjectDraftInput = nothing
@@ -166,8 +166,8 @@ func Init() gen.Config {
 	c.Directives.Hook_deleteProjectDraft = nothing
 	// @DEBUG: input rawQuery isssue (input modification not propagated with rawQuery whil rawQuery loose field with argument) !!!
 	// to be reviewed...
-	//c.Directives.Hook_addTensionInput = tensionInputHook
-	//c.Directives.Hook_updateTensionInput = tensionInputHook
+	// c.Directives.Hook_addTensionInput = tensionInputHook
+	// c.Directives.Hook_updateTensionInput = tensionInputHook
 	c.Directives.Hook_addTensionInput = nothing
 	c.Directives.Hook_updateTensionInput = setUpdateContextInfo // for @hasEvent+@isOwner
 	c.Directives.Hook_deleteTensionInput = nothing
@@ -175,7 +175,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addTension = addTensionHook
 	c.Directives.Hook_updateTension = updateTensionHook
 	c.Directives.Hook_deleteTension = nothing
-	//Comment
+	// Comment
 	c.Directives.Hook_getCommentInput = nothing
 	c.Directives.Hook_queryCommentInput = nothing
 	c.Directives.Hook_addCommentInput = nothing
@@ -185,7 +185,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addComment = nothing
 	c.Directives.Hook_updateComment = nothing
 	c.Directives.Hook_deleteComment = nothing
-	//Reaction
+	// Reaction
 	c.Directives.Hook_getReactionInput = nothing
 	c.Directives.Hook_queryReactionInput = nothing
 	c.Directives.Hook_addReactionInput = addReactionInputHook
@@ -195,7 +195,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addReaction = nothing
 	c.Directives.Hook_updateReaction = nothing
 	c.Directives.Hook_deleteReaction = nothing
-	//Contract
+	// Contract
 	c.Directives.Hook_getContractInput = nothing
 	c.Directives.Hook_queryContractInput = nothing
 	c.Directives.Hook_addContractInput = addContractInputHook
@@ -205,7 +205,7 @@ func Init() gen.Config {
 	c.Directives.Hook_addContract = addContractHook
 	c.Directives.Hook_updateContract = updateContractHook
 	c.Directives.Hook_deleteContract = deleteContractHook
-	//Vote
+	// Vote
 	c.Directives.Hook_getVoteInput = nothing
 	c.Directives.Hook_queryVoteInput = nothing
 	c.Directives.Hook_addVoteInput = nothing

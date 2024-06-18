@@ -24,8 +24,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis/v8"
 	"log"
+
+	"github.com/go-redis/redis/v8"
 
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/model"
@@ -37,8 +38,8 @@ var REDIS_ADDRESS string = "localhost:6379"
 
 var cache *redis.Client = redis.NewClient(&redis.Options{
 	Addr: REDIS_ADDRESS,
-	//Password: "", // no password set
-	//DB:       0,  // use default DB
+	// Password: "", // no password set
+	// DB:       0,  // use default DB
 })
 
 var ctx = context.Background()
@@ -116,7 +117,7 @@ func processContractNotification(msg *redis.Message) {
 
 	// @deprecated
 	// Add a little sleep to wait for UpdateContractHook as it writes after publishing
-	//time.Sleep(1 * time.Second)
+	// time.Sleep(1 * time.Second)
 
 	// Push notification
 	if err := graph.PushContractNotifications(notif); err != nil {

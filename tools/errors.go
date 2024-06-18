@@ -32,7 +32,7 @@ func LogErr(reason string, err error) error {
 	runtime.Callers(2, pc)    // Skip 2 levels to get the caller
 	f := runtime.FuncForPC(pc[0])
 	fname := f.Name()
-	//file, line := f.FileLine(pc[0])
+	// file, line := f.FileLine(pc[0])
 
 	log.Printf("[@%s] %s: %s", fname, reason, err.Error())
 	return fmt.Errorf("%s: %s", reason, err.Error())

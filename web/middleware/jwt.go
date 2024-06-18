@@ -21,11 +21,11 @@
 package middleware
 
 import (
+	"net/http"
 	//"fmt"
 	"fractale/fractal6.go/tools"
 	"fractale/fractal6.go/web/auth"
 	"github.com/go-chi/jwtauth/v5"
-	"net/http"
 )
 
 // Verifier http middleware handler will verify a JWT string from a http request.
@@ -66,8 +66,8 @@ func JwtDecode(next http.Handler) http.Handler {
 		switch err {
 		case jwtauth.ErrExpired:
 			// pass for now...
-			//http.Error(w, err.Error(), 400)
-			//return
+			// http.Error(w, err.Error(), 400)
+			// return
 		default:
 			// pass
 		}

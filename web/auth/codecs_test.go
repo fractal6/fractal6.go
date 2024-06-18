@@ -28,7 +28,7 @@ import (
 
 func init() {
 	// Necessary to work with with Viper relative path and go test
-	//os.Chdir("../")
+	// os.Chdir("../")
 	// ...doesn"t work, please run
 	//    go test ./web/auth/codecs* -v
 }
@@ -60,7 +60,7 @@ func TestValidateNameid(t *testing.T) {
 		var got bool = true
 		err := ValidateNameid(test.input, "test")
 		if err != nil {
-			//t.Errorf(err.Error())
+			// t.Errorf(err.Error())
 			got = false
 		}
 
@@ -92,7 +92,7 @@ func TestValidateUsername(t *testing.T) {
 		var got bool = true
 		err := ValidateUsername(test.input)
 		if err != nil {
-			//t.Errorf(err.Error())
+			// t.Errorf(err.Error())
 			got = false
 		}
 
@@ -126,7 +126,7 @@ func TestValidateEmail(t *testing.T) {
 		var got bool = true
 		err := ValidateEmail(test.input)
 		if err != nil {
-			//t.Errorf(err.Error())
+			// t.Errorf(err.Error())
 			got = false
 		}
 

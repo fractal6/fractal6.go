@@ -53,7 +53,7 @@ func MatrixJsonSend(body, roomid, access_token string) error {
 
 	// Send message to matrix room
 	// @debug: triple backquote doesnt work with matrix; How to encode backquote ???
-	//data = ```json\n" + QuoteString(data) + "\n```",
+	// data = ```json\n" + QuoteString(data) + "\n```",
 	data = QuoteString(data)
 	data = fmt.Sprintf(`{
         "msgtype":"m.text",
@@ -79,8 +79,8 @@ func MatrixJsonSend(body, roomid, access_token string) error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		//b, _ := ioutil.ReadAll(resp.Body)
-		//fmt.Println(string(b))
+		// b, _ := ioutil.ReadAll(resp.Body)
+		// fmt.Println(string(b))
 		return fmt.Errorf("http matrix error, see body. (code %s)", resp.Status)
 	}
 

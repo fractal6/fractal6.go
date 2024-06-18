@@ -117,7 +117,6 @@ const (
 var authEventsLut map[model.TensionEvent]AuthValue
 
 func init() {
-
 	validationMap = map[model.ContractType]func(EventMap, *model.UserCtx, *model.Tension, *model.EventRef, *model.Contract) (bool, *model.Contract, error){
 		model.ContractTypeAnyCandidates:   AnyCandidates,
 		model.ContractTypeAnyCoordoDual:   AnyCoordoDual,
@@ -177,7 +176,6 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
 		return false, nil, LogErr("Contract not implemened", fmt.Errorf("Contact a coordinator to access this ressource."))
 	}
 	return f(em, uctx, tension, event, contract)
-
 }
 
 // checkTensionRestriction checks the tension can be processed based specific restriction
@@ -264,7 +262,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 			if r != nil && r.(bool) {
 				return true, err
 			} else {
-				return false, fmt.Errorf("Sorry, Guest cannot create tension in this organisation at the moment.")
+				return false, LogErr("access denied", fmt.Errorf("Sorry, Guest cannot create tension in this organisation at the moment."))
 			}
 		} else if auth.UserIsMember(uctx, tension.Receiver.Nameid) >= 0 {
 			return true, err
@@ -435,14 +433,14 @@ func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
 		}
 		contractid := codec.ContractIdCodec(tension.ID, *event.EventType, *event.Old, *event.New)
 		contract := &model.Contract{
-			//Contractid: contractid, // Build in the frontend.
+			// Contractid: contractid, // Build in the frontend.
 			CreatedAt:    Now(),
 			CreatedBy:    &model.User{Username: uctx.Username},
 			Event:        &ev,
 			Tension:      tension,
 			Status:       model.ContractStatusOpen,
 			ContractType: model.ContractTypeAnyCoordoDual,
-			Participants: []*model.Vote{&model.Vote{
+			Participants: []*model.Vote{{
 				Voteid: codec.VoteIdCodec(contractid, rid, uctx.Username),
 				Node:   &model.Node{Nameid: codec.MemberIdCodec(rid, uctx.Username)},
 				Data:   []int{1},

@@ -34,6 +34,15 @@ type AddBlobPayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type AddBuildInfoInput struct {
+	ClientVersion string `json:"client_version"`
+}
+
+type AddBuildInfoPayload struct {
+	BuildInfo []*BuildInfo `json:"buildInfo,omitempty"`
+	NumUids   *int         `json:"numUids,omitempty"`
+}
+
 type AddCommentInput struct {
 	CreatedBy *UserRef       `json:"createdBy"`
 	CreatedAt string         `json:"createdAt"`
@@ -189,6 +198,7 @@ type AddNodeInput struct {
 	FirstLink             *UserRef       `json:"first_link,omitempty"`
 	Contracts             []*VoteRef     `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef    `json:"events_history,omitempty"`
+	CascadeDirective      *bool          `json:"cascade_directive,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -533,6 +543,37 @@ type BlobTypeHash struct {
 	In []*BlobType `json:"in,omitempty"`
 }
 
+type BuildInfo struct {
+	ClientVersion string `json:"client_version"`
+}
+
+type BuildInfoAggregateResult struct {
+	Count            *int    `json:"count,omitempty"`
+	ClientVersionMin *string `json:"client_versionMin,omitempty"`
+	ClientVersionMax *string `json:"client_versionMax,omitempty"`
+}
+
+type BuildInfoFilter struct {
+	Has []*BuildInfoHasFilter `json:"has,omitempty"`
+	And []*BuildInfoFilter    `json:"and,omitempty"`
+	Or  []*BuildInfoFilter    `json:"or,omitempty"`
+	Not *BuildInfoFilter      `json:"not,omitempty"`
+}
+
+type BuildInfoOrder struct {
+	Asc  *BuildInfoOrderable `json:"asc,omitempty"`
+	Desc *BuildInfoOrderable `json:"desc,omitempty"`
+	Then *BuildInfoOrder     `json:"then,omitempty"`
+}
+
+type BuildInfoPatch struct {
+	ClientVersion *string `json:"client_version,omitempty"`
+}
+
+type BuildInfoRef struct {
+	ClientVersion *string `json:"client_version,omitempty"`
+}
+
 type CardKindFilter struct {
 	MemberTypes        []CardKindType      `json:"memberTypes,omitempty"`
 	TensionFilter      *TensionFilter      `json:"tensionFilter,omitempty"`
@@ -738,6 +779,12 @@ type DeleteBlobPayload struct {
 	Blob    []*Blob `json:"blob,omitempty"`
 	Msg     *string `json:"msg,omitempty"`
 	NumUids *int    `json:"numUids,omitempty"`
+}
+
+type DeleteBuildInfoPayload struct {
+	BuildInfo []*BuildInfo `json:"buildInfo,omitempty"`
+	Msg       *string      `json:"msg,omitempty"`
+	NumUids   *int         `json:"numUids,omitempty"`
 }
 
 type DeleteCommentPayload struct {
@@ -1284,6 +1331,7 @@ type Node struct {
 	FirstLink              *User                   `json:"first_link,omitempty"`
 	Contracts              []*Vote                 `json:"contracts,omitempty"`
 	EventsHistory          []*Event                `json:"events_history,omitempty"`
+	CascadeDirective       *bool                   `json:"cascade_directive,omitempty"`
 	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
 	TensionsInAggregate    *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
 	WatchersAggregate      *UserAggregateResult    `json:"watchersAggregate,omitempty"`
@@ -1460,6 +1508,7 @@ type NodePatch struct {
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
+	CascadeDirective      *bool           `json:"cascade_directive,omitempty"`
 }
 
 type NodeRef struct {
@@ -1497,6 +1546,7 @@ type NodeRef struct {
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
+	CascadeDirective      *bool           `json:"cascade_directive,omitempty"`
 }
 
 type NodeTypeHash struct {
@@ -2392,6 +2442,17 @@ type UpdateBlobPayload struct {
 	NumUids *int    `json:"numUids,omitempty"`
 }
 
+type UpdateBuildInfoInput struct {
+	Filter *BuildInfoFilter `json:"filter"`
+	Set    *BuildInfoPatch  `json:"set,omitempty"`
+	Remove *BuildInfoPatch  `json:"remove,omitempty"`
+}
+
+type UpdateBuildInfoPayload struct {
+	BuildInfo []*BuildInfo `json:"buildInfo,omitempty"`
+	NumUids   *int         `json:"numUids,omitempty"`
+}
+
 type UpdateCommentInput struct {
 	Filter *CommentFilter `json:"filter"`
 	Set    *CommentPatch  `json:"set,omitempty"`
@@ -3111,6 +3172,84 @@ func (e *BlobType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e BlobType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type BuildInfoHasFilter string
+
+const (
+	BuildInfoHasFilterClientVersion BuildInfoHasFilter = "client_version"
+)
+
+var AllBuildInfoHasFilter = []BuildInfoHasFilter{
+	BuildInfoHasFilterClientVersion,
+}
+
+func (e BuildInfoHasFilter) IsValid() bool {
+	switch e {
+	case BuildInfoHasFilterClientVersion:
+		return true
+	}
+	return false
+}
+
+func (e BuildInfoHasFilter) String() string {
+	return string(e)
+}
+
+func (e *BuildInfoHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = BuildInfoHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid BuildInfoHasFilter", str)
+	}
+	return nil
+}
+
+func (e BuildInfoHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type BuildInfoOrderable string
+
+const (
+	BuildInfoOrderableClientVersion BuildInfoOrderable = "client_version"
+)
+
+var AllBuildInfoOrderable = []BuildInfoOrderable{
+	BuildInfoOrderableClientVersion,
+}
+
+func (e BuildInfoOrderable) IsValid() bool {
+	switch e {
+	case BuildInfoOrderableClientVersion:
+		return true
+	}
+	return false
+}
+
+func (e BuildInfoOrderable) String() string {
+	return string(e)
+}
+
+func (e *BuildInfoOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = BuildInfoOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid BuildInfoOrderable", str)
+	}
+	return nil
+}
+
+func (e BuildInfoOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
@@ -4335,6 +4474,7 @@ const (
 	NodeHasFilterFirstLink             NodeHasFilter = "first_link"
 	NodeHasFilterContracts             NodeHasFilter = "contracts"
 	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
+	NodeHasFilterCascadeDirective      NodeHasFilter = "cascade_directive"
 )
 
 var AllNodeHasFilter = []NodeHasFilter{
@@ -4371,11 +4511,12 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterFirstLink,
 	NodeHasFilterContracts,
 	NodeHasFilterEventsHistory,
+	NodeHasFilterCascadeDirective,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterCascadeDirective:
 		return true
 	}
 	return false

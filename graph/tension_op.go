@@ -30,8 +30,10 @@ import (
 	"fractale/fractal6.go/web/auth"
 )
 
-var EMAP EventsMap
-var SubscribingEvents map[model.TensionEvent]bool
+var (
+	EMAP              EventsMap
+	SubscribingEvents map[model.TensionEvent]bool
+)
 
 func init() {
 	EMAP = EventsMap{
@@ -191,7 +193,7 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 	if addSubscriber && ok && err == nil {
 		err = db.GetDB().Update(*uctx, "tension", &model.UpdateTensionInput{
 			Filter: &model.TensionFilter{ID: []string{tension.ID}},
-			Set:    &model.TensionPatch{Subscribers: []*model.UserRef{&model.UserRef{Username: &uctx.Username}}},
+			Set:    &model.TensionPatch{Subscribers: []*model.UserRef{{Username: &uctx.Username}}},
 		})
 	}
 
@@ -199,7 +201,8 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 }
 
 func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, blob *model.BlobRef, contract *model.Contract,
-	doCheck, doProcess bool) (bool, *model.Contract, error) {
+	doCheck, doProcess bool,
+) (bool, *model.Contract, error) {
 	var ok bool
 	var err error
 
@@ -254,7 +257,6 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 		}
 
 		// Assumes contract is either closed or cancelled.
-		// @DEBUG: wouldn't it be a bettter way to work with voteid & contractid ?
 		err = db.GetDB().RewriteContractId(contract.ID)
 		if err != nil {
 			return false, contract, err
@@ -301,13 +303,13 @@ func leaveTrace(tension *model.Tension) {
 // Event Actions
 //
 
+// Add or Update Node
+// --
+// 1. switch on TensionCharac.DocType (not blob type) -> rule differ from doc type!
+// 2. swith on TensionCharac.ActionType to add update etc...
+// - update the tension action value AND the blob pushedFlag
+// - copy the Blob data in the target Node.source (Uses GQL requests)
 func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	// Add or Update Node
-	// --
-	// 1. switch on TensionCharac.DocType (not blob type) -> rule differ from doc type!
-	// 2. swith on TensionCharac.ActionType to add update etc...
-	// * update the tension action value AND the blob pushedFlag
-	// * copy the Blob data in the target Node.source (Uses GQL requests)
 	var ok bool
 
 	blob := GetBlob(tension)
@@ -351,11 +353,10 @@ func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 	return ok, err
 }
 
+// Archived/Unarchive Node
+// - link or unlink role
+// - set archive event and flag
 func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	// Archived/Unarchive Node
-	// * link or unlink role
-	// * set archive event and flag
-	// --
 	var ok bool
 
 	blob := GetBlob(tension)
@@ -393,12 +394,11 @@ func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model
 	return ok, err
 }
 
+// ChangeAuthory
+// - If Circle : change mode on pointed node
+// - If Role : change role_type on the pointed node (on Node + Node.RoleExt)
+// - Don't touch the current blob as we do not use "authority" properties at the moment (just when adding node)
 func ChangeAuhtority(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	// ChangeAuthory
-	// * If Circle : change mode on pointed node
-	// * If Role : change role_type on the pointed node (on Node + Node.RoleExt)
-	// * Don't touch the current blob as we do not use "authority" properties at the moment (just when adding node)
-	// --
 	var ok bool
 
 	blob := GetBlob(tension)
@@ -411,11 +411,10 @@ func ChangeAuhtority(uctx *model.UserCtx, tension *model.Tension, event *model.E
 	return ok, err
 }
 
+// ChangeVisibility
+// - Change the visiblity of the node
+// - Don't touch the current blob as we do not use "authority" properties at the moment (just when adding node)
 func ChangeVisibility(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	// ChangeVisibility
-	// * Change the visiblity of the node
-	// * Don't touch the current blob as we do not use "authority" properties at the moment (just when adding node)
-	// --
 	var ok bool
 
 	blob := GetBlob(tension)
@@ -428,10 +427,11 @@ func ChangeVisibility(uctx *model.UserCtx, tension *model.Tension, event *model.
 	return ok, err
 }
 
+// ChangeFirstLink
+// - ensure first_link is free on link
+// - Link/unlink user
+// - Only Guest can be link/unlink in unsafe mode
 func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	// ChangeFirstLink
-	// * ensure first_link is free on link
-	// * Link/unlink user
 	var ok bool
 	var unsafe bool = false
 
@@ -442,7 +442,9 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 	node := blob.Node
 
 	if node != nil && node.Type != nil && *node.Type == model.NodeTypeCircle {
-		// Get membership node node
+		// Build a node membership fragment
+		// Auth: only Guest user can attach/detach
+		// --
 		rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
 		if err != nil {
 			return ok, err
@@ -455,7 +457,7 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 		var nf model.NodeFragment
 		StructMap(n, &nf)
 		if *nf.RoleType != model.RoleTypeGuest {
-			return false, LogErr("Value error", fmt.Errorf("You cannot detach this role (%s) like this.", string(*nf.RoleType)))
+			return false, LogErr("access denied", fmt.Errorf("You cannot detach this role (%s) like this.", string(*nf.RoleType)))
 		}
 		nf.FirstLink = event.Old
 		node = &nf
@@ -472,7 +474,7 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 		return false, fmt.Errorf("old and new event data must be defined.")
 	}
 	if *event.Old != tension.Receiver.Nameid {
-		return false, fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid)
+		return false, LogErr("access denied", fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid))
 	}
 
 	var err error
@@ -574,8 +576,8 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 	// @debug: this should be done before the contract creation.
 	guestid := codec.MemberIdCodec(rootid, username)
 	// Pending node as been created at invitation
-	//ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
-	//if err != nil { return ok, err }
+	// ex, err :=  db.GetDB().Exists("Node.nameid", guestid, nil, nil)
+	// if err != nil { return ok, err }
 	err = LinkUser(rootid, guestid, username)
 	if err != nil {
 		return ok, err
@@ -584,49 +586,41 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 	// Make user watch that organisation.
 	err = db.GetDB().Update(*uctx, "user", &model.UpdateUserInput{
 		Filter: &model.UserFilter{Username: &model.StringHashFilterStringRegExpFilter{Eq: &username}},
-		Set:    &model.UserPatch{Watching: []*model.NodeRef{&model.NodeRef{Nameid: &rootid}}},
+		Set:    &model.UserPatch{Watching: []*model.NodeRef{{Nameid: &rootid}}},
 	})
 
 	return true, err
 }
 
+// UserLeave  remove user reference
+// - remove User role
+// - update user membership
 func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	// Remove user reference
-	// * remove User role
-	// * update user membership
-	// --
 	var ok bool
-	var unsafe bool
 
 	blob := GetBlob(tension)
 	if blob == nil {
 		return false, fmt.Errorf("blob not found.")
 	}
 	node := blob.Node
-	role_type := model.RoleType(*event.New)
 
-	if role_type == model.RoleTypeGuest {
+	// No blob for membership oles
+	roleType := model.RoleType(*event.New)
+	if codec.IsMembershipRoleType(roleType) {
 		uctx.NoCache = true
-		i := auth.UserIsGuest(uctx, tension.Emitter.Nameid)
-		if i < 0 {
-			return ok, LogErr("Value error", fmt.Errorf("You are not a guest in this organisation."))
-		}
+		membershipNode := auth.GetMembershipRole(uctx, tension.Emitter.Nameid)
 		var nf model.NodeFragment
-		t := model.NodeTypeRole
-		StructMap(uctx.Roles[i], &nf)
+		if roleType != *membershipNode.RoleType {
+			return false, LogErr("access denied", fmt.Errorf("You must have the same membership as the one given in the event."))
+		}
+		StructMap(membershipNode, &nf)
 		nf.FirstLink = &uctx.Username
-		nf.Type = &t
+		nodeType := model.NodeTypeRole
+		nf.Type = &nodeType
 		node = &nf
-		unsafe = true
-	} else if role_type == model.RoleTypeRetired ||
-		role_type == model.RoleTypeMember ||
-		role_type == model.RoleTypePending {
-		return false, fmt.Errorf("You cannot leave this role like this.")
-	} else if role_type == model.RoleTypeOwner {
-		return false, fmt.Errorf("Owner cannot leave organisation. Please contact us if you need to transfer ownership.")
 	}
 
-	ok, err := LeaveRole(uctx, tension, node, unsafe)
+	ok, err := LeaveRole(uctx, tension, node)
 	return ok, err
 }
 
@@ -637,7 +631,7 @@ func PinTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventR
 	nodeInput := model.UpdateNodeInput{
 		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
 		Set: &model.NodePatch{
-			Pinned: []*model.TensionRef{&model.TensionRef{ID: &tid}},
+			Pinned: []*model.TensionRef{{ID: &tid}},
 		},
 	}
 	// update node
@@ -652,7 +646,7 @@ func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 	nodeInput := model.UpdateNodeInput{
 		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
 		Remove: &model.NodePatch{
-			Pinned: []*model.TensionRef{&model.TensionRef{ID: &tid}},
+			Pinned: []*model.TensionRef{{ID: &tid}},
 		},
 	}
 	// update node
@@ -672,7 +666,7 @@ func CheckEvent(t *model.Tension, e *model.EventRef) (string, error) {
 	}
 
 	b := GetBlob(t)
-	var v = *e.New
+	v := *e.New
 	var err error
 
 	switch *e.EventType {

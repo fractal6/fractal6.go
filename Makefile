@@ -6,7 +6,7 @@ BINARY := f6
 #DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
 DGRAPH_RELEASE := v22.0.2
-CLIENT_RELEASE := 0.8.2
+CLIENT_RELEASE := 0.8.3
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
@@ -132,6 +132,10 @@ pre_build_op:
 	fi
 	@if [ -d "$(RELEASE_DIR)" ]; then
 		@echo "$(RELEASE_DIR) does exist, please remove it manually to rebuild this release."
+		exit 1
+	fi
+	@if [ -z "$(F6_TOKEN)" ]; then
+		@echo "F6_TOKEN is not defined. Set your token to upload a release."
 		exit 1
 	fi
 	echo "Building (or Re-building) release: $(RELEASE_NAME)"

@@ -83,8 +83,16 @@ var gqlQueries map[string]string = map[string]string{
         }
     }`,
 	// Extra - Bridge
+	"queryExtra": `{
+        "query": "query {{.QueryName}}($filter:{{.FilterType}}, $order:{{.OrderType}}, $first:Int, $offset:Int) {
+            {{.QueryName}}{{.QueryInput}} {{.Directives}} {
+                {{.QueryGraph}}
+            }
+        }",
+        "variables": {{.VarMap}}
+    }`,
 	"addExtra": `{
-        "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!){
+        "query": "mutation {{.QueryName}}($input:[{{.InputType}}!]!) {
             {{.QueryName}}{{.QueryInput}} {
                 {{.QueryGraph}}
             }
@@ -94,7 +102,7 @@ var gqlQueries map[string]string = map[string]string{
         }
     }`,
 	"mutationExtra": `{
-        "query": "mutation {{.QueryName}}($input:{{.InputType}}!){
+        "query": "mutation {{.QueryName}}($input:{{.InputType}}!) {
             {{.QueryName}}{{.QueryInput}} {
                 {{.QueryGraph}}
             }
@@ -311,7 +319,7 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
 
 	switch vertex {
 	case "tension":
-		//field := ToGoNameFormat(k)
+		// field := ToGoNameFormat(k)
 		// pass
 
 	default:
@@ -330,16 +338,68 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
 	return err
 }
 
-//
-// Bridge queries
-//
+/*
+ *  Bridge queries
+ */
+
+// GetDirectives return the list of directives to apply to the given query
+// by looking for the pressence of special attributes in the payload graph.
+func GetDirectives(pg string) (string, string) {
+	directives := []string{}
+	words := strings.Fields(pg)
+	for _, word := range words {
+		if word == "cascade_directive" {
+			directives = append(directives, "@cascade")
+			pg = strings.ReplaceAll(pg, "cascade_directive", "")
+		}
+	}
+	return pg, strings.Join(directives, " ")
+}
+
+// Query codec, to be used in the resolver functions
+func (dg Dgraph) QueryExtra(uctx model.UserCtx, vertex string, filter any, order any, first *int, offset *int, qg string, data any) error {
+	Vertex := strings.Title(vertex)
+	queryName := "query" + Vertex
+	filterType := Vertex + "Filter"
+	orderType := Vertex + "Order"
+
+	// Build the string request
+	var queryInput string
+	queryInput = `(filter: $filter, order: $order, first: $first, offset: $offset)`
+
+	// Marshal the inputs
+	filter_ := struct {
+		Filter any  `json:"filter"`
+		Order  any  `json:"order"`
+		First  *int `json:"first"`
+		Offset *int `json:"offset"`
+	}{filter, order, first, offset}
+	varmap, _ := MarshalWithoutNil(filter_)
+
+	qg, directives := GetDirectives(qg)
+
+	// Build the request template map
+	reqInput := map[string]string{
+		"QueryName":  queryName,               // Query name (e.g addUser)
+		"FilterType": filterType,              // input type name (e.g AddUserInput)
+		"OrderType":  orderType,               // input type name (e.g AddUserInput)
+		"QueryInput": QuoteString(queryInput), // inputs data
+		"QueryGraph": CleanString(qg, true),   // output data
+		"VarMap":     string(varmap),          // inputs data
+		"Directives": directives,
+	}
+
+	// Send request
+	err := dg.QueryGql(uctx, "queryExtra", reqInput, data)
+	return err
+}
 
 // Add codec, to be used in the resolver functions
 func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, upsert *bool, qg string, data interface{}) error {
 	Vertex := strings.Title(vertex)
 	queryName := "add" + Vertex
 	inputType := "Add" + Vertex + "Input"
-	//queryGraph := vertex + " {" + qgraph + "}"
+	// queryGraph := vertex + " {" + qgraph + "}"
 
 	// Build the string request
 	var queryInput string
@@ -381,7 +441,7 @@ func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input interface{
 	Vertex := strings.Title(vertex)
 	queryName := "update" + Vertex
 	inputType := "Update" + Vertex + "Input"
-	//queryGraph := vertex + " {" + qgraph + "}"
+	// queryGraph := vertex + " {" + qgraph + "}"
 
 	// Build the string request
 	var queryInput string = "(input: $input)"
@@ -417,7 +477,7 @@ func (dg Dgraph) DeleteExtra(uctx model.UserCtx, vertex string, input interface{
 	Vertex := strings.Title(vertex)
 	queryName := "delete" + Vertex
 	inputType := Vertex + "Filter"
-	//queryGraph := vertex + " {" + qgraph + "}"
+	// queryGraph := vertex + " {" + qgraph + "}"
 
 	// Build the string request
 	var queryInput string = "(filter: $input)"
@@ -457,7 +517,7 @@ func (dg Dgraph) AddUserRole(username, nameid string) error {
 	userInput := model.UpdateUserInput{
 		Filter: &model.UserFilter{Username: &model.StringHashFilterStringRegExpFilter{Eq: &username}},
 		Set: &model.UserPatch{
-			Roles: []*model.NodeRef{&model.NodeRef{Nameid: &nameid}},
+			Roles: []*model.NodeRef{{Nameid: &nameid}},
 		},
 	}
 	err := dg.Update(dg.GetRootUctx(), "user", userInput)
@@ -469,7 +529,7 @@ func (dg Dgraph) RemoveUserRole(username, nameid string) error {
 	userInput := model.UpdateUserInput{
 		Filter: &model.UserFilter{Username: &model.StringHashFilterStringRegExpFilter{Eq: &username}},
 		Remove: &model.UserPatch{
-			Roles: []*model.NodeRef{&model.NodeRef{Nameid: &nameid}},
+			Roles: []*model.NodeRef{{Nameid: &nameid}},
 		},
 	}
 	err := dg.Update(dg.GetRootUctx(), "user", userInput)

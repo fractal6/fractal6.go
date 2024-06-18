@@ -9,6 +9,10 @@ enum ErrorBla {
   StorageLimitReached
 }
 
+type BuildInfo {
+  client_version: String!
+}
+
 type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query ($OWNIDS: [String]) {
         queryNode(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
@@ -99,6 +103,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   first_link: User
   contracts: [Vote!] @hasInverse(field: node)
   events_history: [Event!]
+  cascade_directive: Boolean
 }
 
 type NodeFragment {

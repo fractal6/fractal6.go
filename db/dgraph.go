@@ -26,9 +26,6 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/jwtauth/v5"
-	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -36,6 +33,11 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
+
 	//"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/dgraph-io/dgo/v200"
 	"github.com/dgraph-io/dgo/v200/protos/api"
@@ -46,10 +48,12 @@ import (
 	. "fractale/fractal6.go/tools"
 )
 
-var dgraphPrivateKey *rsa.PrivateKey
-var dgraphPublicKey *rsa.PublicKey
-var buildMode string
-var DOMAIN string
+var (
+	dgraphPrivateKey *rsa.PrivateKey
+	dgraphPublicKey  *rsa.PublicKey
+	buildMode        string
+	DOMAIN           string
+)
 
 // Database client
 var DB *Dgraph
@@ -162,8 +166,8 @@ func initDB() *Dgraph {
 		panic("Viper error: not host found")
 	} else {
 		// @DEBUG: log level, Viper!
-		//fmt.Println("Dgraph Graphql addr:", dgraphApiAddr)
-		//fmt.Println("Dgraph Grpc addr:", grpcAddr)
+		// fmt.Println("Dgraph Graphql addr:", dgraphApiAddr)
+		// fmt.Println("Dgraph Grpc addr:", grpcAddr)
 	}
 
 	return &Dgraph{
@@ -211,7 +215,7 @@ func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
 	}
 
 	dgClient = dgo.NewDgraphClient(api.NewDgraphClient(conn))
-	//ctx := context.Background()
+	// ctx := context.Background()
 
 	//// Perform login call. If the Dgraph cluster does not have ACL and
 	//// enterprise features enabled, this call should be skipped.
@@ -257,13 +261,13 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
 		if *d.RoleType == model.RoleTypeOwner {
 			ownids = append(ownids, rid)
 			// Owner is also a member !
-			//continue
+			// continue
 		}
 		if _, v := check[rid]; !v {
 			// @DEBUG: if pending is not included here, invited user, or author of tension created with BOT
 			// won't be able to see on tensins. But, authorizing it, make give a visibity hole for private circle
 			// that can be seen by **self-invited** user.
-			//if *d.RoleType != model.RoleTypePending && *d.RoleType != model.RoleTypeRetired {
+			// if *d.RoleType != model.RoleTypePending && *d.RoleType != model.RoleTypeRetired {
 			if *d.RoleType != model.RoleTypeRetired {
 				check[rid] = true
 				rootids = append(rootids, rid)
@@ -295,7 +299,7 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
 
 	// Create token
 	tkm := jwtauth.New("RS256", dgraphPrivateKey, dgraphPublicKey)
-	//tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
+	// tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
 	_, token, err := tkm.Encode(claims)
 	if err != nil {
 		panic("Dgraph JWT error: " + err.Error())
@@ -342,9 +346,9 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
 		// @DEBUG LEVEL
 		fmt.Println(op)
 	}
-	//fmt.Println(string(q))
+	// fmt.Println(string(q))
 	res, err := txn.Query(ctx, q)
-	//fmt.Println(res)
+	// fmt.Println(res)
 	return res, err
 }
 
@@ -397,8 +401,8 @@ func (dg Dgraph) MutateWithQueryDql3(q QueryMut, maps map[string]string) (*api.R
 		mutations = append(mutations, &mu)
 	}
 
-	//fmt.Println(query)
-	//fmt.Println(mutations)
+	// fmt.Println(query)
+	// fmt.Println(mutations)
 
 	if len(q.M) == 0 {
 		return txn.Query(ctx, query)
@@ -426,9 +430,9 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 
 	// Send the dgraph request and follow the results
 	res := &GqlRes{}
-	//fmt.Println("request ->", string(q))
+	// fmt.Println("request ->", string(q))
 	err := dg.postql(uctx, []byte(q), res)
-	//fmt.Println("response ->", res)
+	// fmt.Println("response ->", res)
 	if err != nil {
 		return err
 	}
@@ -447,7 +451,7 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 				// @DEBUG: see bug #3c3f1f7
 				// Not needed since version 5.0.10 of elm-graphql that do not used hashes by defaut.
 				// Not that alias won be supported since we know to handle it with gqlgen resolver.
-				//CleanAliasedMapHook(),
+				// CleanAliasedMapHook(),
 				ToUnionHookFunc(),
 			),
 		}
@@ -463,7 +467,7 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 
 	if res.Errors != nil {
 		err, _ := json.Marshal(res.Errors)
-		//return fmt.Errorf(string(err))
+		// return fmt.Errorf(string(err))
 		return &GraphQLError{string(err)}
 	}
 	return err

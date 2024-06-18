@@ -21,14 +21,14 @@
 package cmd
 
 import (
+	"log"
+	"net/http"
+	"time"
 	//"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
 	"github.com/spf13/viper"
-	"log"
-	"net/http"
-	"time"
 
 	"fractale/fractal6.go/web"
 	"fractale/fractal6.go/web/auth"
@@ -36,8 +36,10 @@ import (
 	middle6 "fractale/fractal6.go/web/middleware"
 )
 
-var tkMaster *auth.Jwt
-var buildMode string
+var (
+	tkMaster  *auth.Jwt
+	buildMode string
+)
 
 func init() {
 	// Get env mode
@@ -71,9 +73,9 @@ func RunServer() {
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
 	cors := cors.New(cors.Options{
 		AllowedOrigins: allowedOrigins,
-		//AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		//AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		//ExposedHeaders:   []string{"Link"},
+		// AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		// AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		// ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	})
@@ -82,7 +84,7 @@ func RunServer() {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(cors.Handler)
-	//r.Use(middle6.RequestContextMiddleware) // Set context info
+	// r.Use(middle6.RequestContextMiddleware) // Set context info
 	// JWT   //r.Use(jwtauth.Verifier(tkMaster.GetAuth()))
 	r.Use(middle6.JwtVerifier(tkMaster.GetAuth())) // Seek, verify and validate JWT token
 	r.Use(middle6.JwtDecode)                       // Set user claims
@@ -106,7 +108,7 @@ func RunServer() {
 		}()
 		secured := r.Group(nil)
 		secured.Use(middle6.CheckBearer)
-		//secured.Handle("/metrics", promhttp.Handler()) // inclue Go collection metrics
+		// secured.Handle("/metrics", promhttp.Handler()) // inclue Go collection metrics
 		secured.Handle("/metrics", handle6.InstruHandler())
 	}
 
@@ -124,7 +126,7 @@ func RunServer() {
 
 	// Auth API
 	r.Group(func(r chi.Router) {
-		//r.Use(middle6.EnsurePostMethod)
+		// r.Use(middle6.EnsurePostMethod)
 		r.Route("/auth", func(r chi.Router) {
 			// User
 			r.Post("/signup", handle6.Signup)
@@ -142,19 +144,21 @@ func RunServer() {
 			r.Post("/createorga", handle6.CreateOrga)
 			r.Post("/setusercanjoin", handle6.SetUserCanJoin)
 			r.Post("/setguestcancreatetension", handle6.SetGuestCanCreateTension)
+
+			// Special
+			r.Post("/makeowner", handle6.MakeOwner)
 		})
 	})
 
 	// Rest API
 	r.Group(func(r chi.Router) {
 		r.Route("/q", func(r chi.Router) {
-
 			// Special recursive query
 			r.Group(func(r chi.Router) {
 				// Those data are not secured by now, and anyone can
 				// query them recursively, but as there are not sensitive
 				// and set them public for now.
-				//r.Use(middle6.CheckRecursiveQueryRights)
+				// r.Use(middle6.CheckRecursiveQueryRights)
 				r.Post("/sub_nodes", handle6.SubNodes)
 				r.Post("/sub_members", handle6.SubMembers)
 				r.Post("/top_labels", handle6.TopLabels)
@@ -167,7 +171,7 @@ func RunServer() {
 			r.Group(func(r chi.Router) {
 				// The filtering is done directly in the query resolver as
 				// doing it here required to rewrite the body, which seems difficult ?!
-				//r.Use(middle6.CheckTensionQueryRights)
+				// r.Use(middle6.CheckTensionQueryRights)
 				r.Post("/tensions_light", handle6.TensionsLight)
 				r.Post("/tensions_int", handle6.TensionsInt)
 				r.Post("/tensions_ext", handle6.TensionsExt)

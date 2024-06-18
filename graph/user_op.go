@@ -33,7 +33,7 @@ import (
 )
 
 func LinkUser(rootnameid, nameid, username string) error {
-	// Anchor role should already exists
+	// Do not remove membership nodes for history
 	if codec.MemberIdCodec(rootnameid, username) != nameid {
 		err := db.GetDB().AddUserRole(username, nameid)
 		if err != nil {
@@ -46,7 +46,7 @@ func LinkUser(rootnameid, nameid, username string) error {
 }
 
 func UnlinkUser(rootnameid, nameid, username string) error {
-	// Keep Retired user for references (tension)
+	// Do not remove membership nodes for history
 	if codec.MemberIdCodec(rootnameid, username) != nameid {
 		err := db.GetDB().RemoveUserRole(username, nameid)
 		if err != nil {
@@ -58,7 +58,7 @@ func UnlinkUser(rootnameid, nameid, username string) error {
 	return err
 }
 
-func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, unsafe bool) (bool, error) {
+func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
 	var err error
 	var rootnameid string
 	var nameid string
@@ -66,16 +66,44 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 
 	// Type check
 	if node.RoleType == nil {
-		return false, fmt.Errorf("Node need a role type for this action.")
+		return false, LogErr("access denied", fmt.Errorf("Node needs a role type for this action."))
 	}
 
-	// unsafe is used to Guest user to be unlink,
-	// as the nameid include a "@" char.
-	if unsafe {
+	// Special case for membership role
+	IsMembershipRole := codec.IsMembershipRoleType(*node.RoleType)
+	if IsMembershipRole {
 		nameid = *node.Nameid
 		rootnameid, err = codec.Nid2rootid(nameid)
 		if err != nil {
 			return false, err
+		}
+		if len(auth.GetRoles(uctx, nameid)) > 1 && *node.RoleType != model.RoleTypeOwner {
+			return false, LogErr("access denied", fmt.Errorf("Doh, you have active roles in this organisation. Please leave your roles first."))
+		} else if *node.RoleType == model.RoleTypePending {
+			return false, LogErr("access denied", fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation."))
+		} else if *node.RoleType == model.RoleTypePending {
+			return false, LogErr("access denied", fmt.Errorf("You are already retired from this role."))
+		} else if *node.RoleType == model.RoleTypeOwner {
+			// Owner can leave if not alone
+			// --
+			// Get all owners of the organization
+			owners := []string{}
+			if users, err := db.GetDB().Meta("getOwners", map[string]string{"nameid": rootnameid}); err != nil {
+				return false, err
+			} else {
+				for _, u := range users {
+					owners = append(owners, u["username"].(string))
+				}
+			}
+			// If owner is alone, prevent orphan organization
+			if len(owners) < 2 {
+				return false, LogErr("access denied", fmt.Errorf("An organization needs at least one Owner. Please contact us if you need to transfer ownership."))
+			}
+
+			// Downgrade Owner to Member
+			if err = db.GetDB().UpgradeMember(nameid, model.RoleTypeMember); err != nil {
+				return false, err
+			}
 		}
 	} else {
 		// Get References
@@ -87,36 +115,25 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 
 	// If user doesn't play role, return error
 	if i := auth.UserPlaysRole(uctx, nameid); i < 0 {
-		return false, fmt.Errorf("Role already leaved or not played.")
+		return false, LogErr("access denied", fmt.Errorf("Role already left or not played."))
 	}
 
-	switch *node.RoleType {
-	case model.RoleTypeOwner:
-		return false, fmt.Errorf("Doh, organisation destruction is not yet implemented.")
-	case model.RoleTypeMember:
-		return false, fmt.Errorf("Doh, you have active role in this organisation. Please leave your roles first.")
-	case model.RoleTypePending:
-		return false, fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation.")
-	case model.RoleTypeRetired:
-		return false, fmt.Errorf("You are already retired from this role.")
-	default: // Guest Peer, Coordinator + user defined roles
-		err = UnlinkUser(rootnameid, nameid, uctx.Username)
-		if err != nil {
-			return false, err
-		}
+	err = UnlinkUser(rootnameid, nameid, uctx.Username)
+	if err != nil {
+		return false, err
 	}
 
 	// Update NodeFragment
 	if node.ID != "" {
 		// @debug: should delete instead...DelFieldById => `<x> <x> * .`
 		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
-		//err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
+		// err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
 	}
 
 	return true, err
 }
 
-// maybeUpdateMembership check try to toggle user membership to Guest or Member
+// maybeUpdateMembership check aitomatically to toggle user membership to Guest or Member if needed
 func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType) error {
 	var uctxFs *model.UserCtx
 	var err error
@@ -126,14 +143,13 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
 		return err
 	}
 
-	// Don't touch owner state
+	// Don't touch owner state here
 	if auth.UserIsOwner(uctxFs, rootnameid) >= 0 {
 		return nil
 	}
 
 	nid := codec.MemberIdCodec(rootnameid, username)
 	roles := auth.GetRoles(uctxFs, rootnameid)
-
 	if len(roles) > 2 {
 		return nil
 	}
@@ -141,14 +157,16 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
 	// User Downgrade
 	if rt == model.RoleTypeGuest {
 		if len(roles) == 1 && *roles[0].RoleType == model.RoleTypeMember {
+			// Member is downgraded to Guest
 			err = db.GetDB().UpgradeMember(nid, model.RoleTypeGuest)
 		} else if len(roles) == 1 && (*roles[0].RoleType == model.RoleTypeGuest || *roles[0].RoleType == model.RoleTypePending) {
+			// Member is retiring
 			err = DB.UpgradeMember(nid, model.RoleTypeRetired)
 			if err != nil {
 				return err
 			}
 
-			// User is leaving an organization: Remove user assignement from tensions in organization
+			// User is leaving an organisation: Remove user assignement from tensions in organisation
 			_, err = db.GetDB().Meta("removeAssignedTension", map[string]string{"username": username, "rootnameid": rootnameid})
 		}
 		return err
@@ -157,8 +175,10 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
 	// User Upgrade
 	if rt == model.RoleTypeMember {
 		if len(roles) == 1 {
+			// Upgrade to Guest
 			err = DB.UpgradeMember(nid, model.RoleTypeGuest)
 		} else if len(roles) == 2 {
+			// Upgrade to Member
 			err = DB.UpgradeMember(nid, model.RoleTypeMember)
 		}
 		return err
@@ -201,7 +221,7 @@ func SyncPendingUser(username, email string) error {
 				User:      &model.UserRef{Email: &email},
 				IsRead:    false,
 				CreatedAt: createdAt,
-				Event:     []*model.EventKindRef{&model.EventKindRef{ContractRef: &model.ContractRef{ID: &cid}}},
+				Event:     []*model.EventKindRef{{ContractRef: &model.ContractRef{ID: &cid}}},
 			})
 
 			// Fetch contract
@@ -216,7 +236,7 @@ func SyncPendingUser(username, email string) error {
 			// Set event type
 			StructMap(contract.Event, &contractPatch.Event)
 			// Set candidate
-			contractPatch.Candidates = []*model.UserRef{&model.UserRef{Email: &email}}
+			contractPatch.Candidates = []*model.UserRef{{Email: &email}}
 			emailPart := strings.Split(email, "@")[0]
 			if contract.Event.Old != nil && strings.HasPrefix(*contract.Event.Old, emailPart) {
 				contractPatch.Event.Old = &username

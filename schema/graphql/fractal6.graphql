@@ -1,12 +1,13 @@
 # <!> Schema Dependencies <!>
-# * fractal6.go/graph/tension_auth/EMAP: propagated fields
-# * fractal6.go/graph/tensions_op: Each event need to be individually processed in `TensionEventHook`
-# * fractal6-ui.elm: query and case on enum object
-# * db/script: hardcoded spec
-# * fractal6.go/db/api: hardcoded query, mutation and delete (fields)
+# - fractal6.go/graph/tension_auth/EMAP: propagated fields
+# - fractal6.go/graph/tensions_op: Each event need to be individually processed in `TensionEventHook`
+# - fractal6-ui.elm: query and case on enum object
+# - db/script: hardcoded spec
+# - fractal6.go/db/api: hardcoded query, mutation and delete (fields)
 
 # <!> Generation Warning <!>
-# interface must be defined before their implementation (or gqlast will crash)
+# - interface must be defined before their implementation (or gqlast will crash)
+# - Warning: dgraph-alpha graphql:config=true confug is important ot get duplication err result not filtered.
 
 # <!> Security Notes <!>
 # Schema authorization is a mix between the Dgraph authorization rules (RBAC and GBAC),
@@ -16,6 +17,10 @@
 # - Artefact nodes.rootnameid == Label.rootnameid
 # - Tension receiver/emitter == receiverid/emmiterid
 # - Node parent.nameid == Node.rootnameid
+
+type BuildInfo {
+  client_version: String!
+}
 
 #
 # Node Interface (Role and Circle)
@@ -112,6 +117,9 @@ type Node @auth(
 
   # Aggregators
   events_history: [Event!] @meta(f:"getNodeHistory", k:"nameid")
+
+  # Dgraph directive
+  cascade_directive: Boolean
 }
 
 type NodeFragment {
@@ -363,7 +371,7 @@ type Contract implements Post @auth(
   closedAt: DateTime           @search
   event: EventFragment!
   participants: [Vote!]!       @hasInverse(field: contract)   # only user node (@...)
-  candidates: [User!]          @hasInverse(field: contracts)
+  candidates: [User!]          @hasInverse(field: contracts) @x_add(r:"ref")
   pending_candidates: [PendingUser!]
   comments: [Comment!]         @x_alter(r:"oneByOne")
   isValidator: Boolean         @isContractValidator
@@ -376,7 +384,7 @@ type Vote implements Post @auth(
   voteid: String!     @id # {contractid}#{nameid}
   contract: Contract! @x_add(r:"ref")
   node: Node!         @x_add(r:"ref") # Named Role (@...)
-  data: [Int!]! # Vote results. Maximum len equal len of candidates.
+  data: [Int!]! # Vote results. Maximum len equal len of candidates - for multiple choice/preferential vote system
 }
 
 #

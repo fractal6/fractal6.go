@@ -24,26 +24,29 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/viper"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/tools"
 )
 
-var clientVersion string
-var reservedUsername map[string]bool
-var MAX_PUBLIC_ORGA int
-var MAX_PRIVATE_ORGA int
-var MAX_ORGA_REG int
-var MAX_ORGA_PRO int
+var (
+	ClientVersion    string
+	ReservedUsername map[string]bool
+	MAX_PUBLIC_ORGA  int
+	MAX_PRIVATE_ORGA int
+	MAX_ORGA_REG     int
+	MAX_ORGA_PRO     int
+)
 
 func init() {
 	var err error
-	clientVersion = viper.GetString("server.client_version")
+	ClientVersion = viper.GetString("server.client_version")
 	MAX_PUBLIC_ORGA, err = strconv.Atoi(viper.GetString("admin.max_public_orgas"))
 	if err != nil {
 		fmt.Println("max_public_orgas conf not found, setting to 100")
@@ -64,7 +67,7 @@ func init() {
 		fmt.Println("max_orga_pro conf not found, setting to 100")
 		MAX_ORGA_PRO = 100
 	}
-	reservedUsername = map[string]bool{
+	ReservedUsername = map[string]bool{
 		// Reserved email endpoint
 		"root":          true,
 		"admin":         true,
@@ -137,7 +140,7 @@ func regularizeUctx(uctx *model.UserCtx) {
 	// Hide the password !
 	uctx.Password = ""
 	// Set the client version
-	uctx.ClientVersion = clientVersion
+	uctx.ClientVersion = ClientVersion
 	// Set the date of expiration (based on the jwt token validity)
 	uctx.ExpiresAt = time.Now().Add(tokenValidityTime).UTC().Format(time.RFC3339)
 }
@@ -236,7 +239,7 @@ func ValidateNewUser(creds model.UserCreds) error {
 	err := ValidateUsername(username)
 	if err != nil {
 		return err
-	} else if reservedUsername[username] {
+	} else if ReservedUsername[username] {
 		return ErrUsernameExist
 	}
 	// Email validation

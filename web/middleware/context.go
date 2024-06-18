@@ -32,13 +32,13 @@ func RequestContextMiddleware(next http.Handler) http.Handler {
 		ctx := r.Context()
 		if r.Method == "POST" {
 			// for content-type != application/json
-			//r.ParseForm()
-			//fmt.Println(r.Proto)
-			//fmt.Println(r.URL)
-			//fmt.Println(r.Header)
-			//fmt.Println(r.Body)
-			//fmt.Println(r.Form)
-			//fmt.Println(r.Form.Encode())
+			// r.ParseForm()
+			// fmt.Println(r.Proto)
+			// fmt.Println(r.URL)
+			// fmt.Println(r.Header)
+			// fmt.Println(r.Body)
+			// fmt.Println(r.Form)
+			// fmt.Println(r.Form.Encode())
 
 			body, _ := ioutil.ReadAll(r.Body)
 			// Restore the io.ReadCloser to its original state

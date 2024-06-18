@@ -22,12 +22,13 @@ package tools
 
 import (
 	"encoding/json"
-	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/viper"
 	"reflect"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/graph/model"
 )
@@ -61,7 +62,7 @@ func InitViper() {
 	viper.AddConfigPath("../")    // `go test` change directory !
 	viper.AddConfigPath("../../") // `go test` change directory !
 	viper.SetConfigName("config") // name of config file (without extension)
-	//viper.AutomaticEnv() // read in environment variables that match
+	// viper.AutomaticEnv() // read in environment variables that match
 	if err := viper.ReadInConfig(); err != nil {
 		// Panic on config reading error
 		panic(err)
@@ -159,7 +160,7 @@ func InterfaceSlice(arg interface{}) (out []interface{}, ok bool) {
 		return out, true
 	}
 	slice, success := takeArg(arg, reflect.Slice)
-	//if slice.IsNil() { return out, true }
+	// if slice.IsNil() { return out, true }
 	if !success { // Non slice type
 		return
 	}

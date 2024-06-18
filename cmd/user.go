@@ -22,8 +22,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"strings"
+
+	"github.com/spf13/cobra"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
@@ -31,8 +32,10 @@ import (
 	"fractale/fractal6.go/web/auth"
 )
 
-var lang string
-var creds model.UserCreds
+var (
+	lang  string
+	creds model.UserCreds
+)
 
 var addUser = &cobra.Command{
 	Use:   "adduser USERNAME EMAIL PASSWORD [--lang LANG]",

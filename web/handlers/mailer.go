@@ -23,11 +23,12 @@ package handlers
 import (
 	//"fmt"
 	"encoding/json"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 	"net/mail"
 	"strings"
+
+	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
@@ -42,9 +43,11 @@ import (
  *
  */
 
-var postalWebhookPK string
-var matrixPostalRoom string
-var matrixToken string
+var (
+	postalWebhookPK  string
+	matrixPostalRoom string
+	matrixToken      string
+)
 
 func init() {
 	postalWebhookPK = viper.GetString("mailer.dkim_key")
@@ -58,8 +61,8 @@ type EmailForm struct {
 	Title      string `json:"subject"`
 	Msg        string `json:"plain_body"`
 	References string `json:"references"`
-	//AttachmentQuantity int  `json:"attachment_quantity"`
-	//Attachments []string    `json:"attachments"`
+	// AttachmentQuantity int  `json:"attachment_quantity"`
+	// Attachments []string    `json:"attachments"`
 }
 
 // Handle user email responses. Receiving email response from email notifications.
@@ -106,7 +109,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 	if isTid != "" { // Is a tension reply/comment
 		// Build Event
 		e := model.TensionEventCommentPushed
-		history := []*model.EventRef{&model.EventRef{
+		history := []*model.EventRef{{
 			CreatedAt: &createdAt,
 			CreatedBy: &createdBy,
 			EventType: &e,
@@ -125,7 +128,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 		db.GetDB().Update(db.DB.GetRootUctx(), "tension", model.UpdateTensionInput{
 			Filter: &model.TensionFilter{ID: []string{isTid}},
 			Set: &model.TensionPatch{
-				Comments: []*model.CommentRef{&model.CommentRef{
+				Comments: []*model.CommentRef{{
 					CreatedAt: &createdAt,
 					CreatedBy: &createdBy,
 					Message:   &form.Msg,
@@ -175,7 +178,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 		db.GetDB().Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
 			Filter: &model.ContractFilter{ID: []string{isCid}},
 			Set: &model.ContractPatch{
-				Comments: []*model.CommentRef{&model.CommentRef{
+				Comments: []*model.CommentRef{{
 					CreatedAt: &createdAt,
 					CreatedBy: &createdBy,
 					Message:   &form.Msg,
@@ -201,7 +204,6 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unknown references", 400)
 		return
 	}
-
 }
 
 // Handle email sent to orga. Convert email to tension.
@@ -262,13 +264,13 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 		Status:     model.TensionStatusOpen,
 		Title:      form.Title,
 		Comments: []*model.Comment{
-			&model.Comment{
+			{
 				CreatedAt: createdAt,
 				CreatedBy: &createdBy,
 				Message:   form.Msg,
 			},
 		},
-		Subscribers: []*model.User{&model.User{Username: uctx.Username}},
+		Subscribers: []*model.User{{Username: uctx.Username}},
 	}
 
 	// Verify author can create tension
@@ -301,7 +303,6 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "PushEventNotifications error: "+err.Error(), 500)
 		return
 	}
-
 }
 
 // Handle Postal WebHook - redirect it to a matrix channel

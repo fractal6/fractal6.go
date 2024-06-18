@@ -23,6 +23,7 @@ package graph
 import (
 	"context"
 	"fmt"
+
 	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"

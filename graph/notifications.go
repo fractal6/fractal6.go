@@ -116,6 +116,8 @@ func PushHistory(notif *model.EventNotif) error {
 
 // Notify users for Event events, where events can be batch of event.
 func PushEventNotifications(notif model.EventNotif) error {
+	var errs []error // keep track of the error on the patch
+
 	// Push event in tension event history
 	err := PushHistory(&notif)
 	if err != nil {
@@ -171,7 +173,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 		}
 	} else {
 		// Get relevant users to notify for that event.
-		users, err = GetUsersToNotify(notif.Tid, true, true, true)
+		users, err = GetUsersToNotify(notif.Tid, true, true, true, true)
 		if err != nil {
 			return err
 		}
@@ -211,12 +213,21 @@ func PushEventNotifications(notif model.EventNotif) error {
 		u := notif.GetExUser()
 		if _, ex := users[u]; !ex {
 			uctxFs, err := db.DB.GetUctx("username", u)
-			if err != nil && !(auth.UserIsMember(uctxFs, notif.Receiverid) >= 0) {
+			if err != nil {
+				return err
+			}
+			var org_name string
+			if x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name"); err != nil {
+				return err
+			} else {
+				org_name = x.(string)
+			}
+			if !(auth.UserIsMember(uctxFs, notif.Receiverid) >= 0) {
 				PushNotifNotifications(model.NotifNotif{
 					Uctx: notif.Uctx,
 					Tid:  &notif.Tid,
 					Cid:  nil,
-					Msg:  "You have been removed from this organization",
+					Msg:  fmt.Sprintf("You have been removed from this organisation (%s)", org_name),
 					To:   []string{u},
 				}, false)
 			}
@@ -272,13 +283,16 @@ func PushEventNotifications(notif model.EventNotif) error {
 		if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
 			if eid == "" {
 				// @deprected warning: unnecessary/noisy
-				//log.Printf("Notification Error: an event is emailable but not notifiable !")
+				// log.Printf("Notification Error: an event is emailable but not notifiable !")
 				return nil
 			}
 			ui.Eid = eid
 			err = email.SendEventNotificationEmail(ui, notif)
 			if err != nil {
 				return err
+				LogErr("Email error", err)
+				errs = append(errs, err)
+				err = nil
 			}
 		}
 	}
@@ -288,6 +302,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 
 // Notify users for Contract event.
 func PushContractNotifications(notif model.ContractNotif) error {
+	var errs []error // keep track of the error on the patch
 	// Only the event with an ID will be notified.
 	var eventBatch []*model.EventKindRef
 	var createdAt string
@@ -298,7 +313,14 @@ func PushContractNotifications(notif model.ContractNotif) error {
 	eventBatch = append(eventBatch, &model.EventKindRef{ContractRef: &model.ContractRef{ID: &notif.Contract.ID}})
 
 	// Get relevant users for the contract
-	users, err := GetUsersToNotify(notif.Tid, true, false, false)
+	// --
+	withCoordos := true
+	//// Exclude Coordo if the user is invited directly (not self-invite)
+	//if notif.Contract.ContractType == model.ContractTypeAnyCandidates &&
+	//    *notif.Contract.Event.New != notif.Uctx.Username {
+	//    withCoordos = false
+	//}
+	users, err := GetUsersToNotify(notif.Tid, true, false, false, withCoordos)
 	if err != nil {
 		return err
 	}
@@ -312,7 +334,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 			return err
 		}
 		targetTid, _ := x.(string)
-		users2, err := GetUsersToNotify(targetTid, true, false, false)
+		users2, err := GetUsersToNotify(targetTid, true, false, false, true)
 		if err != nil {
 			return err
 		}
@@ -347,7 +369,10 @@ func PushContractNotifications(notif model.ContractNotif) error {
 		if _, ex := users[p.Node.FirstLink.Username]; ex {
 			continue
 		}
-		users[p.Node.FirstLink.Username] = model.UserNotifInfo{User: *p.Node.FirstLink, Reason: model.ReasonIsParticipant}
+		users[p.Node.FirstLink.Username] = model.UserNotifInfo{
+			User:   *p.Node.FirstLink,
+			Reason: model.ReasonIsParticipant,
+		}
 	}
 	// +
 	// Add mentionned and **set tension data**
@@ -385,7 +410,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 			// Link contract for future push
 			err = db.GetDB().Update(db.GetDB().GetRootUctx(), "pendingUser", &model.UpdatePendingUserInput{
 				Filter: &model.PendingUserFilter{Email: &model.StringHashFilter{Eq: &u}},
-				Set:    &model.PendingUserPatch{Contracts: []*model.ContractRef{&model.ContractRef{ID: &notif.Contract.ID}}},
+				Set:    &model.PendingUserPatch{Contracts: []*model.ContractRef{{ID: &notif.Contract.ID}}},
 			})
 			if err != nil {
 				return err
@@ -423,7 +448,9 @@ func PushContractNotifications(notif model.ContractNotif) error {
 			ui.Eid = eid
 			err = email.SendContractNotificationEmail(ui, notif)
 			if err != nil {
-				return err
+				LogErr("Email error", err)
+				errs = append(errs, err)
+				err = nil
 			}
 		}
 	}
@@ -450,7 +477,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 					Uctx:   notif.Uctx,
 					Tid:    &notif.Tid,
 					Cid:    &notif.Contract.ID,
-					Msg:    "You've joined a new organization.",
+					Msg:    "You've joined a new organisation.",
 					To:     []string{c.Username},
 					IsRead: isRead,
 				}, true)
@@ -462,6 +489,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 }
 
 // Notify users for Notif events.
+// No email sent here.
 func PushNotifNotifications(notif model.NotifNotif, selfNotify bool) error {
 	// Only the event with an ID will be notified.
 	var eventBatch []*model.EventKindRef
@@ -515,7 +543,7 @@ func PushNotifNotifications(notif model.NotifNotif, selfNotify bool) error {
 
 // GetUserToNotify returns a list of user that should receive notifications upon tension updates.
 // Note: order is important as for priority and emailing policy.
-func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool) (map[string]model.UserNotifInfo, error) {
+func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool, withCoordos bool) (map[string]model.UserNotifInfo, error) {
 	users := make(map[string]model.UserNotifInfo)
 
 	// Data needed to get the first-link
@@ -585,7 +613,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 		}
 	}
 
-	{
+	if withCoordos {
 		// Get Coordos
 		coordos, err := auth.GetCoordosFromTid(tid)
 		if err != nil {

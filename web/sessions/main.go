@@ -23,9 +23,10 @@ package sessions
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/gofrs/uuid"
-	"os"
 	//"github.com/gomodule/redigo/redis"
 )
 
@@ -54,8 +55,8 @@ func initCache() {
 	//cache = con
 	cache = redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
-		//Password: "", // no password set
-		//DB:       0,  // use default DB
+		// Password: "", // no password set
+		// DB:       0,  // use default DB
 	})
 
 	_, err := cache.Ping(context.Background()).Result()
