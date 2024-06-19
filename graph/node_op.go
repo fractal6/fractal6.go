@@ -113,10 +113,8 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 
 		// Eventually Unlink first-link
 		if node.FirstLink != nil {
-			err = UnlinkUser(rootnameid, nameid, *node.FirstLink)
-			if err != nil {
-				return ok, err
-			}
+			// Ignored error if node.FirstLink does not exist (likely to be ""...)
+			UnlinkUser(rootnameid, nameid, *node.FirstLink)
 		}
 	} else if eventType == model.TensionEventBlobUnarchived {
 		// Unarchive
@@ -274,7 +272,6 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 	}
 
 	// Update NodeFragment
-	// @debug: should delete instead...
 	if node.ID != "" {
 		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
 	}

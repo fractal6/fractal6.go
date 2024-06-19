@@ -4,12 +4,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unrealeased]
+## [0.8.3] - 2024-06-18
 
-...
+### ⛰️  Features
+
+- New makeowner endpoint + notif + allow owners to leave if not alone.
+- Allow @cascade trick + dgraph query bridge refactor
+
+### 🐛 Bug Fixes
+
+- Improve user notification for member linked or unlinked (or left)
+- Remove empty contract refeferences when deleting a contract.
+- Fix empty string first-link in NodeFragment
+
+
+### 🚜 Refactor
+
+- Simplify project Project Column update resolver.
+
+### ⚙️ Miscellaneous
+
+- Format with gofumpt
+
+### Schema
+
+- Add build info in schema
+
+
 
 ## [0.8.2]
-
 
 ### Fixed
 - fix/api: test that username are lowercase

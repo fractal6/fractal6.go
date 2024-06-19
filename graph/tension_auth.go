@@ -362,7 +362,7 @@ func AnyCandidates(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
 				candidateVote = -1
 			}
 		} else {
-			// Coordinator
+			// Participants
 			if p.Data[0] == 1 {
 				upVote += 1
 			} else {

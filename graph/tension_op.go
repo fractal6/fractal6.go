@@ -442,8 +442,8 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 	node := blob.Node
 
 	if node != nil && node.Type != nil && *node.Type == model.NodeTypeCircle {
-		// Build a node membership fragment
-		// Auth: only Guest user can attach/detach
+		// A membership node wants to leave.
+		// Auth: only Guest user can be detached (Retired)
 		// --
 		rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)
 		if err != nil {
