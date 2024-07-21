@@ -3,12 +3,6 @@ SHELL := /bin/bash
 
 #.PHONY: dgraph_in
 
-# Requirements:
-# - apt install jq
-# - pip install -r requirements.txt
-# - npm install -g get-graphql-schema@2.1.2
-# Alternative: graphqurl, graphql-cli
-
 
 # Build the main schema by inserting @auth rule in the root schema
 auth_schema:

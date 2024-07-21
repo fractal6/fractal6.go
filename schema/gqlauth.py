@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 '''Graphql auth formating for Dgraph
 

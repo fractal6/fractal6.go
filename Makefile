@@ -230,6 +230,11 @@ install:
 	#sudo apt-get update
 	sudo apt-get install redis
 
+	# Codegen requirements
+	# - apt install jq
+	# - npm install -g get-graphql-schema@2.1.2 # alternative: graphqurl, graphql-cli
+	# - pip install -r requirements.txt
+
 
 certs:
 	# Dgraph Authorization
