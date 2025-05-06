@@ -67,7 +67,7 @@ func RunServer() {
 	if buildMode == "PROD" {
 		allowedOrigins = append(allowedOrigins, "https://"+DOMAIN, "https://api."+DOMAIN, "https://staging."+DOMAIN)
 	} else {
-		allowedOrigins = append(allowedOrigins, "http://localhost:8000")
+		allowedOrigins = append(allowedOrigins, "http://localhost:8001")
 	}
 
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
@@ -199,5 +199,8 @@ func RunServer() {
 
 	address := HOST + ":" + PORT
 	log.Printf("Running API (%s) @ http://%s", buildMode, address)
-	http.ListenAndServe(address, r)
+	err := http.ListenAndServe(address, r)
+	if err != nil {
+		log.Fatalf("Failed to start the server: %v", err)
+	}
 }
