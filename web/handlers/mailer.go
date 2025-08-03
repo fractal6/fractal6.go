@@ -144,8 +144,8 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 			History: history,
 		}
 		// Push notification
-		if err := graph.PushEventNotifications(notif); err != nil {
-			http.Error(w, "PushEventNotifications error: "+err.Error(), 500)
+		if err := graph.PublishTensionEvent(notif); err != nil {
+			http.Error(w, "PublishTensionEvent error: "+err.Error(), 500)
 			return
 		}
 	} else if isCid != "" { // If contract reply/comment
@@ -195,8 +195,8 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 			ContractEvent: model.NewComment,
 		}
 		// Push notification
-		if err := graph.PushContractNotifications(notif); err != nil {
-			http.Error(w, "PushContractNotification error: "+err.Error(), 500)
+		if err := graph.PublishContractEvent(notif); err != nil {
+			http.Error(w, "PublishContractEvent error: "+err.Error(), 500)
 			return
 		}
 	} else {
@@ -299,8 +299,8 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 		History: []*model.EventRef{&eventRef},
 	}
 	// Push notification
-	if err := graph.PushEventNotifications(notif); err != nil {
-		http.Error(w, "PushEventNotifications error: "+err.Error(), 500)
+	if err := graph.PublishTensionEvent(notif); err != nil {
+		http.Error(w, "PublishTensionEvent: "+err.Error(), 500)
 		return
 	}
 }
