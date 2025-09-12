@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
@@ -433,6 +434,36 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 	// fmt.Println("request ->", string(q))
 	err := dg.postql(uctx, []byte(q), res)
 	// fmt.Println("response ->", res)
+
+	// Check if error contains the transaction aborted message
+	// @DEBUG: solve the issue https://discuss.hypermode.com/t/transactions-in-graphql/6861/10
+	if res.Errors != nil {
+		gqlErr, _ := json.Marshal(res.Errors)
+		if strings.Contains(string(gqlErr), "Please retry") {
+			// Retry up to 10 times
+			for i := 0; i < 10; i++ {
+				fmt.Println(i)
+				// Random sleep between 10 and 100 ms
+				sleepTime := time.Duration(10+rand.Intn(91)) * time.Millisecond
+				time.Sleep(sleepTime)
+
+				// Retry the request
+				res = &GqlRes{}
+				err = dg.postql(uctx, []byte(q), res)
+
+				// If no error or different error, break the loop
+				if res.Errors != nil {
+					gqlErr, _ = json.Marshal(res.Errors)
+
+					if !strings.Contains(string(gqlErr), "Please retry") {
+						break
+					}
+				}
+				break
+			}
+		}
+	}
+
 	if err != nil {
 		return err
 	}
