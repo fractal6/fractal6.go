@@ -9,7 +9,7 @@ User=admin
 Group=admin
 
 WorkingDirectory=/home/admin/fractal6
-ExecStart=/home/admin/fractal6/f6 notifier
+ExecStart=f6 notifier
 
 Restart=always
 RestartSec=5s
