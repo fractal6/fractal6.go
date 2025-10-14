@@ -5,14 +5,14 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/admin/db
-ExecStart=/home/admin/fractal6/dgraph zero --config /home/admin/fractal6/contrib/dgraph/config-zero.yml
-LimitNOFILE=65536
-Restart=on-failure
-StandardOutput=journal
-StandardError=journal
 User=dgraph
 Group=dgraph
+WorkingDirectory=/home/admin/db
+ExecStart=/home/admin/fractal6/dgraph zero --config /home/admin/fractal6/contrib/dgraph/config-zero.yml
+Restart=always
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target

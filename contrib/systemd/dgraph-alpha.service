@@ -6,14 +6,14 @@ Requires=dgraph-zero.service
 
 [Service]
 Type=simple
-WorkingDirectory=/home/admin/db
-ExecStart=/home/admin/fractal6/dgraph alpha --config /home/admin/fractal6/contrib/dgraph/config-alpha.yml
-LimitNOFILE=65536
-Restart=on-failure
-StandardOutput=journal
-StandardError=journal
 User=dgraph
 Group=dgraph
+WorkingDirectory=/home/admin/db
+ExecStart=/home/admin/fractal6/dgraph alpha --config /home/admin/fractal6/contrib/dgraph/config-alpha.yml
+Restart=always
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
