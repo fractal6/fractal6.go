@@ -55,7 +55,7 @@ Copy public key for the Dgraph authorization at the end of the schema
     echo "# Dgraph.Authorization {\"Header\":\"X-Frac6-Auth\",\"Namespace\":\"https://YOUR_DOMAIN/jwt/claims\",\"Algo\":\"RS256\",\"VerificationKey\":\"$PUBKEY\"}" >> schema/dgraph_schema.graphql
 
 
-> [!WARNING]
+> [!TIP]
 > The YOUR_DOMAIN string in the Namespace must match the "domain" value of the config.toml file
 
 
