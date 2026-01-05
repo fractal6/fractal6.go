@@ -67,10 +67,24 @@ func ParseRsaPrivate(key string) *rsa.PrivateKey {
 	if block == nil {
 		panic("failed to parse PEM block for private key.")
 	}
+
+	// Try PKCS1 first
 	key_priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
-		panic(err.Error())
+		// If PKCS1 fails, try PKCS8
+		key_priv_any, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			panic("failed to parse private key: " + err.Error())
+		}
+
+		// Assert that it's an RSA private key
+		var ok bool
+		key_priv, ok = key_priv_any.(*rsa.PrivateKey)
+		if !ok {
+			panic("not an RSA private key")
+		}
 	}
+
 	return key_priv
 }
 
@@ -85,7 +99,11 @@ func ParseRsaPublic(key string) (key_pub *rsa.PublicKey) {
 		if err != nil {
 			panic(err.Error())
 		}
-		key_pub = key_pub_.(*rsa.PublicKey)
+		var ok bool
+		key_pub, ok = key_pub_.(*rsa.PublicKey)
+		if !ok {
+			panic("not an RSA public key")
+		}
 	} else {
 		key_pub, err = x509.ParsePKCS1PublicKey(block.Bytes)
 		if err != nil {
