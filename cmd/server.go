@@ -37,8 +37,9 @@ import (
 )
 
 var (
-	tkMaster  *auth.Jwt
-	buildMode string
+	tkMaster    *auth.Jwt
+	buildMode   string
+	buildBranch string
 )
 
 func init() {
@@ -64,10 +65,10 @@ func RunServer() {
 	r := chi.NewRouter()
 
 	var allowedOrigins []string
-	if buildMode == "PROD" {
+	if buildMode == "PROD" && buildBranch != "prod" { // @DEBUG: prod branch is for public build...
 		allowedOrigins = append(allowedOrigins, "https://"+DOMAIN, "https://api."+DOMAIN, "https://staging."+DOMAIN)
 	} else {
-		allowedOrigins = append(allowedOrigins, "http://localhost:8001")
+		allowedOrigins = append(allowedOrigins, "http://localhost:8001", "http://localhost:3000", "http://localhost:8080", "http://localhost:8888")
 	}
 
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
