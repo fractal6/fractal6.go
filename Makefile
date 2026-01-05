@@ -36,7 +36,10 @@ build:
 
 prod:
 	go build -trimpath $(GOFLAGS_PROD) \
-		-ldflags "-X $(MOD)/cmd.buildMode=PROD -X $(MOD)/web/auth.buildMode=PROD -X $(MOD)/db.buildMode=PROD \
+		-ldflags "-X $(MOD)/cmd.buildMode=PROD \
+		-X $(MOD)/cmd.buildBranch=$(BRANCH_NAME) \
+		-X $(MOD)/web/auth.buildMode=PROD \
+		-X $(MOD)/db.buildMode=PROD \
 		-X $(MOD)/web.langsAvailable=$(LANGS)" \
 		-o $(BINARY) main.go
 

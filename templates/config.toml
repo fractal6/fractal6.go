@@ -1,6 +1,6 @@
 [server]
 instance_name = "Fractale"
-domain = "fractale.co"
+domain = "YOUR_DOMAIN"
 hostname = "localhost"
 port = "8888"
 jwt_secret = "my_jwt_secret"
