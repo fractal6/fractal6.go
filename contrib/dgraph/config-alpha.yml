@@ -6,7 +6,7 @@ wal: _data/w
 tmp: _data/tmp
 
 cache:
-  size-mb: 1024
+  size-mb: 2048
   percentage: 10,65,25
 
 graphql:

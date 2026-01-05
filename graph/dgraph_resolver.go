@@ -58,11 +58,12 @@ func (r *queryResolver) DgraphGetBridge(ctx context.Context, maps map[string]int
 }
 
 func (r *queryResolver) DgraphQueryBridge(ctx context.Context, filter any, order any, first *int, offset *int, data any) error {
-	uctx, typeName, err := getUserQueryType(ctx)
+	uctx := auth.GetUserContextOrEmpty(ctx)
+	_, typeName, _, err := queryTypeFromGraphqlContext(ctx)
 	if err != nil {
 		return err
 	}
-	err = r.db.QueryExtra(*uctx, typeName, filter, order, first, offset, GetQueryGraph(ctx), data)
+	err = r.db.QueryExtra(uctx, typeName, filter, order, first, offset, GetQueryGraph(ctx), data)
 	return postGqlProcess(ctx, r.db, data, err)
 }
 

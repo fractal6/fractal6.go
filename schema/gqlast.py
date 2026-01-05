@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 '''Graphql format manipulation
 
@@ -18,17 +18,17 @@ Options:
     --nv           Silent output.
 '''
 
-import sys
-import re
 import itertools
-from loguru import logger
+import re
+import sys
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
 from pprint import pprint
+
 from docopt import docopt
 from tatsu import compile
-from tatsu.util import asjsons
 from tatsu.ast import AST
+from tatsu.util import asjsons
 
 from gram.graphql import GRAPHQLParser
 

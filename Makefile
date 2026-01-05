@@ -6,7 +6,7 @@ BINARY := f6
 #DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
 DGRAPH_RELEASE := v22.0.2
-CLIENT_RELEASE := 0.8.3
+CLIENT_RELEASE := 0.8.8
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
@@ -229,6 +229,11 @@ install:
 	#echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
 	#sudo apt-get update
 	sudo apt-get install redis
+
+	# Codegen requirements
+	# - apt install jq
+	# - npm install -g get-graphql-schema@2.1.2 # alternative: graphqurl, graphql-cli
+	# - pip install -r requirements.txt
 
 
 certs:

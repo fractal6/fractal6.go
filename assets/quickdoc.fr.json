@@ -3,16 +3,114 @@
     "name": "Organisation",
     "tasks": [
       {
+        "name": "definition",
         "header": "Définitions",
-        "content": "**organisation** (fractale) : un groupe d'humains partageant une raison d'être commune (cercle racine ou ancre) composé de roles et de cercles.\n\n**Role** : une fonction réalisé par un membre avec un mandat donné.   \n\n**Circle** : ensemble de role et de sous-cercles (équipe, groupe etc) avec un mandat donné.  \n\n**Mandat** : document qui définit la fonction d'un role ou d'un cercle en explicitant :\n\n* sa raison d'être : pourquoi il existe\n* ses responsabilités (optionel) : quelle sont les attentes de ce role/cercle.\n* ses politiques (optionel) : les regles d'acces à ses ressources.\n* ses domaines (optionel) : quelle propriétés/ressources il contrôle.\n\n**Tension** : Un fil de communication dans Fractale. Une tension peut être utilisée par exemple pour partager et gérer des tâches, questions, propositions etc. Elle a une destination qui peut être soit un rôle soit un cercle de l'organisation. Chaque tension nouvellement créé notifiera les membres en fonction de sa destination.\nUne tension appartient à un type en fonction du sujet qu'elle traite. Il y a cinq types différents :\n\n* **Opérationnelle** : Une catégorie générale de tension pour les activités quotidiennes. Cela peut être une tâche, un problème ou tout ce qui doit être partagé dans une organisation.\n* **Gouvernance** : Pour les sujets relatifs à la gouvernance, la structure de l'organisation, les mandats, etc.\n* **Help** : Pour les demandes d'aide, questions ou clarifications.\n* **Alert**: Pour les alertes, communication interne.\n* **Annonce**: Pour les annonces, communication externe.\n\nChaque type de tension a une politique de notification et une politique d'accès limitant respectivement  qui sera notifié lors de la création de la tension et qui peut le faire.\nVoir [la section tension](https://doc.fractale.co/tension) pour en apprendre plus.\n"
+        "content": "**organisation** (fractale) : un groupe d'humains partageant une raison d'être commune (cercle racine ou ancre) composé de roles et de cercles.  \n\n**Role** : une fonction réalisé par un membre avec un mandat donné.   \n\n**Circle** : ensemble de role et de sous-cercles (équipe, groupe etc) avec un mandat donné.  \n\n**Mandat** : document qui définit la fonction d'un role ou d'un cercle en explicitant :\n\n* sa raison d'être : pourquoi il existe\n* ses responsabilités (optionel) : quelle sont les attentes de ce role/cercle.\n* ses politiques (optionel) : les regles d'acces à ses ressources.\n* ses domaines (optionel) : quelle propriétés/ressources il contrôle.\n\n**Tension** : Un fil de communication dans Fractale. Une tension peut être utilisée par exemple pour partager et gérer des tâches, questions, propositions etc. Elle a une destination qui peut être soit un rôle soit un cercle de l'organisation. Chaque tension nouvellement créé notifiera les membres en fonction de sa destination.\nUne tension appartient à un type en fonction du sujet qu'elle traite. Il y a cinq types différents :\n\n* **Opérationnelle** : Une catégorie générale de tension pour les activités quotidiennes. Cela peut être une tâche, un problème ou tout ce qui doit être partagé dans une organisation.\n* **Gouvernance** : Pour les sujets relatifs à la gouvernance, la structure de l'organisation, les mandats, etc.\n* **Help** : Pour les demandes d'aide, questions ou clarifications.\n* **Alert**: Pour les alertes, communication interne.\n* **Annonce**: Pour les annonces, communication externe.\n\nChaque type de tension a une politique de notification et une politique d'accès limitant respectivement  qui sera notifié lors de la création de la tension et qui peut le faire.\nVoir [la section tension](https://doc.fractale.co/tension) pour en apprendre plus.\n"
       },
       {
+        "name": "create",
         "header": "Créer une organisation",
         "content": "Cliquez sur le bouton + dans le coin supérieur droit de la page. Cliquez ensuite sur le bouton 'Créer une nouvelle organisation'."
       },
       {
+        "name": "mode",
         "header": "Processus de gouvernance",
         "content": "Le processus de gouvernance permet de définir la portée des droits associés au roles dans l'organisation. Il existe deux processus de gouvernance :\n\n###### Coordonné\n\nDans le mode coordoné, les rôles de coordinateur ont les droits suivant au sein de leurs cercles :\n\n* création de rôles et de sous-cercles\n* modification des rôles et des sous-cercles\n* création de tensions et commentaires\n* modification des tensions (titre, labels, assignés)\n* déplacement des tensions\n\nLes rôles normaux ont les droits suivante au sein de leurs cercles :\n\n* création de tension et commentaires \n* fermer ses propres tensions \n\n###### Agile\n\nDans le mode agile les rôles ont les droits suivant au sein de leurs cercles :\n\n* création de rôles et de sous-cercles\n* modification des rôles et des sous-cercles\n* création de tension et commentaires\n* modification de tension (titre, labels, assignés)\n* déplacement des tensions\n\nNote: les droits d'un rôle associé à un cercle sont hérité dans les sous-cercles qui ne possède pas rôles\n"
+      },
+      {
+        "name": "navigation",
+        "header": "Navigation dans l'organisation",
+        "content": "Sur l'onglet de vue d'ensemble de l'organisation, vous pouvez naviguer dans votre organisation en cliquant sur un rôle ou un cercle. Le **focus** sera actualisé ainsi que :\n\n* le chemin de l'organisation dans l'en-tête de la page indiquant votre localisation actuelle\n* le mandat dans le cercle actuel\n* les activités récentes du cercle\n"
+      },
+      {
+        "name": "label",
+        "header": "Créer et éditer des labels",
+        "content": "Dans le **panneau de paramètres**, le *menu labels* vous permet de créer, éditer et supprimer des labels.\n\nNotez que les labels sont définis au niveau du cercle. Les labels qui peuvent être attachés à une tension sont ceux qui appartiennent à son destinataire, plus tous les labels définis à un niveau supérieur. En d'autres termes, les cercles enfants héritent des labels de leurs parents.\n"
+      },
+      {
+        "name": "role",
+        "header": "Créer et éditer des rôles modèles",
+        "content": "Dans le **panneau de paramètres**, le *menu rôles* vous permet de créer, éditer et supprimer des rôles.\n\nUne fois qu'un rôle modèle est créé, vous pourrez l'utiliser lorsque vous créez un nouveau rôle dans votre organisation.\n\nCeci est utile lorsque vous voulez créer plusieurs rôles identiques dans différents cercles, qui partagent le même mandat.\n\nNotez que les rôles modèles sont définis au niveau du cercle. Lorsque vous créez un rôle, vous pourrez utiliser les rôles modèles qui sont définis dans ce cercle ou dans n'importe quel cercle parent.\n"
+      },
+      {
+        "name": "invite",
+        "header": "Inviter un membre",
+        "content": "De nouveaux membres peuvent être invités à rejoindre votre organisation. Vous pouvez inviter soit depuis l'onglet **membres**, en cliquant sur le bouton d'invitation, soit depuis le bouton d'invitation dans la carte d'organisation de l'onglet **vue d'ensemble**. Vous pouvez également inviter un nouveau membre à rejoindre un rôle que vous avez créé, bien que vous puissiez inviter des personnes qui sont déjà membres de votre organisation à rejoindre un rôle."
+      }
+    ]
+  },
+  {
+    "name": "Tensions",
+    "tasks": [
+      {
+        "name": "create",
+        "header": "Créer une tension",
+        "content": "Cliquez sur le bouton plus situé dans le coin inférieur droit de l'écran.\nOu dans le menu arborescent basculable, cliquez sur le bouton plus (+) qui apparaît lorsque vous survolez une ligne.\n\nVous pouvez également créer une tension en cliquant sur l'info-bulle qui apparaît lorsque vous survolez un rôle/cercle dans la carte d'organisation.\n"
+      },
+      {
+        "name": "close",
+        "header": "Fermer/Rouvrir une tension",
+        "content": "Une tension peut être fermée ou rouverte à tout moment par les membres ayant des **droits suffisants**, lorsqu'ils la considèrent comme résolue. Les tensions fermées ne sont pas affichées par défaut mais peuvent toujours être consultées en utilisant les bons filtres dans la page des tensions.\n"
+      },
+      {
+        "name": "comment",
+        "header": "Ajouter un commentaire",
+        "content": "Dans une page de tension, vous pouvez ajouter un commentaire à une tension dans le *sous-onglet conversation*."
+      },
+      {
+        "name": "assignee",
+        "header": "Ajouter/supprimer des assignés",
+        "content": "Dans une page de tension, vous pouvez ajouter/supprimer des assignés en cliquant sur le bouton des assignés dans le panneau de droite."
+      },
+      {
+        "name": "label",
+        "header": "Ajouter/Supprimer des labels",
+        "content": "Dans une page de tension, vous pouvez ajouter/supprimer des labels en cliquant sur le bouton des labels dans le panneau de droite.\n\nVous pouvez également ajouter des labels lors de la création d'une tension avec le bouton des labels en bas de la page.\n"
+      }
+    ]
+  },
+  {
+    "name": "Rôles",
+    "tasks": [
+      {
+        "name": "create",
+        "header": "Créer un rôle",
+        "content": "Dans le **panneau de vue d'ensemble**, cliquez sur le bouton plus (+) à droite de la barre de recherche. Dans la fenêtre qui s'ouvre, cliquez sur le bouton **Nouveau Rôle**. Vous pouvez entrer les informations du rôle dans le formulaire, puis cliquez sur \"Créer le Rôle\" pour ajouter le rôle.\n\nNote1 : Le rôle sera créé à l'intérieur du cercle actuellement focalisé.  \nNote2 : Pour chaque rôle créé, il y a une tension de gouvernance qui est co-créée automatiquement et qui permet de consulter et d'éditer l'historique des modifications du rôle.  \nNote3 : Si vous cliquez sur **Soumettre la tension** au lieu de **Créer le Rôle**, seule une tension de gouvernance sera créée mais le rôle ne sera pas ajouté à votre organisation. Vous pouvez toujours l'éditer et l'ajouter plus tard.  \n"
+      },
+      {
+        "name": "edit",
+        "header": "Éditer un rôle",
+        "content": "Si vous avez des droits suffisants, vous pouvez éditer les propriétés suivantes d'un rôle :\n\n* son nom\n* son mandat\n* son autorité\n* son lien principal (inviter ou quitter)\n\nPour éditer ces propriétés, ouvrez le panneau en cliquant soit sur l'info-bulle (les trois points à droite) qui apparaît au-dessus de chaque cercle dans la carte d'organisation (**onglet vue d'ensemble**), soit depuis le panneau latéral de la tension liée à ce rôle.\n"
+      },
+      {
+        "name": "archive",
+        "header": "Archiver un rôle",
+        "content": "Dans l'**onglet vue d'ensemble**, cliquez sur le bouton \"trois points\" (...) à droite de la barre de recherche. Dans le menu qui s'ouvre, cliquez sur l'entrée **archiver le rôle** pour archiver le rôle focalisé (visible uniquement si vous avez les **droits suffisants**).\n\nVous pouvez également archiver un rôle sur la page de tension du rôle, en cliquant sur le bouton _action_ dans le panneau de droite.\n\nNote : vous pouvez accéder à la page de tension d'un rôle en cliquant sur le bouton Éditer dans le bouton \"trois points\" (...).\n"
+      },
+      {
+        "name": "leave",
+        "header": "Quitter un rôle",
+        "content": "Dans l'**onglet vue d'ensemble**, cliquez sur le bouton \"trois points\" (...) à droite de la barre de recherche. Dans le menu qui s'ouvre, cliquez sur l'entrée **quitter le rôle** pour quitter le rôle focalisé (visible uniquement si vous êtes **lié à** ce rôle).\n\nVous pouvez également quitter un rôle sur la page de tension du rôle, en cliquant sur le bouton _action_ dans le panneau de droite.\n\nNote : vous pouvez accéder à la page de tension d'un rôle en cliquant sur le bouton Éditer dans le bouton \"trois points\" (...).\n"
+      }
+    ]
+  },
+  {
+    "name": "Cercles",
+    "tasks": [
+      {
+        "name": "create",
+        "header": "Créer un cercle",
+        "content": "Dans le panneau Vue d'ensemble, cliquez sur le bouton plus (+) à droite de la barre de recherche. Dans la fenêtre qui s'ouvre, cliquez sur le bouton **Nouveau Sous-Cercle**. Vous pouvez entrer les informations du cercle dans le formulaire, puis cliquez sur \"Créer le Cercle\" pour ajouter le cercle.\n\nNote1 : Le cercle sera créé à l'intérieur du cercle actuellement focalisé.  \nNote2 : Pour chaque cercle créé, il y a une tension de gouvernance qui est co-créée automatiquement et qui permet de consulter et d'éditer l'historique des modifications du cercle.  \nNote3 : Si vous cliquez sur **Soumettre la tension** au lieu de **Créer le Cercle**, seule une tension de gouvernance sera créée mais le cercle ne sera pas ajouté à votre organisation. Vous pouvez toujours l'éditer et l'ajouter plus tard.  \n"
+      },
+      {
+        "name": "edit",
+        "header": "Éditer un cercle",
+        "content": "Si vous avez des droits suffisants, vous pouvez éditer les propriétés suivantes d'un cercle :\n\n* son nom\n* son mandat\n* son processus de gouvernance\n* sa visibilité\n\nPour éditer ces propriétés, ouvrez le panneau en cliquant soit dans l'info-bulle (les trois points à droite) qui apparaît au-dessus de chaque cercle, soit depuis le panneau latéral de la tension liée à ce cercle.\n"
+      },
+      {
+        "name": "archive",
+        "header": "Archiver un cercle",
+        "content": "Dans le panneau Vue d'ensemble, cliquez sur le bouton \"trois points\" (...) à droite de la barre de recherche. Dans le menu qui s'ouvre, cliquez sur l'entrée **archiver le cercle** pour archiver le cercle focalisé (visible uniquement si vous avez les **droits suffisants**).\n\nVous pouvez également archiver un cercle sur la page de tension du cercle, en cliquant sur le bouton _action_ dans le panneau de droite.\n\n_Note_ : Vous pouvez accéder à la page de tension d'un cercle en cliquant sur le bouton Éditer dans le bouton \"trois points\" (...).  \n"
       }
     ]
   }

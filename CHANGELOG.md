@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.8.5] - 2026-01-05
+
+### 🐛 Bug Fixes
+
+- *(crypto)* Fix golang private key parsing 
+- update client version to 0.8.8
+
+
+## [0.8.4] - 2025-09-14
+
+### 🐛 Bug Fixes
+
+- *(notification)* Email notification soft fail due to timeout for email reply
+- Concurent transaction aborted (see for multiple invitations)
+
+### 💼 Other
+
+- Fix empty string first-link in NodeFragment
+- Allow query for unauthenticated user
+- Change default dev orginins port allowed
+
+### 📚 Documentation
+
+- Update french quick documentation
+
+
 ## [0.8.3] - 2024-06-18
 
 ### ⛰️  Features

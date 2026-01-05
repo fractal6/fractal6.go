@@ -76,7 +76,8 @@ Procedure to update the single source of truth schema:
 
 ### Git branches
 
-- `prod`: Tag tracking release, main branch (see also [CHANGELOG.md](CHANGELOG.md)).
+- `prod`: production tracking release - community version - branch (see also [CHANGELOG.md](CHANGELOG.md)).
+- `op`: production tracking release branch - vendor version - branch
 - `dev`: The current development branch. Should only be merged via merge requests.
 - `hotfix/*`: A bug fix for production release.
 - `fix/*`: A fix an identified bug or issue.
