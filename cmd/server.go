@@ -21,10 +21,11 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
-	//"fmt"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
@@ -68,7 +69,10 @@ func RunServer() {
 	if buildMode == "PROD" && buildBranch != "prod" { // @DEBUG: prod branch is for public build...
 		allowedOrigins = append(allowedOrigins, "https://"+DOMAIN, "https://api."+DOMAIN, "https://staging."+DOMAIN)
 	} else {
-		allowedOrigins = append(allowedOrigins, "http://localhost:8001", "http://localhost:3000", "http://localhost:8080", "http://localhost:8888")
+		allowedOrigins = append(allowedOrigins, "http://localhost:3000")
+		for port := 8000; port <= 8888; port++ {
+			allowedOrigins = append(allowedOrigins, fmt.Sprintf("http://localhost:%d", port))
+		}
 	}
 
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
