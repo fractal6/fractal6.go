@@ -116,10 +116,14 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 	}
 
 	/* sorting */
-	var sortFilter string = "orderdesc"
+	var orderFilter string = "orderdesc"
+	var orderBy string = "Post.createdAt"
 	if q.Sort != nil {
 		if *q.Sort == "oldest" {
-			sortFilter = "orderasc"
+			orderFilter = "orderasc"
+		}
+		if *q.Sort == "activity" {
+			orderBy = "Post.updatedAt"
 		}
 	}
 
@@ -178,7 +182,8 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 		"tensionFilter": tensionFilter,
 		"authorsFilter": authorsFilter,
 		"labelsFilter":  labelsFilter,
-		"order":         sortFilter,
+		"order":         orderFilter,
+		"orderBy":       orderBy,
 		// Protected
 		"rootnameidProtected": rootnameidProtected,
 		"nameidsProtected":    nameidsProtectedString,

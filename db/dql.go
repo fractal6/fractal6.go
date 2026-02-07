@@ -557,7 +557,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
 
-        all(func: uid(tensions, tensionsProtected), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
+        all(func: uid(tensions, tensionsProtected), first:{{.first}}, offset:{{.offset}}, {{.order}}: {{.orderBy}}) {
             {{.payload}}
         }
     }`,
@@ -576,7 +576,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
 
-        all(func: uid(tensions_in, tensions_out), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
+        all(func: uid(tensions_in, tensions_out), first:{{.first}}, offset:{{.offset}}, {{.order}}: {{.orderBy}}) {
             {{.payload}}
         }
     }`,
@@ -596,7 +596,7 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
 
-        all(func: uid(tensions, tensionsProtected), first:{{.first}}, offset:{{.offset}}, {{.order}}: Post.createdAt) {
+        all(func: uid(tensions, tensionsProtected), first:{{.first}}, offset:{{.offset}}, {{.order}}: {{.orderBy}}) {
             {{.payload}}
         }
     }`,
