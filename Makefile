@@ -17,7 +17,10 @@ RELEASE_DIR := releases/$(BRANCH_NAME)/$(RELEASE_VERSION)
 LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr " " "_")
 
 
-.PHONY: build prod vendor
+.PHONY: build prod vendor \
+	test test-vet test-unit \
+	test-integration-up test-integration test-integration-down test-integration-clean \
+	test-all
 default: build
 
 
@@ -46,10 +49,27 @@ prod:
 vendor:
 	go mod vendor
 
-test:
-	#go clean -testcache
-	go test ./...
-	go test ./web/auth/... -v
+test: test-vet test-unit
+
+test-vet:
+	go vet ./...
+	go vet -tags integration ./db/...
+
+test-unit:
+	go test -v ./...
+
+test-integration-up:
+	docker compose -f docker-compose.test.yml up -d --wait
+
+test-integration: test-integration-up
+	go test -tags integration -v -count=1 -timeout 120s ./db/...
+
+test-integration-down:
+	docker compose -f docker-compose.test.yml down -v --remove-orphans
+
+test-integration-clean: test-integration test-integration-down
+
+test-all: test test-integration-clean
 
 #
 # Generate Graphql code and schema
