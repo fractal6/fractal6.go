@@ -116,7 +116,7 @@ type Node @auth(
   contracts: [Vote!] @hasInverse(field: node) # only for Member role -- named role (@...)
 
   # Aggregators
-  events_history: [Event!] @meta(f:"getNodeHistory", k:"nameid")
+  events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
 
   # Dgraph directive
   cascade_directive: Boolean
@@ -446,7 +446,7 @@ type User @auth(
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter # value ignored
 
   # Aggregators
-  event_count: EventCount @meta(f:"getEventCount", k:"username")
+  event_count: EventCount @meta(f:"getEventCount", k:["username"])
 }
 
 type PendingUser {

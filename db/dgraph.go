@@ -123,7 +123,7 @@ func init() {
 	// Get Jwt public key
 	if fn := viper.GetString("db.dgraph_public_key"); fn != "" {
 		if content, err := ioutil.ReadFile(fn); err != nil {
-			log.Fatal(err)
+			log.Printf("Warning: %v", err)
 		} else {
 			pub_key = string(content)
 		}
@@ -133,7 +133,7 @@ func init() {
 	// Get Jwt private key
 	if fn := viper.GetString("db.dgraph_private_key"); fn != "" {
 		if content, err := ioutil.ReadFile(fn); err != nil {
-			log.Fatal(err)
+			log.Printf("Warning: %v", err)
 		} else {
 			priv_key = string(content)
 		}
@@ -145,7 +145,7 @@ func init() {
 		dgraphPublicKey = ParseRsaPublic(pub_key)
 		dgraphPrivateKey = ParseRsaPrivate(priv_key)
 	} else {
-		log.Fatal("DGRAPH_PRIVATE_KEY or DGRAPH_PUBLIC_KEY not found")
+		log.Println("Warning: DGRAPH_PRIVATE_KEY or DGRAPH_PUBLIC_KEY not found. JWT signing disabled.")
 	}
 
 	DB = initDB()
@@ -299,6 +299,9 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
 	jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))
 
 	// Create token
+	if dgraphPrivateKey == nil || dgraphPublicKey == nil {
+		panic("Dgraph JWT keys not loaded. Ensure public.pem and private.pem are available.")
+	}
 	tkm := jwtauth.New("RS256", dgraphPrivateKey, dgraphPublicKey)
 	// tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
 	_, token, err := tkm.Encode(claims)

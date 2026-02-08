@@ -146,7 +146,7 @@ type DirectiveRoot struct {
 	IsContractValidator           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Lambda                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	LambdaOnMutate                func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
-	Meta                          func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
+	Meta                          func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k []string) (res interface{}, err error)
 	Private                       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Remote                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	RemoteResponse                func(ctx context.Context, obj interface{}, next graphql.Resolver, name *string) (res interface{}, err error)
@@ -762,7 +762,7 @@ type ComplexityRoot struct {
 		ContractsAggregate     func(childComplexity int, filter *model.VoteFilter) int
 		CreatedAt              func(childComplexity int) int
 		CreatedBy              func(childComplexity int, filter *model.UserFilter) int
-		EventsHistory          func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		EventsHistory          func(childComplexity int, query *string) int
 		EventsHistoryAggregate func(childComplexity int, filter *model.EventFilter) int
 		FirstLink              func(childComplexity int, filter *model.UserFilter) int
 		GuestCanCreateTension  func(childComplexity int) int
@@ -4954,7 +4954,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Node.EventsHistory(childComplexity, args["filter"].(*model.EventFilter), args["order"].(*model.EventOrder), args["first"].(*int), args["offset"].(*int)), true
+		return e.complexity.Node.EventsHistory(childComplexity, args["query"].(*string)), true
 
 	case "Node.events_historyAggregate":
 		if e.complexity.Node.EventsHistoryAggregate == nil {
@@ -10172,7 +10172,7 @@ directive @hidden on FIELD_DEFINITION
 
 directive @private on FIELD_DEFINITION
 
-directive @meta(f: String!, k: String) on FIELD_DEFINITION
+directive @meta(f: String!, k: [String!]) on FIELD_DEFINITION
 
 directive @isContractValidator on FIELD_DEFINITION
 
@@ -10240,7 +10240,7 @@ type Node {
   color: String
   first_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
-  events_history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!] @meta(f:"getNodeHistory", k:"nameid")
+  events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
   cascade_directive: Boolean
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -10551,7 +10551,7 @@ type User {
   reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
   events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!] @private
   markAllAsRead: String
-  event_count(filter: EventCountFilter): EventCount @meta(f:"getEventCount", k:"username")
+  event_count(filter: EventCountFilter): EventCount @meta(f:"getEventCount", k:["username"])
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   watchingAggregate(filter: NodeFilter): NodeAggregateResult
@@ -10770,35 +10770,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cascade(fields: [String]) on FIELD
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 directive @lambda on FIELD_DEFINITION
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @cascade(fields: [String]) on FIELD
+
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 input AddBlobInput {
   createdBy: UserRef!

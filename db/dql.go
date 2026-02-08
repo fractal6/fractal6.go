@@ -161,12 +161,15 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         var(func: uid(n1, n2)) {
-            Node.tensions_in {
-                h as Tension.history
+            Node.tensions_in {{if .query}}@filter(anyoftext(Tension.title, "{{.query}}") OR anyoftext(Post.message, "{{.query}}")){{end}} {
+                h_in as Tension.history
+            }
+            Node.tensions_out {{if .query}}@filter(anyoftext(Tension.title, "{{.query}}") OR anyoftext(Post.message, "{{.query}}")){{end}} {
+                h_out as Tension.history
             }
         }
 
-        all(func: uid(h), first:25, orderdesc: Post.createdAt) @filter(NOT eq(Event.event_type, "BlobCreated")) {
+        all(func: uid(h_in, h_out), first:25, orderdesc: Post.createdAt) @filter(NOT eq(Event.event_type, "BlobCreated")) @cascade {
             Post.createdAt
             Post.createdBy { User.username }
             Event.event_type

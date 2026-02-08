@@ -404,10 +404,10 @@ func (ec *executionContext) dir_meta_args(ctx context.Context, rawArgs map[strin
 		}
 	}
 	args["f"] = arg0
-	var arg1 *string
+	var arg1 []string
 	if tmp, ok := rawArgs["k"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("k"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg1, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5516,42 +5516,15 @@ func (ec *executionContext) field_Node_events_historyAggregate_args(ctx context.
 func (ec *executionContext) field_Node_events_history_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.EventFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["query"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 *model.EventOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
+	args["query"] = arg0
 	return args, nil
 }
 
@@ -32870,7 +32843,7 @@ func (ec *executionContext) _Node_events_history(ctx context.Context, field grap
 			if err != nil {
 				return nil, err
 			}
-			k, err := ec.unmarshalOString2ᚖstring(ctx, "nameid")
+			k, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"nameid"})
 			if err != nil {
 				return nil, err
 			}
@@ -58000,7 +57973,7 @@ func (ec *executionContext) _User_event_count(ctx context.Context, field graphql
 			if err != nil {
 				return nil, err
 			}
-			k, err := ec.unmarshalOString2ᚖstring(ctx, "username")
+			k, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"username"})
 			if err != nil {
 				return nil, err
 			}

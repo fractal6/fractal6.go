@@ -304,33 +304,66 @@ func private(ctx context.Context, obj interface{}, next graphql.Resolver) (inter
 
 // Use DQL query to fetch the given field=k.
 // If k is not given, "id" is automatically pass to the query template.
-func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (interface{}, error) {
+func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k []string) (interface{}, error) {
 	data, err := next(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var ok bool
-	var v string
 	maps := map[string]string{}
-	// Get query field
-	if k != nil {
-		if v, ok = ctx.Value(*k).(string); !ok {
-			o := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k))
+	// Get query fields
+	for i, key := range k {
+		var ok bool
+		var v string
+
+		// Try context first, then fall back to object reflection
+		if v, ok = ctx.Value(key).(string); !ok {
+			o := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(key))
 			if !o.IsValid() {
-				rc := graphql.GetResolverContext(ctx)
-				fieldName := rc.Field.Name
-				return nil, fmt.Errorf("'%s' field on '%s' seems not valid or unknown", *k, fieldName)
+				// First key is required (primary key), others are optional
+				if i == 0 {
+					rc := graphql.GetResolverContext(ctx)
+					return nil, fmt.Errorf("'%s' field on '%s' seems not valid or unknown", key, rc.Field.Name)
+				}
+				continue
 			}
-			v = o.String()
+			// Handle pointer fields (e.g., *string for optional fields)
+			if o.Kind() == reflect.Ptr {
+				if o.IsNil() {
+					continue
+				}
+				v = o.Elem().String()
+			} else {
+				v = o.String()
+			}
 		}
-		if v == "" {
+
+		// First key must be non-empty (required)
+		if v == "" && i == 0 {
 			rc := graphql.GetResolverContext(ctx)
-			fieldName := rc.Field.Name
-			err := fmt.Errorf("'%s' field is needed to query '%s'", *k, fieldName)
-			return nil, err
+			return nil, fmt.Errorf("'%s' field is needed to query '%s'", key, rc.Field.Name)
 		}
-		maps[*k] = v
+
+		if v != "" {
+			maps[key] = v
+		}
+	}
+
+	// Collect field arguments into the template map.
+	// gqlgen generates string for required args and *string for optional ones.
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		for argName, argVal := range fc.Args {
+			switch v := argVal.(type) {
+			case string:
+				if v != "" {
+					maps[argName] = v
+				}
+			case *string:
+				if v != nil && *v != "" {
+					maps[argName] = *v
+				}
+			}
+		}
 	}
 
 	// Query

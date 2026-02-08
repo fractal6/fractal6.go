@@ -39,8 +39,8 @@ type TensionQuery struct {
 	Type    *model.TensionType   `json:"type_"`
 	Authors []string             `json:"authors"`
 	Labels  []string             `json:"labels"`
-	// Either filter tension that in or NOT in the given project
-	InProject bool    `json:in_project`
+	// Either filter tension that is in or NOT in the given project
+	InProject bool    `json:"in_project"`
 	Projectid *string `json:"projectid"`
 	// Protected tensions @auth
 	NameidsProtected []string

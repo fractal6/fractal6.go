@@ -102,7 +102,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   color: String
   first_link: User
   contracts: [Vote!] @hasInverse(field: node)
-  events_history: [Event!]
+  events_history(query: String): [Event!]
   cascade_directive: Boolean
 }
 
