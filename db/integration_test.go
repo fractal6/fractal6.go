@@ -55,6 +55,11 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Dgraph not ready: %v", err)
 	}
 
+	// Drop all data from previous runs to avoid duplicates
+	if err := dropAllData(); err != nil {
+		log.Fatalf("Failed to drop data: %v", err)
+	}
+
 	// Load the GraphQL schema into Dgraph
 	if err := loadSchema(); err != nil {
 		log.Fatalf("Failed to load schema: %v", err)

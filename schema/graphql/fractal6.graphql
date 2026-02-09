@@ -117,6 +117,7 @@ type Node @auth(
 
   # Aggregators
   events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
+  activity(from: String, to: String): [Activity!] @meta(f:"getNodeActivity", k:["rootnameid"])
 
   # Dgraph directive
   cascade_directive: Boolean
@@ -448,6 +449,7 @@ type User @auth(
 
   # Aggregators
   event_count: EventCount @meta(f:"getEventCount", k:["username"])
+  activity(from: String, to: String): [Activity!] @meta(f:"getUserActivity", k:["username"])
 }
 
 type PendingUser {
@@ -497,6 +499,21 @@ type EventCount	 {
   unread_events: Int
   pending_contracts: Int
   assigned_tensions: Int
+}
+
+# Daily activity counter for users and organisations.
+# Accessed only via @meta fields; direct GraphQL access restricted.
+type Activity @auth(
+  query: <<is-root>>,
+  add: <<is-root>>,
+  update: <<is-root>>,
+  delete: <<is-root>>
+) {
+  id: ID!
+  activityid: String! @id
+  ownerid: String! @search(by: [hash])
+  date: DateTime! @search(by: [day])
+  count: Int!
 }
 
 #

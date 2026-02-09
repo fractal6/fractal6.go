@@ -22,6 +22,7 @@ package graph
 
 import (
 	"fmt"
+	"time"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
@@ -250,7 +251,7 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 		}
 
 		// leave trace
-		leaveTrace(tension)
+		go leaveTrace(uctx, tension)
 	}
 
 	// Set contract status if any
@@ -278,7 +279,13 @@ func GetBlob(tension *model.Tension) *model.Blob {
 	return nil
 }
 
-func leaveTrace(tension *model.Tension) {
+func leaveTrace(uctx *model.UserCtx, tension *model.Tension) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("error: leaveTrace panic: %v\n", r)
+		}
+	}()
+
 	var err error
 	var nameid string
 
@@ -293,13 +300,48 @@ func leaveTrace(tension *model.Tension) {
 		// Set the Update time into the affected node.
 		err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.updatedAt", Now())
 		if err != nil {
-			panic(err)
+			fmt.Printf("error: leaveTrace node update: %v\n", err)
 		}
 		// Set the Update of its parent node (tension.receiver)
 		err = db.GetDB().SetFieldByEq("Node.nameid", tension.Receiver.Nameid, "Node.updatedAt", Now())
 		if err != nil {
-			panic(err)
+			fmt.Printf("error: leaveTrace receiver update: %v\n", err)
 		}
+	}
+
+	// Track activity
+	trackActivity(uctx.Username, tension.Receiver.Nameid)
+}
+
+// trackActivity increments the daily activity counter for both the user
+// and the root organisation. Called from leaveTrace goroutine.
+func trackActivity(username, receiverNameid string) {
+	today := time.Now().UTC().Format("2006-01-02")
+	todayISO := today + "T00:00:00Z"
+
+	// User activity
+	_, err := db.GetDB().Meta("upsertActivity", map[string]string{
+		"activityid": "u#" + username + "#" + today,
+		"ownerid":    "u#" + username,
+		"date":       todayISO,
+	})
+	if err != nil {
+		fmt.Printf("error: trackActivity user: %v\n", err)
+	}
+
+	// Org activity
+	rootid, err := codec.Nid2rootid(receiverNameid)
+	if err != nil {
+		fmt.Printf("error: trackActivity Nid2rootid: %v\n", err)
+		return
+	}
+	_, err = db.GetDB().Meta("upsertActivity", map[string]string{
+		"activityid": "o#" + rootid + "#" + today,
+		"ownerid":    "o#" + rootid,
+		"date":       todayISO,
+	})
+	if err != nil {
+		fmt.Printf("error: trackActivity org: %v\n", err)
 	}
 }
 

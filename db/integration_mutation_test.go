@@ -24,6 +24,7 @@ package db
 
 import (
 	"testing"
+	"time"
 
 	"fractale/fractal6.go/graph/model"
 )
@@ -127,4 +128,91 @@ func TestGamma_Integration(t *testing.T) {
 
 	// Restore original value
 	_ = DB.SetFieldByEq("Node.nameid", "test-org#", "Node.about", "A test organisation")
+}
+
+func TestUpsertActivity_Integration(t *testing.T) {
+	today := time.Now().UTC().Format("2006-01-02")
+	todayISO := today + "T00:00:00Z"
+	activityid := "u#testuser#" + today
+
+	// Clean up any leftover from a previous run
+	cleanup := QueryMut{
+		Q: `query { v as var(func: eq(Activity.activityid, "` + activityid + `")) }`,
+		M: []X{{D: `uid(v) * * .`}},
+	}
+	_, _ = DB.Gamma(cleanup, map[string]string{})
+
+	// Helper to query the count for today's activity entry
+	getCount := func() int {
+		results, err := DB.Meta("getUserActivity", map[string]string{
+			"username": "testuser",
+		})
+		if err != nil {
+			t.Fatalf("getUserActivity returned error: %v", err)
+		}
+		for _, r := range results {
+			if aid, ok := r["activityid"].(string); ok && aid == activityid {
+				switch c := r["count"].(type) {
+				case float64:
+					return int(c)
+				case int:
+					return c
+				default:
+					t.Fatalf("count type = %T, want numeric", r["count"])
+				}
+			}
+		}
+		return 0
+	}
+
+	// First upsert: creates the activity node with count=1
+	_, err := DB.Meta("upsertActivity", map[string]string{
+		"activityid": activityid,
+		"ownerid":    "u#testuser",
+		"date":       todayISO,
+	})
+	if err != nil {
+		t.Fatalf("upsertActivity (create) returned error: %v", err)
+	}
+
+	count := getCount()
+	if count != 1 {
+		t.Errorf("after 1st upsert: count = %d, want 1", count)
+	}
+
+	// Second upsert: should increment count to 2
+	_, err = DB.Meta("upsertActivity", map[string]string{
+		"activityid": activityid,
+		"ownerid":    "u#testuser",
+		"date":       todayISO,
+	})
+	if err != nil {
+		t.Fatalf("upsertActivity (2nd increment) returned error: %v", err)
+	}
+
+	count = getCount()
+	if count != 2 {
+		t.Errorf("after 2nd upsert: count = %d, want 2", count)
+	}
+
+	// Third upsert: should increment count to 3
+	_, err = DB.Meta("upsertActivity", map[string]string{
+		"activityid": activityid,
+		"ownerid":    "u#testuser",
+		"date":       todayISO,
+	})
+	if err != nil {
+		t.Fatalf("upsertActivity (3rd increment) returned error: %v", err)
+	}
+
+	count = getCount()
+	if count != 3 {
+		t.Errorf("after 3rd upsert: count = %d, want 3", count)
+	}
+
+	// Clean up
+	_, err = DB.Gamma(cleanup, map[string]string{})
+	if err != nil {
+		t.Logf("cleanup warning: %v", err)
+	}
 }

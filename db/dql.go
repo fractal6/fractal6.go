@@ -714,6 +714,24 @@ var dqlQueries map[string]string = map[string]string{
             all_ids as uid
         }
     }`,
+	"getUserActivity": `{
+        all(func: eq(Activity.ownerid, "u#{{.username}}"), orderdesc: Activity.date, first: 366)
+        {{if .from}}@filter(between(Activity.date, "{{.from}}", "{{.to}}")){{end}}
+        {
+            activityid: Activity.activityid
+            count: Activity.count
+            date: Activity.date
+        }
+    }`,
+	"getNodeActivity": `{
+        all(func: eq(Activity.ownerid, "o#{{.rootnameid}}"), orderdesc: Activity.date, first: 366)
+        {{if .from}}@filter(between(Activity.date, "{{.from}}", "{{.to}}")){{end}}
+        {
+            activityid: Activity.activityid
+            count: Activity.count
+            date: Activity.date
+        }
+    }`,
 }
 
 var dqlMutations map[string]QueryMut = map[string]QueryMut{
@@ -1059,6 +1077,28 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         uid(u) * * .
         `,
 		}},
+	},
+	"upsertActivity": {
+		Q: `query {
+            v as var(func: eq(Activity.activityid, "{{.activityid}}")) {
+                c as Activity.count
+                next as math(c + 1)
+            }
+        }`,
+		M: []X{
+			{
+				C: `@if(gt(len(v), 0))`,
+				S: `uid(v) <Activity.count> val(next) .`,
+			},
+			{
+				C: `@if(eq(len(v), 0))`,
+				S: `_:new <dgraph.type> "Activity" .
+                    _:new <Activity.activityid> "{{.activityid}}" .
+                    _:new <Activity.ownerid> "{{.ownerid}}" .
+                    _:new <Activity.date> "{{.date}}" .
+                    _:new <Activity.count> "1" .`,
+			},
+		},
 	},
 }
 

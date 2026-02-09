@@ -1,5 +1,6 @@
 # Docker Compose for integration tests.
-# Runs Dgraph zero + alpha on offset ports (+100) to avoid conflicts with dev instance.
+# Runs Dgraph zero + alpha. Host ports are offset (+100) to avoid conflicts with dev instance.
+# Inside the containers, Dgraph uses its default ports (no --port_offset).
 # Usage:
 #   docker compose -f docker-compose.test.yml up -d --wait
 #   docker compose -f docker-compose.test.yml down -v --remove-orphans
@@ -7,34 +8,35 @@
 services:
   zero-test:
     image: dgraph/dgraph:v22.0.2
-    command: dgraph zero --my=zero-test:5080 --port_offset=100
+    command: dgraph zero --my=zero-test:5080
     ports:
-      - "5180:5180"
-      - "6180:6180"
+      - "5180:5080"
+      - "6180:6080"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:6180/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:6080/health || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 10s
 
   alpha-test:
     image: dgraph/dgraph:v22.0.2
     command: >
       dgraph alpha
-        --my=alpha-test:7180
-        --zero=zero-test:5180
-        --port_offset=100
+        --my=alpha-test:7080
+        --zero=zero-test:5080
         --security=whitelist=0.0.0.0/0
         --limit=mutations=strict
         --graphql=introspection=true
     ports:
-      - "8180:8180"
-      - "9180:9180"
+      - "8180:8080"
+      - "9180:9080"
     depends_on:
       zero-test:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8180/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 10s

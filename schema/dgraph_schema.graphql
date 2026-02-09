@@ -570,6 +570,18 @@ type EventCount {
   assigned_tensions: Int
 }
 
+type Activity @auth(query:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+}, add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+}, update:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+}, delete:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+}) {
+  id: ID!
+  activityid: String! @id
+  ownerid: String! @search(by: [hash])
+  date: DateTime! @search(by: [day])
+  count: Int!
+}
+
 enum NodeType {
   Circle
   Role
