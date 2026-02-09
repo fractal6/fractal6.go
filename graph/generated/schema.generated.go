@@ -64322,7 +64322,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
-				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed"})
+				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed", "CommentDeleted"})
 				if err != nil {
 					return nil, err
 				}
@@ -77087,7 +77087,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
-				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed"})
+				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed", "CommentDeleted"})
 				if err != nil {
 					return nil, err
 				}
@@ -77577,7 +77577,7 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				if err != nil {
 					return nil, err
 				}
-				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed"})
+				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed", "CommentDeleted"})
 				if err != nil {
 					return nil, err
 				}

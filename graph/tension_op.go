@@ -43,6 +43,10 @@ func init() {
 		model.TensionEventCommentPushed: EventMap{
 			Auth: MemberHook | AuthorHook,
 		},
+		model.TensionEventCommentDeleted: EventMap{
+			Auth:   AuthorHook,
+			Action: RemoveComment,
+		},
 		model.TensionEventBlobCreated: EventMap{
 			Auth: MemberStrictHook,
 		},
@@ -651,6 +655,14 @@ func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 	}
 	// update node
 	err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+	return true, err
+}
+
+func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+	tid := tension.ID
+	cid := *event.Old
+	// Delete comment
+	_, err := db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
 	return true, err
 }
 

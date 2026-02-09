@@ -131,7 +131,7 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
 	StructMap(*input.Event, &event)
 	ok, contract, err := contractEventHook(uctx, cid, tid, &event, nil)
 	if !ok || err != nil {
-		// Delete the tension just added
+		// Delete the contract just added
 		e := db.GetDB().DeepDelete("contract", id)
 		if e != nil {
 			panic(e)

@@ -151,9 +151,6 @@ func Init() gen.Config {
 	c.Directives.Hook_addProjectCard = addProjectCardHook
 	c.Directives.Hook_updateProjectCard = updateProjectCardHook
 	c.Directives.Hook_deleteProjectCard = deleteProjectCardHook
-	// Tension
-	c.Directives.Hook_getTensionInput = nothing
-	c.Directives.Hook_queryTensionInput = nothing
 	// ProjectDraft
 	c.Directives.Hook_getProjectDraftInput = nothing
 	c.Directives.Hook_queryProjectDraftInput = nothing
@@ -164,10 +161,13 @@ func Init() gen.Config {
 	c.Directives.Hook_addProjectDraft = nothing
 	c.Directives.Hook_updateProjectDraft = updateProjectDraftHook
 	c.Directives.Hook_deleteProjectDraft = nothing
-	// @DEBUG: input rawQuery isssue (input modification not propagated with rawQuery whil rawQuery loose field with argument) !!!
-	// to be reviewed...
+	// @DEBUG: input rawQuery isssue (input modification not propagated
+	// with rawQuery while rawQuery loose field with arguments) ! to be reviewed...
 	// c.Directives.Hook_addTensionInput = tensionInputHook
 	// c.Directives.Hook_updateTensionInput = tensionInputHook
+	// Tension
+	c.Directives.Hook_getTensionInput = nothing
+	c.Directives.Hook_queryTensionInput = nothing
 	c.Directives.Hook_addTensionInput = nothing
 	c.Directives.Hook_updateTensionInput = setUpdateContextInfo // for @hasEvent+@isOwner
 	c.Directives.Hook_deleteTensionInput = nothing

@@ -93,8 +93,8 @@ type RestrictValue int
 
 const (
 	NoRestriction           RestrictValue = 1      // default
-	UserIsMemberRestrict    RestrictValue = 1 << 1 // the user (asking) should be a member of the receiver circle
-	UserNewIsMemberRestrict RestrictValue = 1 << 2 // the new user (event.new) should be a member of the receiver circle
+	UserIsMemberRestrict    RestrictValue = 1 << 1 // the user (asking) should be a member of the receiver circle(org)
+	UserNewIsMemberRestrict RestrictValue = 1 << 2 // the new user (event.new) should be a member of the receiver circle(org)
 )
 
 // Node Action **Rights** Enum.

@@ -980,7 +980,22 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 			D: `uid(v) * *  .
                 uid(cc) * * .
                 uid(c) * * .
-                `,
+               `,
+		}},
+	},
+	"deleteComment": {
+		Q: `query {
+			t as var(func: uid({{.tid}}))
+            var(func: uid({{.cid}})) {
+                c as uid
+                reactions as Comment.reactions
+            }
+        }`,
+		M: []X{{
+			D: `uid(t) <Tension.comments> uid(c) .
+				uid(reactions) * *  .
+				uid(c) * * .
+				`,
 		}},
 	},
 	// Deleting user by replacing its authoring by the ghost user.
@@ -2755,7 +2770,7 @@ func (dg Dgraph) RewriteContractId(cid string) error {
 // Deletions
 
 // DeepDelete delete edges recursively for type {t} and id {id}.
-// Reverse edges need to be deleted manuall since they are defined in graphql and not in DQL.
+// Reverse edges need to be deleted manually since they are defined in graphql and not in DQL.
 // Note: If reverse are forgotten, empty redisual nodes will accumulates.
 func (dg Dgraph) DeepDelete(t string, id string) error {
 	var reverse string

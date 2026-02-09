@@ -5954,6 +5954,7 @@ const (
 	TensionEventTitleUpdated    TensionEvent = "TitleUpdated"
 	TensionEventTypeUpdated     TensionEvent = "TypeUpdated"
 	TensionEventCommentPushed   TensionEvent = "CommentPushed"
+	TensionEventCommentDeleted  TensionEvent = "CommentDeleted"
 	TensionEventAssigneeAdded   TensionEvent = "AssigneeAdded"
 	TensionEventAssigneeRemoved TensionEvent = "AssigneeRemoved"
 	TensionEventLabelAdded      TensionEvent = "LabelAdded"
@@ -5982,6 +5983,7 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventTitleUpdated,
 	TensionEventTypeUpdated,
 	TensionEventCommentPushed,
+	TensionEventCommentDeleted,
 	TensionEventAssigneeAdded,
 	TensionEventAssigneeRemoved,
 	TensionEventLabelAdded,
@@ -6005,7 +6007,7 @@ var AllTensionEvent = []TensionEvent{
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMentioned, TensionEventPinned, TensionEventUnpinned, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventCommentDeleted, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMentioned, TensionEventPinned, TensionEventUnpinned, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
 		return true
 	}
 	return false
