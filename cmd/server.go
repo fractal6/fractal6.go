@@ -198,7 +198,11 @@ func RunServer() {
 	// Static & Public files
 	// --
 	// Serve static files
-	web.FileServer(r, "/assets/", "./assets", "3600")
+	assetsCacheControl := "max-age=3600"
+	if buildMode == "DEV" {
+		assetsCacheControl = "no-store, no-cache, must-revalidate"
+	}
+	web.FileServer(r, "/assets/", "./assets", assetsCacheControl)
 	// Serve static frontend files
 	web.FileServer(r, "/", "./public", "")
 
