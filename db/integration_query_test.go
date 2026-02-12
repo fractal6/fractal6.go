@@ -28,6 +28,7 @@ import (
 )
 
 func TestCountHas_Integration(t *testing.T) {
+	t.Parallel()
 	count := DB.CountHas("Node.nameid")
 	if count < 1 {
 		t.Errorf("CountHas(Node.nameid) = %d, want >= 1", count)
@@ -36,27 +37,34 @@ func TestCountHas_Integration(t *testing.T) {
 }
 
 func TestExists_Integration(t *testing.T) {
-	found, err := DB.Exists("Node.nameid", "test-org#", nil)
-	if err != nil {
-		t.Fatalf("Exists returned error: %v", err)
-	}
-	if !found {
-		t.Error("Exists(Node.nameid, test-org#) = false, want true")
-	}
-}
+	t.Parallel()
 
-func TestExists_IntegrationNotFound(t *testing.T) {
-	found, err := DB.Exists("Node.nameid", "nonexistent-org#", nil)
-	if err != nil {
-		t.Fatalf("Exists returned error: %v", err)
-	}
-	if found {
-		t.Error("Exists(Node.nameid, nonexistent-org#) = true, want false")
-	}
+	t.Run("found", func(t *testing.T) {
+		t.Parallel()
+		found, err := DB.Exists("Node.nameid", "test-org", nil)
+		if err != nil {
+			t.Fatalf("Exists returned error: %v", err)
+		}
+		if !found {
+			t.Error("Exists(Node.nameid, test-org) = false, want true")
+		}
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		t.Parallel()
+		found, err := DB.Exists("Node.nameid", "nonexistent-org#", nil)
+		if err != nil {
+			t.Fatalf("Exists returned error: %v", err)
+		}
+		if found {
+			t.Error("Exists(Node.nameid, nonexistent-org#) = true, want false")
+		}
+	})
 }
 
 func TestGetFieldByEq_Integration(t *testing.T) {
-	val, err := DB.GetFieldByEq("Node.nameid", "test-org#", "Node.name")
+	t.Parallel()
+	val, err := DB.GetFieldByEq("Node.nameid", "test-org", "Node.name")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -70,47 +78,56 @@ func TestGetFieldByEq_Integration(t *testing.T) {
 }
 
 func TestIsChild_Integration(t *testing.T) {
-	isChild, err := DB.IsChild("test-org#", "test-org#@testuser")
-	if err != nil {
-		t.Fatalf("IsChild returned error: %v", err)
-	}
-	if !isChild {
-		t.Error("IsChild(test-org#, test-org#@testuser) = false, want true")
-	}
-}
+	t.Parallel()
 
-func TestIsChild_IntegrationNotChild(t *testing.T) {
-	isChild, err := DB.IsChild("test-org#", "nonexistent#")
-	if err != nil {
-		t.Fatalf("IsChild returned error: %v", err)
-	}
-	if isChild {
-		t.Error("IsChild(test-org#, nonexistent#) = true, want false")
-	}
+	t.Run("is_child", func(t *testing.T) {
+		t.Parallel()
+		isChild, err := DB.IsChild("test-org", "test-org##@testuser")
+		if err != nil {
+			t.Fatalf("IsChild returned error: %v", err)
+		}
+		if !isChild {
+			t.Error("IsChild(test-org, test-org##@testuser) = false, want true")
+		}
+	})
+
+	t.Run("not_child", func(t *testing.T) {
+		t.Parallel()
+		isChild, err := DB.IsChild("test-org", "nonexistent#")
+		if err != nil {
+			t.Fatalf("IsChild returned error: %v", err)
+		}
+		if isChild {
+			t.Error("IsChild(test-org, nonexistent#) = true, want false")
+		}
+	})
 }
 
 func TestGetChildren_Integration(t *testing.T) {
-	children, err := DB.GetChildren("test-org#")
+	t.Parallel()
+	children, err := DB.GetChildren("test-org")
 	if err != nil {
 		t.Fatalf("GetChildren returned error: %v", err)
 	}
 	if len(children) < 2 {
-		t.Errorf("GetChildren(test-org#) returned %d children, want >= 2", len(children))
+		t.Errorf("GetChildren(test-org) returned %d children, want >= 2", len(children))
 	}
-	t.Logf("GetChildren(test-org#) = %v", children)
+	t.Logf("GetChildren(test-org) = %v", children)
 }
 
 func TestHasCoordos_Integration(t *testing.T) {
-	has := DB.HasCoordos("test-org#")
+	t.Parallel()
+	has := DB.HasCoordos("test-org")
 	if !has {
-		t.Error("HasCoordos(test-org#) = false, want true")
+		t.Error("HasCoordos(test-org) = false, want true")
 	}
 }
 
 func TestQueryDql_IntegrationRaw(t *testing.T) {
+	t.Parallel()
 	res, err := DB.QueryDql("exists", map[string]string{
 		"fieldName": "Node.nameid",
-		"value":     "test-org#",
+		"value":     "test-org",
 		"filter":    "",
 	})
 	if err != nil {
@@ -126,9 +143,29 @@ func TestQueryDql_IntegrationRaw(t *testing.T) {
 	}
 }
 
+func TestGetUserRoles_Integration(t *testing.T) {
+	t.Parallel()
+	roles, err := DB.GetUserRoles("testuser")
+	if err != nil {
+		t.Fatalf("GetUserRoles returned error: %v", err)
+	}
+	t.Logf("GetUserRoles returned %d roles", len(roles))
+	for i, r := range roles {
+		rtStr := "<nil>"
+		if r.RoleType != nil {
+			rtStr = string(*r.RoleType)
+		}
+		t.Logf("  role[%d]: nameid=%q name=%q role_type=%s", i, r.Nameid, r.Name, rtStr)
+	}
+	if len(roles) < 1 {
+		t.Errorf("expected at least 1 role, got %d", len(roles))
+	}
+}
+
 func TestMeta_IntegrationGetNodeHistory(t *testing.T) {
+	t.Parallel()
 	results, err := DB.Meta("getNodeHistory", map[string]string{
-		"nameid": "test-org#",
+		"nameid": "test-org",
 		"query":  "",
 	})
 	if err != nil {

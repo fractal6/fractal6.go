@@ -169,6 +169,33 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Activity struct {
+		Activityid func(childComplexity int) int
+		Count      func(childComplexity int) int
+		Date       func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Ownerid    func(childComplexity int) int
+	}
+
+	ActivityAggregateResult struct {
+		ActivityidMax func(childComplexity int) int
+		ActivityidMin func(childComplexity int) int
+		Count         func(childComplexity int) int
+		CountAvg      func(childComplexity int) int
+		CountMax      func(childComplexity int) int
+		CountMin      func(childComplexity int) int
+		CountSum      func(childComplexity int) int
+		DateMax       func(childComplexity int) int
+		DateMin       func(childComplexity int) int
+		OwneridMax    func(childComplexity int) int
+		OwneridMin    func(childComplexity int) int
+	}
+
+	AddActivityPayload struct {
+		Activity func(childComplexity int, filter *model.ActivityFilter, order *model.ActivityOrder, first *int, offset *int) int
+		NumUids  func(childComplexity int) int
+	}
+
 	AddBlobPayload struct {
 		Blob    func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
@@ -394,6 +421,12 @@ type ComplexityRoot struct {
 		MessageMin    func(childComplexity int) int
 		UpdatedAtMax  func(childComplexity int) int
 		UpdatedAtMin  func(childComplexity int) int
+	}
+
+	DeleteActivityPayload struct {
+		Activity func(childComplexity int, filter *model.ActivityFilter, order *model.ActivityOrder, first *int, offset *int) int
+		Msg      func(childComplexity int) int
+		NumUids  func(childComplexity int) int
 	}
 
 	DeleteBlobPayload struct {
@@ -670,6 +703,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AddActivity             func(childComplexity int, input []*model.AddActivityInput, upsert *bool) int
 		AddBlob                 func(childComplexity int, input []*model.AddBlobInput) int
 		AddBuildInfo            func(childComplexity int, input []*model.AddBuildInfoInput) int
 		AddComment              func(childComplexity int, input []*model.AddCommentInput) int
@@ -696,6 +730,7 @@ type ComplexityRoot struct {
 		AddUserEvent            func(childComplexity int, input []*model.AddUserEventInput) int
 		AddUserRights           func(childComplexity int, input []*model.AddUserRightsInput) int
 		AddVote                 func(childComplexity int, input []*model.AddVoteInput, upsert *bool) int
+		DeleteActivity          func(childComplexity int, filter model.ActivityFilter) int
 		DeleteBlob              func(childComplexity int, filter model.BlobFilter) int
 		DeleteBuildInfo         func(childComplexity int, filter model.BuildInfoFilter) int
 		DeleteComment           func(childComplexity int, filter model.CommentFilter) int
@@ -723,6 +758,7 @@ type ComplexityRoot struct {
 		DeleteUserEvent         func(childComplexity int, filter model.UserEventFilter) int
 		DeleteUserRights        func(childComplexity int, filter model.UserRightsFilter) int
 		DeleteVote              func(childComplexity int, filter model.VoteFilter) int
+		UpdateActivity          func(childComplexity int, input model.UpdateActivityInput) int
 		UpdateBlob              func(childComplexity int, input model.UpdateBlobInput) int
 		UpdateBuildInfo         func(childComplexity int, input model.UpdateBuildInfoInput) int
 		UpdateComment           func(childComplexity int, input model.UpdateCommentInput) int
@@ -754,6 +790,8 @@ type ComplexityRoot struct {
 
 	Node struct {
 		About                  func(childComplexity int) int
+		Activity               func(childComplexity int, from *string, to *string) int
+		ActivityAggregate      func(childComplexity int, filter *model.ActivityFilter) int
 		CascadeDirective       func(childComplexity int) int
 		Children               func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		ChildrenAggregate      func(childComplexity int, filter *model.NodeFilter) int
@@ -883,6 +921,7 @@ type ComplexityRoot struct {
 		Email              func(childComplexity int) int
 		EmailToken         func(childComplexity int) int
 		ID                 func(childComplexity int) int
+		Lang               func(childComplexity int) int
 		Password           func(childComplexity int) int
 		Subscribe          func(childComplexity int) int
 		Token              func(childComplexity int) int
@@ -1073,6 +1112,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		AggregateActivity          func(childComplexity int, filter *model.ActivityFilter) int
 		AggregateBlob              func(childComplexity int, filter *model.BlobFilter) int
 		AggregateBuildInfo         func(childComplexity int, filter *model.BuildInfoFilter) int
 		AggregateComment           func(childComplexity int, filter *model.CommentFilter) int
@@ -1100,6 +1140,7 @@ type ComplexityRoot struct {
 		AggregateUserEvent         func(childComplexity int, filter *model.UserEventFilter) int
 		AggregateUserRights        func(childComplexity int, filter *model.UserRightsFilter) int
 		AggregateVote              func(childComplexity int, filter *model.VoteFilter) int
+		GetActivity                func(childComplexity int, id *string, activityid *string) int
 		GetBlob                    func(childComplexity int, id string) int
 		GetComment                 func(childComplexity int, id string) int
 		GetContract                func(childComplexity int, id *string, contractid *string) int
@@ -1121,6 +1162,7 @@ type ComplexityRoot struct {
 		GetUser                    func(childComplexity int, id *string, username *string, email *string) int
 		GetUserEvent               func(childComplexity int, id string) int
 		GetVote                    func(childComplexity int, id *string, voteid *string) int
+		QueryActivity              func(childComplexity int, filter *model.ActivityFilter, order *model.ActivityOrder, first *int, offset *int) int
 		QueryBlob                  func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
 		QueryBuildInfo             func(childComplexity int, filter *model.BuildInfoFilter, order *model.BuildInfoOrder, first *int, offset *int) int
 		QueryComment               func(childComplexity int, filter *model.CommentFilter, order *model.CommentOrder, first *int, offset *int) int
@@ -1247,6 +1289,11 @@ type ComplexityRoot struct {
 		TitleMin      func(childComplexity int) int
 		UpdatedAtMax  func(childComplexity int) int
 		UpdatedAtMin  func(childComplexity int) int
+	}
+
+	UpdateActivityPayload struct {
+		Activity func(childComplexity int, filter *model.ActivityFilter, order *model.ActivityOrder, first *int, offset *int) int
+		NumUids  func(childComplexity int) int
 	}
 
 	UpdateBlobPayload struct {
@@ -1385,6 +1432,8 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
+		Activity                  func(childComplexity int, from *string, to *string) int
+		ActivityAggregate         func(childComplexity int, filter *model.ActivityFilter) int
 		Bio                       func(childComplexity int) int
 		Contracts                 func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
 		ContractsAggregate        func(childComplexity int, filter *model.ContractFilter) int
@@ -1522,6 +1571,137 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Activity.activityid":
+		if e.complexity.Activity.Activityid == nil {
+			break
+		}
+
+		return e.complexity.Activity.Activityid(childComplexity), true
+
+	case "Activity.count":
+		if e.complexity.Activity.Count == nil {
+			break
+		}
+
+		return e.complexity.Activity.Count(childComplexity), true
+
+	case "Activity.date":
+		if e.complexity.Activity.Date == nil {
+			break
+		}
+
+		return e.complexity.Activity.Date(childComplexity), true
+
+	case "Activity.id":
+		if e.complexity.Activity.ID == nil {
+			break
+		}
+
+		return e.complexity.Activity.ID(childComplexity), true
+
+	case "Activity.ownerid":
+		if e.complexity.Activity.Ownerid == nil {
+			break
+		}
+
+		return e.complexity.Activity.Ownerid(childComplexity), true
+
+	case "ActivityAggregateResult.activityidMax":
+		if e.complexity.ActivityAggregateResult.ActivityidMax == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.ActivityidMax(childComplexity), true
+
+	case "ActivityAggregateResult.activityidMin":
+		if e.complexity.ActivityAggregateResult.ActivityidMin == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.ActivityidMin(childComplexity), true
+
+	case "ActivityAggregateResult.count":
+		if e.complexity.ActivityAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.Count(childComplexity), true
+
+	case "ActivityAggregateResult.countAvg":
+		if e.complexity.ActivityAggregateResult.CountAvg == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.CountAvg(childComplexity), true
+
+	case "ActivityAggregateResult.countMax":
+		if e.complexity.ActivityAggregateResult.CountMax == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.CountMax(childComplexity), true
+
+	case "ActivityAggregateResult.countMin":
+		if e.complexity.ActivityAggregateResult.CountMin == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.CountMin(childComplexity), true
+
+	case "ActivityAggregateResult.countSum":
+		if e.complexity.ActivityAggregateResult.CountSum == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.CountSum(childComplexity), true
+
+	case "ActivityAggregateResult.dateMax":
+		if e.complexity.ActivityAggregateResult.DateMax == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.DateMax(childComplexity), true
+
+	case "ActivityAggregateResult.dateMin":
+		if e.complexity.ActivityAggregateResult.DateMin == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.DateMin(childComplexity), true
+
+	case "ActivityAggregateResult.owneridMax":
+		if e.complexity.ActivityAggregateResult.OwneridMax == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.OwneridMax(childComplexity), true
+
+	case "ActivityAggregateResult.owneridMin":
+		if e.complexity.ActivityAggregateResult.OwneridMin == nil {
+			break
+		}
+
+		return e.complexity.ActivityAggregateResult.OwneridMin(childComplexity), true
+
+	case "AddActivityPayload.activity":
+		if e.complexity.AddActivityPayload.Activity == nil {
+			break
+		}
+
+		args, err := ec.field_AddActivityPayload_activity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddActivityPayload.Activity(childComplexity, args["filter"].(*model.ActivityFilter), args["order"].(*model.ActivityOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddActivityPayload.numUids":
+		if e.complexity.AddActivityPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddActivityPayload.NumUids(childComplexity), true
 
 	case "AddBlobPayload.blob":
 		if e.complexity.AddBlobPayload.Blob == nil {
@@ -2612,6 +2792,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ContractAggregateResult.UpdatedAtMin(childComplexity), true
+
+	case "DeleteActivityPayload.activity":
+		if e.complexity.DeleteActivityPayload.Activity == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteActivityPayload_activity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteActivityPayload.Activity(childComplexity, args["filter"].(*model.ActivityFilter), args["order"].(*model.ActivityOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "DeleteActivityPayload.msg":
+		if e.complexity.DeleteActivityPayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteActivityPayload.Msg(childComplexity), true
+
+	case "DeleteActivityPayload.numUids":
+		if e.complexity.DeleteActivityPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteActivityPayload.NumUids(childComplexity), true
 
 	case "DeleteBlobPayload.blob":
 		if e.complexity.DeleteBlobPayload.Blob == nil {
@@ -3896,6 +4102,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MultiPolygon.Polygons(childComplexity), true
 
+	case "Mutation.addActivity":
+		if e.complexity.Mutation.AddActivity == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addActivity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddActivity(childComplexity, args["input"].([]*model.AddActivityInput), args["upsert"].(*bool)), true
+
 	case "Mutation.addBlob":
 		if e.complexity.Mutation.AddBlob == nil {
 			break
@@ -4207,6 +4425,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddVote(childComplexity, args["input"].([]*model.AddVoteInput), args["upsert"].(*bool)), true
+
+	case "Mutation.deleteActivity":
+		if e.complexity.Mutation.DeleteActivity == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteActivity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteActivity(childComplexity, args["filter"].(model.ActivityFilter)), true
 
 	case "Mutation.deleteBlob":
 		if e.complexity.Mutation.DeleteBlob == nil {
@@ -4531,6 +4761,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteVote(childComplexity, args["filter"].(model.VoteFilter)), true
+
+	case "Mutation.updateActivity":
+		if e.complexity.Mutation.UpdateActivity == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateActivity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateActivity(childComplexity, args["input"].(model.UpdateActivityInput)), true
 
 	case "Mutation.updateBlob":
 		if e.complexity.Mutation.UpdateBlob == nil {
@@ -4862,6 +5104,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.About(childComplexity), true
+
+	case "Node.activity":
+		if e.complexity.Node.Activity == nil {
+			break
+		}
+
+		args, err := ec.field_Node_activity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Activity(childComplexity, args["from"].(*string), args["to"].(*string)), true
+
+	case "Node.activityAggregate":
+		if e.complexity.Node.ActivityAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_activityAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.ActivityAggregate(childComplexity, args["filter"].(*model.ActivityFilter)), true
 
 	case "Node.cascade_directive":
 		if e.complexity.Node.CascadeDirective == nil {
@@ -5794,6 +6060,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PendingUser.ID(childComplexity), true
+
+	case "PendingUser.lang":
+		if e.complexity.PendingUser.Lang == nil {
+			break
+		}
+
+		return e.complexity.PendingUser.Lang(childComplexity), true
 
 	case "PendingUser.password":
 		if e.complexity.PendingUser.Password == nil {
@@ -6856,6 +7129,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectFieldValueAggregateResult.ValueMin(childComplexity), true
 
+	case "Query.aggregateActivity":
+		if e.complexity.Query.AggregateActivity == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateActivity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateActivity(childComplexity, args["filter"].(*model.ActivityFilter)), true
+
 	case "Query.aggregateBlob":
 		if e.complexity.Query.AggregateBlob == nil {
 			break
@@ -7180,6 +7465,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateVote(childComplexity, args["filter"].(*model.VoteFilter)), true
 
+	case "Query.getActivity":
+		if e.complexity.Query.GetActivity == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getActivity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetActivity(childComplexity, args["id"].(*string), args["activityid"].(*string)), true
+
 	case "Query.getBlob":
 		if e.complexity.Query.GetBlob == nil {
 			break
@@ -7431,6 +7728,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetVote(childComplexity, args["id"].(*string), args["voteid"].(*string)), true
+
+	case "Query.queryActivity":
+		if e.complexity.Query.QueryActivity == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryActivity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryActivity(childComplexity, args["filter"].(*model.ActivityFilter), args["order"].(*model.ActivityOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryBlob":
 		if e.complexity.Query.QueryBlob == nil {
@@ -8463,6 +8772,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TensionAggregateResult.UpdatedAtMin(childComplexity), true
 
+	case "UpdateActivityPayload.activity":
+		if e.complexity.UpdateActivityPayload.Activity == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateActivityPayload_activity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateActivityPayload.Activity(childComplexity, args["filter"].(*model.ActivityFilter), args["order"].(*model.ActivityOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdateActivityPayload.numUids":
+		if e.complexity.UpdateActivityPayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateActivityPayload.NumUids(childComplexity), true
+
 	case "UpdateBlobPayload.blob":
 		if e.complexity.UpdateBlobPayload.Blob == nil {
 			break
@@ -8975,6 +9303,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateVotePayload.Vote(childComplexity, args["filter"].(*model.VoteFilter), args["order"].(*model.VoteOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "User.activity":
+		if e.complexity.User.Activity == nil {
+			break
+		}
+
+		args, err := ec.field_User_activity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Activity(childComplexity, args["from"].(*string), args["to"].(*string)), true
+
+	case "User.activityAggregate":
+		if e.complexity.User.ActivityAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_User_activityAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.ActivityAggregate(childComplexity, args["filter"].(*model.ActivityFilter)), true
 
 	case "User.bio":
 		if e.complexity.User.Bio == nil {
@@ -9764,6 +10116,11 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputActivityFilter,
+		ec.unmarshalInputActivityOrder,
+		ec.unmarshalInputActivityPatch,
+		ec.unmarshalInputActivityRef,
+		ec.unmarshalInputAddActivityInput,
 		ec.unmarshalInputAddBlobInput,
 		ec.unmarshalInputAddBuildInfoInput,
 		ec.unmarshalInputAddCommentInput,
@@ -9926,6 +10283,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputTensionRef,
 		ec.unmarshalInputTensionStatus_hash,
 		ec.unmarshalInputTensionType_hash,
+		ec.unmarshalInputUpdateActivityInput,
 		ec.unmarshalInputUpdateBlobInput,
 		ec.unmarshalInputUpdateBuildInfoInput,
 		ec.unmarshalInputUpdateCommentInput,
@@ -10241,6 +10599,7 @@ type Node {
   first_link(filter: UserFilter): User
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
+  activity(from: String, to: String): [Activity!] @meta(f:"getNodeActivity", k:["rootnameid"])
   cascade_directive: Boolean
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -10253,6 +10612,7 @@ type Node {
   pinnedAggregate(filter: TensionFilter): TensionAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
   events_historyAggregate(filter: EventFilter): EventAggregateResult
+  activityAggregate(filter: ActivityFilter): ActivityAggregateResult
 }
 
 type NodeFragment {
@@ -10552,6 +10912,7 @@ type User {
   events(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent!] @private
   markAllAsRead: String
   event_count(filter: EventCountFilter): EventCount @meta(f:"getEventCount", k:["username"])
+  activity(from: String, to: String): [Activity!] @meta(f:"getUserActivity", k:["username"])
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   watchingAggregate(filter: NodeFilter): NodeAggregateResult
@@ -10561,6 +10922,7 @@ type User {
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
   reactionsAggregate(filter: ReactionFilter): ReactionAggregateResult
   eventsAggregate(filter: UserEventFilter): UserEventAggregateResult
+  activityAggregate(filter: ActivityFilter): ActivityAggregateResult
 }
 
 type PendingUser {
@@ -10573,6 +10935,7 @@ type PendingUser {
   token: String @hidden
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
   subscribe: Boolean
+  lang: Lang
 
   contractsAggregate(filter: ContractFilter): ContractAggregateResult
 }
@@ -10611,6 +10974,14 @@ type EventCount {
   unread_events: Int
   pending_contracts: Int
   assigned_tensions: Int
+}
+
+type Activity {
+  id: ID!
+  activityid: String!
+  ownerid: String!
+  date: DateTime!
+  count: Int!
 }
 
 enum NodeType {
@@ -10773,33 +11144,104 @@ enum Lang {
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @lambda on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
+
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+type ActivityAggregateResult {
+  count: Int
+  activityidMin: String
+  activityidMax: String
+  owneridMin: String
+  owneridMax: String
+  dateMin: DateTime
+  dateMax: DateTime
+  countMin: Int
+  countMax: Int
+  countSum: Int
+  countAvg: Float
+}
+
+input ActivityFilter {
+  id: [ID!]
+  activityid: StringHashFilter
+  ownerid: StringHashFilter
+  date: DateTimeFilter
+  has: [ActivityHasFilter]
+  and: [ActivityFilter]
+  or: [ActivityFilter]
+  not: ActivityFilter
+}
+
+enum ActivityHasFilter {
+  activityid
+  ownerid
+  date
+  count
+}
+
+input ActivityOrder {
+  asc: ActivityOrderable
+  desc: ActivityOrderable
+  then: ActivityOrder
+}
+
+enum ActivityOrderable {
+  activityid
+  ownerid
+  date
+  count
+}
+
+input ActivityPatch {
+  ownerid: String @x_patch_ro
+  date: DateTime @x_patch_ro
+  count: Int @x_patch_ro
+}
+
+input ActivityRef {
+  id: ID
+  activityid: String
+  ownerid: String
+  date: DateTime
+  count: Int
+}
+
+input AddActivityInput {
+  activityid: String!
+  ownerid: String!
+  date: DateTime!
+  count: Int!
+}
+
+type AddActivityPayload {
+  activity(filter: ActivityFilter, order: ActivityOrder, first: Int, offset: Int): [Activity]
+  numUids: Int
+}
 
 input AddBlobInput {
   createdBy: UserRef!
@@ -10983,6 +11425,7 @@ input AddNodeInput {
   first_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
+  activity: [ActivityRef!]
   cascade_directive: Boolean
 }
 
@@ -11015,6 +11458,7 @@ input AddPendingUserInput {
   token: String
   contracts: [ContractRef!]
   subscribe: Boolean
+  lang: Lang
 }
 
 type AddPendingUserPayload {
@@ -11203,6 +11647,7 @@ input AddUserInput {
   events: [UserEventRef!]
   markAllAsRead: String
   event_count: EventCountRef
+  activity: [ActivityRef!]
 }
 
 type AddUserPayload {
@@ -11582,6 +12027,12 @@ input DateTimeFilter {
 input DateTimeRange {
   min: DateTime!
   max: DateTime!
+}
+
+type DeleteActivityPayload {
+  activity(filter: ActivityFilter, order: ActivityOrder, first: Int, offset: Int): [Activity]
+  msg: String
+  numUids: Int
 }
 
 type DeleteBlobPayload {
@@ -12251,6 +12702,9 @@ type Mutation {
   addEventCount(input: [AddEventCountInput!]!): AddEventCountPayload
   updateEventCount(input: UpdateEventCountInput!): UpdateEventCountPayload
   deleteEventCount(filter: EventCountFilter!): DeleteEventCountPayload
+  addActivity(input: [AddActivityInput!]!, upsert: Boolean): AddActivityPayload
+  updateActivity(input: UpdateActivityInput!): UpdateActivityPayload
+  deleteActivity(filter: ActivityFilter!): DeleteActivityPayload
 }
 
 input NearFilter {
@@ -12420,6 +12874,7 @@ enum NodeHasFilter {
   first_link
   contracts
   events_history
+  activity
   cascade_directive
 }
 
@@ -12478,6 +12933,7 @@ input NodePatch {
   first_link: UserRef @x_patch_ro
   contracts: [VoteRef!] @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
+  activity: [ActivityRef!] @x_patch_ro
   cascade_directive: Boolean @x_patch_ro
 }
 
@@ -12516,6 +12972,7 @@ input NodeRef {
   first_link: UserRef
   contracts: [VoteRef!]
   events_history: [EventRef!]
+  activity: [ActivityRef!]
   cascade_directive: Boolean
 }
 
@@ -12632,6 +13089,7 @@ enum PendingUserHasFilter {
   token
   contracts
   subscribe
+  lang
 }
 
 input PendingUserOrder {
@@ -12656,6 +13114,7 @@ input PendingUserPatch {
   token: String @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
   subscribe: Boolean @x_patch_ro
+  lang: Lang @x_patch_ro
 }
 
 input PendingUserRef {
@@ -12668,6 +13127,7 @@ input PendingUserRef {
   token: String
   contracts: [ContractRef!]
   subscribe: Boolean
+  lang: Lang
 }
 
 type Point {
@@ -13200,6 +13660,9 @@ type Query {
   aggregateNotif(filter: NotifFilter): NotifAggregateResult
   queryEventCount(filter: EventCountFilter, order: EventCountOrder, first: Int, offset: Int): [EventCount]
   aggregateEventCount(filter: EventCountFilter): EventCountAggregateResult
+  getActivity(id: ID, activityid: String): Activity
+  queryActivity(filter: ActivityFilter, order: ActivityOrder, first: Int, offset: Int): [Activity]
+  aggregateActivity(filter: ActivityFilter): ActivityAggregateResult
 }
 
 type ReactionAggregateResult {
@@ -13514,6 +13977,17 @@ input TensionStatus_hash {
 input TensionType_hash {
   eq: TensionType
   in: [TensionType]
+}
+
+input UpdateActivityInput {
+  filter: ActivityFilter!
+  set: ActivityPatch
+  remove: ActivityPatch
+}
+
+type UpdateActivityPayload {
+  activity(filter: ActivityFilter, order: ActivityOrder, first: Int, offset: Int): [Activity]
+  numUids: Int
 }
 
 input UpdateBlobInput {
@@ -13921,6 +14395,7 @@ enum UserHasFilter {
   events
   markAllAsRead
   event_count
+  activity
 }
 
 input UserOrder {
@@ -13965,6 +14440,7 @@ input UserPatch {
   events: [UserEventRef!]
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username")
   event_count: EventCountRef @x_patch_ro
+  activity: [ActivityRef!] @x_patch_ro
 }
 
 input UserRef {
@@ -13993,6 +14469,7 @@ input UserRef {
   events: [UserEventRef!]
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username")
   event_count: EventCountRef
+  activity: [ActivityRef!]
 }
 
 type UserRightsAggregateResult {

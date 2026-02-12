@@ -18,7 +18,7 @@ LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr 
 
 
 .PHONY: build prod vendor \
-	test test-vet test-unit \
+	test test-vet test-unit test-external \
 	test-integration-up test-integration test-integration-down test-integration-clean \
 	test-all
 default: build
@@ -49,20 +49,33 @@ prod:
 vendor:
 	go mod vendor
 
+#
+# Tests
+#
+
 test: test-vet test-unit
 
 test-vet:
 	go vet ./...
-	go vet -tags integration ./db/...
+	go vet -tags integration ./db/... ./web/handlers/...
 
 test-unit:
-	go test -v ./...
+	go test ./...
+
+test-external:
+	go test -tags external ./internal/tools/...
 
 test-integration-up:
 	docker compose -f docker-compose.test.yml up -d --wait
 
-test-integration: test-integration-up
-	go test -tags integration -v -count=1 -timeout 120s ./db/...
+test-integration-setup: test-integration-up
+	go run ./cmd/testsetup
+
+test-integration: test-integration-setup
+	REDIS_ADDR=localhost:6479 \
+	DGRAPH_PUBLIC_KEY="$$(cat public.pem)" \
+	DGRAPH_PRIVATE_KEY="$$(cat private.pem)" \
+	go test -tags integration -count=1 -timeout 120s ./db/... ./web/handlers/...
 
 test-integration-down:
 	docker compose -f docker-compose.test.yml down -v --remove-orphans

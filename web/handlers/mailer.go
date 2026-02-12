@@ -34,7 +34,7 @@ import (
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/internal/tools"
 )
 
 /*

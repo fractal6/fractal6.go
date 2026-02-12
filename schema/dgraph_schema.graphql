@@ -103,6 +103,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   first_link: User
   contracts: [Vote!] @hasInverse(field: node)
   events_history(query: String): [Event!]
+  activity(from: String, to: String): [Activity!]
   cascade_directive: Boolean
 }
 
@@ -511,6 +512,7 @@ type User @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   events: [UserEvent!] @hasInverse(field: user)
   markAllAsRead: String
   event_count: EventCount
+  activity(from: String, to: String): [Activity!]
 }
 
 type PendingUser {
@@ -523,6 +525,7 @@ type PendingUser {
   token: String @search(by:[hash])
   contracts: [Contract!]
   subscribe: Boolean
+  lang: Lang
 }
 
 type UserRights {
@@ -577,8 +580,8 @@ type Activity @auth(query:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }) {
   id: ID!
   activityid: String! @id
-  ownerid: String! @search(by: [hash])
-  date: DateTime! @search(by: [day])
+  ownerid: String! @search(by:[hash])
+  date: DateTime! @search(by:[day])
   count: Int!
 }
 

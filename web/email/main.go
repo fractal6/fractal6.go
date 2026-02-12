@@ -36,7 +36,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/internal/tools"
 )
 
 var md goldmark.Markdown = goldmark.New(
@@ -68,6 +68,12 @@ func init() {
 
 	DOMAIN = viper.GetString("server.domain")
 	maintainerEmail = viper.GetString("mailer.admin_email")
+}
+
+// SetTestConfig overrides email configuration for integration tests.
+func SetTestConfig(url, secret string) {
+	emailUrl = url
+	emailSecret = secret
 }
 
 //

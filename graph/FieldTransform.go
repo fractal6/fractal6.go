@@ -28,7 +28,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/internal/tools"
 )
 
 var FieldTransformFunc map[string]func(context.Context, graphql.Resolver) (interface{}, error)

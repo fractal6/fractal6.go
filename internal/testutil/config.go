@@ -1,5 +1,3 @@
-//go:build integration
-
 /*
  * Fractale - Self-organisation for humans.
  * Copyright (C) 2026 Fractale Co
@@ -20,28 +18,18 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package db
+// Package testutil provides shared constants for integration tests and test setup.
+package testutil
 
-import (
-	"log"
-	"os"
-	"testing"
+const (
+	TestGrpcAddr = "localhost:9180"
+	TestHTTPAddr = "http://localhost:8180"
 
-	"fractale/fractal6.go/internal/testutil"
+	TestUser     = "testuser"
+	TestEmail    = "testuser@test.co"
+	TestPassword = "TestPassword123!"
+
+	TestUser2     = "testuser2"
+	TestEmail2    = "testuser2@test.co"
+	TestPassword2 = "TestPassword456!"
 )
-
-func TestMain(m *testing.M) {
-	// Override the global DB singleton with test-instance addresses.
-	DB = &Dgraph{
-		gqlAddr:  testutil.TestHTTPAddr + "/graphql",
-		grpcAddr: testutil.TestGrpcAddr,
-	}
-
-	// Verify test data is present (seeded by cmd/testsetup).
-	ex, err := DB.Exists("User.username", testutil.TestUser, nil)
-	if err != nil || !ex {
-		log.Fatal("Test data not found. Run 'go run ./cmd/testsetup' first (or use 'make test-integration').")
-	}
-
-	os.Exit(m.Run())
-}

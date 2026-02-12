@@ -1,3 +1,5 @@
+//go:build external
+
 /*
  * Fractale - Self-organisation for humans.
  * Copyright (C) 2026 Fractale Co
@@ -21,34 +23,29 @@
 package tools
 
 import (
-	"reflect"
+	"fmt"
 	"testing"
 
-	"fractale/fractal6.go/graph/model"
+	"github.com/spf13/viper"
 )
 
-func TestStructMap(t *testing.T) {
-	var nodeFragment *model.NodeFragment
-	var nodeInput model.AddNodeInput
+var (
+	matrixPostalRoom string
+	matrixToken      string
+	DOMAIN           string
+)
 
-	name := "name"
-	nameid := "nameid"
-	username := "username"
-	nodeFragment = &model.NodeFragment{
-		Name:      &name,
-		Nameid:    &nameid,
-		FirstLink: &username,
-	}
+func init() {
+	InitViper()
+	matrixPostalRoom = viper.GetString("mailer.matrix_postal_room")
+	matrixToken = viper.GetString("mailer.matrix_token")
+	DOMAIN = viper.GetString("server.domain")
+}
 
-	StructMap(nodeFragment, &nodeInput)
-
-	// FirstLink cannot be added by adding a node !
-	want := model.AddNodeInput{
-		Name:   name,
-		Nameid: nameid,
-	}
-
-	if reflect.DeepEqual(nodeInput, want) {
-		t.Errorf("StructMap error, want: %v, got: %v", want, nodeInput)
+func TestMatrixJsonSend(t *testing.T) {
+	body := fmt.Sprintf(`"Hi! webhook test for %s"`, DOMAIN)
+	err := MatrixJsonSend(string(body), matrixPostalRoom, matrixToken)
+	if err != nil {
+		t.Errorf("MatrixJsonSend failed: %s", err.Error())
 	}
 }

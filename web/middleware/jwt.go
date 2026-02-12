@@ -23,7 +23,7 @@ package middleware
 import (
 	"net/http"
 	//"fmt"
-	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 	"github.com/go-chi/jwtauth/v5"
 )

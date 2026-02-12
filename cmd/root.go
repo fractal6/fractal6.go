@@ -27,7 +27,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 

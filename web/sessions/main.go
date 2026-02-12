@@ -49,12 +49,12 @@ func GenerateToken() string {
 }
 
 func initCache() {
-	//con, err := redis.DialURL("redis://localhost")
-	////defer con.Close()
-	//if err != nil { panic("Redis connection error:" + err.Error()) }
-	//cache = con
+	addr := os.Getenv("REDIS_ADDR")
+	if addr == "" {
+		addr = "localhost:6379"
+	}
 	cache = redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: addr,
 		// Password: "", // no password set
 		// DB:       0,  // use default DB
 	})

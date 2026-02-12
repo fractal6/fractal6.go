@@ -32,13 +32,13 @@ import (
 func TestSetFieldByEq_Integration(t *testing.T) {
 	// Set Node.about on our test org
 	newAbout := "Updated about text"
-	err := DB.SetFieldByEq("Node.nameid", "test-org#", "Node.about", newAbout)
+	err := DB.SetFieldByEq("Node.nameid", "test-org", "Node.about", newAbout)
 	if err != nil {
 		t.Fatalf("SetFieldByEq returned error: %v", err)
 	}
 
 	// Read it back
-	val, err := DB.GetFieldByEq("Node.nameid", "test-org#", "Node.about")
+	val, err := DB.GetFieldByEq("Node.nameid", "test-org", "Node.about")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -51,7 +51,7 @@ func TestSetFieldByEq_Integration(t *testing.T) {
 	}
 
 	// Restore original value
-	_ = DB.SetFieldByEq("Node.nameid", "test-org#", "Node.about", "A test organisation")
+	_ = DB.SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
 }
 
 func TestMeta_MarkAllAsRead_Integration(t *testing.T) {
@@ -66,7 +66,7 @@ func TestMeta_MarkAllAsRead_Integration(t *testing.T) {
 }
 
 func TestUpgradeMember_Integration(t *testing.T) {
-	nameid := "test-org#@testuser"
+	nameid := "test-org##@testuser"
 
 	// Change role_type to Guest
 	err := DB.UpgradeMember(nameid, model.RoleTypeGuest)
@@ -87,10 +87,10 @@ func TestUpgradeMember_Integration(t *testing.T) {
 		t.Errorf("Node.role_type = %q, want %q", roleType, "Guest")
 	}
 
-	// Restore to Member
-	err = DB.UpgradeMember(nameid, model.RoleTypeMember)
+	// Restore to Owner (original seed value)
+	err = DB.UpgradeMember(nameid, model.RoleTypeOwner)
 	if err != nil {
-		t.Fatalf("UpgradeMember to Member (restore) returned error: %v", err)
+		t.Fatalf("UpgradeMember to Owner (restore) returned error: %v", err)
 	}
 }
 
@@ -100,7 +100,7 @@ func TestGamma_Integration(t *testing.T) {
 	newAbout := "gamma-test-value"
 	qm := QueryMut{
 		Q: `query {
-			node as var(func: eq(Node.nameid, "test-org#"))
+			node as var(func: eq(Node.nameid, "test-org"))
 		}`,
 		M: []X{{
 			S: `uid(node) <Node.about> "` + newAbout + `" .`,
@@ -114,7 +114,7 @@ func TestGamma_Integration(t *testing.T) {
 	t.Logf("Gamma returned %d results", len(results))
 
 	// Verify the change
-	val, err := DB.GetFieldByEq("Node.nameid", "test-org#", "Node.about")
+	val, err := DB.GetFieldByEq("Node.nameid", "test-org", "Node.about")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -127,7 +127,7 @@ func TestGamma_Integration(t *testing.T) {
 	}
 
 	// Restore original value
-	_ = DB.SetFieldByEq("Node.nameid", "test-org#", "Node.about", "A test organisation")
+	_ = DB.SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
 }
 
 func TestUpsertActivity_Integration(t *testing.T) {
@@ -165,53 +165,24 @@ func TestUpsertActivity_Integration(t *testing.T) {
 		return 0
 	}
 
-	// First upsert: creates the activity node with count=1
-	_, err := DB.Meta("upsertActivity", map[string]string{
-		"activityid": activityid,
-		"ownerid":    "u#testuser",
-		"date":       todayISO,
-	})
-	if err != nil {
-		t.Fatalf("upsertActivity (create) returned error: %v", err)
-	}
+	// Upsert 3 times: first creates (count=1), subsequent increment.
+	for i := 1; i <= 3; i++ {
+		_, err := DB.Meta("upsertActivity", map[string]string{
+			"activityid": activityid,
+			"ownerid":    "u#testuser",
+			"date":       todayISO,
+		})
+		if err != nil {
+			t.Fatalf("upsertActivity (iteration %d) returned error: %v", i, err)
+		}
 
-	count := getCount()
-	if count != 1 {
-		t.Errorf("after 1st upsert: count = %d, want 1", count)
-	}
-
-	// Second upsert: should increment count to 2
-	_, err = DB.Meta("upsertActivity", map[string]string{
-		"activityid": activityid,
-		"ownerid":    "u#testuser",
-		"date":       todayISO,
-	})
-	if err != nil {
-		t.Fatalf("upsertActivity (2nd increment) returned error: %v", err)
-	}
-
-	count = getCount()
-	if count != 2 {
-		t.Errorf("after 2nd upsert: count = %d, want 2", count)
-	}
-
-	// Third upsert: should increment count to 3
-	_, err = DB.Meta("upsertActivity", map[string]string{
-		"activityid": activityid,
-		"ownerid":    "u#testuser",
-		"date":       todayISO,
-	})
-	if err != nil {
-		t.Fatalf("upsertActivity (3rd increment) returned error: %v", err)
-	}
-
-	count = getCount()
-	if count != 3 {
-		t.Errorf("after 3rd upsert: count = %d, want 3", count)
+		if count := getCount(); count != i {
+			t.Errorf("after upsert %d: count = %d, want %d", i, count, i)
+		}
 	}
 
 	// Clean up
-	_, err = DB.Gamma(cleanup, map[string]string{})
+	_, err := DB.Gamma(cleanup, map[string]string{})
 	if err != nil {
 		t.Logf("cleanup warning: %v", err)
 	}

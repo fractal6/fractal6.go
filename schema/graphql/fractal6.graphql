@@ -462,6 +462,7 @@ type PendingUser {
   token: String @hidden @search(by: [hash])
   contracts: [Contract!]
   subscribe: Boolean
+  lang: Lang
 }
 
 type UserRights {

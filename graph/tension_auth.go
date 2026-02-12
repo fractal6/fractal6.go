@@ -26,7 +26,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 

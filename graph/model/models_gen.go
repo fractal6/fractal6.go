@@ -16,6 +16,71 @@ type EventKind interface {
 	IsEventKind()
 }
 
+type Activity struct {
+	ID         string `json:"id"`
+	Activityid string `json:"activityid"`
+	Ownerid    string `json:"ownerid"`
+	Date       string `json:"date"`
+	Count      int    `json:"count"`
+}
+
+type ActivityAggregateResult struct {
+	Count         *int     `json:"count,omitempty"`
+	ActivityidMin *string  `json:"activityidMin,omitempty"`
+	ActivityidMax *string  `json:"activityidMax,omitempty"`
+	OwneridMin    *string  `json:"owneridMin,omitempty"`
+	OwneridMax    *string  `json:"owneridMax,omitempty"`
+	DateMin       *string  `json:"dateMin,omitempty"`
+	DateMax       *string  `json:"dateMax,omitempty"`
+	CountMin      *int     `json:"countMin,omitempty"`
+	CountMax      *int     `json:"countMax,omitempty"`
+	CountSum      *int     `json:"countSum,omitempty"`
+	CountAvg      *float64 `json:"countAvg,omitempty"`
+}
+
+type ActivityFilter struct {
+	ID         []string             `json:"id,omitempty"`
+	Activityid *StringHashFilter    `json:"activityid,omitempty"`
+	Ownerid    *StringHashFilter    `json:"ownerid,omitempty"`
+	Date       *DateTimeFilter      `json:"date,omitempty"`
+	Has        []*ActivityHasFilter `json:"has,omitempty"`
+	And        []*ActivityFilter    `json:"and,omitempty"`
+	Or         []*ActivityFilter    `json:"or,omitempty"`
+	Not        *ActivityFilter      `json:"not,omitempty"`
+}
+
+type ActivityOrder struct {
+	Asc  *ActivityOrderable `json:"asc,omitempty"`
+	Desc *ActivityOrderable `json:"desc,omitempty"`
+	Then *ActivityOrder     `json:"then,omitempty"`
+}
+
+type ActivityPatch struct {
+	Ownerid *string `json:"ownerid,omitempty"`
+	Date    *string `json:"date,omitempty"`
+	Count   *int    `json:"count,omitempty"`
+}
+
+type ActivityRef struct {
+	ID         *string `json:"id,omitempty"`
+	Activityid *string `json:"activityid,omitempty"`
+	Ownerid    *string `json:"ownerid,omitempty"`
+	Date       *string `json:"date,omitempty"`
+	Count      *int    `json:"count,omitempty"`
+}
+
+type AddActivityInput struct {
+	Activityid string `json:"activityid"`
+	Ownerid    string `json:"ownerid"`
+	Date       string `json:"date"`
+	Count      int    `json:"count"`
+}
+
+type AddActivityPayload struct {
+	Activity []*Activity `json:"activity,omitempty"`
+	NumUids  *int        `json:"numUids,omitempty"`
+}
+
 type AddBlobInput struct {
 	CreatedBy    *UserRef         `json:"createdBy"`
 	CreatedAt    string           `json:"createdAt"`
@@ -198,6 +263,7 @@ type AddNodeInput struct {
 	FirstLink             *UserRef       `json:"first_link,omitempty"`
 	Contracts             []*VoteRef     `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef    `json:"events_history,omitempty"`
+	Activity              []*ActivityRef `json:"activity,omitempty"`
 	CascadeDirective      *bool          `json:"cascade_directive,omitempty"`
 }
 
@@ -230,6 +296,7 @@ type AddPendingUserInput struct {
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	Subscribe  *bool          `json:"subscribe,omitempty"`
+	Lang       *Lang          `json:"lang,omitempty"`
 }
 
 type AddPendingUserPayload struct {
@@ -418,6 +485,7 @@ type AddUserInput struct {
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
+	Activity         []*ActivityRef  `json:"activity,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -773,6 +841,12 @@ type DateTimeFilter struct {
 type DateTimeRange struct {
 	Min string `json:"min"`
 	Max string `json:"max"`
+}
+
+type DeleteActivityPayload struct {
+	Activity []*Activity `json:"activity,omitempty"`
+	Msg      *string     `json:"msg,omitempty"`
+	NumUids  *int        `json:"numUids,omitempty"`
 }
 
 type DeleteBlobPayload struct {
@@ -1297,51 +1371,53 @@ type NearFilter struct {
 }
 
 type Node struct {
-	ID                     string                  `json:"id"`
-	CreatedBy              *User                   `json:"createdBy"`
-	CreatedAt              string                  `json:"createdAt"`
-	UpdatedAt              *string                 `json:"updatedAt,omitempty"`
-	Nameid                 string                  `json:"nameid"`
-	Rootnameid             string                  `json:"rootnameid"`
-	Source                 *Blob                   `json:"source,omitempty"`
-	Name                   string                  `json:"name"`
-	About                  *string                 `json:"about,omitempty"`
-	Skills                 []string                `json:"skills,omitempty"`
-	IsRoot                 bool                    `json:"isRoot"`
-	Parent                 *Node                   `json:"parent,omitempty"`
-	Type                   NodeType                `json:"type_"`
-	TensionsOut            []*Tension              `json:"tensions_out,omitempty"`
-	TensionsIn             []*Tension              `json:"tensions_in,omitempty"`
-	Visibility             NodeVisibility          `json:"visibility"`
-	Mode                   NodeMode                `json:"mode"`
-	Rights                 int                     `json:"rights"`
-	IsArchived             bool                    `json:"isArchived"`
-	IsPersonal             *bool                   `json:"isPersonal,omitempty"`
-	UserCanJoin            *bool                   `json:"userCanJoin,omitempty"`
-	GuestCanCreateTension  *bool                   `json:"guestCanCreateTension,omitempty"`
-	Watchers               []*User                 `json:"watchers,omitempty"`
-	Children               []*Node                 `json:"children,omitempty"`
-	Labels                 []*Label                `json:"labels,omitempty"`
-	Roles                  []*RoleExt              `json:"roles,omitempty"`
-	Projects               []*Project              `json:"projects,omitempty"`
-	Pinned                 []*Tension              `json:"pinned,omitempty"`
-	RoleExt                *RoleExt                `json:"role_ext,omitempty"`
-	RoleType               *RoleType               `json:"role_type,omitempty"`
-	Color                  *string                 `json:"color,omitempty"`
-	FirstLink              *User                   `json:"first_link,omitempty"`
-	Contracts              []*Vote                 `json:"contracts,omitempty"`
-	EventsHistory          []*Event                `json:"events_history,omitempty"`
-	CascadeDirective       *bool                   `json:"cascade_directive,omitempty"`
-	TensionsOutAggregate   *TensionAggregateResult `json:"tensions_outAggregate,omitempty"`
-	TensionsInAggregate    *TensionAggregateResult `json:"tensions_inAggregate,omitempty"`
-	WatchersAggregate      *UserAggregateResult    `json:"watchersAggregate,omitempty"`
-	ChildrenAggregate      *NodeAggregateResult    `json:"childrenAggregate,omitempty"`
-	LabelsAggregate        *LabelAggregateResult   `json:"labelsAggregate,omitempty"`
-	RolesAggregate         *RoleExtAggregateResult `json:"rolesAggregate,omitempty"`
-	ProjectsAggregate      *ProjectAggregateResult `json:"projectsAggregate,omitempty"`
-	PinnedAggregate        *TensionAggregateResult `json:"pinnedAggregate,omitempty"`
-	ContractsAggregate     *VoteAggregateResult    `json:"contractsAggregate,omitempty"`
-	EventsHistoryAggregate *EventAggregateResult   `json:"events_historyAggregate,omitempty"`
+	ID                     string                   `json:"id"`
+	CreatedBy              *User                    `json:"createdBy"`
+	CreatedAt              string                   `json:"createdAt"`
+	UpdatedAt              *string                  `json:"updatedAt,omitempty"`
+	Nameid                 string                   `json:"nameid"`
+	Rootnameid             string                   `json:"rootnameid"`
+	Source                 *Blob                    `json:"source,omitempty"`
+	Name                   string                   `json:"name"`
+	About                  *string                  `json:"about,omitempty"`
+	Skills                 []string                 `json:"skills,omitempty"`
+	IsRoot                 bool                     `json:"isRoot"`
+	Parent                 *Node                    `json:"parent,omitempty"`
+	Type                   NodeType                 `json:"type_"`
+	TensionsOut            []*Tension               `json:"tensions_out,omitempty"`
+	TensionsIn             []*Tension               `json:"tensions_in,omitempty"`
+	Visibility             NodeVisibility           `json:"visibility"`
+	Mode                   NodeMode                 `json:"mode"`
+	Rights                 int                      `json:"rights"`
+	IsArchived             bool                     `json:"isArchived"`
+	IsPersonal             *bool                    `json:"isPersonal,omitempty"`
+	UserCanJoin            *bool                    `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension  *bool                    `json:"guestCanCreateTension,omitempty"`
+	Watchers               []*User                  `json:"watchers,omitempty"`
+	Children               []*Node                  `json:"children,omitempty"`
+	Labels                 []*Label                 `json:"labels,omitempty"`
+	Roles                  []*RoleExt               `json:"roles,omitempty"`
+	Projects               []*Project               `json:"projects,omitempty"`
+	Pinned                 []*Tension               `json:"pinned,omitempty"`
+	RoleExt                *RoleExt                 `json:"role_ext,omitempty"`
+	RoleType               *RoleType                `json:"role_type,omitempty"`
+	Color                  *string                  `json:"color,omitempty"`
+	FirstLink              *User                    `json:"first_link,omitempty"`
+	Contracts              []*Vote                  `json:"contracts,omitempty"`
+	EventsHistory          []*Event                 `json:"events_history,omitempty"`
+	Activity               []*Activity              `json:"activity,omitempty"`
+	CascadeDirective       *bool                    `json:"cascade_directive,omitempty"`
+	TensionsOutAggregate   *TensionAggregateResult  `json:"tensions_outAggregate,omitempty"`
+	TensionsInAggregate    *TensionAggregateResult  `json:"tensions_inAggregate,omitempty"`
+	WatchersAggregate      *UserAggregateResult     `json:"watchersAggregate,omitempty"`
+	ChildrenAggregate      *NodeAggregateResult     `json:"childrenAggregate,omitempty"`
+	LabelsAggregate        *LabelAggregateResult    `json:"labelsAggregate,omitempty"`
+	RolesAggregate         *RoleExtAggregateResult  `json:"rolesAggregate,omitempty"`
+	ProjectsAggregate      *ProjectAggregateResult  `json:"projectsAggregate,omitempty"`
+	PinnedAggregate        *TensionAggregateResult  `json:"pinnedAggregate,omitempty"`
+	ContractsAggregate     *VoteAggregateResult     `json:"contractsAggregate,omitempty"`
+	EventsHistoryAggregate *EventAggregateResult    `json:"events_historyAggregate,omitempty"`
+	ActivityAggregate      *ActivityAggregateResult `json:"activityAggregate,omitempty"`
 }
 
 type NodeAggregateResult struct {
@@ -1508,6 +1584,7 @@ type NodePatch struct {
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
+	Activity              []*ActivityRef  `json:"activity,omitempty"`
 	CascadeDirective      *bool           `json:"cascade_directive,omitempty"`
 }
 
@@ -1546,6 +1623,7 @@ type NodeRef struct {
 	FirstLink             *UserRef        `json:"first_link,omitempty"`
 	Contracts             []*VoteRef      `json:"contracts,omitempty"`
 	EventsHistory         []*EventRef     `json:"events_history,omitempty"`
+	Activity              []*ActivityRef  `json:"activity,omitempty"`
 	CascadeDirective      *bool           `json:"cascade_directive,omitempty"`
 }
 
@@ -1631,6 +1709,7 @@ type PendingUser struct {
 	Token              *string                  `json:"token,omitempty"`
 	Contracts          []*Contract              `json:"contracts,omitempty"`
 	Subscribe          *bool                    `json:"subscribe,omitempty"`
+	Lang               *Lang                    `json:"lang,omitempty"`
 	ContractsAggregate *ContractAggregateResult `json:"contractsAggregate,omitempty"`
 }
 
@@ -1675,6 +1754,7 @@ type PendingUserPatch struct {
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	Subscribe  *bool          `json:"subscribe,omitempty"`
+	Lang       *Lang          `json:"lang,omitempty"`
 }
 
 type PendingUserRef struct {
@@ -1687,6 +1767,7 @@ type PendingUserRef struct {
 	Token      *string        `json:"token,omitempty"`
 	Contracts  []*ContractRef `json:"contracts,omitempty"`
 	Subscribe  *bool          `json:"subscribe,omitempty"`
+	Lang       *Lang          `json:"lang,omitempty"`
 }
 
 type Point struct {
@@ -2431,6 +2512,17 @@ type TensionTypeHash struct {
 	In []*TensionType `json:"in,omitempty"`
 }
 
+type UpdateActivityInput struct {
+	Filter *ActivityFilter `json:"filter"`
+	Set    *ActivityPatch  `json:"set,omitempty"`
+	Remove *ActivityPatch  `json:"remove,omitempty"`
+}
+
+type UpdateActivityPayload struct {
+	Activity []*Activity `json:"activity,omitempty"`
+	NumUids  *int        `json:"numUids,omitempty"`
+}
+
 type UpdateBlobInput struct {
 	Filter *BlobFilter `json:"filter"`
 	Set    *BlobPatch  `json:"set,omitempty"`
@@ -2754,6 +2846,7 @@ type User struct {
 	Events                    []*UserEvent              `json:"events,omitempty"`
 	MarkAllAsRead             *string                   `json:"markAllAsRead,omitempty"`
 	EventCount                *EventCount               `json:"event_count,omitempty"`
+	Activity                  []*Activity               `json:"activity,omitempty"`
 	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
 	WatchingAggregate         *NodeAggregateResult      `json:"watchingAggregate,omitempty"`
 	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
@@ -2762,6 +2855,7 @@ type User struct {
 	ContractsAggregate        *ContractAggregateResult  `json:"contractsAggregate,omitempty"`
 	ReactionsAggregate        *ReactionAggregateResult  `json:"reactionsAggregate,omitempty"`
 	EventsAggregate           *UserEventAggregateResult `json:"eventsAggregate,omitempty"`
+	ActivityAggregate         *ActivityAggregateResult  `json:"activityAggregate,omitempty"`
 }
 
 type UserAggregateResult struct {
@@ -2873,6 +2967,7 @@ type UserPatch struct {
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
+	Activity         []*ActivityRef  `json:"activity,omitempty"`
 }
 
 type UserRef struct {
@@ -2901,6 +2996,7 @@ type UserRef struct {
 	Events           []*UserEventRef `json:"events,omitempty"`
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
+	Activity         []*ActivityRef  `json:"activity,omitempty"`
 }
 
 type UserRights struct {
@@ -3020,6 +3116,96 @@ type VoteRef struct {
 
 type WithinFilter struct {
 	Polygon *PolygonRef `json:"polygon"`
+}
+
+type ActivityHasFilter string
+
+const (
+	ActivityHasFilterActivityid ActivityHasFilter = "activityid"
+	ActivityHasFilterOwnerid    ActivityHasFilter = "ownerid"
+	ActivityHasFilterDate       ActivityHasFilter = "date"
+	ActivityHasFilterCount      ActivityHasFilter = "count"
+)
+
+var AllActivityHasFilter = []ActivityHasFilter{
+	ActivityHasFilterActivityid,
+	ActivityHasFilterOwnerid,
+	ActivityHasFilterDate,
+	ActivityHasFilterCount,
+}
+
+func (e ActivityHasFilter) IsValid() bool {
+	switch e {
+	case ActivityHasFilterActivityid, ActivityHasFilterOwnerid, ActivityHasFilterDate, ActivityHasFilterCount:
+		return true
+	}
+	return false
+}
+
+func (e ActivityHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ActivityHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ActivityHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ActivityHasFilter", str)
+	}
+	return nil
+}
+
+func (e ActivityHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ActivityOrderable string
+
+const (
+	ActivityOrderableActivityid ActivityOrderable = "activityid"
+	ActivityOrderableOwnerid    ActivityOrderable = "ownerid"
+	ActivityOrderableDate       ActivityOrderable = "date"
+	ActivityOrderableCount      ActivityOrderable = "count"
+)
+
+var AllActivityOrderable = []ActivityOrderable{
+	ActivityOrderableActivityid,
+	ActivityOrderableOwnerid,
+	ActivityOrderableDate,
+	ActivityOrderableCount,
+}
+
+func (e ActivityOrderable) IsValid() bool {
+	switch e {
+	case ActivityOrderableActivityid, ActivityOrderableOwnerid, ActivityOrderableDate, ActivityOrderableCount:
+		return true
+	}
+	return false
+}
+
+func (e ActivityOrderable) String() string {
+	return string(e)
+}
+
+func (e *ActivityOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ActivityOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ActivityOrderable", str)
+	}
+	return nil
+}
+
+func (e ActivityOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type BlobHasFilter string
@@ -4474,6 +4660,7 @@ const (
 	NodeHasFilterFirstLink             NodeHasFilter = "first_link"
 	NodeHasFilterContracts             NodeHasFilter = "contracts"
 	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
+	NodeHasFilterActivity              NodeHasFilter = "activity"
 	NodeHasFilterCascadeDirective      NodeHasFilter = "cascade_directive"
 )
 
@@ -4511,12 +4698,13 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterFirstLink,
 	NodeHasFilterContracts,
 	NodeHasFilterEventsHistory,
+	NodeHasFilterActivity,
 	NodeHasFilterCascadeDirective,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterCascadeDirective:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterCascadeDirective:
 		return true
 	}
 	return false
@@ -4828,6 +5016,7 @@ const (
 	PendingUserHasFilterToken      PendingUserHasFilter = "token"
 	PendingUserHasFilterContracts  PendingUserHasFilter = "contracts"
 	PendingUserHasFilterSubscribe  PendingUserHasFilter = "subscribe"
+	PendingUserHasFilterLang       PendingUserHasFilter = "lang"
 )
 
 var AllPendingUserHasFilter = []PendingUserHasFilter{
@@ -4839,11 +5028,12 @@ var AllPendingUserHasFilter = []PendingUserHasFilter{
 	PendingUserHasFilterToken,
 	PendingUserHasFilterContracts,
 	PendingUserHasFilterSubscribe,
+	PendingUserHasFilterLang,
 }
 
 func (e PendingUserHasFilter) IsValid() bool {
 	switch e {
-	case PendingUserHasFilterUpdatedAt, PendingUserHasFilterUsername, PendingUserHasFilterPassword, PendingUserHasFilterEmail, PendingUserHasFilterEmailToken, PendingUserHasFilterToken, PendingUserHasFilterContracts, PendingUserHasFilterSubscribe:
+	case PendingUserHasFilterUpdatedAt, PendingUserHasFilterUsername, PendingUserHasFilterPassword, PendingUserHasFilterEmail, PendingUserHasFilterEmailToken, PendingUserHasFilterToken, PendingUserHasFilterContracts, PendingUserHasFilterSubscribe, PendingUserHasFilterLang:
 		return true
 	}
 	return false
@@ -6365,6 +6555,7 @@ const (
 	UserHasFilterEvents           UserHasFilter = "events"
 	UserHasFilterMarkAllAsRead    UserHasFilter = "markAllAsRead"
 	UserHasFilterEventCount       UserHasFilter = "event_count"
+	UserHasFilterActivity         UserHasFilter = "activity"
 )
 
 var AllUserHasFilter = []UserHasFilter{
@@ -6392,11 +6583,12 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterEvents,
 	UserHasFilterMarkAllAsRead,
 	UserHasFilterEventCount,
+	UserHasFilterActivity,
 }
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount, UserHasFilterActivity:
 		return true
 	}
 	return false

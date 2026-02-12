@@ -21,29 +21,33 @@
 package tools
 
 import (
-	"fmt"
+	"reflect"
 	"testing"
 
-	"github.com/spf13/viper"
+	"fractale/fractal6.go/graph/model"
 )
 
-var (
-	matrixPostalRoom string
-	matrixToken      string
-	DOMAIN           string
-)
+func TestStructMap(t *testing.T) {
+	name := "name"
+	nameid := "nameid"
+	username := "username"
+	nodeFragment := &model.NodeFragment{
+		Name:      &name,
+		Nameid:    &nameid,
+		FirstLink: &username,
+	}
 
-func init() {
-	InitViper()
-	matrixPostalRoom = viper.GetString("mailer.matrix_postal_room")
-	matrixToken = viper.GetString("mailer.matrix_token")
-	DOMAIN = viper.GetString("server.domain")
-}
+	var nodeInput model.AddNodeInput
+	StructMap(nodeFragment, &nodeInput)
 
-func TestMatrixJsonSend(t *testing.T) {
-	body := fmt.Sprintf(`"Hi! webhook test for %s"`, DOMAIN)
-	err := MatrixJsonSend(string(body), matrixPostalRoom, matrixToken)
-	if err != nil {
-		t.Errorf("MatrixJsonSend failed: %s", err.Error())
+	// StructMap should copy all matching fields including FirstLink.
+	// (The API layer rejects FirstLink later, not StructMap.)
+	// Verify nodeInput differs from a struct with only Name/Nameid set.
+	withoutFirstLink := model.AddNodeInput{
+		Name:   name,
+		Nameid: nameid,
+	}
+	if reflect.DeepEqual(nodeInput, withoutFirstLink) {
+		t.Errorf("StructMap did not copy FirstLink: got %v", nodeInput)
 	}
 }

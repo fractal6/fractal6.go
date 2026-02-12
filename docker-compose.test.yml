@@ -34,9 +34,21 @@ services:
     depends_on:
       zero-test:
         condition: service_healthy
+      redis-test:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 10s
+
+  redis-test:
+    image: redis:7-alpine
+    ports:
+      - "6479:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5

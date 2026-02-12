@@ -36,7 +36,7 @@ import (
 	"fractale/fractal6.go/db"
 	gen "fractale/fractal6.go/graph/generated"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 

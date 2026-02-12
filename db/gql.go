@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 // HTTP/Graphql Request Template

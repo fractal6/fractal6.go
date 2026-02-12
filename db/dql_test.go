@@ -26,7 +26,7 @@ import (
 	"testing"
 	"text/template"
 
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 // dummyVars provides a value for every template variable used across

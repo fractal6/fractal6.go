@@ -55,7 +55,7 @@ type UserCreds struct {
 	Username   string   `json:"username"`
 	Email      string   `json:"email"`
 	Name       *string  `json:"name"`
-	Lang       *string  `json:"lang"`
+	Lang       *Lang    `json:"lang"`
 	Password   string   `json:"password"`
 	Puid       *string  `json:"puid"`
 	EmailToken *string  `json:"email_token"`

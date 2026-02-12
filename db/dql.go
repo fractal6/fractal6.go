@@ -32,7 +32,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 // @refactor: modularize generic function (GetFilterBy*) (returns (interface{}, error}
@@ -286,6 +286,7 @@ var dqlQueries map[string]string = map[string]string{
             PendingUser.password
             PendingUser.updatedAt
             PendingUser.subscribe
+            PendingUser.lang
         }
     }`,
 	"getNode": `{
