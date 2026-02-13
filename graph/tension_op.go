@@ -45,7 +45,7 @@ func init() {
 			Auth: MemberHook | AuthorHook,
 		},
 		model.TensionEventCommentDeleted: EventMap{
-			Auth:   AuthorHook,
+			Auth:   MemberHook | AuthorHook,
 			Action: RemoveComment,
 		},
 		model.TensionEventBlobCreated: EventMap{
@@ -703,8 +703,18 @@ func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
 	tid := tension.ID
 	cid := *event.Old
+
+	// Check that the user is the author of the comment
+	res, err := db.GetDB().GetSubFieldById(cid, "Post.createdBy", "User.username")
+	if err != nil {
+		return false, err
+	}
+	if res == nil || res.(string) != uctx.Username {
+		return false, LogErr("Access denied", fmt.Errorf("Only the author of the comment can delete it."))
+	}
+
 	// Delete comment
-	_, err := db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
+	_, err = db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
 	return true, err
 }
 
