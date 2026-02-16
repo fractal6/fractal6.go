@@ -101,6 +101,7 @@ func buildTestRouter() chi.Router {
 		r.Post("/createorga", CreateOrga)
 		r.Post("/setusercanjoin", SetUserCanJoin)
 		r.Post("/setguestcancreatetension", SetGuestCanCreateTension)
+		r.Post("/setlexicon", SetLexicon)
 	})
 
 	return r

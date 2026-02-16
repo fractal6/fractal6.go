@@ -810,6 +810,7 @@ type ComplexityRoot struct {
 		IsRoot                 func(childComplexity int) int
 		Labels                 func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		LabelsAggregate        func(childComplexity int, filter *model.LabelFilter) int
+		Lexicon                func(childComplexity int) int
 		Mode                   func(childComplexity int) int
 		Name                   func(childComplexity int) int
 		Nameid                 func(childComplexity int) int
@@ -846,6 +847,8 @@ type ComplexityRoot struct {
 		Count         func(childComplexity int) int
 		CreatedAtMax  func(childComplexity int) int
 		CreatedAtMin  func(childComplexity int) int
+		LexiconMax    func(childComplexity int) int
+		LexiconMin    func(childComplexity int) int
 		NameMax       func(childComplexity int) int
 		NameMin       func(childComplexity int) int
 		NameidMax     func(childComplexity int) int
@@ -5305,6 +5308,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.LabelsAggregate(childComplexity, args["filter"].(*model.LabelFilter)), true
 
+	case "Node.lexicon":
+		if e.complexity.Node.Lexicon == nil {
+			break
+		}
+
+		return e.complexity.Node.Lexicon(childComplexity), true
+
 	case "Node.mode":
 		if e.complexity.Node.Mode == nil {
 			break
@@ -5610,6 +5620,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NodeAggregateResult.CreatedAtMin(childComplexity), true
+
+	case "NodeAggregateResult.lexiconMax":
+		if e.complexity.NodeAggregateResult.LexiconMax == nil {
+			break
+		}
+
+		return e.complexity.NodeAggregateResult.LexiconMax(childComplexity), true
+
+	case "NodeAggregateResult.lexiconMin":
+		if e.complexity.NodeAggregateResult.LexiconMin == nil {
+			break
+		}
+
+		return e.complexity.NodeAggregateResult.LexiconMin(childComplexity), true
 
 	case "NodeAggregateResult.nameMax":
 		if e.complexity.NodeAggregateResult.NameMax == nil {
@@ -10587,6 +10611,7 @@ type Node {
   isPersonal: Boolean
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  lexicon: String
   watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
@@ -11144,33 +11169,33 @@ enum Lang {
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambda on FIELD_DEFINITION
 
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
 directive @id on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @cacheControl(maxAge: Int!) on QUERY
 
 type ActivityAggregateResult {
   count: Int
@@ -11413,6 +11438,7 @@ input AddNodeInput {
   isPersonal: Boolean
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  lexicon: String
   watchers: [UserRef!]
   children: [NodeRef!]
   labels: [LabelRef!]
@@ -12730,6 +12756,8 @@ type NodeAggregateResult {
   rightsMax: Int
   rightsSum: Int
   rightsAvg: Float
+  lexiconMin: String
+  lexiconMax: String
   colorMin: String
   colorMax: String
 }
@@ -12862,6 +12890,7 @@ enum NodeHasFilter {
   isPersonal
   userCanJoin
   guestCanCreateTension
+  lexicon
   watchers
   children
   labels
@@ -12897,6 +12926,7 @@ enum NodeOrderable {
   name
   about
   rights
+  lexicon
   color
 }
 
@@ -12921,6 +12951,7 @@ input NodePatch {
   isPersonal: Boolean @x_patch_ro
   userCanJoin: Boolean @x_patch_ro
   guestCanCreateTension: Boolean @x_patch_ro
+  lexicon: String @x_patch_ro
   watchers: [UserRef!] @x_patch_ro
   children: [NodeRef!] @x_patch_ro
   labels: [LabelRef!] @x_patch_ro
@@ -12960,6 +12991,7 @@ input NodeRef {
   isPersonal: Boolean
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  lexicon: String
   watchers: [UserRef!]
   children: [NodeRef!]
   labels: [LabelRef!]

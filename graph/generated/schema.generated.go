@@ -13537,6 +13537,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -20662,6 +20664,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -25550,6 +25554,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -25770,6 +25776,10 @@ func (ec *executionContext) fieldContext_Label_nodesAggregate(ctx context.Contex
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -32692,6 +32702,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -33309,6 +33321,44 @@ func (ec *executionContext) fieldContext_Node_guestCanCreateTension(_ context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Node_lexicon(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_lexicon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lexicon, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_lexicon(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Node_watchers(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_watchers(ctx, field)
 	if err != nil {
@@ -33507,6 +33557,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -34814,6 +34866,10 @@ func (ec *executionContext) fieldContext_Node_childrenAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -35996,6 +36052,82 @@ func (ec *executionContext) fieldContext_NodeAggregateResult_rightsAvg(_ context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NodeAggregateResult_lexiconMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LexiconMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NodeAggregateResult_lexiconMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NodeAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NodeAggregateResult_lexiconMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LexiconMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NodeAggregateResult_lexiconMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NodeAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -40473,6 +40605,8 @@ func (ec *executionContext) fieldContext_Project_leaders(ctx context.Context, fi
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -40618,6 +40752,8 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -40879,6 +41015,10 @@ func (ec *executionContext) fieldContext_Project_leadersAggregate(ctx context.Co
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -40968,6 +41108,10 @@ func (ec *executionContext) fieldContext_Project_nodesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -44873,6 +45017,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -45018,6 +45164,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -45153,6 +45301,10 @@ func (ec *executionContext) fieldContext_Query_aggregateNode(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -51506,6 +51658,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -51651,6 +51805,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -51786,6 +51942,10 @@ func (ec *executionContext) fieldContext_RoleExt_rolesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -51875,6 +52035,10 @@ func (ec *executionContext) fieldContext_RoleExt_nodesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -52319,6 +52483,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -52508,6 +52674,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -56422,6 +56590,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -59136,6 +59306,8 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -59347,6 +59519,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -60302,6 +60476,10 @@ func (ec *executionContext) fieldContext_User_watchingAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -60391,6 +60569,10 @@ func (ec *executionContext) fieldContext_User_rolesAggregate(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -62862,6 +63044,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -65107,7 +65291,7 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -65261,6 +65445,13 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.GuestCanCreateTension = data
+		case "lexicon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lexicon"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Lexicon = data
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -73057,7 +73248,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73520,6 +73711,28 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "lexicon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lexicon"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Lexicon = data
+			} else if tmp == nil {
+				it.Lexicon = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -73865,7 +74078,7 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -74026,6 +74239,13 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.GuestCanCreateTension = data
+		case "lexicon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lexicon"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Lexicon = data
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -87703,6 +87923,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_userCanJoin(ctx, field, obj)
 		case "guestCanCreateTension":
 			out.Values[i] = ec._Node_guestCanCreateTension(ctx, field, obj)
+		case "lexicon":
+			out.Values[i] = ec._Node_lexicon(ctx, field, obj)
 		case "watchers":
 			out.Values[i] = ec._Node_watchers(ctx, field, obj)
 		case "children":
@@ -87821,6 +88043,10 @@ func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._NodeAggregateResult_rightsSum(ctx, field, obj)
 		case "rightsAvg":
 			out.Values[i] = ec._NodeAggregateResult_rightsAvg(ctx, field, obj)
+		case "lexiconMin":
+			out.Values[i] = ec._NodeAggregateResult_lexiconMin(ctx, field, obj)
+		case "lexiconMax":
+			out.Values[i] = ec._NodeAggregateResult_lexiconMax(ctx, field, obj)
 		case "colorMin":
 			out.Values[i] = ec._NodeAggregateResult_colorMin(ctx, field, obj)
 		case "colorMax":

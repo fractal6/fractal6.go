@@ -144,6 +144,50 @@ func TestSetGuestCanCreateTension_Success(t *testing.T) {
 	requireStatus(t, rr, http.StatusOK)
 }
 
+func TestSetLexicon_Success(t *testing.T) {
+	// Login as testuser (owner of test-org)
+	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
+
+	// Set lexicon to a JSON string
+	lexiconVal := `{"tension":"Issue","circle":"Team"}`
+	rr := doRequest("POST", "/auth/setlexicon", map[string]interface{}{
+		"nameid": "test-org",
+		"val":    lexiconVal,
+	}, jwtCookie)
+	requireStatus(t, rr, http.StatusOK)
+	if rr.Body.String() != "true" {
+		t.Errorf("expected response body %q, got %q", "true", rr.Body.String())
+	}
+
+	// Verify in DB
+	val, err := db.GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.lexicon")
+	if err != nil {
+		t.Fatalf("failed to query Node.lexicon: %v", err)
+	}
+	if strVal, ok := val.(string); !ok || strVal != lexiconVal {
+		t.Errorf("expected lexicon=%q, got %v", lexiconVal, val)
+	}
+
+	// Restore to empty
+	rr = doRequest("POST", "/auth/setlexicon", map[string]interface{}{
+		"nameid": "test-org",
+		"val":    "",
+	}, jwtCookie)
+	requireStatus(t, rr, http.StatusOK)
+}
+
+func TestSetLexicon_NoAuth(t *testing.T) {
+	// Try without JWT
+	rr := doRequest("POST", "/auth/setlexicon", map[string]interface{}{
+		"nameid": "test-org",
+		"val":    `{"foo":"bar"}`,
+	})
+
+	if rr.Code == http.StatusOK {
+		t.Fatal("expected non-200 status for unauthenticated request")
+	}
+}
+
 func TestSetUserCanJoin_NoAuth(t *testing.T) {
 	// Try without JWT
 	rr := doRequest("POST", "/auth/setusercanjoin", map[string]interface{}{

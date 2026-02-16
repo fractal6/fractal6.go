@@ -149,6 +149,7 @@ func RunServer() {
 			r.Post("/createorga", handle6.CreateOrga)
 			r.Post("/setusercanjoin", handle6.SetUserCanJoin)
 			r.Post("/setguestcancreatetension", handle6.SetGuestCanCreateTension)
+			r.Post("/setlexicon", handle6.SetLexicon)
 
 			// Special
 			r.Post("/makeowner", handle6.MakeOwner)

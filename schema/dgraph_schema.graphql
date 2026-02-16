@@ -91,6 +91,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   isPersonal: Boolean @search
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  lexicon: String
   watchers: [User!] @hasInverse(field: watching)
   children: [Node!] @hasInverse(field: parent)
   labels: [Label!]

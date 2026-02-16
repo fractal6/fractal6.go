@@ -251,6 +251,7 @@ type AddNodeInput struct {
 	IsPersonal            *bool          `json:"isPersonal,omitempty"`
 	UserCanJoin           *bool          `json:"userCanJoin,omitempty"`
 	GuestCanCreateTension *bool          `json:"guestCanCreateTension,omitempty"`
+	Lexicon               *string        `json:"lexicon,omitempty"`
 	Watchers              []*UserRef     `json:"watchers,omitempty"`
 	Children              []*NodeRef     `json:"children,omitempty"`
 	Labels                []*LabelRef    `json:"labels,omitempty"`
@@ -1393,6 +1394,7 @@ type Node struct {
 	IsPersonal             *bool                    `json:"isPersonal,omitempty"`
 	UserCanJoin            *bool                    `json:"userCanJoin,omitempty"`
 	GuestCanCreateTension  *bool                    `json:"guestCanCreateTension,omitempty"`
+	Lexicon                *string                  `json:"lexicon,omitempty"`
 	Watchers               []*User                  `json:"watchers,omitempty"`
 	Children               []*Node                  `json:"children,omitempty"`
 	Labels                 []*Label                 `json:"labels,omitempty"`
@@ -1438,6 +1440,8 @@ type NodeAggregateResult struct {
 	RightsMax     *int     `json:"rightsMax,omitempty"`
 	RightsSum     *int     `json:"rightsSum,omitempty"`
 	RightsAvg     *float64 `json:"rightsAvg,omitempty"`
+	LexiconMin    *string  `json:"lexiconMin,omitempty"`
+	LexiconMax    *string  `json:"lexiconMax,omitempty"`
 	ColorMin      *string  `json:"colorMin,omitempty"`
 	ColorMax      *string  `json:"colorMax,omitempty"`
 }
@@ -1572,6 +1576,7 @@ type NodePatch struct {
 	IsPersonal            *bool           `json:"isPersonal,omitempty"`
 	UserCanJoin           *bool           `json:"userCanJoin,omitempty"`
 	GuestCanCreateTension *bool           `json:"guestCanCreateTension,omitempty"`
+	Lexicon               *string         `json:"lexicon,omitempty"`
 	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	Children              []*NodeRef      `json:"children,omitempty"`
 	Labels                []*LabelRef     `json:"labels,omitempty"`
@@ -1611,6 +1616,7 @@ type NodeRef struct {
 	IsPersonal            *bool           `json:"isPersonal,omitempty"`
 	UserCanJoin           *bool           `json:"userCanJoin,omitempty"`
 	GuestCanCreateTension *bool           `json:"guestCanCreateTension,omitempty"`
+	Lexicon               *string         `json:"lexicon,omitempty"`
 	Watchers              []*UserRef      `json:"watchers,omitempty"`
 	Children              []*NodeRef      `json:"children,omitempty"`
 	Labels                []*LabelRef     `json:"labels,omitempty"`
@@ -4648,6 +4654,7 @@ const (
 	NodeHasFilterIsPersonal            NodeHasFilter = "isPersonal"
 	NodeHasFilterUserCanJoin           NodeHasFilter = "userCanJoin"
 	NodeHasFilterGuestCanCreateTension NodeHasFilter = "guestCanCreateTension"
+	NodeHasFilterLexicon               NodeHasFilter = "lexicon"
 	NodeHasFilterWatchers              NodeHasFilter = "watchers"
 	NodeHasFilterChildren              NodeHasFilter = "children"
 	NodeHasFilterLabels                NodeHasFilter = "labels"
@@ -4686,6 +4693,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterIsPersonal,
 	NodeHasFilterUserCanJoin,
 	NodeHasFilterGuestCanCreateTension,
+	NodeHasFilterLexicon,
 	NodeHasFilterWatchers,
 	NodeHasFilterChildren,
 	NodeHasFilterLabels,
@@ -4704,7 +4712,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterCascadeDirective:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterCascadeDirective:
 		return true
 	}
 	return false
@@ -4782,6 +4790,7 @@ const (
 	NodeOrderableName       NodeOrderable = "name"
 	NodeOrderableAbout      NodeOrderable = "about"
 	NodeOrderableRights     NodeOrderable = "rights"
+	NodeOrderableLexicon    NodeOrderable = "lexicon"
 	NodeOrderableColor      NodeOrderable = "color"
 )
 
@@ -4793,12 +4802,13 @@ var AllNodeOrderable = []NodeOrderable{
 	NodeOrderableName,
 	NodeOrderableAbout,
 	NodeOrderableRights,
+	NodeOrderableLexicon,
 	NodeOrderableColor,
 }
 
 func (e NodeOrderable) IsValid() bool {
 	switch e {
-	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableName, NodeOrderableAbout, NodeOrderableRights, NodeOrderableColor:
+	case NodeOrderableCreatedAt, NodeOrderableUpdatedAt, NodeOrderableNameid, NodeOrderableRootnameid, NodeOrderableName, NodeOrderableAbout, NodeOrderableRights, NodeOrderableLexicon, NodeOrderableColor:
 		return true
 	}
 	return false

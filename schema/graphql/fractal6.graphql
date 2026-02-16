@@ -79,6 +79,7 @@ type Node @auth(
   isPersonal: Boolean @search # Help explore "official" orga - nameid ends with @{username}
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  lexicon: String
   # Watchers
   watchers: [User!] @hasInverse(field: watching)
 
