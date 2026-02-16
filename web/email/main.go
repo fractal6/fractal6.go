@@ -40,11 +40,24 @@ import (
 )
 
 var md goldmark.Markdown = goldmark.New(
-	goldmark.WithExtensions(extension.GFM),
+	goldmark.WithExtensions(
+		extension.GFM,
+		&detailsExtension{},
+	),
 	goldmark.WithRendererOptions(
 		html.WithHardWraps(),
 	),
 )
+
+// sanitizer extends bluemonday's UGCPolicy with <details>/<summary> support
+// and allows the inline-styled wrapper div used by the details extension.
+var sanitizer = func() *bluemonday.Policy {
+	p := bluemonday.UGCPolicy()
+	p.AllowElements("details", "summary")
+	p.AllowAttrs("open").OnElements("details")
+	p.AllowAttrs("style").OnElements("div", "span", "details")
+	return p
+}()
 
 var (
 	emailSecret     string
@@ -312,7 +325,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			payload = bluemonday.UGCPolicy().Sanitize(buf.String())
+			payload = sanitizer.Sanitize(buf.String())
 		}
 
 	} else { // Tension updated
@@ -399,7 +412,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			comment = bluemonday.UGCPolicy().Sanitize(buf.String())
+			comment = sanitizer.Sanitize(buf.String())
 		}
 
 		if comment != "" {
@@ -589,7 +602,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		if err = md.Convert([]byte(notif.Msg), &buf); err != nil {
 			return err
 		}
-		payload += bluemonday.UGCPolicy().Sanitize(buf.String())
+		payload += sanitizer.Sanitize(buf.String())
 	} else {
 		payload += "<br><br>"
 	}
