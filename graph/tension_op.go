@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -22,11 +22,12 @@ package graph
 
 import (
 	"fmt"
+	"time"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 
@@ -42,6 +43,10 @@ func init() {
 		},
 		model.TensionEventCommentPushed: EventMap{
 			Auth: MemberHook | AuthorHook,
+		},
+		model.TensionEventCommentDeleted: EventMap{
+			Auth:   MemberHook | AuthorHook,
+			Action: RemoveComment,
 		},
 		model.TensionEventBlobCreated: EventMap{
 			Auth: MemberStrictHook,
@@ -246,7 +251,7 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 		}
 
 		// leave trace
-		leaveTrace(tension)
+		go leaveTrace(uctx, tension)
 	}
 
 	// Set contract status if any
@@ -274,7 +279,13 @@ func GetBlob(tension *model.Tension) *model.Blob {
 	return nil
 }
 
-func leaveTrace(tension *model.Tension) {
+func leaveTrace(uctx *model.UserCtx, tension *model.Tension) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("error: leaveTrace panic: %v\n", r)
+		}
+	}()
+
 	var err error
 	var nameid string
 
@@ -289,13 +300,48 @@ func leaveTrace(tension *model.Tension) {
 		// Set the Update time into the affected node.
 		err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.updatedAt", Now())
 		if err != nil {
-			panic(err)
+			fmt.Printf("error: leaveTrace node update: %v\n", err)
 		}
 		// Set the Update of its parent node (tension.receiver)
 		err = db.GetDB().SetFieldByEq("Node.nameid", tension.Receiver.Nameid, "Node.updatedAt", Now())
 		if err != nil {
-			panic(err)
+			fmt.Printf("error: leaveTrace receiver update: %v\n", err)
 		}
+	}
+
+	// Track activity
+	trackActivity(uctx.Username, tension.Receiver.Nameid)
+}
+
+// trackActivity increments the daily activity counter for both the user
+// and the root organisation. Called from leaveTrace goroutine.
+func trackActivity(username, receiverNameid string) {
+	today := time.Now().UTC().Format("2006-01-02")
+	todayISO := today + "T00:00:00Z"
+
+	// User activity
+	_, err := db.GetDB().Meta("upsertActivity", map[string]string{
+		"activityid": "u#" + username + "#" + today,
+		"ownerid":    "u#" + username,
+		"date":       todayISO,
+	})
+	if err != nil {
+		fmt.Printf("error: trackActivity user: %v\n", err)
+	}
+
+	// Org activity
+	rootid, err := codec.Nid2rootid(receiverNameid)
+	if err != nil {
+		fmt.Printf("error: trackActivity Nid2rootid: %v\n", err)
+		return
+	}
+	_, err = db.GetDB().Meta("upsertActivity", map[string]string{
+		"activityid": "o#" + rootid + "#" + today,
+		"ownerid":    "o#" + rootid,
+		"date":       todayISO,
+	})
+	if err != nil {
+		fmt.Printf("error: trackActivity org: %v\n", err)
 	}
 }
 
@@ -651,6 +697,24 @@ func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 	}
 	// update node
 	err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+	return true, err
+}
+
+func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+	tid := tension.ID
+	cid := *event.Old
+
+	// Check that the user is the author of the comment
+	res, err := db.GetDB().GetSubFieldById(cid, "Post.createdBy", "User.username")
+	if err != nil {
+		return false, err
+	}
+	if res == nil || res.(string) != uctx.Username {
+		return false, LogErr("Access denied", fmt.Errorf("Only the author of the comment can delete it."))
+	}
+
+	// Delete comment
+	_, err = db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
 	return true, err
 }
 

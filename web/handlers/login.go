@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -32,7 +32,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/web/email"
 	"fractale/fractal6.go/web/sessions"
@@ -87,6 +87,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 				EmailToken: &email_token,
 				UpdatedAt:  &now,
 				Subscribe:  creds.Subscribe.ToBoolPtr(),
+				Lang:       creds.Lang,
 			},
 		})
 		if err != nil {
@@ -104,6 +105,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 			EmailToken: &email_token,
 			UpdatedAt:  &now,
 			Subscribe:  creds.Subscribe.ToBoolPtr(),
+			Lang:       creds.Lang,
 		})
 	}
 	if err != nil {
@@ -141,6 +143,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 		Password  string
 		UpdatedAt *string
 		Subscribe bool
+		Lang      *string
 	}{}
 	if creds.EmailToken != nil {
 		// User signup parcour

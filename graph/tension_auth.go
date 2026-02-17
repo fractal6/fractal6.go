@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -26,7 +26,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 
@@ -93,8 +93,8 @@ type RestrictValue int
 
 const (
 	NoRestriction           RestrictValue = 1      // default
-	UserIsMemberRestrict    RestrictValue = 1 << 1 // the user (asking) should be a member of the receiver circle
-	UserNewIsMemberRestrict RestrictValue = 1 << 2 // the new user (event.new) should be a member of the receiver circle
+	UserIsMemberRestrict    RestrictValue = 1 << 1 // the user (asking) should be a member of the receiver circle(org)
+	UserNewIsMemberRestrict RestrictValue = 1 << 2 // the new user (event.new) should be a member of the receiver circle(org)
 )
 
 // Node Action **Rights** Enum.

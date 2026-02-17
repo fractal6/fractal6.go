@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -56,7 +56,7 @@ func init() {
 // FileServer conveniently sets up a http.FileServer handler to serve
 // static files from a http.FileSystem.
 // FileServer is serving static files
-func FileServer(r chi.Router, publicUri string, location string, maxage string) {
+func FileServer(r chi.Router, publicUri string, location string, cacheControl string) {
 	if strings.ContainsAny(publicUri, "{}*") {
 		panic("FileServer does not permit URL parameters.")
 	}
@@ -78,8 +78,8 @@ func FileServer(r chi.Router, publicUri string, location string, maxage string) 
 		// Headers
 		// --
 		// Set Cache control
-		if maxage != "" {
-			w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s", maxage))
+		if cacheControl != "" {
+			w.Header().Set("Cache-Control", cacheControl)
 		}
 
 		// Redirect to appropriate Language

@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -28,7 +28,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 
@@ -51,8 +51,8 @@ var addUser = &cobra.Command{
 				Password: args[2],
 			}
 			if l := cmd.Flag("lang"); l != nil {
-				l := strings.ToUpper(l.Value.String())
-				creds.Lang = &l
+				lang := model.Lang(strings.ToUpper(l.Value.String()))
+				creds.Lang = &lang
 			}
 			return auth.ValidateNewUser(creds)
 		}),

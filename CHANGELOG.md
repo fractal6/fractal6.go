@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.8.6] - 2026-02-17
+
+### Features
+
+- **Activity heatmap and sorting**: Track and visualize activity over time, with the ability to sort tensions by recent activity.
+- **Journal search**: Full-text search is now available in the organisation journal (event history).
+- **Delete comments**: Comments in tensions can now be deleted.
+- **Lexicon support**: Organisations can now define custom lexicons.
+- **Markdown improvements**: Support for collapsible sections (details/summary) in markdown content.
+
+### Bug Fixes
+
+- Fixed private key parsing for authentication.
+
+
 ## [0.8.5] - 2026-01-05
 
 ### 🐛 Bug Fixes

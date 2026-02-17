@@ -11,7 +11,7 @@ directive @hidden on FIELD_DEFINITION
 directive @private on FIELD_DEFINITION
 
 # Use for DQL requests.
-directive @meta(f: String!, k: String) on FIELD_DEFINITION
+directive @meta(f: String!, k: [String!]) on FIELD_DEFINITION
 
 # Return true if the user is a authorized validator for the given contract.
 directive @isContractValidator on FIELD_DEFINITION

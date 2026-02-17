@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,17 +21,9 @@
 package auth
 
 import (
-	//"os"
 	"reflect"
 	"testing"
 )
-
-func init() {
-	// Necessary to work with with Viper relative path and go test
-	// os.Chdir("../")
-	// ...doesn"t work, please run
-	//    go test ./web/auth/codecs* -v
-}
 
 func TestValidateNameid(t *testing.T) {
 	testcases := []struct {

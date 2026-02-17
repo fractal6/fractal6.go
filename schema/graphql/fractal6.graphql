@@ -79,6 +79,7 @@ type Node @auth(
   isPersonal: Boolean @search # Help explore "official" orga - nameid ends with @{username}
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
+  lexicon: String
   # Watchers
   watchers: [User!] @hasInverse(field: watching)
 
@@ -116,7 +117,8 @@ type Node @auth(
   contracts: [Vote!] @hasInverse(field: node) # only for Member role -- named role (@...)
 
   # Aggregators
-  events_history: [Event!] @meta(f:"getNodeHistory", k:"nameid")
+  events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
+  activity(from: String, to: String): [Activity!] @meta(f:"getNodeActivity", k:["rootnameid"])
 
   # Dgraph directive
   cascade_directive: Boolean
@@ -280,6 +282,7 @@ type ProjectDraft implements Post @hook_ {
   project_status: ProjectColumn!
 }
 
+# Tension Update is managed by graph/tension_op.go
 type Tension implements Post @auth(
   query: <<query-tension>>,
   add: <<add-tension>>
@@ -296,7 +299,7 @@ type Tension implements Post @auth(
 
   assignees: [User!]     @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [Label!]       @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
-  comments: [Comment!]   @x_alter(r:"hasEvent", e:[Created, CommentPushed]) @x_alter(r:"oneByOne")
+  comments: [Comment!]   @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
   blobs: [Blob!]         @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne") @hasInverse(field: tension)
   history: [Event!]      @x_alter @hasInverse(field: tension) # entry point
 
@@ -446,7 +449,8 @@ type User @auth(
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username") @x_alter # value ignored
 
   # Aggregators
-  event_count: EventCount @meta(f:"getEventCount", k:"username")
+  event_count: EventCount @meta(f:"getEventCount", k:["username"])
+  activity(from: String, to: String): [Activity!] @meta(f:"getUserActivity", k:["username"])
 }
 
 type PendingUser {
@@ -459,6 +463,7 @@ type PendingUser {
   token: String @hidden @search(by: [hash])
   contracts: [Contract!]
   subscribe: Boolean
+  lang: Lang
 }
 
 type UserRights {
@@ -496,6 +501,21 @@ type EventCount	 {
   unread_events: Int
   pending_contracts: Int
   assigned_tensions: Int
+}
+
+# Daily activity counter for users and organisations.
+# Accessed only via @meta fields; direct GraphQL access restricted.
+type Activity @auth(
+  query: <<is-root>>,
+  add: <<is-root>>,
+  update: <<is-root>>,
+  delete: <<is-root>>
+) {
+  id: ID!
+  activityid: String! @id
+  ownerid: String! @search(by: [hash])
+  date: DateTime! @search(by: [day])
+  count: Int!
 }
 
 #
@@ -576,6 +596,7 @@ enum TensionEvent {
   TitleUpdated
   TypeUpdated
   CommentPushed
+  CommentDeleted
   AssigneeAdded
   AssigneeRemoved
   LabelAdded

@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -28,27 +28,26 @@ import (
 )
 
 func TestStructMap(t *testing.T) {
-	var nodeFragment *model.NodeFragment
-	var nodeInput model.AddNodeInput
-
 	name := "name"
 	nameid := "nameid"
 	username := "username"
-	nodeFragment = &model.NodeFragment{
+	nodeFragment := &model.NodeFragment{
 		Name:      &name,
 		Nameid:    &nameid,
 		FirstLink: &username,
 	}
 
+	var nodeInput model.AddNodeInput
 	StructMap(nodeFragment, &nodeInput)
 
-	// FirstLink cannot be added by adding a node !
-	want := model.AddNodeInput{
+	// StructMap should copy all matching fields including FirstLink.
+	// (The API layer rejects FirstLink later, not StructMap.)
+	// Verify nodeInput differs from a struct with only Name/Nameid set.
+	withoutFirstLink := model.AddNodeInput{
 		Name:   name,
 		Nameid: nameid,
 	}
-
-	if reflect.DeepEqual(nodeInput, want) {
-		t.Errorf("StructMap error, want: %v, got: %v", want, nodeInput)
+	if reflect.DeepEqual(nodeInput, withoutFirstLink) {
+		t.Errorf("StructMap did not copy FirstLink: got %v", nodeInput)
 	}
 }

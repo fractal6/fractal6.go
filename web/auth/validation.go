@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -32,7 +32,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/tools"
+	"fractale/fractal6.go/internal/tools"
 )
 
 var (
@@ -256,7 +256,7 @@ func ValidateNewUser(creds model.UserCreds) error {
 	}
 	// Lang validation
 	if lang != nil {
-		if !model.Lang(*lang).IsValid() {
+		if !lang.IsValid() {
 			return fmt.Errorf("Bad value for lang.")
 		}
 	}
@@ -306,7 +306,7 @@ func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
 		canLogin = bool(*creds.CanLogin)
 	}
 	if creds.Lang != nil {
-		lang = model.Lang(*creds.Lang)
+		lang = *creds.Lang
 	}
 
 	userInput := model.AddUserInput{

@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -30,7 +30,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 
@@ -260,4 +260,38 @@ func SetGuestCanCreateTension(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte(val))
+}
+
+func SetLexicon(w http.ResponseWriter, r *http.Request) {
+	// Get form data
+	form := struct {
+		Nameid string
+		Val    string
+	}{}
+	err := json.NewDecoder(r.Body).Decode(&form)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	// Check if uctx is owner of the organisation
+	nameid := form.Nameid
+	_, uctx, err := auth.GetUserContext(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	if i := auth.UserIsOwner(uctx, nameid); i < 0 {
+		http.Error(w, "Only owners of the organisation can do this.", 400)
+		return
+	}
+
+	// Set the value (escape JSON for N-Quads)
+	err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.lexicon", QuoteString(form.Val))
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	w.Write([]byte("true"))
 }

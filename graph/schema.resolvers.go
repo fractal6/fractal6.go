@@ -436,6 +436,21 @@ func (r *mutationResolver) DeleteEventCount(ctx context.Context, filter model.Ev
 	panic(fmt.Errorf("not implemented: DeleteEventCount - deleteEventCount"))
 }
 
+// AddActivity is the resolver for the addActivity field.
+func (r *mutationResolver) AddActivity(ctx context.Context, input []*model.AddActivityInput, upsert *bool) (*model.AddActivityPayload, error) {
+	panic(fmt.Errorf("not implemented: AddActivity - addActivity"))
+}
+
+// UpdateActivity is the resolver for the updateActivity field.
+func (r *mutationResolver) UpdateActivity(ctx context.Context, input model.UpdateActivityInput) (*model.UpdateActivityPayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateActivity - updateActivity"))
+}
+
+// DeleteActivity is the resolver for the deleteActivity field.
+func (r *mutationResolver) DeleteActivity(ctx context.Context, filter model.ActivityFilter) (*model.DeleteActivityPayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteActivity - deleteActivity"))
+}
+
 // QueryBuildInfo is the resolver for the queryBuildInfo field.
 func (r *queryResolver) QueryBuildInfo(ctx context.Context, filter *model.BuildInfoFilter, order *model.BuildInfoOrder, first *int, offset *int) ([]*model.BuildInfo, error) {
 	return []*model.BuildInfo{{ClientVersion: auth.ClientVersion}}, nil
@@ -820,6 +835,21 @@ func (r *queryResolver) QueryEventCount(ctx context.Context, filter *model.Event
 // AggregateEventCount is the resolver for the aggregateEventCount field.
 func (r *queryResolver) AggregateEventCount(ctx context.Context, filter *model.EventCountFilter) (data *model.EventCountAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented: AggregateEventCount - aggregateEventCount"))
+}
+
+// GetActivity is the resolver for the getActivity field.
+func (r *queryResolver) GetActivity(ctx context.Context, id *string, activityid *string) (*model.Activity, error) {
+	panic(fmt.Errorf("not implemented: GetActivity - getActivity"))
+}
+
+// QueryActivity is the resolver for the queryActivity field.
+func (r *queryResolver) QueryActivity(ctx context.Context, filter *model.ActivityFilter, order *model.ActivityOrder, first *int, offset *int) ([]*model.Activity, error) {
+	panic(fmt.Errorf("not implemented: QueryActivity - queryActivity"))
+}
+
+// AggregateActivity is the resolver for the aggregateActivity field.
+func (r *queryResolver) AggregateActivity(ctx context.Context, filter *model.ActivityFilter) (*model.ActivityAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateActivity - aggregateActivity"))
 }
 
 // Mutation returns generated.MutationResolver implementation.

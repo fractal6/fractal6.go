@@ -6,7 +6,7 @@ BINARY := f6
 #DGRAPH_RELEASE := v21.03.1
 #DGRAPH_RELEASE := v21.12.0
 DGRAPH_RELEASE := v22.0.2
-CLIENT_RELEASE := 0.8.8
+CLIENT_RELEASE := 0.9.0
 $(eval BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD))
 $(eval COMMIT_NAME=$(shell git rev-parse --short HEAD))
 $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
@@ -17,7 +17,10 @@ RELEASE_DIR := releases/$(BRANCH_NAME)/$(RELEASE_VERSION)
 LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr " " "_")
 
 
-.PHONY: build prod vendor
+.PHONY: build prod vendor \
+	test test-vet test-unit test-external \
+	test-integration-up test-integration test-integration-down test-integration-clean \
+	test-all
 default: build
 
 
@@ -46,10 +49,40 @@ prod:
 vendor:
 	go mod vendor
 
-test:
-	#go clean -testcache
+#
+# Tests
+#
+
+test: test-vet test-unit
+
+test-vet:
+	go vet ./...
+	go vet -tags integration ./db/... ./web/handlers/...
+
+test-unit:
 	go test ./...
-	go test ./web/auth/... -v
+
+test-external:
+	go test -tags external ./internal/tools/...
+
+test-integration-up:
+	docker compose -f docker-compose.test.yml up -d --wait
+
+test-integration-setup: test-integration-up
+	go run ./cmd/testsetup
+
+test-integration: test-integration-setup
+	REDIS_ADDR=localhost:6479 \
+	DGRAPH_PUBLIC_KEY="$$(cat public.pem)" \
+	DGRAPH_PRIVATE_KEY="$$(cat private.pem)" \
+	go test -tags integration -count=1 -timeout 120s ./db/... ./web/handlers/...
+
+test-integration-down:
+	docker compose -f docker-compose.test.yml down -v --remove-orphans
+
+test-integration-clean: test-integration test-integration-down
+
+test-all: test test-integration-clean
 
 #
 # Generate Graphql code and schema

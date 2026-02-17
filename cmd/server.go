@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -21,10 +21,11 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
-	//"fmt"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
@@ -68,7 +69,10 @@ func RunServer() {
 	if buildMode == "PROD" && buildBranch != "prod" { // @DEBUG: prod branch is for public build...
 		allowedOrigins = append(allowedOrigins, "https://"+DOMAIN, "https://api."+DOMAIN, "https://staging."+DOMAIN)
 	} else {
-		allowedOrigins = append(allowedOrigins, "http://localhost:8001", "http://localhost:3000", "http://localhost:8080", "http://localhost:8888")
+		allowedOrigins = append(allowedOrigins, "http://localhost:3000")
+		for port := 8000; port <= 8888; port++ {
+			allowedOrigins = append(allowedOrigins, fmt.Sprintf("http://localhost:%d", port))
+		}
 	}
 
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
@@ -145,6 +149,7 @@ func RunServer() {
 			r.Post("/createorga", handle6.CreateOrga)
 			r.Post("/setusercanjoin", handle6.SetUserCanJoin)
 			r.Post("/setguestcancreatetension", handle6.SetGuestCanCreateTension)
+			r.Post("/setlexicon", handle6.SetLexicon)
 
 			// Special
 			r.Post("/makeowner", handle6.MakeOwner)
@@ -194,7 +199,11 @@ func RunServer() {
 	// Static & Public files
 	// --
 	// Serve static files
-	web.FileServer(r, "/assets/", "./assets", "3600")
+	assetsCacheControl := "max-age=3600"
+	if buildMode == "DEV" {
+		assetsCacheControl = "no-store, no-cache, must-revalidate"
+	}
+	web.FileServer(r, "/assets/", "./assets", assetsCacheControl)
 	// Serve static frontend files
 	web.FileServer(r, "/", "./public", "")
 

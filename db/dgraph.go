@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -46,7 +46,7 @@ import (
 
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/tools"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 var (
@@ -120,24 +120,26 @@ func init() {
 	// @DEBUG: how to integrate it with cobra to execute other command without error ?
 	var pub_key string
 	var priv_key string
-	// Get Jwt public key
+	// Get Jwt public key: try config file first, then env var fallback.
 	if fn := viper.GetString("db.dgraph_public_key"); fn != "" {
 		if content, err := ioutil.ReadFile(fn); err != nil {
-			log.Fatal(err)
+			log.Printf("Warning: %v", err)
 		} else {
 			pub_key = string(content)
 		}
-	} else if os.Getenv("DGRAPH_PUBLIC_KEY") != "" {
+	}
+	if pub_key == "" && os.Getenv("DGRAPH_PUBLIC_KEY") != "" {
 		pub_key = os.Getenv("DGRAPH_PUBLIC_KEY")
 	}
-	// Get Jwt private key
+	// Get Jwt private key: try config file first, then env var fallback.
 	if fn := viper.GetString("db.dgraph_private_key"); fn != "" {
 		if content, err := ioutil.ReadFile(fn); err != nil {
-			log.Fatal(err)
+			log.Printf("Warning: %v", err)
 		} else {
 			priv_key = string(content)
 		}
-	} else if os.Getenv("DGRAPH_PRIVATE_KEY") != "" {
+	}
+	if priv_key == "" && os.Getenv("DGRAPH_PRIVATE_KEY") != "" {
 		priv_key = os.Getenv("DGRAPH_PRIVATE_KEY")
 	}
 
@@ -145,7 +147,7 @@ func init() {
 		dgraphPublicKey = ParseRsaPublic(pub_key)
 		dgraphPrivateKey = ParseRsaPrivate(priv_key)
 	} else {
-		log.Fatal("DGRAPH_PRIVATE_KEY or DGRAPH_PUBLIC_KEY not found")
+		log.Println("Warning: DGRAPH_PRIVATE_KEY or DGRAPH_PUBLIC_KEY not found. JWT signing disabled.")
 	}
 
 	DB = initDB()
@@ -153,6 +155,14 @@ func init() {
 
 func GetDB() *Dgraph {
 	return DB
+}
+
+// SetTestDB overrides the global DB singleton for integration tests.
+func SetTestDB(gqlAddr, grpcAddr string) {
+	DB = &Dgraph{
+		gqlAddr:  gqlAddr,
+		grpcAddr: grpcAddr,
+	}
 }
 
 func initDB() *Dgraph {
@@ -299,6 +309,9 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
 	jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))
 
 	// Create token
+	if dgraphPrivateKey == nil || dgraphPublicKey == nil {
+		panic("Dgraph JWT keys not loaded. Ensure public.pem and private.pem are available.")
+	}
 	tkm := jwtauth.New("RS256", dgraphPrivateKey, dgraphPublicKey)
 	// tkm := jwtauth.New("HS256", []byte("checkJwkToken_or_pubkey"), []byte("checkJwkToken_or_pubkey"))
 	_, token, err := tkm.Encode(claims)

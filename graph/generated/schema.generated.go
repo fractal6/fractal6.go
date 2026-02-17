@@ -99,6 +99,9 @@ type MutationResolver interface {
 	AddEventCount(ctx context.Context, input []*model.AddEventCountInput) (*model.AddEventCountPayload, error)
 	UpdateEventCount(ctx context.Context, input model.UpdateEventCountInput) (*model.UpdateEventCountPayload, error)
 	DeleteEventCount(ctx context.Context, filter model.EventCountFilter) (*model.DeleteEventCountPayload, error)
+	AddActivity(ctx context.Context, input []*model.AddActivityInput, upsert *bool) (*model.AddActivityPayload, error)
+	UpdateActivity(ctx context.Context, input model.UpdateActivityInput) (*model.UpdateActivityPayload, error)
+	DeleteActivity(ctx context.Context, filter model.ActivityFilter) (*model.DeleteActivityPayload, error)
 }
 type QueryResolver interface {
 	QueryBuildInfo(ctx context.Context, filter *model.BuildInfoFilter, order *model.BuildInfoOrder, first *int, offset *int) ([]*model.BuildInfo, error)
@@ -176,6 +179,9 @@ type QueryResolver interface {
 	AggregateNotif(ctx context.Context, filter *model.NotifFilter) (*model.NotifAggregateResult, error)
 	QueryEventCount(ctx context.Context, filter *model.EventCountFilter, order *model.EventCountOrder, first *int, offset *int) ([]*model.EventCount, error)
 	AggregateEventCount(ctx context.Context, filter *model.EventCountFilter) (*model.EventCountAggregateResult, error)
+	GetActivity(ctx context.Context, id *string, activityid *string) (*model.Activity, error)
+	QueryActivity(ctx context.Context, filter *model.ActivityFilter, order *model.ActivityOrder, first *int, offset *int) ([]*model.Activity, error)
+	AggregateActivity(ctx context.Context, filter *model.ActivityFilter) (*model.ActivityAggregateResult, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -404,10 +410,10 @@ func (ec *executionContext) dir_meta_args(ctx context.Context, rawArgs map[strin
 		}
 	}
 	args["f"] = arg0
-	var arg1 *string
+	var arg1 []string
 	if tmp, ok := rawArgs["k"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("k"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg1, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -776,6 +782,48 @@ func (ec *executionContext) dir_x_set_args(ctx context.Context, rawArgs map[stri
 		}
 	}
 	args["n"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_AddActivityPayload_activity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ActivityFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ActivityOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOActivityOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
 	return args, nil
 }
 
@@ -2252,6 +2300,48 @@ func (ec *executionContext) field_Contract_tension_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteActivityPayload_activity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ActivityFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ActivityOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOActivityOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteBlobPayload_blob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3536,6 +3626,30 @@ func (ec *executionContext) field_Label_tensions_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addActivity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddActivityInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddActivityInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddActivityInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["upsert"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("upsert"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["upsert"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addBlob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4184,6 +4298,21 @@ func (ec *executionContext) field_Mutation_addVote_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteActivity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ActivityFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNActivityFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteBlob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4766,6 +4895,21 @@ func (ec *executionContext) field_Mutation_deleteVote_args(ctx context.Context, 
 		}
 	}
 	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateActivity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateActivityInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateActivityInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateActivityInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -5369,6 +5513,45 @@ func (ec *executionContext) field_NodeFragment_mandate_args(ctx context.Context,
 	return args, nil
 }
 
+func (ec *executionContext) field_Node_activityAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ActivityFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_activity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["from"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["from"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["to"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["to"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Node_childrenAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5516,42 +5699,15 @@ func (ec *executionContext) field_Node_events_historyAggregate_args(ctx context.
 func (ec *executionContext) field_Node_events_history_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.EventFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOEventFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventFilter(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["query"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("query"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
-	var arg1 *model.EventOrder
-	if tmp, ok := rawArgs["order"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
-		arg1, err = ec.unmarshalOEventOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐEventOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["order"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg3
+	args["query"] = arg0
 	return args, nil
 }
 
@@ -6755,6 +6911,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateActivity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ActivityFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateBlob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7160,6 +7331,30 @@ func (ec *executionContext) field_Query_aggregateVote_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getActivity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["activityid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityid"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["activityid"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_getBlob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7544,6 +7739,48 @@ func (ec *executionContext) field_Query_getVote_args(ctx context.Context, rawArg
 		}
 	}
 	args["voteid"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_queryActivity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ActivityFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ActivityOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOActivityOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
 	return args, nil
 }
 
@@ -9593,6 +9830,48 @@ func (ec *executionContext) field_Tension_subscribers_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_UpdateActivityPayload_activity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ActivityFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.ActivityOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOActivityOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_UpdateBlobPayload_blob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -10766,6 +11045,45 @@ func (ec *executionContext) field_UserEvent_user_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_User_activityAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ActivityFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_User_activity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["from"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["from"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["to"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["to"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_User_contractsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -11365,6 +11683,728 @@ func (ec *executionContext) _fieldMiddleware(ctx context.Context, obj interface{
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Activity_id(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Activity_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_activityid(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_activityid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Activityid, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Activity_activityid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_ownerid(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_ownerid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ownerid, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Activity_ownerid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_date(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_date(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Date, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Activity_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_count(ctx context.Context, field graphql.CollectedField, obj *model.Activity) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Activity_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Activity_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_activityidMin(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_activityidMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActivityidMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_activityidMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_activityidMax(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_activityidMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActivityidMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_activityidMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_owneridMin(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_owneridMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OwneridMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_owneridMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_owneridMax(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_owneridMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OwneridMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_owneridMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_dateMin(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_dateMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DateMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_dateMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_dateMax(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_dateMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DateMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_dateMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_countMin(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_countMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CountMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_countMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_countMax(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_countMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CountMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_countMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_countSum(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_countSum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CountSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_countSum(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ActivityAggregateResult_countAvg(ctx context.Context, field graphql.CollectedField, obj *model.ActivityAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ActivityAggregateResult_countAvg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CountAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ActivityAggregateResult_countAvg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ActivityAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddActivityPayload_activity(ctx context.Context, field graphql.CollectedField, obj *model.AddActivityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddActivityPayload_activity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Activity, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Activity)
+	fc.Result = res
+	return ec.marshalOActivity2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddActivityPayload_activity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddActivityPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "activityid":
+				return ec.fieldContext_Activity_activityid(ctx, field)
+			case "ownerid":
+				return ec.fieldContext_Activity_ownerid(ctx, field)
+			case "date":
+				return ec.fieldContext_Activity_date(ctx, field)
+			case "count":
+				return ec.fieldContext_Activity_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddActivityPayload_activity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddActivityPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddActivityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddActivityPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddActivityPayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddActivityPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _AddBlobPayload_blob(ctx context.Context, field graphql.CollectedField, obj *model.AddBlobPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AddBlobPayload_blob(ctx, field)
@@ -12497,6 +13537,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -12521,6 +13563,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -12543,6 +13587,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -12755,6 +13801,8 @@ func (ec *executionContext) fieldContext_AddPendingUserPayload_pendingUser(ctx c
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
 			case "subscribe":
 				return ec.fieldContext_PendingUser_subscribe(ctx, field)
+			case "lang":
+				return ec.fieldContext_PendingUser_lang(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -13994,6 +15042,8 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -14010,6 +15060,8 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -14751,6 +15803,8 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -14767,6 +15821,8 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -15780,6 +16836,8 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -15796,6 +16854,8 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -16718,6 +17778,8 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -16734,6 +17796,8 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -16803,6 +17867,8 @@ func (ec *executionContext) fieldContext_Contract_pending_candidates(ctx context
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
 			case "subscribe":
 				return ec.fieldContext_PendingUser_subscribe(ctx, field)
+			case "lang":
+				return ec.fieldContext_PendingUser_lang(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -17073,6 +18139,8 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -17089,6 +18157,8 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -17941,6 +19011,143 @@ func (ec *executionContext) fieldContext_ContractAggregateResult_closedAtMax(_ c
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteActivityPayload_activity(ctx context.Context, field graphql.CollectedField, obj *model.DeleteActivityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteActivityPayload_activity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Activity, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Activity)
+	fc.Result = res
+	return ec.marshalOActivity2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteActivityPayload_activity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteActivityPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "activityid":
+				return ec.fieldContext_Activity_activityid(ctx, field)
+			case "ownerid":
+				return ec.fieldContext_Activity_ownerid(ctx, field)
+			case "date":
+				return ec.fieldContext_Activity_date(ctx, field)
+			case "count":
+				return ec.fieldContext_Activity_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteActivityPayload_activity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteActivityPayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteActivityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteActivityPayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteActivityPayload_msg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteActivityPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteActivityPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteActivityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteActivityPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteActivityPayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteActivityPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -19457,6 +20664,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -19481,6 +20690,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -19503,6 +20714,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -19791,6 +21004,8 @@ func (ec *executionContext) fieldContext_DeletePendingUserPayload_pendingUser(ct
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
 			case "subscribe":
 				return ec.fieldContext_PendingUser_subscribe(ctx, field)
+			case "lang":
+				return ec.fieldContext_PendingUser_lang(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -21585,6 +22800,8 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -21601,6 +22818,8 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -22456,6 +23675,8 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -22472,6 +23693,8 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -24331,6 +25554,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -24355,6 +25580,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -24377,6 +25604,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -24547,6 +25776,10 @@ func (ec *executionContext) fieldContext_Label_nodesAggregate(ctx context.Contex
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -30668,6 +31901,173 @@ func (ec *executionContext) fieldContext_Mutation_deleteEventCount(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_addActivity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addActivity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddActivity(rctx, fc.Args["input"].([]*model.AddActivityInput), fc.Args["upsert"].(*bool))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddActivityPayload)
+	fc.Result = res
+	return ec.marshalOAddActivityPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddActivityPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addActivity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "activity":
+				return ec.fieldContext_AddActivityPayload_activity(ctx, field)
+			case "numUids":
+				return ec.fieldContext_AddActivityPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AddActivityPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addActivity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateActivity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateActivity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateActivity(rctx, fc.Args["input"].(model.UpdateActivityInput))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateActivityPayload)
+	fc.Result = res
+	return ec.marshalOUpdateActivityPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateActivityPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateActivity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "activity":
+				return ec.fieldContext_UpdateActivityPayload_activity(ctx, field)
+			case "numUids":
+				return ec.fieldContext_UpdateActivityPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateActivityPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateActivity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteActivity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteActivity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteActivity(rctx, fc.Args["filter"].(model.ActivityFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteActivityPayload)
+	fc.Result = res
+	return ec.marshalODeleteActivityPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteActivityPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteActivity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "activity":
+				return ec.fieldContext_DeleteActivityPayload_activity(ctx, field)
+			case "msg":
+				return ec.fieldContext_DeleteActivityPayload_msg(ctx, field)
+			case "numUids":
+				return ec.fieldContext_DeleteActivityPayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteActivityPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteActivity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Node_id(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_id(ctx, field)
 	if err != nil {
@@ -30795,6 +32195,8 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -30811,6 +32213,8 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -31298,6 +32702,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -31322,6 +32728,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -31344,6 +32752,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -31911,6 +33321,44 @@ func (ec *executionContext) fieldContext_Node_guestCanCreateTension(_ context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Node_lexicon(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_lexicon(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lexicon, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_lexicon(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Node_watchers(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_watchers(ctx, field)
 	if err != nil {
@@ -31994,6 +33442,8 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -32010,6 +33460,8 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -32105,6 +33557,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -32129,6 +33583,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -32151,6 +33607,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -32745,6 +34203,8 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -32761,6 +34221,8 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -32870,7 +34332,7 @@ func (ec *executionContext) _Node_events_history(ctx context.Context, field grap
 			if err != nil {
 				return nil, err
 			}
-			k, err := ec.unmarshalOString2ᚖstring(ctx, "nameid")
+			k, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"nameid"})
 			if err != nil {
 				return nil, err
 			}
@@ -32941,6 +34403,95 @@ func (ec *executionContext) fieldContext_Node_events_history(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_events_history_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_activity(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_activity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Activity, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalNString2string(ctx, "getNodeActivity")
+			if err != nil {
+				return nil, err
+			}
+			k, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"rootnameid"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Meta == nil {
+				return nil, errors.New("directive meta is not implemented")
+			}
+			return ec.directives.Meta(ctx, obj, directive0, f, k)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Activity); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.Activity`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Activity)
+	fc.Result = res
+	return ec.marshalOActivity2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_activity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "activityid":
+				return ec.fieldContext_Activity_activityid(ctx, field)
+			case "ownerid":
+				return ec.fieldContext_Activity_ownerid(ctx, field)
+			case "date":
+				return ec.fieldContext_Activity_date(ctx, field)
+			case "count":
+				return ec.fieldContext_Activity_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_activity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -33315,6 +34866,10 @@ func (ec *executionContext) fieldContext_Node_childrenAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -33777,6 +35332,79 @@ func (ec *executionContext) fieldContext_Node_events_historyAggregate(ctx contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_events_historyAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_activityAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_activityAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActivityAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ActivityAggregateResult)
+	fc.Result = res
+	return ec.marshalOActivityAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_activityAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ActivityAggregateResult_count(ctx, field)
+			case "activityidMin":
+				return ec.fieldContext_ActivityAggregateResult_activityidMin(ctx, field)
+			case "activityidMax":
+				return ec.fieldContext_ActivityAggregateResult_activityidMax(ctx, field)
+			case "owneridMin":
+				return ec.fieldContext_ActivityAggregateResult_owneridMin(ctx, field)
+			case "owneridMax":
+				return ec.fieldContext_ActivityAggregateResult_owneridMax(ctx, field)
+			case "dateMin":
+				return ec.fieldContext_ActivityAggregateResult_dateMin(ctx, field)
+			case "dateMax":
+				return ec.fieldContext_ActivityAggregateResult_dateMax(ctx, field)
+			case "countMin":
+				return ec.fieldContext_ActivityAggregateResult_countMin(ctx, field)
+			case "countMax":
+				return ec.fieldContext_ActivityAggregateResult_countMax(ctx, field)
+			case "countSum":
+				return ec.fieldContext_ActivityAggregateResult_countSum(ctx, field)
+			case "countAvg":
+				return ec.fieldContext_ActivityAggregateResult_countAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ActivityAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_activityAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -34424,6 +36052,82 @@ func (ec *executionContext) fieldContext_NodeAggregateResult_rightsAvg(_ context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NodeAggregateResult_lexiconMin(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LexiconMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NodeAggregateResult_lexiconMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NodeAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NodeAggregateResult_lexiconMax(ctx context.Context, field graphql.CollectedField, obj *model.NodeAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LexiconMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NodeAggregateResult_lexiconMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NodeAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -35890,6 +37594,8 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -35906,6 +37612,8 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -36867,6 +38575,44 @@ func (ec *executionContext) fieldContext_PendingUser_subscribe(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _PendingUser_lang(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PendingUser_lang(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Lang, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Lang)
+	fc.Result = res
+	return ec.marshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PendingUser_lang(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PendingUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Lang does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PendingUser_contractsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.PendingUser) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 	if err != nil {
@@ -37735,6 +39481,8 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -37751,6 +39499,8 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -38279,6 +40029,8 @@ func (ec *executionContext) fieldContext_Project_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -38295,6 +40047,8 @@ func (ec *executionContext) fieldContext_Project_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -38851,6 +40605,8 @@ func (ec *executionContext) fieldContext_Project_leaders(ctx context.Context, fi
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -38875,6 +40631,8 @@ func (ec *executionContext) fieldContext_Project_leaders(ctx context.Context, fi
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -38897,6 +40655,8 @@ func (ec *executionContext) fieldContext_Project_leaders(ctx context.Context, fi
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -38992,6 +40752,8 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -39016,6 +40778,8 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -39038,6 +40802,8 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -39249,6 +41015,10 @@ func (ec *executionContext) fieldContext_Project_leadersAggregate(ctx context.Co
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -39338,6 +41108,10 @@ func (ec *executionContext) fieldContext_Project_nodesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -41948,6 +43722,8 @@ func (ec *executionContext) fieldContext_ProjectDraft_createdBy(ctx context.Cont
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -41964,6 +43740,8 @@ func (ec *executionContext) fieldContext_ProjectDraft_createdBy(ctx context.Cont
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -43239,6 +45017,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -43263,6 +45043,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -43285,6 +45067,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -43380,6 +45164,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -43404,6 +45190,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -43426,6 +45214,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -43511,6 +45301,10 @@ func (ec *executionContext) fieldContext_Query_aggregateNode(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -47464,6 +49258,8 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -47480,6 +49276,8 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -47581,6 +49379,8 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -47597,6 +49397,8 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -47759,6 +49561,8 @@ func (ec *executionContext) fieldContext_Query_getPendingUser(ctx context.Contex
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
 			case "subscribe":
 				return ec.fieldContext_PendingUser_subscribe(ctx, field)
+			case "lang":
+				return ec.fieldContext_PendingUser_lang(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -47830,6 +49634,8 @@ func (ec *executionContext) fieldContext_Query_queryPendingUser(ctx context.Cont
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
 			case "subscribe":
 				return ec.fieldContext_PendingUser_subscribe(ctx, field)
+			case "lang":
+				return ec.fieldContext_PendingUser_lang(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -48575,6 +50381,201 @@ func (ec *executionContext) fieldContext_Query_aggregateEventCount(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getActivity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getActivity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetActivity(rctx, fc.Args["id"].(*string), fc.Args["activityid"].(*string))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Activity)
+	fc.Result = res
+	return ec.marshalOActivity2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getActivity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "activityid":
+				return ec.fieldContext_Activity_activityid(ctx, field)
+			case "ownerid":
+				return ec.fieldContext_Activity_ownerid(ctx, field)
+			case "date":
+				return ec.fieldContext_Activity_date(ctx, field)
+			case "count":
+				return ec.fieldContext_Activity_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getActivity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_queryActivity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryActivity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryActivity(rctx, fc.Args["filter"].(*model.ActivityFilter), fc.Args["order"].(*model.ActivityOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Activity)
+	fc.Result = res
+	return ec.marshalOActivity2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryActivity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "activityid":
+				return ec.fieldContext_Activity_activityid(ctx, field)
+			case "ownerid":
+				return ec.fieldContext_Activity_ownerid(ctx, field)
+			case "date":
+				return ec.fieldContext_Activity_date(ctx, field)
+			case "count":
+				return ec.fieldContext_Activity_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryActivity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateActivity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateActivity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateActivity(rctx, fc.Args["filter"].(*model.ActivityFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ActivityAggregateResult)
+	fc.Result = res
+	return ec.marshalOActivityAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateActivity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ActivityAggregateResult_count(ctx, field)
+			case "activityidMin":
+				return ec.fieldContext_ActivityAggregateResult_activityidMin(ctx, field)
+			case "activityidMax":
+				return ec.fieldContext_ActivityAggregateResult_activityidMax(ctx, field)
+			case "owneridMin":
+				return ec.fieldContext_ActivityAggregateResult_owneridMin(ctx, field)
+			case "owneridMax":
+				return ec.fieldContext_ActivityAggregateResult_owneridMax(ctx, field)
+			case "dateMin":
+				return ec.fieldContext_ActivityAggregateResult_dateMin(ctx, field)
+			case "dateMax":
+				return ec.fieldContext_ActivityAggregateResult_dateMax(ctx, field)
+			case "countMin":
+				return ec.fieldContext_ActivityAggregateResult_countMin(ctx, field)
+			case "countMax":
+				return ec.fieldContext_ActivityAggregateResult_countMax(ctx, field)
+			case "countSum":
+				return ec.fieldContext_ActivityAggregateResult_countSum(ctx, field)
+			case "countAvg":
+				return ec.fieldContext_ActivityAggregateResult_countAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ActivityAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_aggregateActivity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -48866,6 +50867,8 @@ func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, fiel
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -48882,6 +50885,8 @@ func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, fiel
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -49653,6 +51658,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -49677,6 +51684,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -49699,6 +51708,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -49794,6 +51805,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -49818,6 +51831,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -49840,6 +51855,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -49925,6 +51942,10 @@ func (ec *executionContext) fieldContext_RoleExt_rolesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -50014,6 +52035,10 @@ func (ec *executionContext) fieldContext_RoleExt_nodesAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -50458,6 +52483,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -50482,6 +52509,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -50504,6 +52533,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -50643,6 +52674,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -50667,6 +52700,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -50689,6 +52724,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -50992,6 +53029,8 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -51008,6 +53047,8 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -51549,6 +53590,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -51565,6 +53608,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -51825,6 +53870,8 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -51841,6 +53888,8 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -53311,6 +55360,105 @@ func (ec *executionContext) fieldContext_TensionAggregateResult_n_commentsAvg(_ 
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateActivityPayload_activity(ctx context.Context, field graphql.CollectedField, obj *model.UpdateActivityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateActivityPayload_activity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Activity, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Activity)
+	fc.Result = res
+	return ec.marshalOActivity2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateActivityPayload_activity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateActivityPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "activityid":
+				return ec.fieldContext_Activity_activityid(ctx, field)
+			case "ownerid":
+				return ec.fieldContext_Activity_ownerid(ctx, field)
+			case "date":
+				return ec.fieldContext_Activity_date(ctx, field)
+			case "count":
+				return ec.fieldContext_Activity_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateActivityPayload_activity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateActivityPayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateActivityPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateActivityPayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateActivityPayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateActivityPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateBlobPayload_blob(ctx context.Context, field graphql.CollectedField, obj *model.UpdateBlobPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateBlobPayload_blob(ctx, field)
 	if err != nil {
@@ -54442,6 +56590,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -54466,6 +56616,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -54488,6 +56640,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -54700,6 +56854,8 @@ func (ec *executionContext) fieldContext_UpdatePendingUserPayload_pendingUser(ct
 				return ec.fieldContext_PendingUser_contracts(ctx, field)
 			case "subscribe":
 				return ec.fieldContext_PendingUser_subscribe(ctx, field)
+			case "lang":
+				return ec.fieldContext_PendingUser_lang(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_PendingUser_contractsAggregate(ctx, field)
 			}
@@ -56038,6 +58194,8 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -56054,6 +58212,8 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -57146,6 +59306,8 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -57170,6 +59332,8 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -57192,6 +59356,8 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -57353,6 +59519,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -57377,6 +59545,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -57399,6 +59569,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -58000,7 +60172,7 @@ func (ec *executionContext) _User_event_count(ctx context.Context, field graphql
 			if err != nil {
 				return nil, err
 			}
-			k, err := ec.unmarshalOString2ᚖstring(ctx, "username")
+			k, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"username"})
 			if err != nil {
 				return nil, err
 			}
@@ -58057,6 +60229,95 @@ func (ec *executionContext) fieldContext_User_event_count(ctx context.Context, f
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_event_count_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_activity(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_activity(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return obj.Activity, nil
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			f, err := ec.unmarshalNString2string(ctx, "getUserActivity")
+			if err != nil {
+				return nil, err
+			}
+			k, err := ec.unmarshalOString2ᚕstringᚄ(ctx, []interface{}{"username"})
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.Meta == nil {
+				return nil, errors.New("directive meta is not implemented")
+			}
+			return ec.directives.Meta(ctx, obj, directive0, f, k)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*model.Activity); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.Activity`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Activity)
+	fc.Result = res
+	return ec.marshalOActivity2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_activity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "activityid":
+				return ec.fieldContext_Activity_activityid(ctx, field)
+			case "ownerid":
+				return ec.fieldContext_Activity_ownerid(ctx, field)
+			case "date":
+				return ec.fieldContext_Activity_date(ctx, field)
+			case "count":
+				return ec.fieldContext_Activity_count(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_activity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -58215,6 +60476,10 @@ func (ec *executionContext) fieldContext_User_watchingAggregate(ctx context.Cont
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -58304,6 +60569,10 @@ func (ec *executionContext) fieldContext_User_rolesAggregate(ctx context.Context
 				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
 			case "rightsAvg":
 				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
 			case "colorMin":
 				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
 			case "colorMax":
@@ -58685,6 +60954,79 @@ func (ec *executionContext) fieldContext_User_eventsAggregate(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_eventsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_activityAggregate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_activityAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActivityAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ActivityAggregateResult)
+	fc.Result = res
+	return ec.marshalOActivityAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_activityAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_ActivityAggregateResult_count(ctx, field)
+			case "activityidMin":
+				return ec.fieldContext_ActivityAggregateResult_activityidMin(ctx, field)
+			case "activityidMax":
+				return ec.fieldContext_ActivityAggregateResult_activityidMax(ctx, field)
+			case "owneridMin":
+				return ec.fieldContext_ActivityAggregateResult_owneridMin(ctx, field)
+			case "owneridMax":
+				return ec.fieldContext_ActivityAggregateResult_owneridMax(ctx, field)
+			case "dateMin":
+				return ec.fieldContext_ActivityAggregateResult_dateMin(ctx, field)
+			case "dateMax":
+				return ec.fieldContext_ActivityAggregateResult_dateMax(ctx, field)
+			case "countMin":
+				return ec.fieldContext_ActivityAggregateResult_countMin(ctx, field)
+			case "countMax":
+				return ec.fieldContext_ActivityAggregateResult_countMax(ctx, field)
+			case "countSum":
+				return ec.fieldContext_ActivityAggregateResult_countSum(ctx, field)
+			case "countAvg":
+				return ec.fieldContext_ActivityAggregateResult_countAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ActivityAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_activityAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -59698,6 +62040,8 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -59714,6 +62058,8 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -60698,6 +63044,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_userCanJoin(ctx, field)
 			case "guestCanCreateTension":
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
@@ -60722,6 +63070,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_contracts(ctx, field)
 			case "events_history":
 				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -60744,6 +63094,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
 				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
 		},
@@ -60930,6 +63282,8 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_markAllAsRead(ctx, field)
 			case "event_count":
 				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -60946,6 +63300,8 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_reactionsAggregate(ctx, field)
 			case "eventsAggregate":
 				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -61426,6 +63782,312 @@ func (ec *executionContext) fieldContext_VoteAggregateResult_voteidMax(_ context
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
+
+func (ec *executionContext) unmarshalInputActivityFilter(ctx context.Context, obj interface{}) (model.ActivityFilter, error) {
+	var it model.ActivityFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "activityid", "ownerid", "date", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "activityid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityid"))
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Activityid = data
+		case "ownerid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerid"))
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Ownerid = data
+		case "date":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Date = data
+		case "has":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			data, err := ec.unmarshalOActivityHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Has = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOActivityFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOActivityFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputActivityOrder(ctx context.Context, obj interface{}) (model.ActivityOrder, error) {
+	var it model.ActivityOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "asc":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			data, err := ec.unmarshalOActivityOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Asc = data
+		case "desc":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			data, err := ec.unmarshalOActivityOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Desc = data
+		case "then":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			data, err := ec.unmarshalOActivityOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Then = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputActivityPatch(ctx context.Context, obj interface{}) (model.ActivityPatch, error) {
+	var it model.ActivityPatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"ownerid", "date", "count"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "ownerid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerid"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Ownerid = data
+			} else if tmp == nil {
+				it.Ownerid = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "date":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Date = data
+			} else if tmp == nil {
+				it.Date = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "count":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.Count = data
+			} else if tmp == nil {
+				it.Count = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputActivityRef(ctx context.Context, obj interface{}) (model.ActivityRef, error) {
+	var it model.ActivityRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "activityid", "ownerid", "date", "count"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "activityid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityid"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Activityid = data
+		case "ownerid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerid"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Ownerid = data
+		case "date":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Date = data
+		case "count":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Count = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddActivityInput(ctx context.Context, obj interface{}) (model.AddActivityInput, error) {
+	var it model.AddActivityInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"activityid", "ownerid", "date", "count"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "activityid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityid"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Activityid = data
+		case "ownerid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerid"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Ownerid = data
+		case "date":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			data, err := ec.unmarshalNDateTime2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Date = data
+		case "count":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Count = data
+		}
+	}
+
+	return it, nil
+}
 
 func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj interface{}) (model.AddBlobInput, error) {
 	var it model.AddBlobInput
@@ -62629,7 +65291,7 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "cascade_directive"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -62783,6 +65445,13 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.GuestCanCreateTension = data
+		case "lexicon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lexicon"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Lexicon = data
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -62888,6 +65557,13 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.EventsHistory = data
+		case "activity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activity"))
+			data, err := ec.unmarshalOActivityRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Activity = data
 		case "cascade_directive":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cascade_directive"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -63040,7 +65716,7 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts", "subscribe"}
+	fieldsInOrder := [...]string{"updatedAt", "username", "password", "email", "email_token", "token", "contracts", "subscribe", "lang"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -63137,6 +65813,13 @@ func (ec *executionContext) unmarshalInputAddPendingUserInput(ctx context.Contex
 				return it, err
 			}
 			it.Subscribe = data
+		case "lang":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
+			data, err := ec.unmarshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Lang = data
 		}
 	}
 
@@ -64349,7 +67032,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				if err != nil {
 					return nil, err
 				}
-				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed"})
+				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed", "CommentDeleted"})
 				if err != nil {
 					return nil, err
 				}
@@ -64589,7 +67272,7 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -64947,6 +67630,13 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.EventCount = data
+		case "activity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activity"))
+			data, err := ec.unmarshalOActivityRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Activity = data
 		}
 	}
 
@@ -70558,7 +73248,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "cascade_directive"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -71021,6 +73711,28 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "lexicon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lexicon"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Lexicon = data
+			} else if tmp == nil {
+				it.Lexicon = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -71307,6 +74019,30 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.EventRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "activity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activity"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOActivityRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ActivityRef); ok {
+				it.Activity = data
+			} else if tmp == nil {
+				it.Activity = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ActivityRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "cascade_directive":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cascade_directive"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
@@ -71342,7 +74078,7 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "cascade_directive"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -71503,6 +74239,13 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.GuestCanCreateTension = data
+		case "lexicon":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lexicon"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Lexicon = data
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -71608,6 +74351,13 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.EventsHistory = data
+		case "activity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activity"))
+			data, err := ec.unmarshalOActivityRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Activity = data
 		case "cascade_directive":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cascade_directive"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -72309,7 +75059,7 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"updatedAt", "password", "email_token", "token", "contracts", "subscribe"}
+	fieldsInOrder := [...]string{"updatedAt", "password", "email_token", "token", "contracts", "subscribe", "lang"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72450,6 +75200,30 @@ func (ec *executionContext) unmarshalInputPendingUserPatch(ctx context.Context, 
 				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "lang":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.Lang); ok {
+				it.Lang = data
+			} else if tmp == nil {
+				it.Lang = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.Lang`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -72463,7 +75237,7 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "updatedAt", "username", "password", "email", "email_token", "token", "contracts", "subscribe"}
+	fieldsInOrder := [...]string{"id", "updatedAt", "username", "password", "email", "email_token", "token", "contracts", "subscribe", "lang"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72571,6 +75345,13 @@ func (ec *executionContext) unmarshalInputPendingUserRef(ctx context.Context, ob
 				return it, err
 			}
 			it.Subscribe = data
+		case "lang":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lang"))
+			data, err := ec.unmarshalOLang2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLang(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Lang = data
 		}
 	}
 
@@ -77114,7 +79895,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				if err != nil {
 					return nil, err
 				}
-				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed"})
+				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed", "CommentDeleted"})
 				if err != nil {
 					return nil, err
 				}
@@ -77604,7 +80385,7 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				if err != nil {
 					return nil, err
 				}
-				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed"})
+				e, err := ec.unmarshalOTensionEvent2ᚕfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionEventᚄ(ctx, []interface{}{"Created", "CommentPushed", "CommentDeleted"})
 				if err != nil {
 					return nil, err
 				}
@@ -77830,6 +80611,47 @@ func (ec *executionContext) unmarshalInputTensionType_hash(ctx context.Context, 
 				return it, err
 			}
 			it.In = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateActivityInput(ctx context.Context, obj interface{}) (model.UpdateActivityInput, error) {
+	var it model.UpdateActivityInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			data, err := ec.unmarshalNActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Filter = data
+		case "set":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			data, err := ec.unmarshalOActivityPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Set = data
+		case "remove":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			data, err := ec.unmarshalOActivityPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Remove = data
 		}
 	}
 
@@ -79350,7 +82172,7 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "name", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "name", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -79871,6 +82693,30 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.EventCountRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "activity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activity"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOActivityRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ActivityRef); ok {
+				it.Activity = data
+			} else if tmp == nil {
+				it.Activity = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ActivityRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -79884,7 +82730,7 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count"}
+	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -80401,6 +83247,13 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.EventCount = data
+		case "activity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activity"))
+			data, err := ec.unmarshalOActivityRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Activity = data
 		}
 	}
 
@@ -81302,6 +84155,159 @@ func (ec *executionContext) _EventKind(ctx context.Context, sel ast.SelectionSet
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var activityImplementors = []string{"Activity"}
+
+func (ec *executionContext) _Activity(ctx context.Context, sel ast.SelectionSet, obj *model.Activity) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, activityImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Activity")
+		case "id":
+			out.Values[i] = ec._Activity_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "activityid":
+			out.Values[i] = ec._Activity_activityid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "ownerid":
+			out.Values[i] = ec._Activity_ownerid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "date":
+			out.Values[i] = ec._Activity_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "count":
+			out.Values[i] = ec._Activity_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var activityAggregateResultImplementors = []string{"ActivityAggregateResult"}
+
+func (ec *executionContext) _ActivityAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.ActivityAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, activityAggregateResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ActivityAggregateResult")
+		case "count":
+			out.Values[i] = ec._ActivityAggregateResult_count(ctx, field, obj)
+		case "activityidMin":
+			out.Values[i] = ec._ActivityAggregateResult_activityidMin(ctx, field, obj)
+		case "activityidMax":
+			out.Values[i] = ec._ActivityAggregateResult_activityidMax(ctx, field, obj)
+		case "owneridMin":
+			out.Values[i] = ec._ActivityAggregateResult_owneridMin(ctx, field, obj)
+		case "owneridMax":
+			out.Values[i] = ec._ActivityAggregateResult_owneridMax(ctx, field, obj)
+		case "dateMin":
+			out.Values[i] = ec._ActivityAggregateResult_dateMin(ctx, field, obj)
+		case "dateMax":
+			out.Values[i] = ec._ActivityAggregateResult_dateMax(ctx, field, obj)
+		case "countMin":
+			out.Values[i] = ec._ActivityAggregateResult_countMin(ctx, field, obj)
+		case "countMax":
+			out.Values[i] = ec._ActivityAggregateResult_countMax(ctx, field, obj)
+		case "countSum":
+			out.Values[i] = ec._ActivityAggregateResult_countSum(ctx, field, obj)
+		case "countAvg":
+			out.Values[i] = ec._ActivityAggregateResult_countAvg(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var addActivityPayloadImplementors = []string{"AddActivityPayload"}
+
+func (ec *executionContext) _AddActivityPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddActivityPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addActivityPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddActivityPayload")
+		case "activity":
+			out.Values[i] = ec._AddActivityPayload_activity(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddActivityPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var addBlobPayloadImplementors = []string{"AddBlobPayload"}
 
@@ -82743,6 +85749,46 @@ func (ec *executionContext) _ContractAggregateResult(ctx context.Context, sel as
 			out.Values[i] = ec._ContractAggregateResult_closedAtMin(ctx, field, obj)
 		case "closedAtMax":
 			out.Values[i] = ec._ContractAggregateResult_closedAtMax(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteActivityPayloadImplementors = []string{"DeleteActivityPayload"}
+
+func (ec *executionContext) _DeleteActivityPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteActivityPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteActivityPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteActivityPayload")
+		case "activity":
+			out.Values[i] = ec._DeleteActivityPayload_activity(ctx, field, obj)
+		case "msg":
+			out.Values[i] = ec._DeleteActivityPayload_msg(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._DeleteActivityPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -84751,6 +87797,18 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteEventCount(ctx, field)
 			})
+		case "addActivity":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addActivity(ctx, field)
+			})
+		case "updateActivity":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateActivity(ctx, field)
+			})
+		case "deleteActivity":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteActivity(ctx, field)
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -84865,6 +87923,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_userCanJoin(ctx, field, obj)
 		case "guestCanCreateTension":
 			out.Values[i] = ec._Node_guestCanCreateTension(ctx, field, obj)
+		case "lexicon":
+			out.Values[i] = ec._Node_lexicon(ctx, field, obj)
 		case "watchers":
 			out.Values[i] = ec._Node_watchers(ctx, field, obj)
 		case "children":
@@ -84889,6 +87949,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_contracts(ctx, field, obj)
 		case "events_history":
 			out.Values[i] = ec._Node_events_history(ctx, field, obj)
+		case "activity":
+			out.Values[i] = ec._Node_activity(ctx, field, obj)
 		case "cascade_directive":
 			out.Values[i] = ec._Node_cascade_directive(ctx, field, obj)
 		case "tensions_outAggregate":
@@ -84911,6 +87973,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_contractsAggregate(ctx, field, obj)
 		case "events_historyAggregate":
 			out.Values[i] = ec._Node_events_historyAggregate(ctx, field, obj)
+		case "activityAggregate":
+			out.Values[i] = ec._Node_activityAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -84979,6 +88043,10 @@ func (ec *executionContext) _NodeAggregateResult(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._NodeAggregateResult_rightsSum(ctx, field, obj)
 		case "rightsAvg":
 			out.Values[i] = ec._NodeAggregateResult_rightsAvg(ctx, field, obj)
+		case "lexiconMin":
+			out.Values[i] = ec._NodeAggregateResult_lexiconMin(ctx, field, obj)
+		case "lexiconMax":
+			out.Values[i] = ec._NodeAggregateResult_lexiconMax(ctx, field, obj)
 		case "colorMin":
 			out.Values[i] = ec._NodeAggregateResult_colorMin(ctx, field, obj)
 		case "colorMax":
@@ -85278,6 +88346,8 @@ func (ec *executionContext) _PendingUser(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._PendingUser_contracts(ctx, field, obj)
 		case "subscribe":
 			out.Values[i] = ec._PendingUser_subscribe(ctx, field, obj)
+		case "lang":
+			out.Values[i] = ec._PendingUser_lang(ctx, field, obj)
 		case "contractsAggregate":
 			out.Values[i] = ec._PendingUser_contractsAggregate(ctx, field, obj)
 		default:
@@ -87717,6 +90787,63 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getActivity":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getActivity(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "queryActivity":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryActivity(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "aggregateActivity":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateActivity(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -88148,6 +91275,44 @@ func (ec *executionContext) _TensionAggregateResult(ctx context.Context, sel ast
 			out.Values[i] = ec._TensionAggregateResult_n_commentsSum(ctx, field, obj)
 		case "n_commentsAvg":
 			out.Values[i] = ec._TensionAggregateResult_n_commentsAvg(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateActivityPayloadImplementors = []string{"UpdateActivityPayload"}
+
+func (ec *executionContext) _UpdateActivityPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateActivityPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateActivityPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateActivityPayload")
+		case "activity":
+			out.Values[i] = ec._UpdateActivityPayload_activity(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._UpdateActivityPayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -89285,6 +92450,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_markAllAsRead(ctx, field, obj)
 		case "event_count":
 			out.Values[i] = ec._User_event_count(ctx, field, obj)
+		case "activity":
+			out.Values[i] = ec._User_activity(ctx, field, obj)
 		case "subscriptionsAggregate":
 			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
 		case "watchingAggregate":
@@ -89301,6 +92468,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_reactionsAggregate(ctx, field, obj)
 		case "eventsAggregate":
 			out.Values[i] = ec._User_eventsAggregate(ctx, field, obj)
+		case "activityAggregate":
+			out.Values[i] = ec._User_activityAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -89740,6 +92909,53 @@ func (ec *executionContext) _VoteAggregateResult(ctx context.Context, sel ast.Se
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) marshalNActivity2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx context.Context, sel ast.SelectionSet, v *model.Activity) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Activity(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNActivityFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx context.Context, v interface{}) (model.ActivityFilter, error) {
+	res, err := ec.unmarshalInputActivityFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx context.Context, v interface{}) (*model.ActivityFilter, error) {
+	res, err := ec.unmarshalInputActivityFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNActivityRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRef(ctx context.Context, v interface{}) (*model.ActivityRef, error) {
+	res, err := ec.unmarshalInputActivityRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddActivityInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddActivityInputᚄ(ctx context.Context, v interface{}) ([]*model.AddActivityInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddActivityInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddActivityInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddActivityInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddActivityInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddActivityInput(ctx context.Context, v interface{}) (*model.AddActivityInput, error) {
+	res, err := ec.unmarshalInputAddActivityInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
 
 func (ec *executionContext) unmarshalNAddBlobInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBlobInputᚄ(ctx context.Context, v interface{}) ([]*model.AddBlobInput, error) {
 	var vSlice []interface{}
@@ -91266,6 +94482,11 @@ func (ec *executionContext) marshalNTensionType2fractaleᚋfractal6ᚗgoᚋgraph
 	return v
 }
 
+func (ec *executionContext) unmarshalNUpdateActivityInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateActivityInput(ctx context.Context, v interface{}) (model.UpdateActivityInput, error) {
+	res, err := ec.unmarshalInputUpdateActivityInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateBlobInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateBlobInput(ctx context.Context, v interface{}) (model.UpdateBlobInput, error) {
 	res, err := ec.unmarshalInputUpdateBlobInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -91570,6 +94791,272 @@ func (ec *executionContext) unmarshalNVoteRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋg
 func (ec *executionContext) unmarshalNVoteRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐVoteRef(ctx context.Context, v interface{}) (*model.VoteRef, error) {
 	res, err := ec.unmarshalInputVoteRef(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOActivity2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx context.Context, sel ast.SelectionSet, v []*model.Activity) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOActivity2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOActivity2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Activity) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNActivity2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOActivity2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivity(ctx context.Context, sel ast.SelectionSet, v *model.Activity) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Activity(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOActivityAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.ActivityAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ActivityAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOActivityFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx context.Context, v interface{}) ([]*model.ActivityFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ActivityFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOActivityFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityFilter(ctx context.Context, v interface{}) (*model.ActivityFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputActivityFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOActivityHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityHasFilter(ctx context.Context, v interface{}) ([]*model.ActivityHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ActivityHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOActivityHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOActivityHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.ActivityHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOActivityHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOActivityHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityHasFilter(ctx context.Context, v interface{}) (*model.ActivityHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ActivityHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOActivityHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.ActivityHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOActivityOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrder(ctx context.Context, v interface{}) (*model.ActivityOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputActivityOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOActivityOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrderable(ctx context.Context, v interface{}) (*model.ActivityOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ActivityOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOActivityOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityOrderable(ctx context.Context, sel ast.SelectionSet, v *model.ActivityOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOActivityPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityPatch(ctx context.Context, v interface{}) (*model.ActivityPatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputActivityPatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOActivityRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRefᚄ(ctx context.Context, v interface{}) ([]*model.ActivityRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ActivityRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNActivityRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐActivityRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOAddActivityPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddActivityPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddActivityPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddActivityPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddBlobPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddBlobPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddBlobPayload) graphql.Marshaler {
@@ -93191,6 +96678,13 @@ func (ec *executionContext) unmarshalODateTimeRange2ᚖfractaleᚋfractal6ᚗgo�
 	}
 	res, err := ec.unmarshalInputDateTimeRange(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODeleteActivityPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteActivityPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteActivityPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteActivityPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteBlobPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteBlobPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteBlobPayload) graphql.Marshaler {
@@ -99268,6 +102762,13 @@ func (ec *executionContext) unmarshalOTensionType_hash2ᚖfractaleᚋfractal6ᚗ
 	}
 	res, err := ec.unmarshalInputTensionType_hash(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUpdateActivityPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateActivityPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateActivityPayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateActivityPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateBlobPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateBlobPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateBlobPayload) graphql.Marshaler {

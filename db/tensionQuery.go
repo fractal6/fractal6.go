@@ -1,6 +1,6 @@
 /*
  * Fractale - Self-organisation for humans.
- * Copyright (C) 2024 Fractale Co
+ * Copyright (C) 2026 Fractale Co
  *
  * This file is part of Fractale.
  *
@@ -39,8 +39,8 @@ type TensionQuery struct {
 	Type    *model.TensionType   `json:"type_"`
 	Authors []string             `json:"authors"`
 	Labels  []string             `json:"labels"`
-	// Either filter tension that in or NOT in the given project
-	InProject bool    `json:in_project`
+	// Either filter tension that is in or NOT in the given project
+	InProject bool    `json:"in_project"`
 	Projectid *string `json:"projectid"`
 	// Protected tensions @auth
 	NameidsProtected []string
@@ -116,10 +116,14 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 	}
 
 	/* sorting */
-	var sortFilter string = "orderdesc"
+	var orderFilter string = "orderdesc"
+	var orderBy string = "Post.createdAt"
 	if q.Sort != nil {
 		if *q.Sort == "oldest" {
-			sortFilter = "orderasc"
+			orderFilter = "orderasc"
+		}
+		if *q.Sort == "activity" {
+			orderBy = "Post.updatedAt"
 		}
 	}
 
@@ -178,7 +182,8 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 		"tensionFilter": tensionFilter,
 		"authorsFilter": authorsFilter,
 		"labelsFilter":  labelsFilter,
-		"order":         sortFilter,
+		"order":         orderFilter,
+		"orderBy":       orderBy,
 		// Protected
 		"rootnameidProtected": rootnameidProtected,
 		"nameidsProtected":    nameidsProtectedString,
