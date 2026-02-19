@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"slices"
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -187,7 +188,7 @@ func deleteProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 		if err != nil {
 			return data, err
 		}
-		if l := IndexOf(cardLoc.Typenames, "ProjectDraft"); l >= 0 {
+		if l := slices.Index(cardLoc.Typenames, "ProjectDraft"); l >= 0 {
 			// Delete draft
 			_, err := db.GetDB().Meta("deleteCardDraft", map[string]string{"cardid": card.ID})
 			if err != nil {

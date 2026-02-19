@@ -23,6 +23,7 @@ package db
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	"fractale/fractal6.go/graph/model"
@@ -347,11 +348,9 @@ func (dg Dgraph) UpdateValue(uctx model.UserCtx, vertex string, id, k, v string)
 func GetDirectives(pg string) (string, string) {
 	directives := []string{}
 	words := strings.Fields(pg)
-	for _, word := range words {
-		if word == "cascade_directive" {
-			directives = append(directives, "@cascade")
-			pg = strings.ReplaceAll(pg, "cascade_directive", "")
-		}
+	if slices.Contains(words, "cascade_directive") {
+		directives = append(directives, "@cascade")
+		pg = strings.ReplaceAll(pg, "cascade_directive", "")
 	}
 	return pg, strings.Join(directives, " ")
 }

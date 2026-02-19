@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"slices"
 	"time"
 
 	"github.com/go-chi/jwtauth/v5"
@@ -301,10 +302,8 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
 	}
 
 	// Check if User context need to be updated
-	for _, v := range uctx.CheckedNameid {
-		if v == nid {
-			return uctx, e
-		}
+	if slices.Contains(uctx.CheckedNameid, nid) {
+		return uctx, e
 	}
 
 	// Check last node update date

@@ -22,6 +22,7 @@ package db
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -159,12 +160,7 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 	}
 	// -- Protected circles
 	var rootnameidProtected string
-	var hasSelf bool
-	for _, u := range authors { // @reduce: with generics
-		if u == q.Username {
-			hasSelf = true
-		}
-	}
+	hasSelf := slices.Contains(authors, q.Username)
 	if len(q.NameidsProtected) > 0 && (hasSelf || len(q.Authors) == 0) {
 		rootnameidProtected, err = codec.Nid2rootid(q.NameidsProtected[0])
 		if err != nil {
