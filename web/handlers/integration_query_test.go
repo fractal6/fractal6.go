@@ -65,7 +65,7 @@ func TestSubProjects_MemberSeesPrivateNotSecret(t *testing.T) {
 	// They can see Private circles (org membership) but NOT Secret circles (no role there).
 	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
 
-	rr := doRequest("POST", "/q/sub_projects",
+	rr := doRequest("POST", "/q/projects/sub",
 		nodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true}, jwtCookie)
 	requireStatus(t, rr, http.StatusOK)
 
@@ -91,7 +91,7 @@ func TestSubProjects_OwnerWithSecretRoleSeesAll(t *testing.T) {
 	// They can see all projects including the secret one.
 	jwtCookie := loginAs(testutil.TestUser2, testutil.TestPassword2)
 
-	rr := doRequest("POST", "/q/sub_projects",
+	rr := doRequest("POST", "/q/projects/sub",
 		nodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true}, jwtCookie)
 	requireStatus(t, rr, http.StatusOK)
 
@@ -113,7 +113,7 @@ func TestSubProjects_ExcludeSelf(t *testing.T) {
 	// With IncludeSelf=false, the root circle's project should be excluded.
 	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
 
-	rr := doRequest("POST", "/q/sub_projects",
+	rr := doRequest("POST", "/q/projects/sub",
 		nodeQuery{Nameid: testutil.SecOrg, IncludeSelf: false}, jwtCookie)
 	requireStatus(t, rr, http.StatusOK)
 
@@ -136,7 +136,7 @@ func TestSubProjects_ExcludeSelf(t *testing.T) {
 
 func TestSubProjects_UnauthenticatedSeesNothingOnPrivateOrg(t *testing.T) {
 	// No JWT — sec-org is Private, so unauthenticated users see no projects.
-	rr := doRequest("POST", "/q/sub_projects",
+	rr := doRequest("POST", "/q/projects/sub",
 		nodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true})
 	requireStatus(t, rr, http.StatusOK)
 
@@ -152,7 +152,7 @@ func TestSubProjects_UnauthenticatedSeesNothingOnPrivateOrg(t *testing.T) {
 
 func TestSubProjects_PublicOrgNoProjects(t *testing.T) {
 	// test-org has no projects, should return empty/null
-	rr := doRequest("POST", "/q/sub_projects",
+	rr := doRequest("POST", "/q/projects/sub",
 		nodeQuery{Nameid: "test-org", IncludeSelf: true})
 	requireStatus(t, rr, http.StatusOK)
 
@@ -164,7 +164,7 @@ func TestSubProjects_PublicOrgNoProjects(t *testing.T) {
 
 func TestSubProjects_InvalidBody(t *testing.T) {
 	// Send invalid JSON body (number instead of struct)
-	rr := doRequest("POST", "/q/sub_projects", 12345)
+	rr := doRequest("POST", "/q/projects/sub", 12345)
 	if rr.Code == http.StatusOK {
 		t.Fatal("expected non-200 status for invalid body")
 	}

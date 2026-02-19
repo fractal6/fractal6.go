@@ -31,6 +31,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/spf13/viper"
 
+	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/web"
 	"fractale/fractal6.go/web/auth"
 	handle6 "fractale/fractal6.go/web/handlers"
@@ -160,28 +161,32 @@ func RunServer() {
 	r.Group(func(r chi.Router) {
 		r.Route("/q", func(r chi.Router) {
 			// Special recursive query
-			r.Group(func(r chi.Router) {
-				// The visibility filtering is done through the filterByNodeVisibility
-				// r.Use(middle6.CheckRecursiveQueryRights)
-				r.Post("/sub_nodes", handle6.SubNodes)
-				r.Post("/sub_members", handle6.SubMembers)
-				r.Post("/top_labels", handle6.TopLabels)
-				r.Post("/sub_labels", handle6.SubLabels)
-				r.Post("/top_roles", handle6.TopRoles)
-				r.Post("/sub_roles", handle6.SubRoles)
-				r.Post("/sub_projects", handle6.SubProjects)
+			// The visibility filtering is done through the filterByNodeVisibility
+			r.Route("/nodes", func(r chi.Router) {
+				r.Post("/sub", handle6.SubNodes)
+			})
+			r.Route("/members", func(r chi.Router) {
+				r.Post("/sub", handle6.SubMembers)
+			})
+			r.Route("/labels", func(r chi.Router) {
+				r.Post("/top", handle6.NodeHolderHandler(db.GetDB().GetTopLabels))
+				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubLabels))
+			})
+			r.Route("/roles", func(r chi.Router) {
+				r.Post("/top", handle6.NodeHolderHandler(db.GetDB().GetTopRoles))
+				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubRoles))
+			})
+			r.Route("/projects", func(r chi.Router) {
+				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubProjects))
 			})
 
 			// Special tension query (nested filters and counts)
-			r.Group(func(r chi.Router) {
-				// The visibility filtering is done directly in the query resolver as
-				// doing it here required to rewrite the body, which seems difficult ?!
-				// r.Use(middle6.CheckTensionQueryRights)
-				r.Post("/tensions_light", handle6.TensionsLight)
-				r.Post("/tensions_int", handle6.TensionsInt)
-				r.Post("/tensions_ext", handle6.TensionsExt)
-				r.Post("/tensions_all", handle6.TensionsAll)
-				r.Post("/tensions_count", handle6.TensionsCount)
+			r.Route("/tensions", func(r chi.Router) {
+				r.Post("/light", handle6.TensionsHandler("light"))
+				r.Post("/int", handle6.TensionsHandler("int"))
+				r.Post("/ext", handle6.TensionsHandler("ext"))
+				r.Post("/all", handle6.TensionsHandler("all"))
+				r.Post("/count", handle6.TensionsCount)
 			})
 		})
 	})

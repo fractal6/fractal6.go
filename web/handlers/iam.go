@@ -21,7 +21,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -41,9 +40,7 @@ func MakeOwner(w http.ResponseWriter, r *http.Request) {
 		// Target orga
 		Nameid string
 	}{}
-	err := json.NewDecoder(r.Body).Decode(&form)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &form) {
 		return
 	}
 

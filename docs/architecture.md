@@ -87,23 +87,48 @@ fractal6.go/
 ### HTTP Router (chi/v5)
 
 ```
-POST /api                  - GraphQL endpoint
-POST /auth/signup          - User registration
-POST /auth/login           - User login
-POST /auth/resetpassword   - Password reset
-POST /auth/verificate      - Email verification
-POST /q/sub_nodes          - Query sub-nodes (with visibility filtering)
-POST /q/sub_members        - Query sub-members (with visibility filtering)
-POST /q/top_labels         - Query top labels (with visibility filtering)
-POST /q/sub_labels         - Query sub labels (with visibility filtering)
-POST /q/top_roles          - Query top roles (with visibility filtering)
-POST /q/sub_roles          - Query sub roles (with visibility filtering)
-POST /q/sub_projects       - Query sub-projects (with visibility filtering)
-POST /q/tensions_*         - Filtered tension queries
-POST /notifications        - MTA webhook (email replies)
-GET  /playground           - GraphQL playground (dev only)
-GET  /assets/*             - Static assets
-GET  /*                    - Frontend SPA
+POST /api                              - GraphQL endpoint
+
+# Auth API - User
+POST /auth/signup                      - User registration
+POST /auth/validate                    - Email verification
+POST /auth/login                       - User login
+GET  /auth/logout                      - User logout
+POST /auth/tokenack                    - Token acknowledgment
+POST /auth/resetpasswordchallenge      - Password reset challenge (captcha)
+POST /auth/resetpassword               - Password reset
+POST /auth/resetpassword2              - Password reset (step 2)
+POST /auth/uuidcheck                   - UUID check
+POST /auth/updatepassword              - Update password
+
+# Auth API - Organisation
+POST /auth/createorga                  - Create organisation
+POST /auth/setusercanjoin              - Set user-can-join flag
+POST /auth/setguestcancreatetension    - Set guest-can-create-tension flag
+POST /auth/setlexicon                  - Set organisation lexicon
+POST /auth/makeowner                   - Transfer ownership
+
+# REST API - Queries (with visibility filtering)
+POST /q/nodes/sub                      - Query sub-nodes
+POST /q/members/sub                    - Query sub-members
+POST /q/labels/top                     - Query top labels
+POST /q/labels/sub                     - Query sub labels
+POST /q/roles/top                      - Query top roles
+POST /q/roles/sub                      - Query sub roles
+POST /q/projects/sub                   - Query sub-projects
+POST /q/tensions/{mode}                - Filtered tension queries (light, int, ext, all)
+POST /q/tensions/count                 - Tension count query
+
+# Webhooks
+POST /notifications                    - MTA webhook (email replies)
+POST /mailing                          - Mailing webhook
+POST /postal_webhook                   - Postal webhook
+
+# Dev & Static
+GET  /playground                       - GraphQL playground (dev only)
+GET  /ping                             - Health check (dev only)
+GET  /assets/*                         - Static assets
+GET  /*                                - Frontend SPA
 ```
 
 ### Middleware Stack

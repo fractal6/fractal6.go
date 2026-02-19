@@ -26,7 +26,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
-	"regexp"
 	re "regexp"
 	"strconv"
 	"strings"
@@ -42,7 +41,7 @@ func CleanString(data string, quote bool) string {
 	var d string = data
 	d = strings.Replace(d, `\n`, "", -1)
 	d = strings.Replace(d, "\n", "", -1)
-	space := regexp.MustCompile(`\s+`)
+	space := re.MustCompile(`\s+`)
 	d = space.ReplaceAllString(d, " ")
 	if quote {
 		d = QuoteString(d)

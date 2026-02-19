@@ -21,8 +21,6 @@
 package handlers
 
 import (
-	//"fmt"
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/mail"
@@ -75,9 +73,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 
 	// Get request form
 	var form EmailForm
-	err := json.NewDecoder(r.Body).Decode(&form)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
+	if !decodeBody(w, r, &form) {
 		return
 	}
 
@@ -216,9 +212,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 
 	// Get request form
 	var form EmailForm
-	err := json.NewDecoder(r.Body).Decode(&form)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
+	if !decodeBody(w, r, &form) {
 		return
 	}
 

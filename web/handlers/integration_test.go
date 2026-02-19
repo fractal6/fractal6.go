@@ -91,7 +91,30 @@ func buildTestRouter() chi.Router {
 
 	// Query routes
 	r.Route("/q", func(r chi.Router) {
-		r.Post("/sub_projects", SubProjects)
+		r.Route("/nodes", func(r chi.Router) {
+			r.Post("/sub", SubNodes)
+		})
+		r.Route("/members", func(r chi.Router) {
+			r.Post("/sub", SubMembers)
+		})
+		r.Route("/labels", func(r chi.Router) {
+			r.Post("/top", NodeHolderHandler(db.GetDB().GetTopLabels))
+			r.Post("/sub", NodeHolderHandler(db.GetDB().GetSubLabels))
+		})
+		r.Route("/roles", func(r chi.Router) {
+			r.Post("/top", NodeHolderHandler(db.GetDB().GetTopRoles))
+			r.Post("/sub", NodeHolderHandler(db.GetDB().GetSubRoles))
+		})
+		r.Route("/projects", func(r chi.Router) {
+			r.Post("/sub", NodeHolderHandler(db.GetDB().GetSubProjects))
+		})
+		r.Route("/tensions", func(r chi.Router) {
+			r.Post("/light", TensionsHandler("light"))
+			r.Post("/int", TensionsHandler("int"))
+			r.Post("/ext", TensionsHandler("ext"))
+			r.Post("/all", TensionsHandler("all"))
+			r.Post("/count", TensionsCount)
+		})
 	})
 
 	// Auth routes

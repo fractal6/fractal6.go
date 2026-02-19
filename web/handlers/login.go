@@ -21,8 +21,6 @@
 package handlers
 
 import (
-	//"fmt"
-	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
@@ -47,18 +45,14 @@ func init() {
 // Signup register a new user and gives it a token.
 func Signup(w http.ResponseWriter, r *http.Request) {
 	var creds model.UserCreds
-
-	// Get the JSON body and decode into UserCreds
-	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &creds) {
 		return
 	}
 	// Ignore username/email case
 	creds.Username = strings.ToLower(creds.Username)
 
 	// Validate user form and ensure user uniquenesss.
-	err = auth.ValidateNewUser(creds)
+	err := auth.ValidateNewUser(creds)
 	if err != nil {
 		http.Error(w, err.Error(), 401)
 		return
@@ -127,10 +121,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 	var creds model.UserCreds
 	var uctx *model.UserCtx
 
-	// Get the JSON body and decode into UserCreds
-	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &creds) {
 		return
 	}
 	// Ignore username/email case
@@ -149,7 +140,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 		// User signup parcour
 		// --
 		// User has already been validated and saved in UserPending
-		if err = db.DB.Meta1("getPendingUser", map[string]string{"k": "email_token", "v": *creds.EmailToken}, &pending); err != nil {
+		if err := db.DB.Meta1("getPendingUser", map[string]string{"k": "email_token", "v": *creds.EmailToken}, &pending); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		} else if pending.UpdatedAt != nil &&
@@ -163,7 +154,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 		// User invitation parcour
 		// --
 		// User has not been registered in UserPending
-		if err = db.DB.Meta1("getPendingUser", map[string]string{"k": "token", "v": *creds.Puid}, &pending); err != nil {
+		if err := db.DB.Meta1("getPendingUser", map[string]string{"k": "token", "v": *creds.Puid}, &pending); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		} else if pending.Email == "" {
@@ -183,7 +174,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			creds.Email = pending.Email
-			if err = auth.ValidateNewUser(creds); err != nil {
+			if err := auth.ValidateNewUser(creds); err != nil {
 				http.Error(w, err.Error(), 401)
 				return
 			}
@@ -201,6 +192,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var err error
 		uctx, err = auth.CreateNewUser(creds)
 		if err != nil {
 			// Credentials validation error
@@ -252,24 +244,13 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, httpCookie)
 
-	// Return the user context
-	data, err := json.Marshal(uctx)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	w.Write(data)
+	writeJSON(w, uctx)
 }
 
 // Login create and pass a token to the authenticated user.
 func Login(w http.ResponseWriter, r *http.Request) {
 	var creds model.UserCreds
-	var uctx *model.UserCtx
-
-	// Get the JSON body and decode into UserCreds
-	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &creds) {
 		return
 	}
 	// Ignore username/email case
@@ -277,7 +258,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// === This is protected ===
 	// Returns the user ctx if authenticated.
-	uctx, err = auth.GetAuthUserCtx(creds)
+	uctx, err := auth.GetAuthUserCtx(creds)
 	if err != nil {
 		// Credentials validation error
 		http.Error(w, err.Error(), 401)
@@ -296,13 +277,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, httpCookie)
 
-	// Return the user context
-	data, err := json.Marshal(uctx)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
 	// @debug: use a thread to set the last ack Literal, no need to wait here.
 	err = db.GetDB().SetFieldByEq("User.username", uctx.Username, "User.lastAck", Now())
 	if err != nil {
@@ -310,7 +284,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(data)
+	writeJSON(w, uctx)
 }
 
 // Logout reset the jwt cookie.
@@ -326,7 +300,6 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 	oldUctx, err := auth.GetUserContextLight(r.Context())
 	if err != nil {
 		// User authentication error
-		// w.WriteHeader(http.StatusUnauthorized)
 		http.Error(w, err.Error(), 401)
 		return
 	}
@@ -335,7 +308,6 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 	uctx, err := auth.GetAuthUserFromCtx(*oldUctx)
 	if err != nil {
 		// Credentials validation error
-		// w.WriteHeader(http.StatusUnauthorized)
 		http.Error(w, err.Error(), 401)
 		return
 	}
@@ -344,7 +316,6 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 	httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
-		// w.WriteHeader(http.StatusInternalServerError)
 		http.Error(w, err.Error(), 500)
 		return
 	}
@@ -353,13 +324,6 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, httpCookie)
 
-	// Return the user context
-	data_out, err := json.Marshal(uctx)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
 	// @debug: use a thread to set the last ack Literal, no need to wait here.
 	err = db.GetDB().SetFieldByEq("User.username", uctx.Username, "User.lastAck", Now())
 	if err != nil {
@@ -367,7 +331,7 @@ func TokenAck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(data_out)
+	writeJSON(w, uctx)
 }
 
 func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
@@ -390,7 +354,6 @@ func ResetPasswordChallenge(w http.ResponseWriter, r *http.Request) {
 	data, _ := captcha.New(150, 50, func(options *captcha.Options) {
 		options.CharPreset = "abcdefghkmnpqrstuvwxyz0123456789"
 	})
-	// data, _ := captcha.NewMathExpr(150, 50)
 
 	// Save the token and challenge result in cache
 	// with timeout to clear it.
@@ -418,11 +381,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		Email     string
 		Challenge string
 	}
-
-	// Get the JSON body and decode it
-	err := json.NewDecoder(r.Body).Decode(&data)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &data) {
 		return
 	}
 
@@ -433,7 +392,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check email format
-	err = auth.ValidateEmail(data.Email)
+	err := auth.ValidateEmail(data.Email)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -448,7 +407,6 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	token := c.Value
 
 	// Get the challenge from cache
-	// expected, err := redis.String(cache.Do("GET", token))
 	expected, err := cache.Get(ctx, token).Result()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -495,11 +453,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 		Password2 string
 		Token     string
 	}
-
-	// Get the JSON body and decode it
-	err := json.NewDecoder(r.Body).Decode(&data)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &data) {
 		return
 	}
 
@@ -509,7 +463,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = auth.ValidatePassword(data.Password); err != nil {
+	if err := auth.ValidatePassword(data.Password); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -549,7 +503,6 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 	httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
-		// w.WriteHeader(http.StatusInternalServerError)
 		http.Error(w, err.Error(), 500)
 		return
 	}
@@ -558,14 +511,7 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, httpCookie)
 
-	// Return the user context
-	data_out, err := json.Marshal(uctx)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	w.Write(data_out)
+	writeJSON(w, uctx)
 }
 
 // Check that the cache contains the given token
@@ -574,11 +520,7 @@ func UuidCheck(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		Token string
 	}
-
-	// Get the JSON body and decode it
-	err := json.NewDecoder(r.Body).Decode(&data)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &data) {
 		return
 	}
 
@@ -603,11 +545,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		ConfirmPassword string
 		NewPassword     string
 	}
-
-	// Get the JSON body and decode it
-	err := json.NewDecoder(r.Body).Decode(&data)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &data) {
 		return
 	}
 
@@ -618,7 +556,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "The passwords does not match.", 400)
 		return
 	}
-	if err = auth.ValidatePassword(data.NewPassword); err != nil {
+	if err := auth.ValidatePassword(data.NewPassword); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -640,7 +578,6 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	httpCookie, err := auth.NewUserCookie(*uctx)
 	if err != nil {
 		// Token issuing error
-		// w.WriteHeader(http.StatusInternalServerError)
 		http.Error(w, err.Error(), 500)
 		return
 	}
@@ -649,12 +586,5 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(w, httpCookie)
 
-	// Return the user context
-	data_out, err := json.Marshal(uctx)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	w.Write(data_out)
+	writeJSON(w, uctx)
 }

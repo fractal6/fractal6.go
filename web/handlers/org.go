@@ -21,8 +21,6 @@
 package handlers
 
 import (
-	//"fmt"
-	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -45,9 +43,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 
 	// Get request form
 	var form model.OrgaForm
-	err = json.NewDecoder(r.Body).Decode(&form)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &form) {
 		return
 	}
 
@@ -164,8 +160,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return result on success
-	data, _ := json.Marshal(model.Node{Nameid: nameid})
-	w.Write(data)
+	writeJSON(w, model.Node{Nameid: nameid})
 }
 
 func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
@@ -174,9 +169,7 @@ func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
 		Nameid string
 		Val    bool
 	}{}
-	err := json.NewDecoder(r.Body).Decode(&form)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &form) {
 		return
 	}
 
@@ -233,9 +226,7 @@ func SetGuestCanCreateTension(w http.ResponseWriter, r *http.Request) {
 		Nameid string
 		Val    bool
 	}{}
-	err := json.NewDecoder(r.Body).Decode(&form)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &form) {
 		return
 	}
 
@@ -268,9 +259,7 @@ func SetLexicon(w http.ResponseWriter, r *http.Request) {
 		Nameid string
 		Val    string
 	}{}
-	err := json.NewDecoder(r.Body).Decode(&form)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !decodeBody(w, r, &form) {
 		return
 	}
 
