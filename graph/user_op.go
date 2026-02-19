@@ -250,7 +250,7 @@ func SyncPendingUser(username, email string) error {
 				*contractPatch.Event.Old,
 				*contractPatch.Event.New,
 			)
-			err = db.DB.Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
+			err = db.GetDB().Update(db.GetDB().GetRootUctx(), "contract", model.UpdateContractInput{
 				Filter: &model.ContractFilter{ID: []string{cid}},
 				Set:    &contractPatch,
 			})
@@ -258,7 +258,7 @@ func SyncPendingUser(username, email string) error {
 				return err
 			}
 			// @id field cant't be update with graphql (@debug dgraph)
-			err = db.DB.SetFieldById(cid, "Contract.contractid", contractid)
+			err = db.GetDB().SetFieldById(cid, "Contract.contractid", contractid)
 			if err != nil {
 				return err
 			}
@@ -285,7 +285,7 @@ func SyncPendingUser(username, email string) error {
 	}
 
 	// Remove pending user
-	err = db.DB.Delete(db.DB.GetRootUctx(), "pendingUser", model.PendingUserFilter{
+	err = db.GetDB().Delete(db.GetDB().GetRootUctx(), "pendingUser", model.PendingUserFilter{
 		Email: &model.StringHashFilter{Eq: &email},
 	})
 

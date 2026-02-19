@@ -104,7 +104,7 @@ func (Jwt) New() *Jwt {
 func GenToken(username string) {
 	var uctx model.UserCtx
 	if username == "" {
-		uctx = db.DB.GetRootUctx()
+		uctx = db.GetDB().GetRootUctx()
 	} else {
 		userCtx, err := db.GetDB().GetUctx("username", username)
 		if err != nil {

@@ -568,7 +568,7 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 		}
 
 		// update node
-		err = db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+		err = db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput)
 		if err != nil {
 			return false, err
 		}
@@ -681,7 +681,7 @@ func PinTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventR
 		},
 	}
 	// update node
-	err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+	err := db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput)
 	return true, err
 }
 
@@ -696,7 +696,7 @@ func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 		},
 	}
 	// update node
-	err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+	err := db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput)
 	return true, err
 }
 

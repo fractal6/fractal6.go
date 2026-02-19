@@ -57,7 +57,7 @@ var (
 )
 
 // Database client
-var DB *Dgraph
+var db_dg *Dgraph
 
 // Draph database clients
 type Dgraph struct {
@@ -150,16 +150,16 @@ func init() {
 		log.Println("Warning: DGRAPH_PRIVATE_KEY or DGRAPH_PUBLIC_KEY not found. JWT signing disabled.")
 	}
 
-	DB = initDB()
+	db_dg = initDB()
 }
 
 func GetDB() *Dgraph {
-	return DB
+	return db_dg
 }
 
-// SetTestDB overrides the global DB singleton for integration tests.
+// SetTestDB overrides the global db_dg singleton for integration tests.
 func SetTestDB(gqlAddr, grpcAddr string) {
-	DB = &Dgraph{
+	db_dg = &Dgraph{
 		gqlAddr:  gqlAddr,
 		grpcAddr: grpcAddr,
 	}

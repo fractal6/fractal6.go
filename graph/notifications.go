@@ -212,7 +212,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 	if notif.HasEvent(model.TensionEventMemberUnlinked) && codec.IsCircle(notif.Receiverid) {
 		u := notif.GetExUser()
 		if _, ex := users[u]; !ex {
-			uctxFs, err := db.DB.GetUctx("username", u)
+			uctxFs, err := db.GetDB().GetUctx("username", u)
 			if err != nil {
 				return err
 			}

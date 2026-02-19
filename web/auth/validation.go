@@ -269,7 +269,7 @@ func ValidateNewUser(creds model.UserCreds) error {
 	// TODO: password complexity check
 
 	// Check username existence
-	ex1, err1 := db.DB.Exists("User.username", username, nil)
+	ex1, err1 := db.GetDB().Exists("User.username", username, nil)
 	if err1 != nil {
 		return err1
 	}
@@ -277,7 +277,7 @@ func ValidateNewUser(creds model.UserCreds) error {
 		return ErrUsernameExist
 	}
 	// Check email existence
-	ex2, err2 := db.DB.Exists("User.email", email, nil)
+	ex2, err2 := db.GetDB().Exists("User.email", email, nil)
 	if err2 != nil {
 		return err2
 	}

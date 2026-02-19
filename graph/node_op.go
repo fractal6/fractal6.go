@@ -159,24 +159,24 @@ func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model
 		if codec.IsMembershipRoleType(model.RoleType(value)) {
 			return false, fmt.Errorf("Membership roles are protected and cannot be created like this.")
 		}
-		err = db.DB.SetFieldByEq("Node.nameid", nameid, "Node.role_type", value)
+		err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.role_type", value)
 		if err != nil {
 			return false, err
 		}
-		err = db.DB.SetSubFieldByEq("Node.nameid", nameid, "Node.role_ext", "RoleExt.role_type", value)
+		err = db.GetDB().SetSubFieldByEq("Node.nameid", nameid, "Node.role_ext", "RoleExt.role_type", value)
 		if err != nil {
 			return false, err
 		}
-		err = db.DB.SetFieldById(node.ID, "NodeFragment.role_type", value)
+		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.role_type", value)
 	case model.NodeTypeCircle:
 		if !model.NodeMode(value).IsValid() {
 			return false, fmt.Errorf("Bad value for mode.")
 		}
-		err = db.DB.SetFieldByEq("Node.nameid", nameid, "Node.mode", value)
+		err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.mode", value)
 		if err != nil {
 			return false, err
 		}
-		err = db.DB.SetFieldById(node.ID, "NodeFragment.mode", value)
+		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.mode", value)
 	}
 
 	return ok, err
@@ -216,7 +216,7 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
 	}
 
 	// Change all role direct children
-	err = db.DB.SetChildrenRoleVisibility(nameid, value)
+	err = db.GetDB().SetChildrenRoleVisibility(nameid, value)
 	return ok, err
 }
 
@@ -353,7 +353,7 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
 	}
 
 	// Push the nodes into the database
-	_, err := db.GetDB().Add(db.DB.GetRootUctx(), "node", nodeInput)
+	_, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
 	if err != nil {
 		return err
 	}
@@ -381,7 +381,7 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
 		// Remove: &delNodePatch, // @debug: omitempty issues
 	}
 	// Update the node in database
-	err := db.GetDB().Update(db.DB.GetRootUctx(), "node", nodeInput)
+	err := db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput)
 	return err
 }
 

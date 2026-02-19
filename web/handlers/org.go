@@ -209,7 +209,7 @@ func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			// Change all role direct children
-			err = db.DB.SetChildrenRoleVisibility(nameid, visibilityPublic)
+			err = db.GetDB().SetChildrenRoleVisibility(nameid, visibilityPublic)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return

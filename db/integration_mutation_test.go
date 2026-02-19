@@ -32,13 +32,13 @@ import (
 func TestSetFieldByEq_Integration(t *testing.T) {
 	// Set Node.about on our test org
 	newAbout := "Updated about text"
-	err := DB.SetFieldByEq("Node.nameid", "test-org", "Node.about", newAbout)
+	err := db_dg.SetFieldByEq("Node.nameid", "test-org", "Node.about", newAbout)
 	if err != nil {
 		t.Fatalf("SetFieldByEq returned error: %v", err)
 	}
 
 	// Read it back
-	val, err := DB.GetFieldByEq("Node.nameid", "test-org", "Node.about")
+	val, err := db_dg.GetFieldByEq("Node.nameid", "test-org", "Node.about")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -51,13 +51,13 @@ func TestSetFieldByEq_Integration(t *testing.T) {
 	}
 
 	// Restore original value
-	_ = DB.SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
+	_ = db_dg.SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
 }
 
 func TestMeta_MarkAllAsRead_Integration(t *testing.T) {
 	// markAllAsRead is a mutation that marks UserEvents as read.
 	// With no unread events, this is a no-op mutation — should succeed without error.
-	_, err := DB.Meta("markAllAsRead", map[string]string{
+	_, err := db_dg.Meta("markAllAsRead", map[string]string{
 		"username": "testuser",
 	})
 	if err != nil {
@@ -69,13 +69,13 @@ func TestUpgradeMember_Integration(t *testing.T) {
 	nameid := "test-org##@testuser"
 
 	// Change role_type to Guest
-	err := DB.UpgradeMember(nameid, model.RoleTypeGuest)
+	err := db_dg.UpgradeMember(nameid, model.RoleTypeGuest)
 	if err != nil {
 		t.Fatalf("UpgradeMember to Guest returned error: %v", err)
 	}
 
 	// Verify the change
-	val, err := DB.GetFieldByEq("Node.nameid", nameid, "Node.role_type")
+	val, err := db_dg.GetFieldByEq("Node.nameid", nameid, "Node.role_type")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -88,7 +88,7 @@ func TestUpgradeMember_Integration(t *testing.T) {
 	}
 
 	// Restore to Owner (original seed value)
-	err = DB.UpgradeMember(nameid, model.RoleTypeOwner)
+	err = db_dg.UpgradeMember(nameid, model.RoleTypeOwner)
 	if err != nil {
 		t.Fatalf("UpgradeMember to Owner (restore) returned error: %v", err)
 	}
@@ -107,14 +107,14 @@ func TestGamma_Integration(t *testing.T) {
 		}},
 	}
 
-	results, err := DB.Gamma(qm, map[string]string{})
+	results, err := db_dg.Gamma(qm, map[string]string{})
 	if err != nil {
 		t.Fatalf("Gamma returned error: %v", err)
 	}
 	t.Logf("Gamma returned %d results", len(results))
 
 	// Verify the change
-	val, err := DB.GetFieldByEq("Node.nameid", "test-org", "Node.about")
+	val, err := db_dg.GetFieldByEq("Node.nameid", "test-org", "Node.about")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -127,7 +127,7 @@ func TestGamma_Integration(t *testing.T) {
 	}
 
 	// Restore original value
-	_ = DB.SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
+	_ = db_dg.SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
 }
 
 func TestUpsertActivity_Integration(t *testing.T) {
@@ -140,11 +140,11 @@ func TestUpsertActivity_Integration(t *testing.T) {
 		Q: `query { v as var(func: eq(Activity.activityid, "` + activityid + `")) }`,
 		M: []X{{D: `uid(v) * * .`}},
 	}
-	_, _ = DB.Gamma(cleanup, map[string]string{})
+	_, _ = db_dg.Gamma(cleanup, map[string]string{})
 
 	// Helper to query the count for today's activity entry
 	getCount := func() int {
-		results, err := DB.Meta("getUserActivity", map[string]string{
+		results, err := db_dg.Meta("getUserActivity", map[string]string{
 			"username": "testuser",
 		})
 		if err != nil {
@@ -167,7 +167,7 @@ func TestUpsertActivity_Integration(t *testing.T) {
 
 	// Upsert 3 times: first creates (count=1), subsequent increment.
 	for i := 1; i <= 3; i++ {
-		_, err := DB.Meta("upsertActivity", map[string]string{
+		_, err := db_dg.Meta("upsertActivity", map[string]string{
 			"activityid": activityid,
 			"ownerid":    "u#testuser",
 			"date":       todayISO,
@@ -182,7 +182,7 @@ func TestUpsertActivity_Integration(t *testing.T) {
 	}
 
 	// Clean up
-	_, err := DB.Gamma(cleanup, map[string]string{})
+	_, err := db_dg.Gamma(cleanup, map[string]string{})
 	if err != nil {
 		t.Logf("cleanup warning: %v", err)
 	}

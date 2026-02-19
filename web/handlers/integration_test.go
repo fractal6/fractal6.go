@@ -51,7 +51,7 @@ var testRouter chi.Router
 var mockEmailServer *httptest.Server
 
 func TestMain(m *testing.M) {
-	// 1. Override db.DB with test Dgraph addresses
+	// 1. Override db singleton with test Dgraph addresses
 	db.SetTestDB(testutil.TestHTTPAddr+"/graphql", testutil.TestGrpcAddr)
 
 	// 2. Verify test data is present (seeded by cmd/testsetup).

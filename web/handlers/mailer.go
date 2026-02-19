@@ -121,7 +121,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// Publish  event
-		db.GetDB().Update(db.DB.GetRootUctx(), "tension", model.UpdateTensionInput{
+		db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", model.UpdateTensionInput{
 			Filter: &model.TensionFilter{ID: []string{isTid}},
 			Set: &model.TensionPatch{
 				Comments: []*model.CommentRef{{
@@ -171,7 +171,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		// Publish  event
-		db.GetDB().Update(db.DB.GetRootUctx(), "contract", model.UpdateContractInput{
+		db.GetDB().Update(db.GetDB().GetRootUctx(), "contract", model.UpdateContractInput{
 			Filter: &model.ContractFilter{ID: []string{isCid}},
 			Set: &model.ContractPatch{
 				Comments: []*model.CommentRef{{

@@ -59,7 +59,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Try to get PendingUser
-	pending_, err := db.DB.GetFieldByEq("PendingUser.email", creds.Email, "uid PendingUser.updatedAt")
+	pending_, err := db.GetDB().GetFieldByEq("PendingUser.email", creds.Email, "uid PendingUser.updatedAt")
 	pending, _ := pending_.(model.JsonAtom)
 
 	// Delay to prevent attack and user creation hijacking
@@ -74,7 +74,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	passwd := HashPassword(creds.Password)
 	if pending["id"] != nil {
 		// Update pending user
-		err = db.DB.Update(db.DB.GetRootUctx(), "pendingUser", model.UpdatePendingUserInput{
+		err = db.GetDB().Update(db.GetDB().GetRootUctx(), "pendingUser", model.UpdatePendingUserInput{
 			Filter: &model.PendingUserFilter{Email: &model.StringHashFilter{Eq: &creds.Email}},
 			Set: &model.PendingUserPatch{
 				Password:   &passwd,
@@ -89,10 +89,10 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// @id field cant't be update with graphql (@debug dgraph)
-		err = db.DB.SetFieldByEq("PendingUser.email", creds.Email, "PendingUser.username", creds.Username)
+		err = db.GetDB().SetFieldByEq("PendingUser.email", creds.Email, "PendingUser.username", creds.Username)
 	} else {
 		// Create pending user
-		_, err = db.DB.Add(db.DB.GetRootUctx(), "pendingUser", model.AddPendingUserInput{
+		_, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "pendingUser", model.AddPendingUserInput{
 			Email:      creds.Email,
 			Username:   creds.Username,
 			Password:   &passwd,
@@ -140,7 +140,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 		// User signup parcour
 		// --
 		// User has already been validated and saved in UserPending
-		if err := db.DB.Meta1("getPendingUser", map[string]string{"k": "email_token", "v": *creds.EmailToken}, &pending); err != nil {
+		if err := db.GetDB().Meta1("getPendingUser", map[string]string{"k": "email_token", "v": *creds.EmailToken}, &pending); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		} else if pending.UpdatedAt != nil &&
@@ -154,12 +154,12 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 		// User invitation parcour
 		// --
 		// User has not been registered in UserPending
-		if err := db.DB.Meta1("getPendingUser", map[string]string{"k": "token", "v": *creds.Puid}, &pending); err != nil {
+		if err := db.GetDB().Meta1("getPendingUser", map[string]string{"k": "token", "v": *creds.Puid}, &pending); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		} else if pending.Email == "" {
 			// If user exists, set uctx
-			if ex, err := db.DB.Exists("User.username", creds.Username, nil); err != nil {
+			if ex, err := db.GetDB().Exists("User.username", creds.Username, nil); err != nil {
 				http.Error(w, err.Error(), 500)
 				return
 			} else if ex {

@@ -31,14 +31,14 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	// Override the global DB singleton with test-instance addresses.
-	DB = &Dgraph{
+	// Override the global db_dg singleton with test-instance addresses.
+	db_dg = &Dgraph{
 		gqlAddr:  testutil.TestHTTPAddr + "/graphql",
 		grpcAddr: testutil.TestGrpcAddr,
 	}
 
 	// Verify test data is present (seeded by cmd/testsetup).
-	ex, err := DB.Exists("User.username", testutil.TestUser, nil)
+	ex, err := db_dg.Exists("User.username", testutil.TestUser, nil)
 	if err != nil || !ex {
 		log.Fatal("Test data not found. Run 'go run ./cmd/testsetup' first (or use 'make test-integration').")
 	}
