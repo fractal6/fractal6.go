@@ -206,8 +206,8 @@ type Project @auth(
   # @feature: project view are different filter, and view preference about one project.
   #views: [ProjectView!]
   """ Extra auth """
-  leaders: [Node!]     @x_alter(r:"ref") # @Debug: Role vs User selection ...
   nodes: [Node!]       @hasInverse(field: projects) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  collaborators: [User!]     @x_alter(r:"ref")
 }
 
 type ProjectColumn @hook_ {

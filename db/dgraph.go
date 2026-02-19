@@ -80,7 +80,7 @@ type DgraphClaims struct {
 //
 
 type DqlResp struct {
-	All []map[string]interface{} `json:"all"`
+	All []map[string]any `json:"all"`
 }
 
 type DqlRespCount struct {
@@ -302,7 +302,7 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
 		Rootids:  rootids,
 		Ownids:   ownids,
 	}
-	claims := map[string]interface{}{
+	claims := map[string]any{
 		"https://" + DOMAIN + "/jwt/claims": dgClaims,
 	}
 	jwtauth.SetIssuedNow(claims)
@@ -322,7 +322,7 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
 }
 
 // Post send a post request to the Graphql client.
-func (dg Dgraph) postql(uctx model.UserCtx, data []byte, res interface{}) error {
+func (dg Dgraph) postql(uctx model.UserCtx, data []byte, res any) error {
 	req, err := http.NewRequest("POST", dg.gqlAddr, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -437,7 +437,7 @@ func (dg Dgraph) MutateWithQueryDql3(q QueryMut, maps map[string]string) (*api.R
 
 // QueryGql query the Dgraph Graphql endpoint by following a http request.
 // It map the result in to given data structure
-func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]string, data interface{}) error {
+func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]string, data any) error {
 	// Get the query
 	queryName := reqInput["QueryName"]
 	q := dg.getGqlQuery(op, reqInput)

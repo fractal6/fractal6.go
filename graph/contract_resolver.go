@@ -38,7 +38,7 @@ import (
 // Contract Resolver
 ////////////////////////////////////////////////
 
-func addContractInputHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func addContractInputHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	data, err := next(ctx)
 	if err != nil {
 		return data, err
@@ -85,7 +85,7 @@ func addContractInputHook(ctx context.Context, obj interface{}, next graphql.Res
 }
 
 // Add Contract hook
-func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func addContractHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -159,11 +159,11 @@ func addContractHook(ctx context.Context, obj interface{}, next graphql.Resolver
 		return data, err
 	}
 
-	return data, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+	return data, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this resource."))
 }
 
 // Update Contract hook
-func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func updateContractHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -211,7 +211,7 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 			}
 			return data, err
 		} else {
-			return nil, LogErr("Access denied", fmt.Errorf("You are not authorized to access this ressource."))
+			return nil, LogErr("Access denied", fmt.Errorf("You are not authorized to access this resource."))
 		}
 	}
 
@@ -219,7 +219,7 @@ func updateContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 }
 
 // Delete Contract hook
-func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func deleteContractHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -262,7 +262,7 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 		}
 	}
 	if !ok {
-		return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+		return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this resource."))
 	}
 
 	// Eventually reset the pending node state
@@ -296,7 +296,7 @@ func deleteContractHook(ctx context.Context, obj interface{}, next graphql.Resol
 
 // ------------------------------------------------------------------- Contracts
 
-func isContractValidator(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func isContractValidator(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -329,7 +329,7 @@ func isContractValidator(ctx context.Context, obj interface{}, next graphql.Reso
 // Vote Resolver
 ////////////////////////////////////////////////
 
-func addVoteHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func addVoteHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {

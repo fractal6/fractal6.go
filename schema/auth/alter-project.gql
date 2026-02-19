@@ -4,6 +4,12 @@
     # Authorize members
     { rule: """query ($ROOTIDS: [String]) {
         queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }""" },
+    # Authorize collaborators
+    { rule: """query ($USERNAME: String!) {
+        queryProject {
+          collaborators(filter: {username: {eq: $USERNAME}}) { id }
+        }
     }""" }
     ## Authorize user that have authority in nodes
     #{ rule: """query ($ROOTIDS: [String], $USERNAME: String!) {

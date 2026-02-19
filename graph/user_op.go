@@ -209,7 +209,7 @@ func SyncPendingUser(username, email string) error {
 	// Build inputs
 	var inputs []model.AddUserEventInput
 	if contracts != nil {
-		for _, c := range contracts.([]interface{}) {
+		for _, c := range contracts.([]any) {
 			// Aggregate event inputs
 			con := c.(model.JsonAtom)
 			cid := con["id"].(string)

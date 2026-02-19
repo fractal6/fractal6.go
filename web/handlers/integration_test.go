@@ -89,6 +89,11 @@ func buildTestRouter() chi.Router {
 	r.Use(middle6.JwtDecode)
 	r.Use(middleware.Timeout(30 * time.Second))
 
+	// Query routes
+	r.Route("/q", func(r chi.Router) {
+		r.Post("/sub_projects", SubProjects)
+	})
+
 	// Auth routes
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/signup", Signup)
@@ -108,7 +113,7 @@ func buildTestRouter() chi.Router {
 }
 
 // doRequest performs an HTTP request against the test router and returns the response recorder.
-func doRequest(method, path string, body interface{}, cookies ...*http.Cookie) *httptest.ResponseRecorder {
+func doRequest(method, path string, body any, cookies ...*http.Cookie) *httptest.ResponseRecorder {
 	var reqBody io.Reader
 	if body != nil {
 		jsonBytes, err := json.Marshal(body)

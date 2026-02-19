@@ -158,7 +158,7 @@ func (dg Dgraph) Query(uctx model.UserCtx, vertex string, k string, values []str
 }
 
 // Get a new vertex (NOT USED YET...)
-func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string, graph string) (interface{}, error) {
+func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string, graph string) (any, error) {
 	Vertex := strings.Title(vertex)
 	queryName := "get" + Vertex
 	queryGraph := graph
@@ -186,7 +186,7 @@ func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string,
 }
 
 // Add a new vertex
-func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input interface{}) (string, error) {
+func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input any) (string, error) {
 	Vertex := strings.Title(vertex)
 	queryName := "add" + Vertex
 	inputType := "Add" + Vertex + "Input"
@@ -211,12 +211,12 @@ func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input interface{}) (stri
 	if payload[queryName] == nil {
 		return "", fmt.Errorf("Unauthorized request. Possibly, name already exists.")
 	}
-	res := payload[queryName].(model.JsonAtom)[vertex].([]interface{})[0].(model.JsonAtom)["id"]
+	res := payload[queryName].(model.JsonAtom)[vertex].([]any)[0].(model.JsonAtom)["id"]
 	return res.(string), err
 }
 
 // Update a vertex
-func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input interface{}) error {
+func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input any) error {
 	Vertex := strings.Title(vertex)
 	queryName := "update" + Vertex
 	inputType := "Update" + Vertex + "Input"
@@ -241,7 +241,7 @@ func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input interface{}) er
 }
 
 // Delete a vertex
-func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input interface{}) error {
+func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input any) error {
 	Vertex := strings.Title(vertex)
 	queryName := "delete" + Vertex
 	inputType := Vertex + "Filter"
@@ -270,7 +270,7 @@ func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input interface{}) er
 //
 
 // Add multiple new vertex
-func (dg Dgraph) AddMany(uctx model.UserCtx, vertex string, input interface{}) ([]string, error) {
+func (dg Dgraph) AddMany(uctx model.UserCtx, vertex string, input any) ([]string, error) {
 	Vertex := strings.Title(vertex)
 	queryName := "add" + Vertex
 	inputType := "Add" + Vertex + "Input"
@@ -304,7 +304,7 @@ func (dg Dgraph) AddMany(uctx model.UserCtx, vertex string, input interface{}) (
 		return []string{}, fmt.Errorf("Unauthorized request. Possibly, name already exists.")
 	}
 	var l []string
-	res := payload[queryName].(model.JsonAtom)[vertex].([]interface{})
+	res := payload[queryName].(model.JsonAtom)[vertex].([]any)
 	for _, r := range res {
 		l = append(l, r.(model.JsonAtom)["id"].(string))
 	}
@@ -395,7 +395,7 @@ func (dg Dgraph) QueryExtra(uctx model.UserCtx, vertex string, filter any, order
 }
 
 // Add codec, to be used in the resolver functions
-func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, upsert *bool, qg string, data interface{}) error {
+func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input any, upsert *bool, qg string, data any) error {
 	Vertex := strings.Title(vertex)
 	queryName := "add" + Vertex
 	inputType := "Add" + Vertex + "Input"
@@ -437,7 +437,7 @@ func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input interface{}, 
 }
 
 // Update codec, to be used in the resolver functions
-func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input interface{}, qg string, data interface{}) error {
+func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input any, qg string, data any) error {
 	Vertex := strings.Title(vertex)
 	queryName := "update" + Vertex
 	inputType := "Update" + Vertex + "Input"
@@ -473,7 +473,7 @@ func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input interface{
 }
 
 // Delete codec, to be used in the resolver functions
-func (dg Dgraph) DeleteExtra(uctx model.UserCtx, vertex string, input interface{}, qg string, data interface{}) error {
+func (dg Dgraph) DeleteExtra(uctx model.UserCtx, vertex string, input any, qg string, data any) error {
 	Vertex := strings.Title(vertex)
 	queryName := "delete" + Vertex
 	inputType := Vertex + "Filter"

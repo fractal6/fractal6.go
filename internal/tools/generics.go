@@ -7,7 +7,7 @@ import (
 )
 
 // Use generics to feed a slice of unknow Type T from a list of map.
-func ExtractSlice[T any](a interface{}, data *[]T) error {
+func ExtractSlice[T any](a any, data *[]T) error {
 	elements, ok := InterfaceSlice(a)
 	if !ok {
 		return fmt.Errorf("Input is not a slice")

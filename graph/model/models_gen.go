@@ -371,19 +371,19 @@ type AddProjectFieldValuePayload struct {
 }
 
 type AddProjectInput struct {
-	CreatedBy    *UserRef            `json:"createdBy"`
-	CreatedAt    string              `json:"createdAt"`
-	UpdatedAt    string              `json:"updatedAt"`
-	Rootnameid   string              `json:"rootnameid"`
-	Parentnameid string              `json:"parentnameid"`
-	Nameid       string              `json:"nameid"`
-	Name         string              `json:"name"`
-	Description  *string             `json:"description,omitempty"`
-	Status       ProjectStatus       `json:"status"`
-	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
-	Fields       []*ProjectFieldRef  `json:"fields,omitempty"`
-	Leaders      []*NodeRef          `json:"leaders,omitempty"`
-	Nodes        []*NodeRef          `json:"nodes,omitempty"`
+	CreatedBy     *UserRef            `json:"createdBy"`
+	CreatedAt     string              `json:"createdAt"`
+	UpdatedAt     string              `json:"updatedAt"`
+	Rootnameid    string              `json:"rootnameid"`
+	Parentnameid  string              `json:"parentnameid"`
+	Nameid        string              `json:"nameid"`
+	Name          string              `json:"name"`
+	Description   *string             `json:"description,omitempty"`
+	Status        ProjectStatus       `json:"status"`
+	Columns       []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields        []*ProjectFieldRef  `json:"fields,omitempty"`
+	Nodes         []*NodeRef          `json:"nodes,omitempty"`
+	Collaborators []*UserRef          `json:"collaborators,omitempty"`
 }
 
 type AddProjectPayload struct {
@@ -1860,24 +1860,24 @@ type PostRef struct {
 }
 
 type Project struct {
-	ID               string                        `json:"id"`
-	CreatedBy        *User                         `json:"createdBy"`
-	CreatedAt        string                        `json:"createdAt"`
-	UpdatedAt        string                        `json:"updatedAt"`
-	Rootnameid       string                        `json:"rootnameid"`
-	Parentnameid     string                        `json:"parentnameid"`
-	Nameid           string                        `json:"nameid"`
-	Name             string                        `json:"name"`
-	Description      *string                       `json:"description,omitempty"`
-	Status           ProjectStatus                 `json:"status"`
-	Columns          []*ProjectColumn              `json:"columns,omitempty"`
-	Fields           []*ProjectField               `json:"fields,omitempty"`
-	Leaders          []*Node                       `json:"leaders,omitempty"`
-	Nodes            []*Node                       `json:"nodes,omitempty"`
-	ColumnsAggregate *ProjectColumnAggregateResult `json:"columnsAggregate,omitempty"`
-	FieldsAggregate  *ProjectFieldAggregateResult  `json:"fieldsAggregate,omitempty"`
-	LeadersAggregate *NodeAggregateResult          `json:"leadersAggregate,omitempty"`
-	NodesAggregate   *NodeAggregateResult          `json:"nodesAggregate,omitempty"`
+	ID                     string                        `json:"id"`
+	CreatedBy              *User                         `json:"createdBy"`
+	CreatedAt              string                        `json:"createdAt"`
+	UpdatedAt              string                        `json:"updatedAt"`
+	Rootnameid             string                        `json:"rootnameid"`
+	Parentnameid           string                        `json:"parentnameid"`
+	Nameid                 string                        `json:"nameid"`
+	Name                   string                        `json:"name"`
+	Description            *string                       `json:"description,omitempty"`
+	Status                 ProjectStatus                 `json:"status"`
+	Columns                []*ProjectColumn              `json:"columns,omitempty"`
+	Fields                 []*ProjectField               `json:"fields,omitempty"`
+	Nodes                  []*Node                       `json:"nodes,omitempty"`
+	Collaborators          []*User                       `json:"collaborators,omitempty"`
+	ColumnsAggregate       *ProjectColumnAggregateResult `json:"columnsAggregate,omitempty"`
+	FieldsAggregate        *ProjectFieldAggregateResult  `json:"fieldsAggregate,omitempty"`
+	NodesAggregate         *NodeAggregateResult          `json:"nodesAggregate,omitempty"`
+	CollaboratorsAggregate *UserAggregateResult          `json:"collaboratorsAggregate,omitempty"`
 }
 
 type ProjectAggregateResult struct {
@@ -2170,36 +2170,36 @@ type ProjectOrder struct {
 }
 
 type ProjectPatch struct {
-	CreatedBy    *UserRef            `json:"createdBy,omitempty"`
-	CreatedAt    *string             `json:"createdAt,omitempty"`
-	UpdatedAt    *string             `json:"updatedAt,omitempty"`
-	Rootnameid   *string             `json:"rootnameid,omitempty"`
-	Parentnameid *string             `json:"parentnameid,omitempty"`
-	Nameid       *string             `json:"nameid,omitempty"`
-	Name         *string             `json:"name,omitempty"`
-	Description  *string             `json:"description,omitempty"`
-	Status       *ProjectStatus      `json:"status,omitempty"`
-	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
-	Fields       []*ProjectFieldRef  `json:"fields,omitempty"`
-	Leaders      []*NodeRef          `json:"leaders,omitempty"`
-	Nodes        []*NodeRef          `json:"nodes,omitempty"`
+	CreatedBy     *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt     *string             `json:"createdAt,omitempty"`
+	UpdatedAt     *string             `json:"updatedAt,omitempty"`
+	Rootnameid    *string             `json:"rootnameid,omitempty"`
+	Parentnameid  *string             `json:"parentnameid,omitempty"`
+	Nameid        *string             `json:"nameid,omitempty"`
+	Name          *string             `json:"name,omitempty"`
+	Description   *string             `json:"description,omitempty"`
+	Status        *ProjectStatus      `json:"status,omitempty"`
+	Columns       []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields        []*ProjectFieldRef  `json:"fields,omitempty"`
+	Nodes         []*NodeRef          `json:"nodes,omitempty"`
+	Collaborators []*UserRef          `json:"collaborators,omitempty"`
 }
 
 type ProjectRef struct {
-	ID           *string             `json:"id,omitempty"`
-	CreatedBy    *UserRef            `json:"createdBy,omitempty"`
-	CreatedAt    *string             `json:"createdAt,omitempty"`
-	UpdatedAt    *string             `json:"updatedAt,omitempty"`
-	Rootnameid   *string             `json:"rootnameid,omitempty"`
-	Parentnameid *string             `json:"parentnameid,omitempty"`
-	Nameid       *string             `json:"nameid,omitempty"`
-	Name         *string             `json:"name,omitempty"`
-	Description  *string             `json:"description,omitempty"`
-	Status       *ProjectStatus      `json:"status,omitempty"`
-	Columns      []*ProjectColumnRef `json:"columns,omitempty"`
-	Fields       []*ProjectFieldRef  `json:"fields,omitempty"`
-	Leaders      []*NodeRef          `json:"leaders,omitempty"`
-	Nodes        []*NodeRef          `json:"nodes,omitempty"`
+	ID            *string             `json:"id,omitempty"`
+	CreatedBy     *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt     *string             `json:"createdAt,omitempty"`
+	UpdatedAt     *string             `json:"updatedAt,omitempty"`
+	Rootnameid    *string             `json:"rootnameid,omitempty"`
+	Parentnameid  *string             `json:"parentnameid,omitempty"`
+	Nameid        *string             `json:"nameid,omitempty"`
+	Name          *string             `json:"name,omitempty"`
+	Description   *string             `json:"description,omitempty"`
+	Status        *ProjectStatus      `json:"status,omitempty"`
+	Columns       []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields        []*ProjectFieldRef  `json:"fields,omitempty"`
+	Nodes         []*NodeRef          `json:"nodes,omitempty"`
+	Collaborators []*UserRef          `json:"collaborators,omitempty"`
 }
 
 type ProjectStatusHash struct {
@@ -5701,19 +5701,19 @@ func (e ProjectFieldValueOrderable) MarshalGQL(w io.Writer) {
 type ProjectHasFilter string
 
 const (
-	ProjectHasFilterCreatedBy    ProjectHasFilter = "createdBy"
-	ProjectHasFilterCreatedAt    ProjectHasFilter = "createdAt"
-	ProjectHasFilterUpdatedAt    ProjectHasFilter = "updatedAt"
-	ProjectHasFilterRootnameid   ProjectHasFilter = "rootnameid"
-	ProjectHasFilterParentnameid ProjectHasFilter = "parentnameid"
-	ProjectHasFilterNameid       ProjectHasFilter = "nameid"
-	ProjectHasFilterName         ProjectHasFilter = "name"
-	ProjectHasFilterDescription  ProjectHasFilter = "description"
-	ProjectHasFilterStatus       ProjectHasFilter = "status"
-	ProjectHasFilterColumns      ProjectHasFilter = "columns"
-	ProjectHasFilterFields       ProjectHasFilter = "fields"
-	ProjectHasFilterLeaders      ProjectHasFilter = "leaders"
-	ProjectHasFilterNodes        ProjectHasFilter = "nodes"
+	ProjectHasFilterCreatedBy     ProjectHasFilter = "createdBy"
+	ProjectHasFilterCreatedAt     ProjectHasFilter = "createdAt"
+	ProjectHasFilterUpdatedAt     ProjectHasFilter = "updatedAt"
+	ProjectHasFilterRootnameid    ProjectHasFilter = "rootnameid"
+	ProjectHasFilterParentnameid  ProjectHasFilter = "parentnameid"
+	ProjectHasFilterNameid        ProjectHasFilter = "nameid"
+	ProjectHasFilterName          ProjectHasFilter = "name"
+	ProjectHasFilterDescription   ProjectHasFilter = "description"
+	ProjectHasFilterStatus        ProjectHasFilter = "status"
+	ProjectHasFilterColumns       ProjectHasFilter = "columns"
+	ProjectHasFilterFields        ProjectHasFilter = "fields"
+	ProjectHasFilterNodes         ProjectHasFilter = "nodes"
+	ProjectHasFilterCollaborators ProjectHasFilter = "collaborators"
 )
 
 var AllProjectHasFilter = []ProjectHasFilter{
@@ -5728,13 +5728,13 @@ var AllProjectHasFilter = []ProjectHasFilter{
 	ProjectHasFilterStatus,
 	ProjectHasFilterColumns,
 	ProjectHasFilterFields,
-	ProjectHasFilterLeaders,
 	ProjectHasFilterNodes,
+	ProjectHasFilterCollaborators,
 }
 
 func (e ProjectHasFilter) IsValid() bool {
 	switch e {
-	case ProjectHasFilterCreatedBy, ProjectHasFilterCreatedAt, ProjectHasFilterUpdatedAt, ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterStatus, ProjectHasFilterColumns, ProjectHasFilterFields, ProjectHasFilterLeaders, ProjectHasFilterNodes:
+	case ProjectHasFilterCreatedBy, ProjectHasFilterCreatedAt, ProjectHasFilterUpdatedAt, ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterStatus, ProjectHasFilterColumns, ProjectHasFilterFields, ProjectHasFilterNodes, ProjectHasFilterCollaborators:
 		return true
 	}
 	return false

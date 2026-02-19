@@ -36,7 +36,7 @@ import (
 // Tension Resolver
 ////////////////////////////////////////////////
 
-func tensionInputHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func tensionInputHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	data, err := setUpdateContextInfo(ctx, obj, next) // for @hasEvent+@isOwner
 	if err != nil {
 		return data, err
@@ -93,7 +93,7 @@ func tensionInputHook(ctx context.Context, obj interface{}, next graphql.Resolve
 }
 
 // Add Tension - Hook
-func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -144,11 +144,11 @@ func addTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver)
 		PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: id, History: history})
 		return data, err
 	}
-	return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+	return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this resource."))
 }
 
 // Update Tension - Hook
-func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func updateTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -199,7 +199,7 @@ func updateTensionHook(ctx context.Context, obj interface{}, next graphql.Resolv
 			}}
 			return &t, err
 		} else {
-			return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
+			return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this resource."))
 		}
 	}
 

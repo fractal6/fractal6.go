@@ -31,10 +31,10 @@ import (
 	"fractale/fractal6.go/internal/tools"
 )
 
-var FieldTransformFunc map[string]func(context.Context, graphql.Resolver) (interface{}, error)
+var FieldTransformFunc map[string]func(context.Context, graphql.Resolver) (any, error)
 
 func init() {
-	FieldTransformFunc = map[string]func(context.Context, graphql.Resolver) (interface{}, error){
+	FieldTransformFunc = map[string]func(context.Context, graphql.Resolver) (any, error){
 		"lower": lower,
 		"now":   now,
 	}
@@ -49,7 +49,7 @@ func init() {
 //    //SetEq(s string)
 //}
 
-func lower(ctx context.Context, next graphql.Resolver) (interface{}, error) {
+func lower(ctx context.Context, next graphql.Resolver) (any, error) {
 	data, err := next(ctx)
 	switch d := data.(type) {
 	case *string:
@@ -91,7 +91,7 @@ func lower(ctx context.Context, next graphql.Resolver) (interface{}, error) {
 	return nil, fmt.Errorf("Type unknwown for field %s", field)
 }
 
-func now(ctx context.Context, next graphql.Resolver) (interface{}, error) {
+func now(ctx context.Context, next graphql.Resolver) (any, error) {
 	data, err := next(ctx)
 	now := tools.Now()
 	switch data.(type) {

@@ -67,7 +67,7 @@ type UpdateArtefactInput struct {
 }
 
 // Add "Artefact"
-func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func addNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Authorization
 	// - Check that rootnameid comply with Nodes
 	// - nodes is required
@@ -92,7 +92,7 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
 			return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid does not match."))
 		}
 		// Authorization with regards to the given nodes.
-		if err = auth.CheckNodesAuth(uctx, input.Nodes, true); err != nil {
+		if err = auth.Authorize(auth.CheckNodesAuth(uctx, input.Nodes, true)); err != nil {
 			return nil, err
 		}
 	}
@@ -102,13 +102,13 @@ func addNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Reso
 }
 
 // Update "Artefact" - Must be coordo
-func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Pre-processing:
 	// - Auth
 	// - get values prior mutattions
 
 	// Protected Object has more restrivive conditions to be updated.
-	// @TODO: Clarify how the ressources access policy for artefacts object (that can belongs to multiple nodes)
+	// @TODO: Clarify how the resources access policy for artefacts object (that can belongs to multiple nodes)
 	// Ex: { Leaders: (mandate acess, tension access), Coordinators: (artefact access, tension access) }?
 	protecteds := []string{"Label", "RoleExt"}
 	isProtected := false
@@ -133,7 +133,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 	// Get nodes in order to perform @auth rules against it
 	nodes := []model.NodeRef{}
 	nodesGiven := []*model.NodeRef{}
-	var x interface{}
+	var x any
 	if len(input.Filter.ID) > 0 { // Updates with UID
 		x, err = db.GetDB().GetSubFieldById(input.Filter.ID[0], typeName+".nodes", "Node.nameid")
 	} else { // Update from hash names
@@ -150,14 +150,12 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 	if err != nil {
 		return nil, err
 	}
-	if x != nil {
-		for _, n := range x.([]interface{}) {
-			nameid := n.(string)
-			nodes = append(nodes, model.NodeRef{Nameid: &nameid})
-		}
-	} else {
-		// Allow if the artefact is not yet linked
+
+	// If x is nil (artefact not yet linked), nodes stays empty — allowed
+	for _, nameid := range InterfaceToSlice[string](x) {
+		nodes = append(nodes, model.NodeRef{Nameid: &nameid})
 	}
+
 	// Get given nodes
 	if input.Set != nil {
 		nodesGiven = append(nodesGiven, input.Set.Nodes...)
@@ -171,12 +169,12 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 	}
 
 	// Authorization with regards to nodes attributes.
-	if err = auth.CheckNodesAuth(uctx, nodes, false); err != nil {
+	if err = auth.Authorize(auth.CheckNodesAuth(uctx, nodes, false)); err != nil {
 		return nil, err
 	}
 
 	// Authorization with regards to the given nodes.
-	if err = auth.CheckNodesAuth(uctx, nodesGiven, true); err != nil {
+	if err = auth.Authorize(auth.CheckNodesAuth(uctx, nodesGiven, true)); err != nil {
 		return nil, err
 	}
 
@@ -203,7 +201,7 @@ func updateNodeArtefactHook(ctx context.Context, obj interface{}, next graphql.R
 		if err != nil {
 			return nil, LogErr("Internal error", err)
 		} else if !ok {
-			return nil, LogErr("Access denied", fmt.Errorf("you need the be a coordinator of the highest circle that use this ressource to update it."))
+			return nil, LogErr("Access denied", fmt.Errorf("you need the be a coordinator of the highest circle that use this resource to update it."))
 		}
 
 	}

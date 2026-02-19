@@ -55,7 +55,7 @@ func createTestComment(t *testing.T, tensionUID, userUID string) string {
 	// Gamma returns the Uids map in the response; extract comment UID
 	_ = results
 	// Use GetIDs to find the comment we just created by querying tension comments
-	// Instead, we use the mutation response. Gamma returns []map[string]interface{}.
+	// Instead, we use the mutation response. Gamma returns []map[string]any.
 	// The uid is in the Uids map of the dgraph response, but Gamma returns query results.
 	// We'll query for the comment we just created.
 	ids, err := db.GetDB().GetIDs("Post.message", "test comment for deletion", nil, nil)

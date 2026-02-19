@@ -70,16 +70,16 @@ func InitViper() {
 }
 
 // StructMap convert/copy a interface to another
-func StructMap(in interface{}, out interface{}) {
+func StructMap(in any, out any) {
 	raw, _ := json.Marshal(in)
 	json.Unmarshal(raw, &out)
 }
 
-// StructToMap convert a struct to a map[string]interface{} based on your JSON tag in your structs.
+// StructToMap convert a struct to a map[string]any based on your JSON tag in your structs.
 // Use mapstructure instead ?
 // @deprectad: show omitempty tag, and values seems to be nil ?
-func StructToMap(item interface{}) map[string]interface{} {
-	res := map[string]interface{}{}
+func StructToMap(item any) map[string]any {
+	res := map[string]any{}
 	if item == nil {
 		return res
 	}
@@ -107,14 +107,14 @@ func StructToMap(item interface{}) map[string]interface{} {
 // Use Marshaling and Unmarshaling to convert an object to a map of string.
 // @DEBUG: mapstructure seems to not decode enum (RoleType) !
 // @see also: https://stackoverflow.com/questions/23589564/function-for-converting-a-struct-to-map-in-golang#25117810
-func Struct2Map(item interface{}) map[string]interface{} {
-	var amap map[string]interface{}
+func Struct2Map(item any) map[string]any {
+	var amap map[string]any
 	itemRaw, _ := json.Marshal(item)
 	json.Unmarshal(itemRaw, &amap)
 	return amap
 }
 
-func Map2Struct(item map[string]interface{}, res interface{}) error {
+func Map2Struct(item map[string]any, res any) error {
 	// @performance: use marshal/unmarshal instead ?
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		Result:  res,
@@ -125,22 +125,22 @@ func Map2Struct(item map[string]interface{}, res interface{}) error {
 }
 
 // MarshalWithoutNil marshal an struct but removed all empty (null) edges.
-func MarshalWithoutNil(item interface{}) ([]byte, error) {
+func MarshalWithoutNil(item any) ([]byte, error) {
 	m := CleanNilMap(Struct2Map(item))
 	return json.Marshal(m)
 }
 
 // CleanNilMap remove all empty (nil) edges recursively.
-func CleanNilMap(m map[string]interface{}) map[string]interface{} {
-	out := make(map[string]interface{}, len(m))
+func CleanNilMap(m map[string]any) map[string]any {
+	out := make(map[string]any, len(m))
 	for k, v := range m {
 		if v == nil {
 			continue
 		}
 
-		var nv interface{}
+		var nv any
 		switch t := v.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			nv = CleanNilMap(t)
 		default:
 			nv = t
@@ -154,7 +154,7 @@ func CleanNilMap(m map[string]interface{}) map[string]interface{} {
 // InterfaceSlice tries to convert an interface to a Slice of interface.
 // see stackoverflow.com/a/12754757/4223749
 // and https://ahmet.im/blog/golang-take-slices-of-any-type-as-input-parameter/
-func InterfaceSlice(arg interface{}) (out []interface{}, ok bool) {
+func InterfaceSlice(arg any) (out []any, ok bool) {
 	// Keep the distinction between nil and empty slice input
 	if arg == nil {
 		return out, true
@@ -165,14 +165,14 @@ func InterfaceSlice(arg interface{}) (out []interface{}, ok bool) {
 		return
 	}
 	c := slice.Len()
-	out = make([]interface{}, c)
+	out = make([]any, c)
 	for i := 0; i < c; i++ {
 		out[i] = slice.Index(i).Interface()
 	}
 	return out, true
 }
 
-func takeArg(arg interface{}, kind reflect.Kind) (val reflect.Value, ok bool) {
+func takeArg(arg any, kind reflect.Kind) (val reflect.Value, ok bool) {
 	val = reflect.ValueOf(arg)
 	if val.Kind() == kind {
 		ok = true
@@ -180,14 +180,19 @@ func takeArg(arg interface{}, kind reflect.Kind) (val reflect.Value, ok bool) {
 	return
 }
 
-func InterfaceToStringSlice(in interface{}) []string {
-	if in == nil {
-		return []string{}
+// InterfaceToSlice safely converts an any (expected to be []any)
+// into a typed []T slice. Elements that don't match type T are skipped.
+// Returns nil if in is nil or not a slice.
+func InterfaceToSlice[T any](in any) []T {
+	items, ok := in.([]any)
+	if !ok {
+		return nil
 	}
-	temp := in.([]interface{})
-	var out []string
-	for _, x := range temp {
-		out = append(out, x.(string))
+	out := make([]T, 0, len(items))
+	for _, v := range items {
+		if typed, ok := v.(T); ok {
+			out = append(out, typed)
+		}
 	}
 	return out
 }
@@ -195,8 +200,8 @@ func InterfaceToStringSlice(in interface{}) []string {
 // CleanAliasedMap copy the input map by renaming all the keys
 // recursively by removing trailing integers.
 // @DEBUG: how to better handle aliasing (check gqlgen)
-func CleanAliasedMap(m map[string]interface{}) map[string]interface{} {
-	out := make(map[string]interface{}, len(m))
+func CleanAliasedMap(m map[string]any) map[string]any {
+	out := make(map[string]any, len(m))
 	for k, v := range m {
 		var nk string
 		if IsDigit(k[len(k)-1]) {
@@ -206,11 +211,11 @@ func CleanAliasedMap(m map[string]interface{}) map[string]interface{} {
 			nk = k
 		}
 
-		var nv interface{}
+		var nv any
 		switch t := v.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			nv = CleanAliasedMap(t)
-		case []interface{}:
+		case []any:
 			for i, x := range t {
 				if m, ok := x.(model.JsonAtom); ok {
 					t[i] = CleanAliasedMap(m)
@@ -228,8 +233,8 @@ func CleanAliasedMap(m map[string]interface{}) map[string]interface{} {
 
 // Keep the last key string when separated by dot (eg [a.key.name: 10] -> [name: 10])
 // + replace uid field with ID (dgraph to gqlgen compatibility
-func CleanCompositeName(m map[string]interface{}, deep bool) map[string]interface{} {
-	out := make(map[string]interface{}, len(m))
+func CleanCompositeName(m map[string]any, deep bool) map[string]any {
+	out := make(map[string]any, len(m))
 	for k, v := range m {
 		ks := strings.Split(k, ".")
 		nk := ks[len(ks)-1]
@@ -238,15 +243,15 @@ func CleanCompositeName(m map[string]interface{}, deep bool) map[string]interfac
 			nk = "id"
 		}
 
-		var nv interface{}
+		var nv any
 		switch t := v.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			if deep {
 				nv = CleanCompositeName(CleanAliasedMap(t), true)
 			} else {
 				nv = CleanAliasedMap(t)
 			}
-		case []interface{}:
+		case []any:
 			for i, x := range t {
 				if m, ok := x.(model.JsonAtom); ok {
 					t[i] = CleanCompositeName(CleanAliasedMap(m), true)
@@ -263,9 +268,9 @@ func CleanCompositeName(m map[string]interface{}, deep bool) map[string]interfac
 }
 
 func CleanAliasedMapHook() mapstructure.DecodeHookFunc {
-	return func(from, to reflect.Kind, data interface{}) (interface{}, error) {
+	return func(from, to reflect.Kind, data any) (any, error) {
 		if to == reflect.Struct {
-			return CleanAliasedMap(data.(map[string]interface{})), nil
+			return CleanAliasedMap(data.(map[string]any)), nil
 		}
 		return data, nil
 	}
@@ -275,12 +280,12 @@ func ToUnionHookFunc() mapstructure.DecodeHookFunc {
 	// @DEBUG union type decoding
 	// see  https://github.com/mitchellh/mapstructure/issues/159
 	// and also https://github.com/99designs/gqlgen/issues/1055
-	return func(f, t reflect.Type, data interface{}) (interface{}, error) {
+	return func(f, t reflect.Type, data any) (any, error) {
 		var u1 model.EventKind // because EventKind is an interface...else TypeOf(MyStrct) works.
 		if t == reflect.TypeOf(&u1).Elem() {
 			switch f.Kind() {
 			case reflect.Map:
-				var d interface{}
+				var d any
 				b, _ := json.Marshal(data)
 				switch data.(model.JsonAtom)["__typename"] {
 				case "Event":
@@ -313,7 +318,7 @@ func ToUnionHookFunc() mapstructure.DecodeHookFunc {
 		if t == reflect.TypeOf(&u2).Elem() {
 			switch f.Kind() {
 			case reflect.Map:
-				var d interface{}
+				var d any
 				b, _ := json.Marshal(data)
 				switch data.(model.JsonAtom)["__typename"] {
 				case "Tension":

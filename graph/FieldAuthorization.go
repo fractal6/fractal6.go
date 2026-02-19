@@ -33,10 +33,10 @@ import (
 	"fractale/fractal6.go/web/auth"
 )
 
-var FieldAuthorizationFunc map[string]func(context.Context, interface{}, graphql.Resolver, *string, []model.TensionEvent, *int) (interface{}, error)
+var FieldAuthorizationFunc map[string]func(context.Context, any, graphql.Resolver, *string, []model.TensionEvent, *int) (any, error)
 
 func init() {
-	FieldAuthorizationFunc = map[string]func(context.Context, interface{}, graphql.Resolver, *string, []model.TensionEvent, *int) (interface{}, error){
+	FieldAuthorizationFunc = map[string]func(context.Context, any, graphql.Resolver, *string, []model.TensionEvent, *int) (any, error){
 		"isOwner":          isOwner,
 		"unique":           unique,
 		"oneByOne":         oneByOne,
@@ -50,7 +50,7 @@ func init() {
 
 // isOwner Check that object is own by the user.
 // If user(u) field is empty, assume a user object, else field should match the user(u) credential.
-func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+func isOwner(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	// Retrieve userCtx from token
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
@@ -81,7 +81,7 @@ func isOwner(ctx context.Context, obj interface{}, next graphql.Resolver, f *str
 
 // unique Check uniqueness (@DEBUG follow @unique dgraph field iplementation)
 // Ensure the field value is unique. If a field is given, it check the uniqueness on a subset of the parent type.
-func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+func unique(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	data, err := next(ctx)
 	if err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ func unique(ctx context.Context, obj interface{}, next graphql.Resolver, f *stri
 }
 
 // oneByOne ensure that the mutation on the given field should contains at least one element.
-func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+func oneByOne(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	data, err := next(ctx)
 	slice, ok := InterfaceSlice(data)
 	if !ok {
@@ -150,11 +150,11 @@ func oneByOne(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
 }
 
 // hasEvent ensure the given events are present in the `history` property.
-func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
-	var events []interface{}
+func hasEvent(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
+	var events []any
 	events_ := obj.(model.JsonAtom)["history"]
 	if events_ != nil {
-		events = events_.([]interface{})
+		events = events_.([]any)
 	}
 
 	for _, event := range e {
@@ -194,7 +194,7 @@ func hasEvent(ctx context.Context, obj interface{}, next graphql.Resolver, f *st
 }
 
 // tensionTypeCheck check is the user can use a tension type.
-func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+func tensionTypeCheck(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	data, err := next(ctx)
 	if err != nil {
 		return nil, err
@@ -263,12 +263,12 @@ func tensionTypeCheck(ctx context.Context, obj interface{}, next graphql.Resolve
 }
 
 // ref ensure the given objects are just linked to an existing one, no more. (@weak: by testing that its size if not equal to one.)
-func ref(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+func ref(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	data, err := next(ctx)
 	if err != nil {
 		return nil, err
 	}
-	test := func(x interface{}) bool {
+	test := func(x any) bool {
 		return len(CleanNilMap(Struct2Map(x))) == 1
 	}
 	var pass bool
@@ -294,7 +294,7 @@ func ref(ctx context.Context, obj interface{}, next graphql.Resolver, f *string,
 }
 
 // inputMinLength the that the size of the field is stricly lesser than the given value
-func minLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+func minLength(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	var l int
 	data, err := next(ctx)
 	if err != nil {
@@ -318,7 +318,7 @@ func minLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *s
 }
 
 // inputMaxLength the that the size of the field is stricly greater than the given value
-func maxLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+func maxLength(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	var l int
 	data, err := next(ctx)
 	if err != nil {
@@ -347,7 +347,7 @@ func maxLength(ctx context.Context, obj interface{}, next graphql.Resolver, f *s
 ////////////////////////////////////////////////
 
 // Check if an user owns the given object
-func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField string, userObj interface{}) (bool, error) {
+func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField string, userObj any) (bool, error) {
 	// Get user ID
 	var username string
 	var err error

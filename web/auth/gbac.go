@@ -22,6 +22,7 @@ package auth
 
 import (
 	"fmt"
+	"slices"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
@@ -48,11 +49,24 @@ func InheritNodeCharacDefault(node *model.NodeFragment, parent *model.Node) {
 	}
 }
 
+// Authorize converts a (bool, error) auth result into a single error suitable
+// for callers that just need a pass/fail gate.  It returns nil on success,
+// passes through system errors, and produces a LogErr on denial.
+func Authorize(ok bool, err error) error {
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this resource."))
+	}
+	return nil
+}
+
 // Check that user satisfies strict condition (coordo roles on the given nodes)
 // @DEBUG: add a schema like validation for mandatory field when passing a list of NodeRef?
 // Mandatory field
 // - nameid
-func CheckNodesAuth(uctx *model.UserCtx, d interface{}, passAll bool) error {
+func CheckNodesAuth(uctx *model.UserCtx, d any, passAll bool) (bool, error) {
 	var ok bool
 	var err error
 
@@ -76,12 +90,12 @@ func CheckNodesAuth(uctx *model.UserCtx, d interface{}, passAll bool) error {
 	mode := model.NodeModeCoordinated
 	for _, n := range nodes {
 		if n.Nameid == nil {
-			return LogErr("Access denied", fmt.Errorf("nameid in required in artefact nodes fields."))
+			return false, LogErr("Access denied", fmt.Errorf("nameid in required in artefact nodes fields."))
 		}
 
 		ok, err = HasCoordoAuth(uctx, *n.Nameid, &mode)
 		if err != nil {
-			return LogErr("Internal error", err)
+			return false, err
 		}
 
 		if passAll && !ok {
@@ -93,33 +107,48 @@ func CheckNodesAuth(uctx *model.UserCtx, d interface{}, passAll bool) error {
 
 	if len(nodes) == 0 {
 		ok = true
-	} else if !ok {
-		err = LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this ressource."))
 	}
-	return err
+	return ok, nil
 }
 
-func CheckProjectAuth(uctx *model.UserCtx, projectid string) error {
-	nodes := []model.NodeRef{}
+// CheckProjectAuth verifies the user has write access to a project.
+// Access is granted if the user is either:
+//   - a project collaborator, or
+//   - a coordinator of any node linked to the project
+func CheckProjectAuth(uctx *model.UserCtx, projectid string) (bool, error) {
+	// Check collaborator access first (cheap username match)
+	if ok, err := isProjectCollaborator(uctx, projectid); err != nil {
+		return false, err
+	} else if ok {
+		return true, nil
+	}
+
+	// Fall back to node-based coordinator authorization
+	return checkProjectNodeAuth(uctx, projectid)
+}
+
+// isProjectCollaborator checks if the user is listed as a project collaborator.
+func isProjectCollaborator(uctx *model.UserCtx, projectid string) (bool, error) {
+	x, err := db.GetDB().GetSubFieldById(projectid, "Project.collaborators", "User.username")
+	if err != nil {
+		return false, LogErr("Internal error", err)
+	}
+	return slices.Contains(InterfaceToSlice[string](x), uctx.Username), nil
+}
+
+// checkProjectNodeAuth verifies the user has coordinator authority on at least
+// one node linked to the project.
+func checkProjectNodeAuth(uctx *model.UserCtx, projectid string) (bool, error) {
 	x, err := db.GetDB().GetSubFieldById(projectid, "Project.nodes", "Node.nameid")
 	if err != nil {
-		return LogErr("Internal Error", err)
+		return false, LogErr("Internal error", err)
 	}
-	if x != nil {
-		for _, n := range x.([]interface{}) {
-			nameid := n.(string)
-			nodes = append(nodes, model.NodeRef{Nameid: &nameid})
-		}
-	} else {
-		// Allow if the artefact is not yet linked
+	nameids := InterfaceToSlice[string](x)
+	if len(nameids) == 0 {
+		// Allow access when the project has no linked nodes
+		return true, nil
 	}
-
-	// Authorization with regards to nodes attributes.
-	if err = CheckNodesAuth(uctx, nodes, false); err != nil {
-		return err
-	}
-
-	return nil
+	return CheckNodesAuth(uctx, nameids, false)
 }
 
 // HasCoordoAuth tells if the user has authority in the given node.
@@ -182,7 +211,7 @@ func CheckUpperAuth(uctx *model.UserCtx, nameid string, mode model.NodeMode) (bo
 	var ok bool = false
 	parents, err := db.GetDB().GetParents(nameid)
 	if err != nil {
-		return ok, LogErr("Internal Error", err)
+		return ok, LogErr("Internal error", err)
 	}
 
 	for _, p := range parents {
@@ -232,16 +261,16 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
 	var parents []string
 	node, err := db.GetDB().Meta("getParentFromTid", map[string]string{"tid": tid})
 	if err != nil {
-		return coordos, LogErr("Internal Error", err)
+		return coordos, LogErr("Internal error", err)
 	}
 	if len(node) == 0 || node[0]["parent"] == nil {
 		return coordos, err
 	}
 	// @debug: dql decoding !
-	if nodes := node[0]["parent"].([]interface{}); len(nodes) > 0 {
+	if nodes := node[0]["parent"].([]any); len(nodes) > 0 {
 		if nids, ok := nodes[0].(model.JsonAtom)["nameid"]; ok && nids != nil {
 			switch x := nids.(type) {
-			case []interface{}:
+			case []any:
 				for _, v := range x {
 					parents = append(parents, v.(string))
 				}
@@ -296,6 +325,47 @@ func GetPeersFromTid(tid string) ([]model.User, error) {
 //
 // Sanitize TensionQuery
 //
+
+// NodeVisibilityFilter checks a set of node nameids and returns only those
+// the user is authorized to see based on visibility rules:
+//   - Public nodes are always visible
+//   - Private nodes require org membership
+//   - Secret nodes require a role in the circle
+func NodeVisibilityFilter(uctx *model.UserCtx, nameids []string) (map[string]bool, error) {
+	visible := make(map[string]bool)
+	if len(nameids) == 0 {
+		return visible, nil
+	}
+
+	res, err := db.GetDB().Query(*uctx, "node", "nameid", nameids, "nameid visibility")
+	if err != nil {
+		return nil, err
+	}
+
+	for _, r := range res {
+		nameid := r["nameid"]
+		visibility := r["visibility"]
+		nid, err := codec.Nid2pid(nameid)
+		if err != nil {
+			return nil, err
+		}
+
+		switch visibility {
+		case string(model.NodeVisibilityPrivate):
+			if UserIsMember(uctx, nid) >= 0 {
+				visible[nameid] = true
+			}
+		case string(model.NodeVisibilitySecret):
+			if UserHasRole(uctx, nid) >= 0 {
+				visible[nameid] = true
+			}
+		default: // Public
+			visible[nameid] = true
+		}
+	}
+
+	return visible, nil
+}
 
 // NameidsProtected and Username information into the query.
 func QueryAuthFilter(uctx model.UserCtx, q *db.TensionQuery) error {

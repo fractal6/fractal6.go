@@ -83,7 +83,7 @@ var dummyVars = map[string]string{
 	"tensionFilter":         `@filter(eq(Tension.status, "Open"))`,
 	"labelsFilter":          "",
 	"authorsFilter":         "",
-	"fieldinclude":          "",
+	"excludeSelf":           "",
 	"extra_pre_vars":        "",
 }
 

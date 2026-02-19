@@ -32,4 +32,15 @@ const (
 	TestUser2     = "testuser2"
 	TestEmail2    = "testuser2@test.co"
 	TestPassword2 = "TestPassword456!"
+
+	// sec-org: Private organisation for visibility/security tests.
+	// testuser is Member, testuser2 is Owner + Coordinator of secret circle.
+	SecOrg              = "sec-org"
+	SecOrgPrivateCircle = "sec-org#private-circle"
+	SecOrgSecretCircle  = "sec-org#secret-circle"
+
+	// Projects seeded in sec-org
+	SecOrgRootProject    = "Root Project"
+	SecOrgPrivateProject = "Private Project"
+	SecOrgSecretProject  = "Secret Project"
 )

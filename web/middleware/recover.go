@@ -51,7 +51,7 @@ func NotifRecover(info string) {
 }
 
 // Graphql api recoverer
-func GqlRecover(ctx context.Context, err interface{}) error {
+func GqlRecover(ctx context.Context, err any) error {
 	qn := graphql.GetResolverContext(ctx).Field.Name
 
 	// Email Notification

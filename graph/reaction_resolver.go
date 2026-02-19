@@ -33,7 +33,7 @@ import (
 	"fractale/fractal6.go/web/auth"
 )
 
-func addReactionInputHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func addReactionInputHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {

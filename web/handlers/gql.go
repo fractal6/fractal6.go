@@ -34,7 +34,7 @@ import (
 )
 
 // Defining the Graphql handler
-func GraphqlHandler(c map[string]interface{}) http.HandlerFunc {
+func GraphqlHandler(c map[string]any) http.HandlerFunc {
 	introspection := c["introspection"].(bool)
 	complextityLimit := int(c["complexity_limit"].(int64))
 

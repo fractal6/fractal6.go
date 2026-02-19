@@ -91,7 +91,7 @@ func TestLogout(t *testing.T) {
 // --- Signup Tests ---
 
 func TestSignup_Success(t *testing.T) {
-	rr := doRequest("POST", "/auth/signup", map[string]interface{}{
+	rr := doRequest("POST", "/auth/signup", map[string]any{
 		"username": "signupuser",
 		"email":    "signupuser@test.co",
 		"password": "SignupPassword123!",
@@ -116,7 +116,7 @@ func TestSignup_Success(t *testing.T) {
 }
 
 func TestSignup_InvalidUsername(t *testing.T) {
-	rr := doRequest("POST", "/auth/signup", map[string]interface{}{
+	rr := doRequest("POST", "/auth/signup", map[string]any{
 		"username": "ab",
 		"email":    "short@test.co",
 		"password": "ValidPassword123!",
@@ -126,7 +126,7 @@ func TestSignup_InvalidUsername(t *testing.T) {
 
 func TestSignup_DuplicateEmail(t *testing.T) {
 	// testuser@test.co already exists from seed data
-	rr := doRequest("POST", "/auth/signup", map[string]interface{}{
+	rr := doRequest("POST", "/auth/signup", map[string]any{
 		"username": "newuser123",
 		"email":    testutil.TestEmail,
 		"password": "ValidPassword123!",
@@ -142,7 +142,7 @@ func TestSignupValidate_Success(t *testing.T) {
 	signupLang := "FR"
 
 	// 1. Signup to create PendingUser
-	rr := doRequest("POST", "/auth/signup", map[string]interface{}{
+	rr := doRequest("POST", "/auth/signup", map[string]any{
 		"username": signupUsername,
 		"email":    signupEmail,
 		"password": "ValidatePassword123!",
@@ -161,7 +161,7 @@ func TestSignupValidate_Success(t *testing.T) {
 	}
 
 	// 3. Validate with the email_token
-	rr = doRequest("POST", "/auth/validate", map[string]interface{}{
+	rr = doRequest("POST", "/auth/validate", map[string]any{
 		"email_token": emailToken,
 	})
 	requireStatus(t, rr, http.StatusOK)

@@ -38,7 +38,7 @@ func TestCreateOrga_Success(t *testing.T) {
 
 	// Create a new organisation
 	orgNameid := "integration-test-org"
-	rr := doRequest("POST", "/auth/createorga", map[string]interface{}{
+	rr := doRequest("POST", "/auth/createorga", map[string]any{
 		"name":    "Integration Test Org",
 		"nameid":  orgNameid,
 		"purpose": "Testing org creation",
@@ -67,7 +67,7 @@ func TestCreateOrga_Success(t *testing.T) {
 
 func TestCreateOrga_NoAuth(t *testing.T) {
 	// Try to create org without JWT
-	rr := doRequest("POST", "/auth/createorga", map[string]interface{}{
+	rr := doRequest("POST", "/auth/createorga", map[string]any{
 		"name":   "No Auth Org",
 		"nameid": "no-auth-org",
 	})
@@ -81,7 +81,7 @@ func TestCreateOrga_InvalidNameid(t *testing.T) {
 	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
 
 	// Nameid with # should be rejected
-	rr := doRequest("POST", "/auth/createorga", map[string]interface{}{
+	rr := doRequest("POST", "/auth/createorga", map[string]any{
 		"name":   "Bad Org",
 		"nameid": "bad#org",
 	}, jwtCookie)
@@ -93,7 +93,7 @@ func TestSetUserCanJoin_Success(t *testing.T) {
 	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
 
 	// Set userCanJoin to false
-	rr := doRequest("POST", "/auth/setusercanjoin", map[string]interface{}{
+	rr := doRequest("POST", "/auth/setusercanjoin", map[string]any{
 		"nameid": "test-org",
 		"val":    false,
 	}, jwtCookie)
@@ -109,7 +109,7 @@ func TestSetUserCanJoin_Success(t *testing.T) {
 	}
 
 	// Restore to true
-	rr = doRequest("POST", "/auth/setusercanjoin", map[string]interface{}{
+	rr = doRequest("POST", "/auth/setusercanjoin", map[string]any{
 		"nameid": "test-org",
 		"val":    true,
 	}, jwtCookie)
@@ -121,7 +121,7 @@ func TestSetGuestCanCreateTension_Success(t *testing.T) {
 	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
 
 	// Set guestCanCreateTension to false
-	rr := doRequest("POST", "/auth/setguestcancreatetension", map[string]interface{}{
+	rr := doRequest("POST", "/auth/setguestcancreatetension", map[string]any{
 		"nameid": "test-org",
 		"val":    false,
 	}, jwtCookie)
@@ -137,7 +137,7 @@ func TestSetGuestCanCreateTension_Success(t *testing.T) {
 	}
 
 	// Restore to true
-	rr = doRequest("POST", "/auth/setguestcancreatetension", map[string]interface{}{
+	rr = doRequest("POST", "/auth/setguestcancreatetension", map[string]any{
 		"nameid": "test-org",
 		"val":    true,
 	}, jwtCookie)
@@ -150,7 +150,7 @@ func TestSetLexicon_Success(t *testing.T) {
 
 	// Set lexicon to a JSON string
 	lexiconVal := `{"tension":"Issue","circle":"Team"}`
-	rr := doRequest("POST", "/auth/setlexicon", map[string]interface{}{
+	rr := doRequest("POST", "/auth/setlexicon", map[string]any{
 		"nameid": "test-org",
 		"val":    lexiconVal,
 	}, jwtCookie)
@@ -169,7 +169,7 @@ func TestSetLexicon_Success(t *testing.T) {
 	}
 
 	// Restore to empty
-	rr = doRequest("POST", "/auth/setlexicon", map[string]interface{}{
+	rr = doRequest("POST", "/auth/setlexicon", map[string]any{
 		"nameid": "test-org",
 		"val":    "",
 	}, jwtCookie)
@@ -178,7 +178,7 @@ func TestSetLexicon_Success(t *testing.T) {
 
 func TestSetLexicon_NoAuth(t *testing.T) {
 	// Try without JWT
-	rr := doRequest("POST", "/auth/setlexicon", map[string]interface{}{
+	rr := doRequest("POST", "/auth/setlexicon", map[string]any{
 		"nameid": "test-org",
 		"val":    `{"foo":"bar"}`,
 	})
@@ -190,7 +190,7 @@ func TestSetLexicon_NoAuth(t *testing.T) {
 
 func TestSetUserCanJoin_NoAuth(t *testing.T) {
 	// Try without JWT
-	rr := doRequest("POST", "/auth/setusercanjoin", map[string]interface{}{
+	rr := doRequest("POST", "/auth/setusercanjoin", map[string]any{
 		"nameid": "test-org",
 		"val":    false,
 	})

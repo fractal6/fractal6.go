@@ -173,7 +173,7 @@ func (em EventMap) Check(uctx *model.UserCtx, tension *model.Tension, event *mod
 	// --
 	f := validationMap[em.Validation]
 	if f == nil {
-		return false, nil, LogErr("Contract not implemened", fmt.Errorf("Contact a coordinator to access this ressource."))
+		return false, nil, LogErr("Contract not implemened", fmt.Errorf("Contact a coordinator to access this resource."))
 	}
 	return f(em, uctx, tension, event, contract)
 }
@@ -239,7 +239,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 	// --
 
 	if AuthorHook&em.Auth > 0 {
-		// isAuthorCheck: Check if the user is the creator of the ressource
+		// isAuthorCheck: Check if the user is the creator of the resource
 		if uctx.Username == tension.CreatedBy.Username {
 			return true, err
 		}
@@ -286,13 +286,13 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 	if AssigneeHook&em.Auth > 0 {
 		// isAssigneeCheck: Check if the user is an assignee of the curent tension
 		// @debug: use checkAssignee function, but how to pass the context ?
-		var assignees []interface{}
+		var assignees []any
 		res, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.assignees", "User.username")
 		if err != nil {
 			return false, err
 		}
 		if res != nil {
-			assignees = res.([]interface{})
+			assignees = res.([]any)
 		}
 		for _, a := range assignees {
 			if a.(string) == uctx.Username {

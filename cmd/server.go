@@ -161,9 +161,7 @@ func RunServer() {
 		r.Route("/q", func(r chi.Router) {
 			// Special recursive query
 			r.Group(func(r chi.Router) {
-				// Those data are not secured by now, and anyone can
-				// query them recursively, but as there are not sensitive
-				// and set them public for now.
+				// The visibility filtering is done through the filterByNodeVisibility
 				// r.Use(middle6.CheckRecursiveQueryRights)
 				r.Post("/sub_nodes", handle6.SubNodes)
 				r.Post("/sub_members", handle6.SubMembers)
@@ -171,11 +169,12 @@ func RunServer() {
 				r.Post("/sub_labels", handle6.SubLabels)
 				r.Post("/top_roles", handle6.TopRoles)
 				r.Post("/sub_roles", handle6.SubRoles)
+				r.Post("/sub_projects", handle6.SubProjects)
 			})
 
 			// Special tension query (nested filters and counts)
 			r.Group(func(r chi.Router) {
-				// The filtering is done directly in the query resolver as
+				// The visibility filtering is done directly in the query resolver as
 				// doing it here required to rewrite the body, which seems difficult ?!
 				// r.Use(middle6.CheckTensionQueryRights)
 				r.Post("/tensions_light", handle6.TensionsLight)

@@ -92,9 +92,13 @@ POST /auth/signup          - User registration
 POST /auth/login           - User login
 POST /auth/resetpassword   - Password reset
 POST /auth/verificate      - Email verification
-POST /q/sub_nodes          - Query sub-nodes
-POST /q/sub_members        - Query sub-members
-POST /q/top_labels         - Query top labels
+POST /q/sub_nodes          - Query sub-nodes (with visibility filtering)
+POST /q/sub_members        - Query sub-members (with visibility filtering)
+POST /q/top_labels         - Query top labels (with visibility filtering)
+POST /q/sub_labels         - Query sub labels (with visibility filtering)
+POST /q/top_roles          - Query top roles (with visibility filtering)
+POST /q/sub_roles          - Query sub roles (with visibility filtering)
+POST /q/sub_projects       - Query sub-projects (with visibility filtering)
 POST /q/tensions_*         - Filtered tension queries
 POST /notifications        - MTA webhook (email replies)
 GET  /playground           - GraphQL playground (dev only)
@@ -345,6 +349,29 @@ Pre/post mutation hooks in resolver files. Perform complex authorization checks:
 // In node_resolver.go: addNodeArtefactHook
 // Checks coordinator authority, rootnameid compliance, etc.
 ```
+
+### Collaborator-Based Access (per-resource)
+
+Some resource types support direct user-level access that bypasses the node-based coordinator hierarchy. This is used when external users (who may not be organisation members) need read/write access to a specific resource.
+
+**Currently applies to:** `Project`
+
+The `Project` type has a `collaborators: [User!]` field. When a user is listed as a collaborator, they are granted access at two levels:
+
+- **Dgraph `@auth` rules** (`schema/auth/query-project.gql`, `alter-project.gql`): Include a rule that checks if the requesting user's `$USERNAME` matches any entry in `Project.collaborators`. This grants query and mutation access at the database level.
+- **Hook-level auth** (`web/auth/gbac.go:CheckProjectAuth`): Checks collaborator membership first (cheap username match) before falling back to the standard node-based coordinator authorization. This means a collaborator gets access even without any role in the organisation tree.
+
+```
+CheckProjectAuth(uctx, projectid)
+    |
+    ├── isProjectCollaborator? ──yes──> ALLOW
+    |
+    └── checkProjectNodeAuth (coordinator check on linked nodes)
+            |
+            └── CheckNodesAuth -> HasCoordoAuth -> ...
+```
+
+This pattern can be extended to other resource types that need direct user invitations without requiring organisation membership.
 
 ### Layer 4: Event Authorization (EMAP)
 

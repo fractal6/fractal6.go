@@ -45,7 +45,7 @@ var QueryDraft db.QueryMut = db.QueryMut{
         }`,
 }
 
-func updateProjectDraftHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func updateProjectDraftHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Pre-processing:
 	// - Auth (Author, or Project rights)
 
@@ -75,7 +75,7 @@ func updateProjectDraftHook(ctx context.Context, obj interface{}, next graphql.R
 		}
 
 		// Check project auth
-		if err = auth.CheckProjectAuth(uctx, draft.ProjectStatus.Project.ID); err != nil {
+		if err = auth.Authorize(auth.CheckProjectAuth(uctx, draft.ProjectStatus.Project.ID)); err != nil {
 			return nil, err
 		}
 	}

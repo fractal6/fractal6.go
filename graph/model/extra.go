@@ -28,10 +28,10 @@ import "encoding/json"
 
 // JsonAtom is a general interface
 // for decoding unknonw structure
-type JsonAtom = map[string]interface{}
+type JsonAtom = map[string]any
 
 // StructMap convert/copy a interface to another
-func StructMap(in interface{}, out interface{}) {
+func StructMap(in any, out any) {
 	raw, _ := json.Marshal(in)
 	json.Unmarshal(raw, &out)
 }

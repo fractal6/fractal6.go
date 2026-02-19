@@ -222,8 +222,8 @@ func Init() gen.Config {
 // https://stackoverflow.com/questions/58468134/how-to-compose-functions-in-go
 // @generics
 // @debug: do not workd with resolvers
-func compose(manyv ...func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error)) func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-	return func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func compose(manyv ...func(ctx context.Context, obj any, next graphql.Resolver) (any, error)) func(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
+	return func(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 		var err error
 		for _, v := range manyv {
 			obj, err = v(ctx, obj, next)
@@ -263,17 +263,17 @@ func ExtractFilter[T any](ctx context.Context, filter *T) {
 //  fc := graphql.GetFieldContext(ctx)
 //  pc := graphql.GetPathContext(ctx) // .*.Field to get the field name
 
-func nothing(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func nothing(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	return next(ctx)
 }
 
-func hidden(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func hidden(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	rc := graphql.GetResolverContext(ctx)
 	fieldName := rc.Field.Name
 	return nil, fmt.Errorf("'%s' field is hidden", fieldName)
 }
 
-func private(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func private(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	ctx, uctx, err := auth.GetUserContext(ctx)
 	if err != nil {
 		return nil, LogErr("Access denied", err)
@@ -304,7 +304,7 @@ func private(ctx context.Context, obj interface{}, next graphql.Resolver) (inter
 
 // Use DQL query to fetch the given field=k.
 // If k is not given, "id" is automatically pass to the query template.
-func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k []string) (interface{}, error) {
+func meta(ctx context.Context, obj any, next graphql.Resolver, f string, k []string) (any, error) {
 	data, err := next(ctx)
 	if err != nil {
 		return nil, err
@@ -401,7 +401,7 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
 		default:
 			// Assume interface
 			// Merge results (needed for user defined returns (i.e. EventCouts))
-			m := make(map[string]interface{}, 2)
+			m := make(map[string]any, 2)
 			for _, s := range res {
 				for k, v := range s {
 					m[k] = v
@@ -413,7 +413,7 @@ func meta(ctx context.Context, obj interface{}, next graphql.Resolver, f string,
 	return data, err
 }
 
-func meta_patch(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (interface{}, error) {
+func meta_patch(ctx context.Context, obj any, next graphql.Resolver, f string, k *string) (any, error) {
 	uctx := auth.GetUserContextOrEmpty(ctx)
 	// @FIX this hack ! Redis push ?
 	var ok bool
@@ -462,7 +462,7 @@ func meta_patch(ctx context.Context, obj interface{}, next graphql.Resolver, f s
 // Input directives
 //
 
-func setContextWithID(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func setContextWithID(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	var err error
 	for _, n := range []string{"id", "nameid", "rootnameid", "username"} {
 		ctx, _, err = setContextWith(ctx, obj, n)
@@ -473,7 +473,7 @@ func setContextWithID(ctx context.Context, obj interface{}, next graphql.Resolve
 	return next(ctx)
 }
 
-func setContextWithNameid(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func setContextWithNameid(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	ctx, _, err := setContextWith(ctx, obj, "nameid")
 	if err != nil {
 		return nil, err
@@ -481,7 +481,7 @@ func setContextWithNameid(ctx context.Context, obj interface{}, next graphql.Res
 	return next(ctx)
 }
 
-func setUpdateContextInfo(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func setUpdateContextInfo(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	hasSet := obj.(model.JsonAtom)["set"] != nil
 	hasRemove := obj.(model.JsonAtom)["remove"] != nil
 	ctx = context.WithValue(ctx, "hasSet", hasSet)
@@ -497,7 +497,7 @@ func setUpdateContextInfo(ctx context.Context, obj interface{}, next graphql.Res
 // Input Field directives
 //
 
-func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func readOnly(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	rc := graphql.GetResolverContext(ctx)
 	pc := graphql.GetPathContext(ctx)
 	queryName := rc.Field.Name
@@ -505,7 +505,7 @@ func readOnly(ctx context.Context, obj interface{}, next graphql.Resolver) (inte
 	return nil, LogErr("Forbiden", fmt.Errorf("Read only field on %s:%s", queryName, fieldName))
 }
 
-func FieldAuthorization(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (interface{}, error) {
+func FieldAuthorization(ctx context.Context, obj any, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (any, error) {
 	// If the directives exists withtout a rule, it pass through.
 	if r == nil {
 		return next(ctx)
@@ -519,7 +519,7 @@ func FieldAuthorization(ctx context.Context, obj interface{}, next graphql.Resol
 	return nil, LogErr("directive error", fmt.Errorf("unknown rule '%s'", *r))
 }
 
-func FieldTransform(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (interface{}, error) {
+func FieldTransform(ctx context.Context, obj any, next graphql.Resolver, a string) (any, error) {
 	if fun := FieldTransformFunc[a]; fun != nil {
 		return fun(ctx, next)
 	}

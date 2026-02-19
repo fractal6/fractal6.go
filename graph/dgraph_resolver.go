@@ -53,7 +53,7 @@ func init() {
  * @warning: It looses eventual directive in the query graph (@cascade, @skip, @include...)
  */
 
-func (r *queryResolver) DgraphGetBridge(ctx context.Context, maps map[string]interface{}, data interface{}) error {
+func (r *queryResolver) DgraphGetBridge(ctx context.Context, maps map[string]any, data any) error {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -67,7 +67,7 @@ func (r *queryResolver) DgraphQueryBridge(ctx context.Context, filter any, order
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
-func (r *mutationResolver) DgraphAddBridge(ctx context.Context, input interface{}, upsert *bool, data interface{}) error {
+func (r *mutationResolver) DgraphAddBridge(ctx context.Context, input any, upsert *bool, data any) error {
 	uctx, typeName, err := getUserQueryType(ctx)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (r *mutationResolver) DgraphAddBridge(ctx context.Context, input interface{
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
-func (r *mutationResolver) DgraphUpdateBridge(ctx context.Context, input interface{}, data interface{}) error {
+func (r *mutationResolver) DgraphUpdateBridge(ctx context.Context, input any, data any) error {
 	uctx, typeName, err := getUserQueryType(ctx)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func (r *mutationResolver) DgraphUpdateBridge(ctx context.Context, input interfa
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
-func (r *mutationResolver) DgraphDeleteBridge(ctx context.Context, filter interface{}, data interface{}) error {
+func (r *mutationResolver) DgraphDeleteBridge(ctx context.Context, filter any, data any) error {
 	uctx, typeName, err := getUserQueryType(ctx)
 	if err != nil {
 		return err
@@ -111,7 +111,7 @@ func getUserQueryType(ctx context.Context) (*model.UserCtx, string, error) {
 // postGqlProcess postprocess output data and error:
 // - ignore error if data are returned (cause by @auth rules filtering).
 // - handle meta query passed with redis.
-func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors error) error {
+func postGqlProcess(ctx context.Context, db *db.Dgraph, data any, errors error) error {
 	if data != nil && errors != nil {
 		// Gqlgen ignore the data if there is an error returned
 		// see https://github.com/99designs/gqlgen/issues/1191
@@ -164,12 +164,12 @@ func postGqlProcess(ctx context.Context, db *db.Dgraph, data interface{}, errors
  * @deprecated
  */
 
-func (r *queryResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
+func (r *queryResolver) DgraphBridgeRaw(ctx context.Context, data any) error {
 	err := DgraphQueryResolverRaw(ctx, r.db, data)
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
-func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data interface{}) error {
+func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data any) error {
 	err := DgraphQueryResolverRaw(ctx, r.db, data)
 	return postGqlProcess(ctx, r.db, data, err)
 }
@@ -177,7 +177,7 @@ func (r *mutationResolver) DgraphBridgeRaw(ctx context.Context, data interface{}
 // @deprecated: Follow the Gql request to Dgraph.
 // This use raw query from the request context and thus won't propagate change
 // of the input that may happend in the resolvers.
-func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data interface{}) error {
+func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data any) error {
 	// How to get the query args ? https://github.com/99designs/gqlgen/issues/1144
 	// for k, a := range rc.Args {
 
@@ -209,8 +209,8 @@ func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data interface{}
 
 		// If Graphql variables are given...
 		t := strings.ToLower(typeName) // @DEBUG: only the first letter must lowered ?!
-		if variables[t] != nil && variables[t].(map[string]interface{})["set"] != nil {
-			s := variables[t].(map[string]interface{})["set"].(map[string]interface{})
+		if variables[t] != nil && variables[t].(map[string]any)["set"] != nil {
+			s := variables[t].(map[string]any)["set"].(map[string]any)
 			s["history"] = nil
 		}
 	}

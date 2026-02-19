@@ -130,7 +130,7 @@ func (tk Jwt) GetAuth() *jwtauth.JWTAuth {
 
 // Issue generate and encode a new token
 func (tk *Jwt) issue(d model.UserCtx, t time.Duration) (string, error) {
-	claims := map[string]interface{}{tk.tokenClaim: d}
+	claims := map[string]any{tk.tokenClaim: d}
 	jwtauth.SetIssuedNow(claims)
 	jwtauth.SetExpiry(claims, time.Now().UTC().Add(t))
 	_, token, err := tk.tokenAuth.Encode(claims)

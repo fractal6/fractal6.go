@@ -144,7 +144,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 	users := make(map[string]model.UserNotifInfo)
 	if type_ == model.TensionTypeAlert {
 		// Alert tension Notify every members (including Guest)
-		if data, err := db.GetDB().GetSubMembers("nameid", receiverid, auth.UserSelection); err == nil {
+		if data, err := db.GetDB().GetSubMembers("nameid", receiverid, auth.UserSelection, true); err == nil {
 			for _, n := range data {
 				user := *n.FirstLink
 				if _, ex := users[user.Username]; ex {

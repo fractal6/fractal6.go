@@ -66,7 +66,7 @@ var QueryCardLoc db.QueryMut = db.QueryMut{
 }
 
 // Add "ProjectCard"
-func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func addProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Pre-processing:
 	// - Auth
 
@@ -87,7 +87,7 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 		projectid := x.(string)
 
 		// Check project auth
-		if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
+		if err = auth.Authorize(auth.CheckProjectAuth(uctx, projectid)); err != nil {
 			return nil, err
 		}
 	}
@@ -119,7 +119,7 @@ func addProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resol
 }
 
 // Add "ProjectCard"
-func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func deleteProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Pre-processing:
 	// - get values prior mutations
 	// - Auth
@@ -147,7 +147,7 @@ func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 		oldCards = append(oldCards, card)
 
 		// Check project auth
-		if err = auth.CheckProjectAuth(uctx, card.Projectid); err != nil {
+		if err = auth.Authorize(auth.CheckProjectAuth(uctx, card.Projectid)); err != nil {
 			return nil, err
 		}
 	}
@@ -201,7 +201,7 @@ func deleteProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 
 // Update "ProjectCard"
 // @warning: update of card position only supported for one card at a time.
-func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func updateProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// Pre-processing:
 	// - Auth
 
@@ -236,7 +236,7 @@ func updateProjectCardHook(ctx context.Context, obj interface{}, next graphql.Re
 		}
 
 		// Check project auth
-		if err = auth.CheckProjectAuth(uctx, projectid); err != nil {
+		if err = auth.Authorize(auth.CheckProjectAuth(uctx, projectid)); err != nil {
 			return nil, err
 		}
 	} else {

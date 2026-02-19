@@ -35,9 +35,9 @@ import (
 	. "fractale/fractal6.go/internal/tools"
 )
 
-// @refactor: modularize generic function (GetFilterBy*) (returns (interface{}, error}
+// @refactor: modularize generic function (GetFilterBy*) (returns (any, error}
 //            as Traverse([list of key to traver], [list of payload to get])
-//  Use Meta() for all other queries... (return []interface{})
+//  Use Meta() for all other queries... (return []any)
 
 var userCtxPayload string = `{
     User.name
@@ -451,20 +451,23 @@ var dqlQueries map[string]string = map[string]string{
     }`,
 	"getSubNodes": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as Node.children
+            o as uid
+            Node.children
         }
 
-        all(func: uid(o)) @filter(eq(Node.isArchived, false)) {
+        all(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
             Node.{{.fieldid}}
         }
     }`,
 	"getSubMembers": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as Node.children
+            o as uid
+            Node.children
         }
 
         all(func: uid(o)) @filter(has(Node.first_link) AND has(Node.role_type) AND eq(Node.isArchived, false)
                            AND NOT eq(Node.role_type, "Pending") AND NOT eq(Node.role_type, "Retired")
+                           {{if .excludeSelf}}AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}
             ) {
             Node.createdAt
             Node.name
@@ -483,7 +486,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.parent @normalize
         }
 
-        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldinclude}}, "{{.objid}}")) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
             l as Node.labels
         }
 
@@ -496,10 +499,11 @@ var dqlQueries map[string]string = map[string]string{
     }`,
 	"getSubLabels": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as Node.children
+            o as uid
+            Node.children
         }
 
-        var(func: uid(o)) @filter(eq(Node.isArchived, false)) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
             l as Node.labels
         }
 
@@ -516,7 +520,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.parent @normalize
         }
 
-        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldinclude}}, "{{.objid}}")) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
             l as Node.roles
         }
 
@@ -530,10 +534,11 @@ var dqlQueries map[string]string = map[string]string{
     }`,
 	"getSubRoles": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as Node.children
+            o as uid
+            Node.children
         }
 
-        var(func: uid(o)) @filter(eq(Node.isArchived, false)) {
+        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
             l as Node.roles
         }
 
@@ -543,6 +548,25 @@ var dqlQueries map[string]string = map[string]string{
             RoleExt.color
             RoleExt.role_type
             RoleExt.nodes { Node.nameid }
+        }
+    }`,
+	"getSubProjects": `{
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+            o as uid
+            Node.children
+        }
+
+        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
+            p as Node.projects
+        }
+
+        all(func: uid(p)) @filter(eq(Project.status, "Open")) {
+            uid
+            Project.updatedAt
+            Project.name
+            Project.description
+            Project.nodes { Node.nameid Node.name }
+            Project.collaborators { User.username User.name }
         }
     }`,
 	"getTensionInt": `{
@@ -1247,7 +1271,7 @@ func (dg Dgraph) CountHas2(fieldName, f2, v2 string) int {
 	return values[0]
 }
 
-func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{}, error) {
+func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]any, error) {
 	// Execute a DQL request from the given defined query template
 	// Returns: array
 	var res *api.Response
@@ -1276,9 +1300,9 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{
 	}
 
 	// Extract result
-	x := make([]map[string]interface{}, len(r.All))
+	x := make([]map[string]any, len(r.All))
 	for i, s := range r.All {
-		y := make(map[string]interface{}, len(s))
+		y := make(map[string]any, len(s))
 		for n, m := range CleanCompositeName(s, true) {
 			y[n] = m
 		}
@@ -1287,7 +1311,7 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]interface{
 	return x, err
 }
 
-func (dg Dgraph) Meta1(f string, maps map[string]string, data interface{}) error {
+func (dg Dgraph) Meta1(f string, maps map[string]string, data any) error {
 	// Execute a DQL request from the given defined query template
 	// Returns: interface
 	if x, err := dg.Meta(f, maps); err != nil {
@@ -1298,7 +1322,7 @@ func (dg Dgraph) Meta1(f string, maps map[string]string, data interface{}) error
 	return nil
 }
 
-func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]interface{}, error) {
+func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]any, error) {
 	// Send Custom DQL request
 	// Returns: array
 	var res *api.Response
@@ -1317,9 +1341,9 @@ func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]interfa
 	}
 
 	// Extract result
-	x := make([]map[string]interface{}, len(r.All))
+	x := make([]map[string]any, len(r.All))
 	for i, s := range r.All {
-		y := make(map[string]interface{}, len(s))
+		y := make(map[string]any, len(s))
 		for n, m := range CleanCompositeName(s, true) {
 			y[n] = m
 		}
@@ -1328,7 +1352,7 @@ func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]interfa
 	return x, err
 }
 
-func (dg Dgraph) Gamma1(q QueryMut, maps map[string]string, data interface{}) error {
+func (dg Dgraph) Gamma1(q QueryMut, maps map[string]string, data any) error {
 	// Send Custom DQL request
 	// Returns: interface
 	if x, err := dg.Gamma(q, maps); err != nil {
@@ -1415,7 +1439,7 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
 }
 
 // Returns a field from id
-func (dg Dgraph) GetFieldById(id string, fieldName string) (interface{}, error) {
+func (dg Dgraph) GetFieldById(id string, fieldName string) (any, error) {
 	// Format Query
 	maps := map[string]string{
 		"id":        id,
@@ -1449,7 +1473,7 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (interface{}, error) 
 }
 
 // Returns a field from objid
-func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (interface{}, error) {
+func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (any, error) {
 	// Format Query
 	maps := map[string]string{
 		"fieldid":   fieldid,
@@ -1484,7 +1508,7 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (i
 }
 
 // Returns a subfield from uid
-func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTarget string) (interface{}, error) {
+func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTarget string) (any, error) {
 	// Format Query
 	maps := map[string]string{
 		"id":              id,
@@ -1518,9 +1542,9 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
 					return x[fieldNameTarget], nil
 				}
 			}
-		case []interface{}:
+		case []any:
 			if x != nil {
-				var y []interface{}
+				var y []any
 				for _, v := range x {
 					if len(fields) > 1 {
 						y = append(y, CleanCompositeName(v.(model.JsonAtom), true))
@@ -1538,7 +1562,7 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
 }
 
 // Returns a subfield from Eq
-func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string) (interface{}, error) {
+func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string) (any, error) {
 	// Format Query
 	maps := map[string]string{
 		"fieldid":         fieldid,
@@ -1573,9 +1597,9 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
 					return x[fieldNameTarget], nil
 				}
 			}
-		case []interface{}:
+		case []any:
 			if x != nil {
-				var y []interface{}
+				var y []any
 				for _, v := range x {
 					if len(fields) > 1 {
 						y = append(y, CleanCompositeName(v.(model.JsonAtom), true))
@@ -1592,7 +1616,7 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
 	return nil, err
 }
 
-func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, fieldNameTarget string) (interface{}, error) {
+func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, fieldNameTarget string) (any, error) {
 	// Format Query
 	maps := map[string]string{
 		"fieldid":         fieldid,
@@ -1629,9 +1653,9 @@ func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, field
 					return x[fieldNameTarget], nil
 				}
 			}
-		case []interface{}:
+		case []any:
 			if x != nil {
-				var y []interface{}
+				var y []any
 				for _, v := range x {
 					if len(fields) > 1 {
 						y = append(y, CleanCompositeName(v.(model.JsonAtom), true))
@@ -1649,7 +1673,7 @@ func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, field
 }
 
 // Returns a subsubfield from uid
-func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (interface{}, error) {
+func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (any, error) {
 	// Format Query
 	maps := map[string]string{
 		"id":                 id,
@@ -1691,7 +1715,7 @@ func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldName
 }
 
 // Returns a subsubfield from Eq
-func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (interface{}, error) {
+func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (any, error) {
 	// Format Query
 	maps := map[string]string{
 		"fieldid":            fieldid,
@@ -1794,9 +1818,9 @@ func (dg Dgraph) GetUctxFull(fieldid string, userid string) (*model.UserCtx, err
 		config := &mapstructure.DecoderConfig{
 			Result:  &user,
 			TagName: "json",
-			DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+			DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 				if to == reflect.Struct {
-					nv := CleanCompositeName(v.(map[string]interface{}), false)
+					nv := CleanCompositeName(v.(map[string]any), false)
 					return nv, nil
 				}
 				return v, nil
@@ -1838,9 +1862,9 @@ func (dg Dgraph) GetUserRoles(userid string) ([]*model.Node, error) {
 	config := &mapstructure.DecoderConfig{
 		Result:  &data,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -1910,9 +1934,9 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
 	config := &mapstructure.DecoderConfig{
 		Result:  &data,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -1968,9 +1992,9 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
 		config := &mapstructure.DecoderConfig{
 			Result:  &obj,
 			TagName: "json",
-			DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+			DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 				if to == reflect.Struct {
-					nv := CleanCompositeName(v.(map[string]interface{}), false)
+					nv := CleanCompositeName(v.(map[string]any), false)
 					return nv, nil
 				}
 				return v, nil
@@ -2028,9 +2052,9 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
 		config := &mapstructure.DecoderConfig{
 			Result:  &obj,
 			TagName: "json",
-			DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+			DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 				if to == reflect.Struct {
-					nv := CleanCompositeName(v.(map[string]interface{}), false)
+					nv := CleanCompositeName(v.(map[string]any), false)
 					return nv, nil
 				}
 				return v, nil
@@ -2048,12 +2072,21 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
 	return &obj, err
 }
 
+// excludeSelfFlag returns "true" (truthy in Go templates) when the target
+// node should be excluded, or "" (falsy) when it should be included.
+func excludeSelfFlag(includeSelf bool) string {
+	if !includeSelf {
+		return "true"
+	}
+	return ""
+}
+
 // Get all sub children
-func (dg Dgraph) GetSubNodes(fieldid string, objid string) ([]model.Node, error) {
-	// Format Query
+func (dg Dgraph) GetSubNodes(fieldid string, objid string, includeSelf bool) ([]model.Node, error) {
 	maps := map[string]string{
-		"fieldid": fieldid,
-		"objid":   objid,
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
 	}
 	// Send request
 	res, err := dg.QueryDql("getSubNodes", maps)
@@ -2072,9 +2105,9 @@ func (dg Dgraph) GetSubNodes(fieldid string, objid string) ([]model.Node, error)
 	config := &mapstructure.DecoderConfig{
 		Result:  &data,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -2089,12 +2122,12 @@ func (dg Dgraph) GetSubNodes(fieldid string, objid string) ([]model.Node, error)
 }
 
 // Get all sub members
-func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string) ([]model.Node, error) {
-	// Format Query
+func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string, includeSelf bool) ([]model.Node, error) {
 	maps := map[string]string{
 		"fieldid":      fieldid,
 		"objid":        objid,
 		"user_payload": user_payload,
+		"excludeSelf":  excludeSelfFlag(includeSelf),
 	}
 	// Send request
 	res, err := dg.QueryDql("getSubMembers", maps)
@@ -2113,9 +2146,9 @@ func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string) ([]model.Nod
 	config := &mapstructure.DecoderConfig{
 		Result:  &data,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -2131,17 +2164,10 @@ func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string) ([]model.Nod
 
 // Get all top labels
 func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([]model.Label, error) {
-	// Format Query
-	var fieldinclude string
-	if includeSelf {
-		fieldinclude = fieldid + "_IGNORE"
-	} else {
-		fieldinclude = fieldid
-	}
 	maps := map[string]string{
-		"fieldid":      fieldid,
-		"objid":        objid,
-		"fieldinclude": fieldinclude,
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
 	}
 	// Send request
 	res, err := dg.QueryDql("getTopLabels", maps)
@@ -2160,9 +2186,9 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([
 	config := &mapstructure.DecoderConfig{
 		Result:  &data_dup,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -2186,11 +2212,11 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([
 }
 
 // Get all sub labels
-func (dg Dgraph) GetSubLabels(fieldid string, objid string) ([]model.Label, error) {
-	// Format Query
+func (dg Dgraph) GetSubLabels(fieldid string, objid string, includeSelf bool) ([]model.Label, error) {
 	maps := map[string]string{
-		"fieldid": fieldid,
-		"objid":   objid,
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
 	}
 	// Send request
 	res, err := dg.QueryDql("getSubLabels", maps)
@@ -2209,9 +2235,9 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string) ([]model.Label, erro
 	config := &mapstructure.DecoderConfig{
 		Result:  &data_dup,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -2236,17 +2262,10 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string) ([]model.Label, erro
 
 // Get all top roles
 func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]model.RoleExt, error) {
-	// Format Query
-	var fieldinclude string
-	if includeSelf {
-		fieldinclude = fieldid + "_IGNORE"
-	} else {
-		fieldinclude = fieldid
-	}
 	maps := map[string]string{
-		"fieldid":      fieldid,
-		"objid":        objid,
-		"fieldinclude": fieldinclude,
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
 	}
 	// Send request
 	res, err := dg.QueryDql("getTopRoles", maps)
@@ -2265,9 +2284,9 @@ func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]
 	config := &mapstructure.DecoderConfig{
 		Result:  &data_dup,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -2290,12 +2309,12 @@ func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]
 	return data, err
 }
 
-// Get all sub labels
-func (dg Dgraph) GetSubRoles(fieldid string, objid string) ([]model.RoleExt, error) {
-	// Format Query
+// Get all sub roles
+func (dg Dgraph) GetSubRoles(fieldid string, objid string, includeSelf bool) ([]model.RoleExt, error) {
 	maps := map[string]string{
-		"fieldid": fieldid,
-		"objid":   objid,
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
 	}
 	// Send request
 	res, err := dg.QueryDql("getSubRoles", maps)
@@ -2314,9 +2333,9 @@ func (dg Dgraph) GetSubRoles(fieldid string, objid string) ([]model.RoleExt, err
 	config := &mapstructure.DecoderConfig{
 		Result:  &data_dup,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -2337,6 +2356,56 @@ func (dg Dgraph) GetSubRoles(fieldid string, objid string) ([]model.RoleExt, err
 		}
 	}
 	return data, err
+}
+
+// ProjectFull is a lightweight project representation for the sub_projects endpoint.
+type ProjectFull struct {
+	ID            string        `json:"id"`
+	UpdatedAt     string        `json:"updatedAt,omitempty"`
+	Name          string        `json:"name"`
+	Description   *string       `json:"description,omitempty"`
+	Nodes         []*model.Node `json:"nodes,omitempty"`
+	Collaborators []*model.User `json:"collaborators,omitempty"`
+}
+
+// Get all sub projects
+func (dg Dgraph) GetSubProjects(fieldid string, objid string, includeSelf bool) ([]ProjectFull, error) {
+	maps := map[string]string{
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
+	}
+	res, err := dg.QueryDql("getSubProjects", maps)
+	if err != nil {
+		return nil, err
+	}
+
+	var r DqlResp
+	if err = json.Unmarshal(res.Json, &r); err != nil {
+		return nil, err
+	}
+
+	var data []ProjectFull
+	config := &mapstructure.DecoderConfig{
+		Result:  &data,
+		TagName: "json",
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
+			if to == reflect.Struct {
+				nv := CleanCompositeName(v.(map[string]any), false)
+				return nv, nil
+			}
+			return v, nil
+		},
+	}
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		return nil, err
+	}
+	if err = decoder.Decode(r.All); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, error) {
@@ -2404,9 +2473,9 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 	config := &mapstructure.DecoderConfig{
 		Result:  &data,
 		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v interface{}) (interface{}, error) {
+		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
 			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]interface{}), false)
+				nv := CleanCompositeName(v.(map[string]any), false)
 				return nv, nil
 			}
 			return v, nil
@@ -2474,7 +2543,7 @@ func (dg Dgraph) GetLastBlobId(tid string) *string {
 	if len(r.All) > 1 {
 		return nil
 	} else if len(r.All) == 1 {
-		blobs := r.All[0]["Tension.blobs"].([]interface{})
+		blobs := r.All[0]["Tension.blobs"].([]any)
 		if len(blobs) > 0 {
 			bid = blobs[0].(model.JsonAtom)["uid"].(string)
 		}
@@ -2507,7 +2576,7 @@ func (dg Dgraph) HasCoordos(nameid string) bool {
 		return ok
 	} else if len(r.All) == 1 {
 		c := r.All[0]["Node.children"]
-		if c != nil && len(c.([]interface{})) > 0 {
+		if c != nil && len(c.([]any)) > 0 {
 			ok = true
 		}
 	}
@@ -2537,7 +2606,7 @@ func (dg Dgraph) GetChildren(nameid string) ([]string, error) {
 	if len(r.All) > 1 {
 		return nil, fmt.Errorf("Got multiple object for term: %s", nameid)
 	} else if len(r.All) == 1 {
-		c := r.All[0]["Node.children"].([]interface{})
+		c := r.All[0]["Node.children"].([]any)
 		for _, x := range c {
 			data = append(data, x.(model.JsonAtom)["Node.nameid"].(string))
 		}
@@ -2573,8 +2642,8 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
 		if parents == nil {
 			return data, err
 		}
-		switch p := parents.([]interface{})[0].(model.JsonAtom)["Node.nameid"].(type) {
-		case []interface{}:
+		switch p := parents.([]any)[0].(model.JsonAtom)["Node.nameid"].(type) {
+		case []any:
 			for _, x := range p {
 				data = append(data, x.(string))
 			}

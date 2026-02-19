@@ -61,7 +61,7 @@ func queryTypeFromGraphqlContext(ctx context.Context) (string, string, string, e
 
 // setContext add the {n} field in the context for further inspection in next resolvers.
 // Its used in the hook_ resolvers for Update and Delete queries.
-func setContextWith(ctx context.Context, obj interface{}, n string) (context.Context, string, error) {
+func setContextWith(ctx context.Context, obj any, n string) (context.Context, string, error) {
 	var val string
 	var err error
 	var filter model.JsonAtom
@@ -99,7 +99,7 @@ func setContextWith(ctx context.Context, obj interface{}, n string) (context.Con
 			val = v.(string)
 		}
 	case "id":
-		ids := filter[n].([]interface{})
+		ids := filter[n].([]any)
 		if len(ids) != 1 {
 			return ctx, val, fmt.Errorf("multiple ID is not allowed for this request.")
 		}
@@ -110,9 +110,9 @@ func setContextWith(ctx context.Context, obj interface{}, n string) (context.Con
 	return ctx, val, err
 }
 
-func getNestedObj(obj interface{}, field string) interface{} {
+func getNestedObj(obj any, field string) any {
 	var source model.JsonAtom
-	var target interface{}
+	var target any
 
 	source = obj.(model.JsonAtom)
 	fields := strings.Split(field, ".")
@@ -130,7 +130,7 @@ func getNestedObj(obj interface{}, field string) interface{} {
 	return target
 }
 
-func get(obj model.JsonAtom, field string, deflt interface{}) interface{} {
+func get(obj model.JsonAtom, field string, deflt any) any {
 	v := obj[field]
 	if v == nil {
 		return deflt
@@ -224,7 +224,7 @@ func PayloadContains(ctx context.Context, field string) bool {
 // PayloadContains return true if the query payload contains the given field,
 // by looking the reflected Go variable. It is used for input hook when
 // the payload is not available in the context.
-func PayloadContainsGo(obj interface{}, field string) bool {
+func PayloadContainsGo(obj any, field string) bool {
 	n := reflect.ValueOf(obj).Elem().FieldByName(field).String()
 	return n != ""
 }

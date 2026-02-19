@@ -203,15 +203,30 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query ($ROOTIDS: [String]) {
         queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryProject {
+          collaborators(filter: {username: {eq: $USERNAME}}) { id }
+        }
+    }"""
 }]
 }, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query ($ROOTIDS: [String]) {
         queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
     }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryProject {
+          collaborators(filter: {username: {eq: $USERNAME}}) { id }
+        }
+    }"""
 }]
 }, update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 },{ rule:"""query ($ROOTIDS: [String]) {
         queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryProject {
+          collaborators(filter: {username: {eq: $USERNAME}}) { id }
+        }
     }"""
 }]
 }) {
@@ -227,8 +242,8 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   status: ProjectStatus! @search
   columns: [ProjectColumn!] @hasInverse(field: project)
   fields: [ProjectField!]
-  leaders: [Node!]
   nodes: [Node!] @hasInverse(field: projects)
+  collaborators: [User!]
 }
 
 type ProjectColumn {
