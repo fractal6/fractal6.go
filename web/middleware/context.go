@@ -23,7 +23,7 @@ package middleware
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -40,9 +40,9 @@ func RequestContextMiddleware(next http.Handler) http.Handler {
 			// fmt.Println(r.Form)
 			// fmt.Println(r.Form.Encode())
 
-			body, _ := ioutil.ReadAll(r.Body)
+			body, _ := io.ReadAll(r.Body)
 			// Restore the io.ReadCloser to its original state
-			r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+			r.Body = io.NopCloser(bytes.NewBuffer(body))
 			// Forward body in context
 			ctx = context.WithValue(ctx, "request_body", body)
 		}

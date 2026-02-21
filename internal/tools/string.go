@@ -25,7 +25,7 @@ import (
 	"compress/gzip"
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	re "regexp"
 	"strconv"
 	"strings"
@@ -150,7 +150,7 @@ func Unpack64(c string) string {
 	data, _ := base64.StdEncoding.DecodeString(c)
 	rdata := bytes.NewReader(data)
 	r, _ := gzip.NewReader(rdata)
-	s, _ := ioutil.ReadAll(r)
+	s, _ := io.ReadAll(r)
 	return string(s)
 }
 

@@ -24,7 +24,7 @@ import (
 	//"fmt"
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/spf13/viper"
@@ -56,10 +56,10 @@ func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 		// var q string
 
 		//// Keep this to reset the body reader later
-		//body, _ := ioutil.ReadAll(r.Body)
+		//body, _ := io.ReadAll(r.Body)
 
 		//// reset the body reader
-		//r.Body = ioutil.NopCloser(bytes.NewReader(body))
+		//r.Body = io.NopCloser(bytes.NewReader(body))
 		//// Get the JSON body and decode it
 		//err := json.NewDecoder(r.Body).Decode(&q)
 		//if err != nil {
@@ -68,7 +68,7 @@ func CheckRecursiveQueryRights(next http.Handler) http.Handler {
 		//    return
 		//}
 		//// reset the body reader agin
-		//r.Body = ioutil.NopCloser(bytes.NewReader(body))
+		//r.Body = io.NopCloser(bytes.NewReader(body))
 
 		//// This test is not enough, as private node will be return below.
 		//input := map[string]string{"key":"nameid", "value": q}
@@ -94,9 +94,9 @@ func CheckTensionQueryRights(next http.Handler) http.Handler {
 		var q struct{ Nameids []string }
 
 		// Keep this to reset the body reader later
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		// reset the body reader
-		r.Body = ioutil.NopCloser(bytes.NewReader(body))
+		r.Body = io.NopCloser(bytes.NewReader(body))
 		// Get the JSON body and decode it
 		err := json.NewDecoder(r.Body).Decode(&q)
 		if err != nil {
@@ -105,7 +105,7 @@ func CheckTensionQueryRights(next http.Handler) http.Handler {
 			return
 		}
 		// Restore the io.ReadCloser to its original state
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		r.Body = io.NopCloser(bytes.NewBuffer(body))
 
 		// Authentification tasks...
 		// to be completed, rewrite body !?

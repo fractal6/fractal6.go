@@ -21,7 +21,7 @@
 package handlers
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/mail"
 	"strings"
@@ -308,7 +308,7 @@ func PostalWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get request string
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return

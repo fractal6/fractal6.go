@@ -26,7 +26,6 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -122,7 +121,7 @@ func init() {
 	var priv_key string
 	// Get Jwt public key: try config file first, then env var fallback.
 	if fn := viper.GetString("db.dgraph_public_key"); fn != "" {
-		if content, err := ioutil.ReadFile(fn); err != nil {
+		if content, err := os.ReadFile(fn); err != nil {
 			log.Printf("Warning: %v", err)
 		} else {
 			pub_key = string(content)
@@ -133,7 +132,7 @@ func init() {
 	}
 	// Get Jwt private key: try config file first, then env var fallback.
 	if fn := viper.GetString("db.dgraph_private_key"); fn != "" {
-		if content, err := ioutil.ReadFile(fn); err != nil {
+		if content, err := os.ReadFile(fn); err != nil {
 			log.Printf("Warning: %v", err)
 		} else {
 			priv_key = string(content)
