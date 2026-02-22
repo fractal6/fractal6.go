@@ -2,36 +2,23 @@ package tools
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
-// Use generics to feed a slice of unknow Type T from a list of map.
-func ExtractSlice[T any](a any, data *[]T) error {
-	elements, ok := InterfaceSlice(a)
-	if !ok {
-		return fmt.Errorf("Input is not a slice")
-	}
-
-	for _, e := range elements {
-		// temp := new(T)
-		// StructMap(e, temp)
-		raw, err := json.Marshal(e)
-		if err != nil {
-			return err
-		}
-		temp, _ := unmarshalAny[T](raw)
-		*data = append(*data, *temp)
-	}
-
-	return nil
+// StructMap converts a value to another type via JSON round-trip.
+func StructMap[Out any](in any) Out {
+	var out Out
+	raw, _ := json.Marshal(in)
+	json.Unmarshal(raw, &out)
+	return out
 }
 
-func unmarshalAny[T any](bytes []byte) (*T, error) {
-	out := new(T)
-	if err := json.Unmarshal(bytes, out); err != nil {
-		return nil, err
+// ExtractSlice converts any slice-typed value to a typed []T via JSON round-trip.
+func ExtractSlice[T any](a any, data *[]T) error {
+	raw, err := json.Marshal(a)
+	if err != nil {
+		return err
 	}
-	return out, nil
+	return json.Unmarshal(raw, data)
 }
 
 // DerefSlice converts a slice of pointers []*T into a slice of values []T.
@@ -59,10 +46,6 @@ func InterfaceToSlice[T any](in any) []T {
 	}
 	return out
 }
-
-//
-// COMMON
-//
 
 // Find search an element in a slice based on a predicate. It returns element and true if element was found.
 func Find[T any](collection []T, predicate func(item T) bool) (T, bool) {

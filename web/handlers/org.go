@@ -113,8 +113,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 		CreatedBy: &model.UserRef{Username: &uctx.Username},
 	}
 	// Set Owner
-	var owner model.NodeRef
-	StructMap(nodeInput, &owner)
+	owner := StructMap[model.NodeRef](nodeInput)
 	t := model.NodeTypeRole
 	rt := model.RoleTypeOwner
 	n := string(rt)

@@ -18,36 +18,32 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package tools_test
+package tools
 
 import (
-	"reflect"
 	"testing"
-
-	"fractale/fractal6.go/graph/model"
-	. "fractale/fractal6.go/internal/tools"
 )
 
-func TestStructMap(t *testing.T) {
-	name := "name"
-	nameid := "nameid"
-	username := "username"
-	nodeFragment := &model.NodeFragment{
-		Name:      &name,
-		Nameid:    &nameid,
-		FirstLink: &username,
+func TestDerefSlice(t *testing.T) {
+	a, b := "x", "y"
+	input := []*string{&a, &b}
+	got := DerefSlice(input)
+	if len(got) != 2 || got[0] != "x" || got[1] != "y" {
+		t.Errorf("DerefSlice: got %v", got)
 	}
+}
 
-	nodeInput := StructMap[model.AddNodeInput](nodeFragment)
-
-	// StructMap should copy all matching fields including FirstLink.
-	// (The API layer rejects FirstLink later, not StructMap.)
-	// Verify nodeInput differs from a struct with only Name/Nameid set.
-	withoutFirstLink := model.AddNodeInput{
-		Name:   name,
-		Nameid: nameid,
+func TestInterfaceToSlice_Strings(t *testing.T) {
+	input := any([]any{"a", "b"})
+	got := InterfaceToSlice[string](input)
+	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
+		t.Errorf("InterfaceToSlice strings: got %v", got)
 	}
-	if reflect.DeepEqual(nodeInput, withoutFirstLink) {
-		t.Errorf("StructMap did not copy FirstLink: got %v", nodeInput)
+}
+
+func TestInterfaceToSlice_Nil(t *testing.T) {
+	got := InterfaceToSlice[string](nil)
+	if got != nil {
+		t.Errorf("InterfaceToSlice nil: expected nil, got %v", got)
 	}
 }

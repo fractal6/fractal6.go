@@ -127,8 +127,7 @@ func addContractHook(ctx context.Context, obj any, next graphql.Resolver) (any, 
 	cid := *&input.Contractid
 
 	// Validate and process Blob Event
-	var event model.EventRef
-	StructMap(*input.Event, &event)
+	event := StructMap[model.EventRef](*input.Event)
 	ok, contract, err := contractEventHook(uctx, cid, tid, &event, nil)
 	if !ok || err != nil {
 		// Delete the contract just added

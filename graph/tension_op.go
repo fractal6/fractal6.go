@@ -500,8 +500,7 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 		if err != nil {
 			return ok, err
 		}
-		var nf model.NodeFragment
-		StructMap(n, &nf)
+		nf := StructMap[model.NodeFragment](n)
 		if *nf.RoleType != model.RoleTypeGuest {
 			return false, LogErr("access denied", fmt.Errorf("You cannot detach this role (%s) like this.", string(*nf.RoleType)))
 		}
@@ -655,11 +654,10 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
 	if codec.IsMembershipRoleType(roleType) {
 		uctx.NoCache = true
 		membershipNode := auth.GetMembershipRole(uctx, tension.Emitter.Nameid)
-		var nf model.NodeFragment
 		if roleType != *membershipNode.RoleType {
 			return false, LogErr("access denied", fmt.Errorf("You must have the same membership as the one given in the event."))
 		}
-		StructMap(membershipNode, &nf)
+		nf := StructMap[model.NodeFragment](membershipNode)
 		nf.FirstLink = &uctx.Username
 		nodeType := model.NodeTypeRole
 		nf.Type = &nodeType

@@ -269,7 +269,7 @@ func ref(ctx context.Context, obj any, next graphql.Resolver, f *string, e []mod
 		return nil, err
 	}
 	test := func(x any) bool {
-		return len(CleanNilMap(Struct2Map(x))) == 1
+		return len(CleanNilMap(StructMap[map[string]any](x))) == 1
 	}
 	var pass bool
 	data_list, ok := InterfaceSlice(data)

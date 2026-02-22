@@ -234,7 +234,7 @@ func SyncPendingUser(username, email string) error {
 			// --
 			var contractPatch model.ContractPatch
 			// Set event type
-			StructMap(contract.Event, &contractPatch.Event)
+			contractPatch.Event = StructMap[*model.EventFragmentRef](contract.Event)
 			// Set candidate
 			contractPatch.Candidates = []*model.UserRef{{Email: &email}}
 			emailPart := strings.Split(email, "@")[0]

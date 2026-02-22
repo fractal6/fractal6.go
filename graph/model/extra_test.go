@@ -24,6 +24,8 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+
+	"fractale/fractal6.go/internal/tools"
 )
 
 func TestUserCreds(t *testing.T) {
@@ -81,8 +83,7 @@ func TestUserCredsMap(t *testing.T) {
 	}
 
 	for _, test := range testcases {
-		var got UserCreds
-		StructMap(test.input, &got)
+		got := tools.StructMap[UserCreds](test.input)
 		if !reflect.DeepEqual(got, test.want) {
 			t.Errorf("For p = %v, want %v. Got %v",
 				test.input, test.want, got)

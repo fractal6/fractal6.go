@@ -25,11 +25,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"reflect"
 	"strings"
 
 	"github.com/dgraph-io/dgo/v200/protos/api"
-	"github.com/mitchellh/mapstructure"
 
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/internal/tools"
@@ -1300,15 +1298,7 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]any, error
 	}
 
 	// Extract result
-	x := make([]map[string]any, len(r.All))
-	for i, s := range r.All {
-		y := make(map[string]any, len(s))
-		for n, m := range CleanCompositeName(s, true) {
-			y[n] = m
-		}
-		x[i] = y
-	}
-	return x, err
+	return CleanDqlMaps(r.All), err
 }
 
 func (dg Dgraph) Meta1(f string, maps map[string]string, data any) error {
@@ -1341,15 +1331,7 @@ func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]any, er
 	}
 
 	// Extract result
-	x := make([]map[string]any, len(r.All))
-	for i, s := range r.All {
-		y := make(map[string]any, len(s))
-		for n, m := range CleanCompositeName(s, true) {
-			y[n] = m
-		}
-		x[i] = y
-	}
-	return x, err
+	return CleanDqlMaps(r.All), err
 }
 
 func (dg Dgraph) Gamma1(q QueryMut, maps map[string]string, data any) error {
@@ -1464,7 +1446,7 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (any, error) {
 		return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, id)
 	} else if len(r.All) == 1 {
 		if len(fields) > 1 {
-			return CleanCompositeName(r.All[0], true), nil
+			return CleanDqlMap(r.All[0]), nil
 		} else {
 			return r.All[0][fieldName], nil
 		}
@@ -1499,7 +1481,7 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (a
 		return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, objid)
 	} else if len(r.All) == 1 {
 		if len(fields) > 1 {
-			return CleanCompositeName(r.All[0], true), nil
+			return CleanDqlMap(r.All[0]), nil
 		} else {
 			return r.All[0][fieldName], nil
 		}
@@ -1537,7 +1519,7 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
 		case model.JsonAtom:
 			if x != nil {
 				if len(fields) > 1 {
-					return CleanCompositeName(x, true), nil
+					return CleanDqlMap(x), nil
 				} else {
 					return x[fieldNameTarget], nil
 				}
@@ -1547,7 +1529,7 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
 				var y []any
 				for _, v := range x {
 					if len(fields) > 1 {
-						y = append(y, CleanCompositeName(v.(model.JsonAtom), true))
+						y = append(y, CleanDqlMap(v.(model.JsonAtom)))
 					} else {
 						y = append(y, v.(model.JsonAtom)[fieldNameTarget])
 					}
@@ -1592,7 +1574,7 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
 		case model.JsonAtom:
 			if x != nil {
 				if len(fields) > 1 {
-					return CleanCompositeName(x, true), nil
+					return CleanDqlMap(x), nil
 				} else {
 					return x[fieldNameTarget], nil
 				}
@@ -1602,7 +1584,7 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
 				var y []any
 				for _, v := range x {
 					if len(fields) > 1 {
-						y = append(y, CleanCompositeName(v.(model.JsonAtom), true))
+						y = append(y, CleanDqlMap(v.(model.JsonAtom)))
 					} else {
 						y = append(y, v.(model.JsonAtom)[fieldNameTarget])
 					}
@@ -1648,7 +1630,7 @@ func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, field
 		case model.JsonAtom:
 			if x != nil {
 				if len(fields) > 1 {
-					return CleanCompositeName(x, true), nil
+					return CleanDqlMap(x), nil
 				} else {
 					return x[fieldNameTarget], nil
 				}
@@ -1658,7 +1640,7 @@ func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, field
 				var y []any
 				for _, v := range x {
 					if len(fields) > 1 {
-						y = append(y, CleanCompositeName(v.(model.JsonAtom), true))
+						y = append(y, CleanDqlMap(v.(model.JsonAtom)))
 					} else {
 						y = append(y, v.(model.JsonAtom)[fieldNameTarget])
 					}
@@ -1704,7 +1686,7 @@ func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldName
 			y := x[fieldNameTarget].(model.JsonAtom)
 			if y != nil {
 				if len(fields) > 1 {
-					return CleanCompositeName(y, true), nil
+					return CleanDqlMap(y), nil
 				} else {
 					return y[subFieldNameTarget], nil
 				}
@@ -1747,7 +1729,7 @@ func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSourc
 			y := x[fieldNameTarget].(model.JsonAtom)
 			if y != nil {
 				if len(fields) > 1 {
-					return CleanCompositeName(y, true), nil
+					return CleanDqlMap(y), nil
 				} else {
 					return y[subFieldNameTarget], nil
 				}
@@ -1815,22 +1797,7 @@ func (dg Dgraph) GetUctxFull(fieldid string, userid string) (*model.UserCtx, err
 	if len(r.All) > 1 {
 		return nil, fmt.Errorf("Got multiple user with same @id: %s, %s", fieldid, userid)
 	} else if len(r.All) == 1 {
-		config := &mapstructure.DecoderConfig{
-			Result:  &user,
-			TagName: "json",
-			DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-				if to == reflect.Struct {
-					nv := CleanCompositeName(v.(map[string]any), false)
-					return nv, nil
-				}
-				return v, nil
-			},
-		}
-		decoder, err := mapstructure.NewDecoder(config)
-		if err != nil {
-			return nil, err
-		}
-		err = decoder.Decode(r.All[0])
+		user, err = DecodeDql[model.UserCtx](r.All[0])
 		if err != nil {
 			return nil, err
 		}
@@ -1858,23 +1825,7 @@ func (dg Dgraph) GetUserRoles(userid string) ([]*model.Node, error) {
 		return nil, err
 	}
 
-	var data []*model.Node
-	config := &mapstructure.DecoderConfig{
-		Result:  &data,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
-	if err != nil {
-		return nil, err
-	}
-	err = decoder.Decode(r.All)
+	data, err := DecodeDql[[]*model.Node](r.All)
 	return data, err
 }
 
@@ -1930,23 +1881,7 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
 		return nil, err
 	}
 
-	var data []model.Node
-	config := &mapstructure.DecoderConfig{
-		Result:  &data,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
-	if err != nil {
-		return nil, err
-	}
-	err = decoder.Decode(r.All)
+	data, err := DecodeDql[[]model.Node](r.All)
 	return data, err
 }
 
@@ -1989,22 +1924,7 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
 	if len(r.All) > 1 {
 		return nil, fmt.Errorf("Got multiple tension for @uid: %s", tid)
 	} else if len(r.All) == 1 {
-		config := &mapstructure.DecoderConfig{
-			Result:  &obj,
-			TagName: "json",
-			DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-				if to == reflect.Struct {
-					nv := CleanCompositeName(v.(map[string]any), false)
-					return nv, nil
-				}
-				return v, nil
-			},
-		}
-		decoder, err := mapstructure.NewDecoder(config)
-		if err != nil {
-			return nil, err
-		}
-		err = decoder.Decode(r.All[0])
+		obj, err = DecodeDql[model.Tension](r.All[0])
 		if err != nil {
 			return nil, err
 		}
@@ -2049,22 +1969,7 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
 	if len(r.All) > 1 {
 		return nil, fmt.Errorf("Got multiple contract for @uid: %s", cid)
 	} else if len(r.All) == 1 {
-		config := &mapstructure.DecoderConfig{
-			Result:  &obj,
-			TagName: "json",
-			DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-				if to == reflect.Struct {
-					nv := CleanCompositeName(v.(map[string]any), false)
-					return nv, nil
-				}
-				return v, nil
-			},
-		}
-		decoder, err := mapstructure.NewDecoder(config)
-		if err != nil {
-			return nil, err
-		}
-		err = decoder.Decode(r.All[0])
+		obj, err = DecodeDql[model.Contract](r.All[0])
 		if err != nil {
 			return nil, err
 		}
@@ -2101,23 +2006,7 @@ func (dg Dgraph) GetSubNodes(fieldid string, objid string, includeSelf bool) ([]
 		return nil, err
 	}
 
-	var data []model.Node
-	config := &mapstructure.DecoderConfig{
-		Result:  &data,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
-	if err != nil {
-		return nil, err
-	}
-	err = decoder.Decode(r.All)
+	data, err := DecodeDql[[]model.Node](r.All)
 	return data, err
 }
 
@@ -2142,23 +2031,7 @@ func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string, includeSelf 
 		return nil, err
 	}
 
-	var data []model.Node
-	config := &mapstructure.DecoderConfig{
-		Result:  &data,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
-	if err != nil {
-		return nil, err
-	}
-	err = decoder.Decode(r.All)
+	data, err := DecodeDql[[]model.Node](r.All)
 	return data, err
 }
 
@@ -2182,23 +2055,10 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([
 		return nil, err
 	}
 
-	var data_dup []model.Label
-	config := &mapstructure.DecoderConfig{
-		Result:  &data_dup,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
+	data_dup, err := DecodeDql[[]model.Label](r.All)
 	if err != nil {
 		return nil, err
 	}
-	err = decoder.Decode(r.All)
 	// Remove duplicate based on Label.name
 	data := []model.Label{}
 	check := make(map[string]bool)
@@ -2231,23 +2091,10 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string, includeSelf bool) ([
 		return nil, err
 	}
 
-	var data_dup []model.Label
-	config := &mapstructure.DecoderConfig{
-		Result:  &data_dup,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
+	data_dup, err := DecodeDql[[]model.Label](r.All)
 	if err != nil {
 		return nil, err
 	}
-	err = decoder.Decode(r.All)
 	// Remove duplicate based on Label.name
 	data := []model.Label{}
 	check := make(map[string]bool)
@@ -2280,23 +2127,10 @@ func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]
 		return nil, err
 	}
 
-	var data_dup []model.RoleExt
-	config := &mapstructure.DecoderConfig{
-		Result:  &data_dup,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
+	data_dup, err := DecodeDql[[]model.RoleExt](r.All)
 	if err != nil {
 		return nil, err
 	}
-	err = decoder.Decode(r.All)
 	// Remove duplicate based on RoleExt.name
 	data := []model.RoleExt{}
 	check := make(map[string]bool)
@@ -2329,23 +2163,10 @@ func (dg Dgraph) GetSubRoles(fieldid string, objid string, includeSelf bool) ([]
 		return nil, err
 	}
 
-	var data_dup []model.RoleExt
-	config := &mapstructure.DecoderConfig{
-		Result:  &data_dup,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
+	data_dup, err := DecodeDql[[]model.RoleExt](r.All)
 	if err != nil {
 		return nil, err
 	}
-	err = decoder.Decode(r.All)
 	// Remove duplicate based on Label.name
 	data := []model.RoleExt{}
 	check := make(map[string]bool)
@@ -2385,23 +2206,8 @@ func (dg Dgraph) GetSubProjects(fieldid string, objid string, includeSelf bool) 
 		return nil, err
 	}
 
-	var data []ProjectFull
-	config := &mapstructure.DecoderConfig{
-		Result:  &data,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
+	data, err := DecodeDql[[]ProjectFull](r.All)
 	if err != nil {
-		return nil, err
-	}
-	if err = decoder.Decode(r.All); err != nil {
 		return nil, err
 	}
 
@@ -2469,23 +2275,7 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 		return nil, err
 	}
 
-	var data []model.TensionRef
-	config := &mapstructure.DecoderConfig{
-		Result:  &data,
-		TagName: "json",
-		DecodeHook: func(from, to reflect.Kind, v any) (any, error) {
-			if to == reflect.Struct {
-				nv := CleanCompositeName(v.(map[string]any), false)
-				return nv, nil
-			}
-			return v, nil
-		},
-	}
-	decoder, err := mapstructure.NewDecoder(config)
-	if err != nil {
-		return nil, err
-	}
-	err = decoder.Decode(r.All)
+	data, err := DecodeDql[[]model.TensionRef](r.All)
 	return data, err
 }
 

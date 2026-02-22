@@ -93,8 +93,7 @@ func PushHistory(notif *model.EventNotif) error {
 	var inputs []model.AddEventInput
 	for _, e := range notif.History {
 		// Build AddtensionInput
-		var temp model.AddEventInput
-		StructMap(e, &temp)
+		temp := StructMap[model.AddEventInput](e)
 		temp.Tension = &model.TensionRef{ID: &notif.Tid}
 
 		// Push AddtensionInput
@@ -162,8 +161,8 @@ func PushEventNotifications(notif model.EventNotif) error {
 			return err
 		}
 		for _, u := range data {
-			var user model.User
-			if err := Map2Struct(u, &user); err != nil {
+			user, err := DecodeDql[model.User](u)
+			if err != nil {
 				return err
 			}
 			if _, ex := users[user.Username]; ex {
@@ -458,8 +457,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 	if notif.ContractEvent == model.CloseContract {
 		// Push Event History and Notifications
 		// Only once because this do not depend
-		var event model.EventRef
-		StructMap(notif.Contract.Event, &event)
+		event := StructMap[model.EventRef](notif.Contract.Event)
 		now := Now()
 		event.CreatedAt = &now
 		event.CreatedBy = &model.UserRef{Username: &notif.Uctx.Username}
@@ -566,8 +564,8 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 			return users, err
 		}
 		if res != nil {
-			var user model.User
-			if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+			user, err := DecodeDql[model.User](res.(model.JsonAtom))
+			if err == nil {
 				if _, ex := users[user.Username]; !ex {
 					users[user.Username] = model.UserNotifInfo{User: user, Reason: model.ReasonIsFirstLink}
 				}
@@ -583,8 +581,8 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 		}
 		if assignees, ok := InterfaceSlice(res); ok {
 			for _, u := range assignees {
-				var user model.User
-				if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
+				user, err := DecodeDql[model.User](u.(model.JsonAtom))
+				if err == nil {
 					if _, ex := users[user.Username]; ex {
 						continue
 					}
@@ -602,8 +600,8 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 		}
 		if subscribers, ok := InterfaceSlice(res); ok {
 			for _, u := range subscribers {
-				var user model.User
-				if err := Map2Struct(u.(model.JsonAtom), &user); err == nil {
+				user, err := DecodeDql[model.User](u.(model.JsonAtom))
+				if err == nil {
 					if _, ex := users[user.Username]; ex {
 						continue
 					}
@@ -673,8 +671,8 @@ func UpdateWithMentionnedUser(msg string, receiverid string, users map[string]mo
 				return err
 			}
 			if res != nil {
-				var user model.User
-				if err := Map2Struct(res.(model.JsonAtom), &user); err == nil {
+				user, err := DecodeDql[model.User](res.(model.JsonAtom))
+				if err == nil {
 					users[u] = model.UserNotifInfo{User: user, Reason: model.ReasonIsMentionned}
 				}
 			}

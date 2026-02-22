@@ -35,7 +35,6 @@ import (
 	"time"
 
 	"github.com/go-chi/jwtauth/v5"
-	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 
 	//"github.com/vektah/gqlparser/v2/gqlerror"
@@ -486,24 +485,11 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 			v[k] = val
 		}
 	default: // Interface{} data type (Payload)
-		config := &mapstructure.DecoderConfig{
-			Result:  data,
-			TagName: "json",
-			DecodeHook: mapstructure.ComposeDecodeHookFunc(
-				// Decoder config to handle aliased request
-				// @DEBUG: see bug #3c3f1f7
-				// Not needed since version 5.0.10 of elm-graphql that do not used hashes by defaut.
-				// Not that alias won be supported since we know to handle it with gqlgen resolver.
-				// CleanAliasedMapHook(),
-				ToUnionHookFunc(),
-			),
-		}
-
-		decoder, err := mapstructure.NewDecoder(config)
+		b, err := json.Marshal(res.Data[queryName])
 		if err != nil {
 			return err
 		}
-		if err = decoder.Decode(res.Data[queryName]); err != nil {
+		if err = json.Unmarshal(b, data); err != nil {
 			return err
 		}
 	}

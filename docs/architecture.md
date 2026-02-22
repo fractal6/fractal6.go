@@ -286,7 +286,7 @@ Dgraph DQL execution via gRPC
 JSON response unmarshaled -> []map[string]interface{}
     |
     v
-meta() converts maps to []*model.Event via reflection + Map2Struct
+meta() converts maps to []*model.Event via reflect.New + json.Marshal/Unmarshal
     |
     v
 Result marshaled to GraphQL response

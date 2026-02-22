@@ -215,7 +215,7 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 		if err != nil {
 			return nil, LogErr("Internal error", err)
 		}
-		StructMap(old_, &old)
+		old = StructMap[struct{ Name, Color, Rootnameid string }](old_)
 	}
 
 	// Forward Query

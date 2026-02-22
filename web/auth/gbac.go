@@ -235,8 +235,8 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
 	// Return direct coordos if present
 	if len(nodes) > 0 {
 		for _, c := range nodes {
-			var coordo model.User
-			if err := Map2Struct(c, &coordo); err != nil {
+			coordo, err := DecodeDql[model.User](c)
+			if err != nil {
 				return coordos, err
 			}
 			coordos = append(coordos, coordo)
@@ -275,8 +275,8 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
 		// stop at the first circle with coordos
 		if len(res) > 0 {
 			for _, c := range res {
-				var coordo model.User
-				if err := Map2Struct(c, &coordo); err != nil {
+				coordo, err := DecodeDql[model.User](c)
+				if err != nil {
 					return coordos, err
 				}
 				coordos = append(coordos, coordo)
@@ -299,8 +299,8 @@ func GetPeersFromTid(tid string) ([]model.User, error) {
 
 	// Return direct peers
 	for _, c := range nodes {
-		var peer model.User
-		if err := Map2Struct(c, &peer); err != nil {
+		peer, err := DecodeDql[model.User](c)
+		if err != nil {
 			return peers, err
 		}
 		peers = append(peers, peer)

@@ -149,7 +149,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// Overwrite creds to prevent CSRF
-		StructMap(pending, &creds)
+		creds = StructMap[model.UserCreds](pending)
 	} else if creds.Puid != nil {
 		// User invitation parcour
 		// --

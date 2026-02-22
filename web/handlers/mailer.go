@@ -268,8 +268,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Verify author can create tension
-	var eventRef model.EventRef
-	tools.StructMap(event, &eventRef)
+	eventRef := tools.StructMap[model.EventRef](event)
 	ok, _, err := graph.ProcessEvent(uctx, &tension, &eventRef, nil, nil, true, false)
 	if !ok || err != nil {
 		http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 400)
@@ -277,8 +276,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create tension
-	var tensionInput model.AddTensionInput
-	tools.StructMap(tension, &tensionInput)
+	tensionInput := tools.StructMap[model.AddTensionInput](tension)
 	tid, err := db.GetDB().Add(*uctx, "tension", tensionInput)
 	if err != nil {
 		http.Error(w, err.Error(), 400)

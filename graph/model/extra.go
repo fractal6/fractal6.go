@@ -20,7 +20,9 @@
 
 package model
 
-import "encoding/json"
+import (
+	"fractale/fractal6.go/internal/tools"
+)
 
 //
 // General
@@ -29,12 +31,6 @@ import "encoding/json"
 // JsonAtom is a general interface
 // for decoding unknonw structure
 type JsonAtom = map[string]any
-
-// StructMap convert/copy a interface to another
-func StructMap(in any, out any) {
-	raw, _ := json.Marshal(in)
-	json.Unmarshal(raw, &out)
-}
 
 //
 // Errors
@@ -307,8 +303,7 @@ func (notif EventNotif) GetExRoleType() string {
 //
 
 func (notif ContractNotif) IsEventEmailable(ui UserNotifInfo) bool {
-	ev := EventRef{}
-	StructMap(notif.Contract.Event, &ev)
+	ev := tools.StructMap[EventRef](notif.Contract.Event)
 	en := EventNotif{
 		Uctx:       notif.Uctx,
 		Tid:        notif.Tid,

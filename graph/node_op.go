@@ -333,8 +333,7 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
 	rootnameid, _ := codec.Nid2rootid(nameid)
 
 	// Map NodeFragment to Node Input
-	var nodeInput model.AddNodeInput
-	StructMap(node, &nodeInput)
+	nodeInput := StructMap[model.AddNodeInput](node)
 
 	// Fix Automatic fields
 	nodeInput.CreatedAt = Now()
@@ -366,10 +365,8 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
 	// Map NodeFragment to Node Patch Input
 	// The NodeFraglent copy is only necesary for the @search feature.
 	// see https://discuss.dgraph.io/t/fulltext-search-across-multiple-fields/14354
-	var nodePatchFilter model.NodePatchFromFragment
-	var nodePatch model.NodePatch
-	StructMap(node, &nodePatchFilter)
-	StructMap(nodePatchFilter, &nodePatch)
+	nodePatchFilter := StructMap[model.NodePatchFromFragment](node)
+	nodePatch := StructMap[model.NodePatch](nodePatchFilter)
 	// Blob reference update
 	if bid != nil {
 		nodePatch.Source = &model.BlobRef{ID: bid}
@@ -401,8 +398,7 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *strin
 	evt2 := model.TensionEventBlobCreated
 	evt3 := model.TensionEventBlobPushed
 	blob_type := model.BlobTypeOnNode
-	var noderef model.NodeFragmentRef
-	StructMap(node, &noderef)
+	noderef := StructMap[model.NodeFragmentRef](node)
 	emptyString := "" // root's tension feature
 	noderef.Nameid = &emptyString
 	noderef.About = about
@@ -447,9 +443,11 @@ func MaybeAddPendingNode(username string, tension *model.Tension) (bool, error) 
 		} else if len(tension_m) == 0 {
 			return ok, fmt.Errorf("no tension found for tid: %s", tension.ID)
 		}
-		if err = Map2Struct(tension_m[0], tension); err != nil {
+		t, err := DecodeDql[model.Tension](tension_m[0])
+		if err != nil {
 			return ok, err
 		}
+		*tension = t
 	}
 
 	rootid, err := codec.Nid2rootid(tension.Receiver.Nameid)

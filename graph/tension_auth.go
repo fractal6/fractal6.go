@@ -423,8 +423,7 @@ func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
 	if (ok1 && ok2) && contract == nil {
 		return true, contract, err
 	} else if (ok1 || ok2) && contract == nil {
-		var ev model.EventFragment
-		StructMap(*event, &ev)
+		ev := StructMap[model.EventFragment](*event)
 		var rid string
 		if ok1 {
 			rid, _ = codec.Nid2rootid(tension.Receiver.Nameid)

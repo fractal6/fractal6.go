@@ -27,6 +27,7 @@ package graph
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
@@ -242,12 +243,12 @@ func ExtractInputs[T any](ctx context.Context, inputs *[]T) {
 
 func ExtractInput[T any](ctx context.Context, input *T) {
 	a := graphql.GetResolverContext(ctx).Args["input"]
-	StructMap(a, input)
+	*input = StructMap[T](a)
 }
 
 func ExtractFilter[T any](ctx context.Context, filter *T) {
 	a := graphql.GetResolverContext(ctx).Args["filter"]
-	StructMap(a, filter)
+	*filter = StructMap[T](a)
 }
 
 /*
@@ -388,26 +389,37 @@ func meta(ctx context.Context, obj any, next graphql.Resolver, f string, k []str
 		switch rt.Kind() {
 		case reflect.Slice:
 			// Convert list of map to the desired list of interface
-			t := reflect.MakeSlice(rt, 1, 1)
 			newData := reflect.MakeSlice(rt, 0, len(res))
 			for i := 0; i < len(res); i++ {
-				v := reflect.ValueOf(t.Interface()).Index(0).Interface()
-				if err := Map2Struct(res[i], &v); err != nil {
+				elemPtr := reflect.New(rt.Elem())
+				b, err := json.Marshal(res[i])
+				if err != nil {
 					return data, err
 				}
-				newData = reflect.Append(newData, reflect.ValueOf(v))
+				if err := json.Unmarshal(b, elemPtr.Interface()); err != nil {
+					return data, err
+				}
+				newData = reflect.Append(newData, elemPtr.Elem())
 			}
 			data = newData.Interface()
 		default:
-			// Assume interface
-			// Merge results (needed for user defined returns (i.e. EventCouts))
+			// Assume interface (pointer type, e.g. *EventCount)
+			// Merge results (needed for user defined returns (i.e. EventCounts))
 			m := make(map[string]any, 2)
 			for _, s := range res {
 				for k, v := range s {
 					m[k] = v
 				}
 			}
-			err = Map2Struct(m, &data)
+			b, err := json.Marshal(m)
+			if err != nil {
+				return data, err
+			}
+			newVal := reflect.New(reflect.TypeOf(data).Elem())
+			if err := json.Unmarshal(b, newVal.Interface()); err != nil {
+				return data, err
+			}
+			data = newVal.Interface()
 		}
 	}
 	return data, err

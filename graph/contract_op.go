@@ -118,8 +118,7 @@ func voteEventHook(uctx *model.UserCtx, cid string) (bool, *model.Contract, erro
 	}
 
 	// Process event
-	var event model.EventRef
-	StructMap(contract.Event, &event)
+	event := StructMap[model.EventRef](contract.Event)
 	ok, contract, err = ProcessEvent(uctx, tension, &event, nil, contract, true, true)
 	if contract == nil || err != nil {
 		return false, contract, err
@@ -139,8 +138,7 @@ func voteEventHook(uctx *model.UserCtx, cid string) (bool, *model.Contract, erro
 
 // HasContractRight check if user has validation rights (Coordo right like).
 func HasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, error) {
-	var event model.EventRef
-	StructMap(contract.Event, &event)
+	event := StructMap[model.EventRef](contract.Event)
 
 	if contract == nil {
 		return false, fmt.Errorf("Contract not found")

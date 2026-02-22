@@ -17,7 +17,7 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 | 10 | Request-level observability | Medium | Medium | Medium |
 | 7 | Consolidate hook registration | Low | Low | Medium |
 | 11 | Simplify meta() type switch | Low | Low | Medium |
-| 9 | Modernize dependencies | Medium | Medium | Low |
+| 9 | Modernize dependencies | Medium | Medium | Low (mapstructure direct dependency removed) |
 | 12 | Reduce hardcoded payloads | Low | Medium | Low |
 | 13 | Clean up TODO/DEBUG | Low | Low | Low |
 | 15 | Schema documentation | Medium | Medium | Low |
@@ -33,7 +33,7 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 - Extract DQL templates into a `db/dql_templates.go` (or use embedded `.dql` files with `//go:embed`)
 - Extract payload definitions into `db/payloads.go`
 - Keep execution methods (`Meta()`, `QueryDql()`, helper functions) in `dql.go`
-- Extract data mapping helpers (`CleanCompositeName`, `Map2Struct` wrappers) into `db/mappers.go`
+- ~~Extract data mapping helpers (`CleanCompositeName`, `Map2Struct` wrappers) into `db/mappers.go`~~ (Done: `DecodeDql[T]` generic helper in `internal/tools/dql_decode.go` replaces all DQL mapstructure boilerplate)
 
 **Benefit:** Easier navigation, clear separation between query definitions and execution logic. The existing `@refactor` comment at line 38 already acknowledges this need.
 
@@ -63,9 +63,10 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 - Dynamically dispatch based on return type (`reflect.TypeOf`, `reflect.MakeSlice`)
 
 **Recommendation:**
-- Use Go generics (1.18+) for the type conversion layer: `func MetaSlice[T any](results []map[string]interface{}) ([]T, error)`
+- ~~Use Go generics (1.18+) for the type conversion layer~~ (Done: `DecodeDql[T]` generic in `internal/tools/dql_decode.go`)
 - Register typed handlers per @meta field instead of relying on runtime type switching
-- Replace `Map2Struct` reflection with explicit struct mapping functions for known types (`Event`, `EventCount`)
+- ~~Replace `Map2Struct` reflection with explicit struct mapping functions for known types (`Event`, `EventCount`)~~ (Done: `Map2Struct` now uses `json.Marshal/Unmarshal`, `meta()` uses `reflect.New` + JSON)
+- ~~Migrate standalone `Map2Struct` callers to `DecodeDql[T]`~~ (Done: all 9 call sites in `gbac.go`, `notifications.go`, `node_op.go` migrated; `Map2Struct` deprecated, only used by `Meta1`/`Gamma1`)
 
 **Benefit:** Compile-time type safety, clearer error messages, better performance, easier debugging.
 
