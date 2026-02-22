@@ -436,16 +436,11 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *strin
 func MaybeAddPendingNode(username string, tension *model.Tension) (bool, error) {
 	ok := false
 	if tension.Receiver == nil {
-		var tension_m []map[string]any
-		var err error
-		if tension_m, err = db.GetDB().Meta("getTensionSimple", map[string]string{"id": tension.ID}); err != nil {
-			return ok, err
-		} else if len(tension_m) == 0 {
-			return ok, fmt.Errorf("no tension found for tid: %s", tension.ID)
-		}
-		t, err := DecodeDql[model.Tension](tension_m[0])
+		t, err := First(db.Meta[model.Tension]("getTensionSimple", map[string]string{"id": tension.ID}))
 		if err != nil {
 			return ok, err
+		} else if t.Receiver == nil {
+			return ok, fmt.Errorf("no tension found for tid: %s", tension.ID)
 		}
 		*tension = t
 	}

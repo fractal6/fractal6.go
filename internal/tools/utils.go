@@ -64,15 +64,6 @@ func InitViper() {
 	}
 }
 
-// Deprecated: Use DecodeDql[T] for type-safe DQL map decoding.
-func Map2Struct(item map[string]any, res any) error {
-	b, err := json.Marshal(item)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(b, res)
-}
-
 // MarshalWithoutNil marshal an struct but removed all empty (null) edges.
 func MarshalWithoutNil(item any) ([]byte, error) {
 	m := CleanNilMap(StructMap[map[string]any](item))

@@ -38,6 +38,15 @@ import (
 
 var cache *sessions.Session
 
+type pendingUser struct {
+	Username  string
+	Email     string
+	Password  string
+	UpdatedAt *string
+	Subscribe bool
+	Lang      *string
+}
+
 func init() {
 	cache = sessions.GetCache()
 }
@@ -128,22 +137,18 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 	creds.Username = strings.ToLower(creds.Username)
 
 	// Update Creds depending on PendingUser
-	pending := struct {
-		Username  string
-		Email     string
-		Password  string
-		UpdatedAt *string
-		Subscribe bool
-		Lang      *string
-	}{}
+	var pending pendingUser
 	if creds.EmailToken != nil {
 		// User signup parcour
 		// --
 		// User has already been validated and saved in UserPending
-		if err := db.GetDB().Meta1("getPendingUser", map[string]string{"k": "email_token", "v": *creds.EmailToken}, &pending); err != nil {
+		if p, err := First(db.Meta[pendingUser]("getPendingUser", map[string]string{"k": "email_token", "v": *creds.EmailToken})); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
-		} else if pending.UpdatedAt != nil &&
+		} else {
+			pending = p
+		}
+		if pending.UpdatedAt != nil &&
 			TimeDelta(Now(), *pending.UpdatedAt) > time.Hour*48 {
 			http.Error(w, "The session has expired.", 500)
 			return
@@ -154,10 +159,13 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 		// User invitation parcour
 		// --
 		// User has not been registered in UserPending
-		if err := db.GetDB().Meta1("getPendingUser", map[string]string{"k": "token", "v": *creds.Puid}, &pending); err != nil {
+		if p, err := First(db.Meta[pendingUser]("getPendingUser", map[string]string{"k": "token", "v": *creds.Puid})); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
-		} else if pending.Email == "" {
+		} else {
+			pending = p
+		}
+		if pending.Email == "" {
 			// If user exists, set uctx
 			if ex, err := db.GetDB().Exists("User.username", creds.Username, nil); err != nil {
 				http.Error(w, err.Error(), 500)

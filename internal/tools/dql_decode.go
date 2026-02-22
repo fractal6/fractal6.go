@@ -26,9 +26,22 @@ import (
 	"strings"
 )
 
+// DecodeDqlSlice converts a slice of raw DQL maps into typed values using DecodeDql.
+func DecodeDqlSlice[T any](results []map[string]any) ([]T, error) {
+	out := make([]T, 0, len(results))
+	for _, m := range results {
+		v, err := DecodeDql[T](m)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, v)
+	}
+	return out, nil
+}
+
 // DecodeDql decodes a DQL result into a typed value.
 // raw can be map[string]any (single record) or []map[string]any (slice).
-// Applies CleanCompositeName preprocessing before JSON decoding.
+// Applies CleanDqlMap preprocessing before JSON decoding.
 //
 // Usage:
 //
@@ -36,7 +49,19 @@ import (
 //	data, err := DecodeDql[[]model.Node](r.All)         // slice
 func DecodeDql[T any](raw any) (T, error) {
 	var result T
-	cleaned := cleanDqlRaw(raw)
+	var cleaned any
+	switch t := raw.(type) {
+	case map[string]any:
+		cleaned = CleanDqlMap(t)
+	case []map[string]any:
+		out := make([]map[string]any, len(t))
+		for i, m := range t {
+			out[i] = CleanDqlMap(m)
+		}
+		cleaned = out
+	default:
+		cleaned = raw
+	}
 	b, err := json.Marshal(cleaned)
 	if err != nil {
 		return result, err
@@ -45,22 +70,37 @@ func DecodeDql[T any](raw any) (T, error) {
 	return result, err
 }
 
-// CleanDqlMaps applies deep DQL name cleaning to a slice of raw DQL result maps.
+// CleanDqlMap applies deep DQL name cleaning to a raw DQL result map.
 // Strips composite prefixes ("Node.name" → "name"), renames "uid" → "id",
 // and recursively cleans nested maps and arrays.
-// Used by Meta() and Gamma() which return untyped maps to callers.
-func CleanDqlMaps(all []map[string]any) []map[string]any {
-	out := make([]map[string]any, len(all))
-	for i, m := range all {
-		out[i] = CleanCompositeName(m, true)
-	}
-	return out
-}
-
-// CleanDqlMap applies deep DQL name cleaning to a single raw DQL result map.
-// Used by GetFieldBy*/GetSubFieldBy* which return cleaned maps for multi-field queries.
 func CleanDqlMap(m map[string]any) map[string]any {
-	return CleanCompositeName(m, true)
+	out := make(map[string]any, len(m))
+	for k, v := range m {
+		ks := strings.Split(k, ".")
+		nk := ks[len(ks)-1]
+
+		if nk == "uid" {
+			nk = "id"
+		}
+
+		var nv any
+		switch t := v.(type) {
+		case map[string]any:
+			nv = CleanDqlMap(CleanAliasedMap(t))
+		case []any:
+			for i, x := range t {
+				if m, ok := x.(map[string]any); ok {
+					t[i] = CleanDqlMap(CleanAliasedMap(m))
+				}
+			}
+			nv = t
+		default:
+			nv = t
+		}
+		out[nk] = nv
+	}
+
+	return out
 }
 
 var endDigits = regexp.MustCompile(`[0-9]+$`)
@@ -98,55 +138,15 @@ func CleanAliasedMap(m map[string]any) map[string]any {
 	return out
 }
 
-// CleanCompositeName keeps the last key string when separated by dot
-// (eg [a.key.name: 10] -> [name: 10]) and replaces uid field with id
-// (dgraph to gqlgen compatibility).
-func CleanCompositeName(m map[string]any, deep bool) map[string]any {
-	out := make(map[string]any, len(m))
-	for k, v := range m {
-		ks := strings.Split(k, ".")
-		nk := ks[len(ks)-1]
-
-		if nk == "uid" {
-			nk = "id"
-		}
-
-		var nv any
-		switch t := v.(type) {
-		case map[string]any:
-			if deep {
-				nv = CleanCompositeName(CleanAliasedMap(t), true)
-			} else {
-				nv = CleanAliasedMap(t)
-			}
-		case []any:
-			for i, x := range t {
-				if m, ok := x.(map[string]any); ok {
-					t[i] = CleanCompositeName(CleanAliasedMap(m), true)
-				}
-			}
-			nv = t
-		default:
-			nv = t
-		}
-		out[nk] = nv
+// First extracts the first element from a slice, or zero value if empty.
+// Composes with functions returning ([]T, error) like Meta and Gamma.
+func First[T any](items []T, err error) (T, error) {
+	var zero T
+	if err != nil {
+		return zero, err
 	}
-
-	return out
-}
-
-// cleanDqlRaw preprocesses DQL response data (single map or slice of maps).
-func cleanDqlRaw(v any) any {
-	switch t := v.(type) {
-	case map[string]any:
-		return CleanCompositeName(t, true)
-	case []map[string]any:
-		out := make([]map[string]any, len(t))
-		for i, m := range t {
-			out[i] = CleanCompositeName(m, true)
-		}
-		return out
-	default:
-		return v
+	if len(items) == 0 {
+		return zero, nil
 	}
+	return items[0], nil
 }

@@ -63,8 +63,7 @@ func updateProjectDraftHook(ctx context.Context, obj any, next graphql.Resolver)
 	}
 
 	for _, id := range input.Filter.ID {
-		draft := model.ProjectDraft{}
-		err := db.GetDB().Gamma1(QueryDraft, map[string]string{"id": id}, &draft)
+		draft, err := First(db.Gamma[model.ProjectDraft](QueryDraft, map[string]string{"id": id}))
 		if err != nil {
 			return nil, err
 		}

@@ -21,6 +21,7 @@
 package tools_test
 
 import (
+	"fmt"
 	"testing"
 
 	"fractale/fractal6.go/graph/model"
@@ -139,50 +140,110 @@ func TestDecodeDql_EmptySlice(t *testing.T) {
 	}
 }
 
-func TestCleanDqlMaps(t *testing.T) {
+func TestDecodeDqlSlice_MultipleRecords(t *testing.T) {
 	input := []map[string]any{
-		{
-			"uid":         "0x1",
-			"Node.nameid": "org#circle1",
-			"Node.name":   "Circle1",
-		},
-		{
-			"uid":         "0x2",
-			"Node.nameid": "org#circle2",
-			"Node.parent": map[string]any{
-				"uid":         "0x1",
-				"Node.nameid": "org",
-			},
-		},
+		{"name": "alice", "username": "alice123"},
+		{"name": "bob", "username": "bob456"},
 	}
-	result := CleanDqlMaps(input)
-	if len(result) != 2 {
-		t.Fatalf("expected 2 maps, got %d", len(result))
+	results, err := DecodeDqlSlice[map[string]any](input)
+	if err != nil {
+		t.Fatalf("DecodeDqlSlice error: %v", err)
 	}
-	// Check first map: composite stripped, uid→id
-	if result[0]["id"] != "0x1" {
-		t.Errorf("expected id=0x1, got %v", result[0]["id"])
+	if len(results) != 2 {
+		t.Fatalf("expected 2 results, got %d", len(results))
 	}
-	if result[0]["nameid"] != "org#circle1" {
-		t.Errorf("expected nameid=org#circle1, got %v", result[0]["nameid"])
+	if results[0]["name"] != "alice" {
+		t.Errorf("expected first name=alice, got %v", results[0]["name"])
 	}
-	// Check second map: nested map also cleaned (deep=true)
-	parent, ok := result[1]["parent"].(map[string]any)
-	if !ok {
-		t.Fatalf("expected parent to be map[string]any, got %T", result[1]["parent"])
-	}
-	if parent["id"] != "0x1" {
-		t.Errorf("expected nested id=0x1, got %v", parent["id"])
-	}
-	if parent["nameid"] != "org" {
-		t.Errorf("expected nested nameid=org, got %v", parent["nameid"])
+	if results[1]["username"] != "bob456" {
+		t.Errorf("expected second username=bob456, got %v", results[1]["username"])
 	}
 }
 
-func TestCleanDqlMaps_Empty(t *testing.T) {
-	result := CleanDqlMaps([]map[string]any{})
-	if len(result) != 0 {
-		t.Errorf("expected empty slice, got %d elements", len(result))
+func TestDecodeDqlSlice_EmptySlice(t *testing.T) {
+	results, err := DecodeDqlSlice[map[string]any]([]map[string]any{})
+	if err != nil {
+		t.Fatalf("DecodeDqlSlice error: %v", err)
+	}
+	if len(results) != 0 {
+		t.Errorf("expected empty results, got %d", len(results))
+	}
+}
+
+func TestDecodeDqlSlice_TypedStruct(t *testing.T) {
+	input := []map[string]any{
+		{
+			"uid":         "0x1",
+			"Node.nameid": "org#circle",
+			"Node.name":   "Circle",
+		},
+	}
+	results, err := DecodeDqlSlice[model.Node](input)
+	if err != nil {
+		t.Fatalf("DecodeDqlSlice typed error: %v", err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("expected 1 result, got %d", len(results))
+	}
+	if results[0].Nameid != "org#circle" {
+		t.Errorf("expected nameid=org#circle, got %s", results[0].Nameid)
+	}
+}
+
+func TestFirst_WithItems(t *testing.T) {
+	items := []string{"a", "b", "c"}
+	got, err := First(items, nil)
+	if err != nil {
+		t.Fatalf("First returned unexpected error: %v", err)
+	}
+	if got != "a" {
+		t.Errorf("First: expected 'a', got '%s'", got)
+	}
+}
+
+func TestFirst_EmptySlice(t *testing.T) {
+	got, err := First([]int{}, nil)
+	if err != nil {
+		t.Fatalf("First returned unexpected error: %v", err)
+	}
+	if got != 0 {
+		t.Errorf("First empty: expected zero value, got %d", got)
+	}
+}
+
+func TestFirst_NilSlice(t *testing.T) {
+	got, err := First[string](nil, nil)
+	if err != nil {
+		t.Fatalf("First returned unexpected error: %v", err)
+	}
+	if got != "" {
+		t.Errorf("First nil: expected zero value, got '%s'", got)
+	}
+}
+
+func TestFirst_PropagatesError(t *testing.T) {
+	testErr := fmt.Errorf("test error")
+	got, err := First([]string{"a"}, testErr)
+	if err != testErr {
+		t.Fatalf("First should propagate error, got: %v", err)
+	}
+	if got != "" {
+		t.Errorf("First with error: expected zero value, got '%s'", got)
+	}
+}
+
+func TestFirst_Struct(t *testing.T) {
+	type item struct {
+		Name string
+		ID   int
+	}
+	items := []item{{Name: "first", ID: 1}, {Name: "second", ID: 2}}
+	got, err := First(items, nil)
+	if err != nil {
+		t.Fatalf("First returned unexpected error: %v", err)
+	}
+	if got.Name != "first" || got.ID != 1 {
+		t.Errorf("First struct: expected {first 1}, got %+v", got)
 	}
 }
 

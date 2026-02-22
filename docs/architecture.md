@@ -43,7 +43,7 @@ fractal6.go/
 ├── cmd/                        # CLI commands (server, notifier, user mgmt)
 ├── db/                         # Database layer (Dgraph client, DQL/GQL queries)
 │   ├── dgraph.go               # Client setup, connection management, JWT for Dgraph
-│   ├── dql.go                  # DQL query templates and execution (~2800 lines)
+│   ├── dql.go                  # DQL query templates, execution, and generic helpers
 │   ├── gql.go                  # GraphQL query/mutation API to Dgraph
 │   └── tensionQuery.go         # Tension query builder with filtering/sorting
 ├── graph/                      # GraphQL resolvers and business logic
@@ -494,7 +494,24 @@ The database layer uses two Dgraph interfaces:
 - Bypasses GraphQL auth (custom authorization needed)
 - Template-based queries with `{{.key}}` substitution
 - ~40+ named query templates in `dqlQueries` map
-- Methods: `QueryDql()`, `MutateWithQueryDql()`, `Meta()`
+- Methods: `QueryDql()`, `MutateWithQueryDql()`, `Meta()`, `Gamma()`
+
+### Generic DQL Helpers
+
+The `db` package provides generic package-level functions that compose cleanly for typed DQL access:
+
+```go
+// Execute a named DQL query/mutation, decode results into typed values
+users, err := db.Meta[model.User]("getWatchers", maps)
+
+// Execute a custom DQL query/mutation, decode results into typed values
+col, err := First(db.Gamma[ProjectColumnLoc](QueryColumnLoc, maps))
+
+// Extract the first result (composes with Meta/Gamma)
+tension, err := First(db.Meta[model.Tension]("getTensionSimple", maps))
+```
+
+`db.Meta[T]` and `db.Gamma[T]` call `GetDB()` internally and use `DecodeDqlSlice[T]` (from `internal/tools/dql_decode.go`) for JSON-based type conversion. `First[T]` and `DecodeDqlSlice[T]` live in `internal/tools/dql_decode.go` as pure generic helpers with no db dependency. These coexist with the untyped `(dg Dgraph).Meta()` / `(dg Dgraph).Gamma()` methods, which are still used for mutations that discard results or need raw map access (e.g., `resolver.go` reflection-based `meta()`).
 
 ### Connection Setup
 

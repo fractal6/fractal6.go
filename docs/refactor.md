@@ -12,7 +12,7 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 | 1 | Split dql.go | Medium | Low | High |
 | 4 | Remove dot-imports | Medium | Low | High |
 | 8 | Extract business logic from hooks | High | High | High |
-| 3 | Replace reflection with generics | Medium | Medium | Medium |
+| 3 | Replace reflection with generics | Medium | Medium | Medium (mostly done) |
 | 14 | Database interface abstraction | Medium | Medium | Medium |
 | 10 | Request-level observability | Medium | Medium | Medium |
 | 7 | Consolidate hook registration | Low | Low | Medium |
@@ -32,7 +32,7 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 **Recommendation:**
 - Extract DQL templates into a `db/dql_templates.go` (or use embedded `.dql` files with `//go:embed`)
 - Extract payload definitions into `db/payloads.go`
-- Keep execution methods (`Meta()`, `QueryDql()`, helper functions) in `dql.go`
+- Keep execution methods (`Meta()`, `Gamma()`, `QueryDql()`, generic helpers `Meta[T]`/`Gamma[T]`/`First[T]`) in `dql.go`
 - ~~Extract data mapping helpers (`CleanCompositeName`, `Map2Struct` wrappers) into `db/mappers.go`~~ (Done: `DecodeDql[T]` generic helper in `internal/tools/dql_decode.go` replaces all DQL mapstructure boilerplate)
 
 **Benefit:** Easier navigation, clear separation between query definitions and execution logic. The existing `@refactor` comment at line 38 already acknowledges this need.
@@ -66,7 +66,10 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 - ~~Use Go generics (1.18+) for the type conversion layer~~ (Done: `DecodeDql[T]` generic in `internal/tools/dql_decode.go`)
 - Register typed handlers per @meta field instead of relying on runtime type switching
 - ~~Replace `Map2Struct` reflection with explicit struct mapping functions for known types (`Event`, `EventCount`)~~ (Done: `Map2Struct` now uses `json.Marshal/Unmarshal`, `meta()` uses `reflect.New` + JSON)
-- ~~Migrate standalone `Map2Struct` callers to `DecodeDql[T]`~~ (Done: all 9 call sites in `gbac.go`, `notifications.go`, `node_op.go` migrated; `Map2Struct` deprecated, only used by `Meta1`/`Gamma1`)
+- ~~Migrate standalone `Map2Struct` callers to `DecodeDql[T]`~~ (Done: all call sites migrated; `Map2Struct` deleted)
+- ~~Factorize `Meta1`/`Gamma1` into generic package-level `db.Meta[T]`/`db.Gamma[T]` + `First[T]`~~ (Done: `Meta1`/`Gamma1` deleted; all call sites migrated to `First(db.Meta[T](...))` or `First(db.Gamma[T](...))`; `First[T]` and `DecodeDqlSlice[T]` moved to `internal/tools/dql_decode.go`)
+
+**Current state:** The DQL data mapping layer is now fully generic. The remaining reflection is in `meta()` (resolver.go) which dynamically dispatches `@meta` field results — this requires either per-field typed handlers or staying with reflection since `@meta` operates on schema-declared types unknown at compile time.
 
 **Benefit:** Compile-time type safety, clearer error messages, better performance, easier debugging.
 

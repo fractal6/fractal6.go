@@ -224,24 +224,15 @@ func CheckUpperAuth(uctx *model.UserCtx, nameid string, mode model.NodeMode) (bo
 
 // @REFACTOR: this is an DQL impementation of HasCoordoAuth
 func GetCoordosFromTid(tid string) ([]model.User, error) {
-	var coordos []model.User
-
 	// Fetch Coordo users in receiver circle.
-	nodes, err := db.GetDB().Meta("getCoordosFromTid", map[string]string{"tid": tid, "user_payload": UserSelection})
+	coordos, err := db.Meta[model.User]("getCoordosFromTid", map[string]string{"tid": tid, "user_payload": UserSelection})
 	if err != nil {
-		return coordos, LogErr("Internal error", err)
+		return nil, LogErr("Internal error", err)
 	}
 
 	// Return direct coordos if present
-	if len(nodes) > 0 {
-		for _, c := range nodes {
-			coordo, err := DecodeDql[model.User](c)
-			if err != nil {
-				return coordos, err
-			}
-			coordos = append(coordos, coordo)
-		}
-		return coordos, err
+	if len(coordos) > 0 {
+		return coordos, nil
 	}
 
 	// Return first met parent coordos
@@ -267,46 +258,28 @@ func GetCoordosFromTid(tid string) ([]model.User, error) {
 		}
 	}
 	for _, nameid := range parents {
-		res, err := db.GetDB().Meta("getCoordos2", map[string]string{"nameid": nameid, "user_payload": UserSelection})
+		res, err := db.Meta[model.User]("getCoordos2", map[string]string{"nameid": nameid, "user_payload": UserSelection})
 		if err != nil {
 			return coordos, LogErr("Internal error", err)
 		}
 
 		// stop at the first circle with coordos
 		if len(res) > 0 {
-			for _, c := range res {
-				coordo, err := DecodeDql[model.User](c)
-				if err != nil {
-					return coordos, err
-				}
-				coordos = append(coordos, coordo)
-			}
-			return coordos, err
+			return res, nil
 		}
 	}
 
-	return coordos, err
+	return coordos, nil
 }
 
 func GetPeersFromTid(tid string) ([]model.User, error) {
-	var peers []model.User
-
 	// Fetch Peer users in receiver circle.
-	nodes, err := db.GetDB().Meta("getPeersFromTid", map[string]string{"tid": tid, "user_payload": UserSelection})
+	peers, err := db.Meta[model.User]("getPeersFromTid", map[string]string{"tid": tid, "user_payload": UserSelection})
 	if err != nil {
-		return peers, LogErr("Internal error", err)
+		return nil, LogErr("Internal error", err)
 	}
 
-	// Return direct peers
-	for _, c := range nodes {
-		peer, err := DecodeDql[model.User](c)
-		if err != nil {
-			return peers, err
-		}
-		peers = append(peers, peer)
-	}
-
-	return peers, err
+	return peers, nil
 }
 
 //

@@ -174,8 +174,7 @@ func deleteProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 	// Prior to remove, get information about that object for post-processing
 	oldColumns := []ProjectColumnLoc{}
 	for _, uid := range filter.ID {
-		col := ProjectColumnLoc{}
-		err := db.GetDB().Gamma1(QueryColumnLoc, map[string]string{"colid": uid}, &col)
+		col, err := First(db.Gamma[ProjectColumnLoc](QueryColumnLoc, map[string]string{"colid": uid}))
 		if err != nil {
 			return nil, err
 		}
@@ -258,7 +257,7 @@ func updateProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 	projectid := ""
 	if input.Set.Pos != nil {
 		isMoved = true
-		err := db.GetDB().Gamma1(QueryColumnLoc, map[string]string{"colid": id}, &oldColumn)
+		oldColumn, err = First(db.Gamma[ProjectColumnLoc](QueryColumnLoc, map[string]string{"colid": id}))
 		if err != nil {
 			return nil, err
 		}

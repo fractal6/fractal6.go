@@ -140,8 +140,7 @@ func deleteProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 	// Prior to remove, get information about that object for post-processing
 	oldCards := []ProjectCardLoc{}
 	for _, uid := range filter.ID {
-		card := ProjectCardLoc{}
-		err := db.GetDB().Gamma1(QueryCardLoc, map[string]string{"cardid": uid}, &card)
+		card, err := First(db.Gamma[ProjectCardLoc](QueryCardLoc, map[string]string{"cardid": uid}))
 		if err != nil {
 			return nil, err
 		}
@@ -223,7 +222,7 @@ func updateProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 		if input.Set.Pos != nil && input.Set.Pc != nil {
 			// Extract the value before moving
 			isMoved = true
-			err := db.GetDB().Gamma1(QueryCardLoc, map[string]string{"cardid": id}, &oldCard)
+			oldCard, err = First(db.Gamma[ProjectCardLoc](QueryCardLoc, map[string]string{"cardid": id}))
 			if err != nil {
 				return nil, err
 			}

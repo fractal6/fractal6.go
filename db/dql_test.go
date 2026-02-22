@@ -136,3 +136,13 @@ func TestDqlMutationsRender(t *testing.T) {
 		}
 	}
 }
+
+func TestDecodeDqlResp_NilResponse(t *testing.T) {
+	results, err := DecodeDqlResp(nil)
+	if err != nil {
+		t.Fatalf("DecodeDqlResp nil error: %v", err)
+	}
+	if results != nil {
+		t.Errorf("expected nil results for nil response, got %v", results)
+	}
+}

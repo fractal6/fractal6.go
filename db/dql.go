@@ -1290,26 +1290,7 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]any, error
 		return nil, err
 	}
 
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	// Extract result
-	return CleanDqlMaps(r.All), err
-}
-
-func (dg Dgraph) Meta1(f string, maps map[string]string, data any) error {
-	// Execute a DQL request from the given defined query template
-	// Returns: interface
-	if x, err := dg.Meta(f, maps); err != nil {
-		return err
-	} else if len(x) > 0 {
-		Map2Struct(x[0], data)
-	}
-	return nil
+	return decodeDqlResp(res)
 }
 
 func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]any, error) {
@@ -1323,26 +1304,7 @@ func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]any, er
 		return nil, err
 	}
 
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	// Extract result
-	return CleanDqlMaps(r.All), err
-}
-
-func (dg Dgraph) Gamma1(q QueryMut, maps map[string]string, data any) error {
-	// Send Custom DQL request
-	// Returns: interface
-	if x, err := dg.Gamma(q, maps); err != nil {
-		return err
-	} else if len(x) > 0 {
-		Map2Struct(x[0], data)
-	}
-	return nil
+	return decodeDqlResp(res)
 }
 
 // Probe if an object exists.
@@ -2708,4 +2670,42 @@ func (dg Dgraph) DeepDelete(t string, id string) error {
 
 	err := dg.MutateWithQueryDql(query, mutation)
 	return err
+}
+
+//
+// Generic DQL helpers
+//
+
+// decodeDqlResp decodes an api.Response into cleaned DQL result maps.
+func decodeDqlResp(res *api.Response) ([]map[string]any, error) {
+	if res == nil {
+		return nil, nil
+	}
+	var r DqlResp
+	if err := json.Unmarshal(res.Json, &r); err != nil {
+		return nil, err
+	}
+	out := make([]map[string]any, len(r.All))
+	for i, m := range r.All {
+		out[i] = CleanDqlMap(m)
+	}
+	return out, nil
+}
+
+// Meta executes a named DQL query/mutation and decodes results into typed values.
+func Meta[T any](f string, maps map[string]string) ([]T, error) {
+	results, err := GetDB().Meta(f, maps)
+	if err != nil {
+		return nil, err
+	}
+	return DecodeDqlSlice[T](results)
+}
+
+// Gamma executes a custom DQL query/mutation and decodes results into typed values.
+func Gamma[T any](q QueryMut, maps map[string]string) ([]T, error) {
+	results, err := GetDB().Gamma(q, maps)
+	if err != nil {
+		return nil, err
+	}
+	return DecodeDqlSlice[T](results)
 }

@@ -156,15 +156,11 @@ func PushEventNotifications(notif model.EventNotif) error {
 		}
 	} else if type_ == model.TensionTypeAnnouncement {
 		// Announcement tension Notify all watching users.
-		data, err := db.GetDB().Meta("getWatchers", map[string]string{"nameid": receiverid, "user_payload": auth.UserSelection})
+		watchers, err := db.Meta[model.User]("getWatchers", map[string]string{"nameid": receiverid, "user_payload": auth.UserSelection})
 		if err != nil {
 			return err
 		}
-		for _, u := range data {
-			user, err := DecodeDql[model.User](u)
-			if err != nil {
-				return err
-			}
+		for _, user := range watchers {
 			if _, ex := users[user.Username]; ex {
 				continue
 			}
