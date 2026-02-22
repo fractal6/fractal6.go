@@ -20,13 +20,14 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package tools
+package tools_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/spf13/viper"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 var (

@@ -1,4 +1,4 @@
-package email
+package email_test
 
 import (
 	"bytes"
@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/yuin/goldmark"
+	. "fractale/fractal6.go/web/email"
 )
 
 func newTestMD() goldmark.Markdown {
 	return goldmark.New(
-		goldmark.WithExtensions(&detailsExtension{}),
+		goldmark.WithExtensions(&DetailsExtension{}),
 	)
 }
 
@@ -24,7 +25,7 @@ func render(t *testing.T, md goldmark.Markdown, input string) string {
 }
 
 // divOpen is the styled wrapper div injected after <summary>.
-var divOpen = fmt.Sprintf("<div style=\"%s\">\n", detailsBodyStyle)
+var divOpen = fmt.Sprintf("<div style=\"%s\">\n", DetailsBodyStyle)
 
 // detailsLastBlock is the opening tag when <details> is the last block (margin-bottom for email signature spacing).
 const detailsLastBlock = `<details style="margin-bottom:1rem">` + "\n"

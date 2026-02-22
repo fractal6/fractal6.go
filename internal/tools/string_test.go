@@ -18,11 +18,13 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package tools
+package tools_test
 
 import (
 	"reflect"
 	"testing"
+
+	. "fractale/fractal6.go/internal/tools"
 )
 
 func TestFindUsername(t *testing.T) {

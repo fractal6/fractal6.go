@@ -20,7 +20,7 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package handlers
+package handlers_test
 
 import (
 	"bytes"
@@ -41,6 +41,7 @@ import (
 	"fractale/fractal6.go/internal/testutil"
 	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/web/email"
+	. "fractale/fractal6.go/web/handlers"
 	middle6 "fractale/fractal6.go/web/middleware"
 )
 

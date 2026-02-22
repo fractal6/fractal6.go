@@ -18,11 +18,13 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package auth
+package auth_test
 
 import (
 	"reflect"
 	"testing"
+
+	. "fractale/fractal6.go/web/auth"
 )
 
 func TestValidateNameid(t *testing.T) {

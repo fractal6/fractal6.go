@@ -18,7 +18,7 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package db
+package db_test
 
 import (
 	"bytes"
@@ -26,11 +26,12 @@ import (
 	"testing"
 	"text/template"
 
+	. "fractale/fractal6.go/db"
 	. "fractale/fractal6.go/internal/tools"
 )
 
 // dummyVars provides a value for every template variable used across
-// dqlQueries and dqlMutations.
+// DqlQueries and DqlMutations.
 var dummyVars = map[string]string{
 	"id":                    "0x1",
 	"fieldName":             "Node.name",
@@ -112,7 +113,7 @@ func assertTemplateRenders(t *testing.T, label, raw string) {
 // TestDqlQueriesRender verifies that every DQL query template parses and
 // renders without error.
 func TestDqlQueriesRender(t *testing.T) {
-	for name, raw := range dqlQueries {
+	for name, raw := range DqlQueries {
 		assertTemplateRenders(t, name, raw)
 	}
 }
@@ -120,7 +121,7 @@ func TestDqlQueriesRender(t *testing.T) {
 // TestDqlMutationsRender verifies that every DQL mutation template (query,
 // set, delete, and condition parts) parses and renders without error.
 func TestDqlMutationsRender(t *testing.T) {
-	for name, qm := range dqlMutations {
+	for name, qm := range DqlMutations {
 		assertTemplateRenders(t, name+".Q", qm.Q)
 		for i, x := range qm.M {
 			if x.S != "" {

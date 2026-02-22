@@ -20,13 +20,14 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package graph
+package graph_test
 
 import (
 	"strings"
 	"testing"
 
 	"fractale/fractal6.go/db"
+	. "fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/internal/testutil"
 )

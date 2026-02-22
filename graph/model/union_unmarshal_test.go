@@ -18,18 +18,20 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package model
+package model_test
 
 import (
 	"encoding/json"
 	"testing"
+
+	. "fractale/fractal6.go/graph/model"
 )
 
 func TestDecodeEventKind_Event(t *testing.T) {
 	raw := json.RawMessage(`{"__typename":"Event","id":"0x1","event_type":"Created"}`)
-	kind, err := decodeEventKind(raw)
+	kind, err := DecodeEventKind(raw)
 	if err != nil {
-		t.Fatalf("decodeEventKind error: %v", err)
+		t.Fatalf("DecodeEventKind error: %v", err)
 	}
 	ev, ok := kind.(*Event)
 	if !ok {
@@ -42,9 +44,9 @@ func TestDecodeEventKind_Event(t *testing.T) {
 
 func TestDecodeEventKind_Contract(t *testing.T) {
 	raw := json.RawMessage(`{"__typename":"Contract","id":"0x2","status":"Open"}`)
-	kind, err := decodeEventKind(raw)
+	kind, err := DecodeEventKind(raw)
 	if err != nil {
-		t.Fatalf("decodeEventKind error: %v", err)
+		t.Fatalf("DecodeEventKind error: %v", err)
 	}
 	c, ok := kind.(*Contract)
 	if !ok {
@@ -57,9 +59,9 @@ func TestDecodeEventKind_Contract(t *testing.T) {
 
 func TestDecodeEventKind_Notif(t *testing.T) {
 	raw := json.RawMessage(`{"__typename":"Notif","id":"0x3","link":"https://example.com"}`)
-	kind, err := decodeEventKind(raw)
+	kind, err := DecodeEventKind(raw)
 	if err != nil {
-		t.Fatalf("decodeEventKind error: %v", err)
+		t.Fatalf("DecodeEventKind error: %v", err)
 	}
 	n, ok := kind.(*Notif)
 	if !ok {
@@ -72,7 +74,7 @@ func TestDecodeEventKind_Notif(t *testing.T) {
 
 func TestDecodeEventKind_UnknownType(t *testing.T) {
 	raw := json.RawMessage(`{"__typename":"Unknown","id":"0x4"}`)
-	_, err := decodeEventKind(raw)
+	_, err := DecodeEventKind(raw)
 	if err == nil {
 		t.Error("expected error for unknown __typename")
 	}
@@ -80,7 +82,7 @@ func TestDecodeEventKind_UnknownType(t *testing.T) {
 
 func TestDecodeEventKind_MissingTypename(t *testing.T) {
 	raw := json.RawMessage(`{"id":"0x5"}`)
-	_, err := decodeEventKind(raw)
+	_, err := DecodeEventKind(raw)
 	if err == nil {
 		t.Error("expected error for missing __typename")
 	}
@@ -88,9 +90,9 @@ func TestDecodeEventKind_MissingTypename(t *testing.T) {
 
 func TestDecodeCardKind_Tension(t *testing.T) {
 	raw := json.RawMessage(`{"__typename":"Tension","id":"0x10","title":"Test tension"}`)
-	kind, err := decodeCardKind(raw)
+	kind, err := DecodeCardKind(raw)
 	if err != nil {
-		t.Fatalf("decodeCardKind error: %v", err)
+		t.Fatalf("DecodeCardKind error: %v", err)
 	}
 	ten, ok := kind.(*Tension)
 	if !ok {
@@ -103,9 +105,9 @@ func TestDecodeCardKind_Tension(t *testing.T) {
 
 func TestDecodeCardKind_ProjectDraft(t *testing.T) {
 	raw := json.RawMessage(`{"__typename":"ProjectDraft","id":"0x11","title":"Draft"}`)
-	kind, err := decodeCardKind(raw)
+	kind, err := DecodeCardKind(raw)
 	if err != nil {
-		t.Fatalf("decodeCardKind error: %v", err)
+		t.Fatalf("DecodeCardKind error: %v", err)
 	}
 	pd, ok := kind.(*ProjectDraft)
 	if !ok {

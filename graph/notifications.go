@@ -289,9 +289,9 @@ func PushEventNotifications(notif model.EventNotif) error {
 			err = email.SendEventNotificationEmail(ui, notif)
 			if err != nil {
 				errs = append(errs, err)
-				return err
-				LogErr("Email error", err)
+				// LogErr("Email error", err)
 				// err = nil
+				return err
 			}
 		}
 	}

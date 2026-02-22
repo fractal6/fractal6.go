@@ -20,25 +20,23 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package db
+package db_test
 
 import (
 	"log"
 	"os"
 	"testing"
 
+	. "fractale/fractal6.go/db"
 	"fractale/fractal6.go/internal/testutil"
 )
 
 func TestMain(m *testing.M) {
-	// Override the global db_dg singleton with test-instance addresses.
-	db_dg = &Dgraph{
-		gqlAddr:  testutil.TestHTTPAddr + "/graphql",
-		grpcAddr: testutil.TestGrpcAddr,
-	}
+	// Override the global db singleton with test-instance addresses.
+	SetTestDB(testutil.TestHTTPAddr+"/graphql", testutil.TestGrpcAddr)
 
 	// Verify test data is present (seeded by cmd/testsetup).
-	ex, err := db_dg.Exists("User.username", testutil.TestUser, nil)
+	ex, err := GetDB().Exists("User.username", testutil.TestUser, nil)
 	if err != nil || !ex {
 		log.Fatal("Test data not found. Run 'go run ./cmd/testsetup' first (or use 'make test-integration').")
 	}

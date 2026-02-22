@@ -20,7 +20,7 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package handlers
+package handlers_test
 
 import (
 	"encoding/json"

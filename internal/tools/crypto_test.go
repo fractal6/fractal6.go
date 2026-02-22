@@ -18,7 +18,7 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package tools
+package tools_test
 
 import (
 	"crypto"
@@ -26,6 +26,8 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"testing"
+
+	. "fractale/fractal6.go/internal/tools"
 )
 
 func TestValidatePostalSignature(t *testing.T) {

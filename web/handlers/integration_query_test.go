@@ -20,7 +20,7 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package handlers
+package handlers_test
 
 import (
 	"encoding/json"
@@ -29,6 +29,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/internal/testutil"
+	. "fractale/fractal6.go/web/handlers"
 )
 
 // projectNames extracts project names from a ProjectFull slice.
@@ -66,7 +67,7 @@ func TestSubProjects_MemberSeesPrivateNotSecret(t *testing.T) {
 	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
 
 	rr := doRequest("POST", "/q/projects/sub",
-		nodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true}, jwtCookie)
+		NodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true}, jwtCookie)
 	requireStatus(t, rr, http.StatusOK)
 
 	projects := decodeProjects(t, rr.Body.Bytes())
@@ -92,7 +93,7 @@ func TestSubProjects_OwnerWithSecretRoleSeesAll(t *testing.T) {
 	jwtCookie := loginAs(testutil.TestUser2, testutil.TestPassword2)
 
 	rr := doRequest("POST", "/q/projects/sub",
-		nodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true}, jwtCookie)
+		NodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true}, jwtCookie)
 	requireStatus(t, rr, http.StatusOK)
 
 	projects := decodeProjects(t, rr.Body.Bytes())
@@ -114,7 +115,7 @@ func TestSubProjects_ExcludeSelf(t *testing.T) {
 	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
 
 	rr := doRequest("POST", "/q/projects/sub",
-		nodeQuery{Nameid: testutil.SecOrg, IncludeSelf: false}, jwtCookie)
+		NodeQuery{Nameid: testutil.SecOrg, IncludeSelf: false}, jwtCookie)
 	requireStatus(t, rr, http.StatusOK)
 
 	projects := decodeProjects(t, rr.Body.Bytes())
@@ -137,7 +138,7 @@ func TestSubProjects_ExcludeSelf(t *testing.T) {
 func TestSubProjects_UnauthenticatedSeesNothingOnPrivateOrg(t *testing.T) {
 	// No JWT — sec-org is Private, so unauthenticated users see no projects.
 	rr := doRequest("POST", "/q/projects/sub",
-		nodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true})
+		NodeQuery{Nameid: testutil.SecOrg, IncludeSelf: true})
 	requireStatus(t, rr, http.StatusOK)
 
 	projects := decodeProjects(t, rr.Body.Bytes())
@@ -153,7 +154,7 @@ func TestSubProjects_UnauthenticatedSeesNothingOnPrivateOrg(t *testing.T) {
 func TestSubProjects_PublicOrgNoProjects(t *testing.T) {
 	// test-org has no projects, should return empty/null
 	rr := doRequest("POST", "/q/projects/sub",
-		nodeQuery{Nameid: "test-org", IncludeSelf: true})
+		NodeQuery{Nameid: "test-org", IncludeSelf: true})
 	requireStatus(t, rr, http.StatusOK)
 
 	projects := decodeProjects(t, rr.Body.Bytes())

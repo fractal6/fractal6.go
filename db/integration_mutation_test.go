@@ -20,25 +20,26 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package db
+package db_test
 
 import (
 	"testing"
 	"time"
 
+	. "fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 )
 
 func TestSetFieldByEq_Integration(t *testing.T) {
 	// Set Node.about on our test org
 	newAbout := "Updated about text"
-	err := db_dg.SetFieldByEq("Node.nameid", "test-org", "Node.about", newAbout)
+	err := GetDB().SetFieldByEq("Node.nameid", "test-org", "Node.about", newAbout)
 	if err != nil {
 		t.Fatalf("SetFieldByEq returned error: %v", err)
 	}
 
 	// Read it back
-	val, err := db_dg.GetFieldByEq("Node.nameid", "test-org", "Node.about")
+	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.about")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -51,13 +52,13 @@ func TestSetFieldByEq_Integration(t *testing.T) {
 	}
 
 	// Restore original value
-	_ = db_dg.SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
+	_ = GetDB().SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
 }
 
 func TestMeta_MarkAllAsRead_Integration(t *testing.T) {
 	// markAllAsRead is a mutation that marks UserEvents as read.
 	// With no unread events, this is a no-op mutation — should succeed without error.
-	_, err := db_dg.Meta("markAllAsRead", map[string]string{
+	_, err := GetDB().Meta("markAllAsRead", map[string]string{
 		"username": "testuser",
 	})
 	if err != nil {
@@ -69,13 +70,13 @@ func TestUpgradeMember_Integration(t *testing.T) {
 	nameid := "test-org##@testuser"
 
 	// Change role_type to Guest
-	err := db_dg.UpgradeMember(nameid, model.RoleTypeGuest)
+	err := GetDB().UpgradeMember(nameid, model.RoleTypeGuest)
 	if err != nil {
 		t.Fatalf("UpgradeMember to Guest returned error: %v", err)
 	}
 
 	// Verify the change
-	val, err := db_dg.GetFieldByEq("Node.nameid", nameid, "Node.role_type")
+	val, err := GetDB().GetFieldByEq("Node.nameid", nameid, "Node.role_type")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -88,7 +89,7 @@ func TestUpgradeMember_Integration(t *testing.T) {
 	}
 
 	// Restore to Owner (original seed value)
-	err = db_dg.UpgradeMember(nameid, model.RoleTypeOwner)
+	err = GetDB().UpgradeMember(nameid, model.RoleTypeOwner)
 	if err != nil {
 		t.Fatalf("UpgradeMember to Owner (restore) returned error: %v", err)
 	}
@@ -107,14 +108,14 @@ func TestGamma_Integration(t *testing.T) {
 		}},
 	}
 
-	results, err := db_dg.Gamma(qm, map[string]string{})
+	results, err := GetDB().Gamma(qm, map[string]string{})
 	if err != nil {
 		t.Fatalf("Gamma returned error: %v", err)
 	}
 	t.Logf("Gamma returned %d results", len(results))
 
 	// Verify the change
-	val, err := db_dg.GetFieldByEq("Node.nameid", "test-org", "Node.about")
+	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.about")
 	if err != nil {
 		t.Fatalf("GetFieldByEq returned error: %v", err)
 	}
@@ -127,7 +128,7 @@ func TestGamma_Integration(t *testing.T) {
 	}
 
 	// Restore original value
-	_ = db_dg.SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
+	_ = GetDB().SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
 }
 
 func TestUpsertActivity_Integration(t *testing.T) {
@@ -140,11 +141,11 @@ func TestUpsertActivity_Integration(t *testing.T) {
 		Q: `query { v as var(func: eq(Activity.activityid, "` + activityid + `")) }`,
 		M: []X{{D: `uid(v) * * .`}},
 	}
-	_, _ = db_dg.Gamma(cleanup, map[string]string{})
+	_, _ = GetDB().Gamma(cleanup, map[string]string{})
 
 	// Helper to query the count for today's activity entry
 	getCount := func() int {
-		results, err := db_dg.Meta("getUserActivity", map[string]string{
+		results, err := GetDB().Meta("getUserActivity", map[string]string{
 			"username": "testuser",
 		})
 		if err != nil {
@@ -167,7 +168,7 @@ func TestUpsertActivity_Integration(t *testing.T) {
 
 	// Upsert 3 times: first creates (count=1), subsequent increment.
 	for i := 1; i <= 3; i++ {
-		_, err := db_dg.Meta("upsertActivity", map[string]string{
+		_, err := GetDB().Meta("upsertActivity", map[string]string{
 			"activityid": activityid,
 			"ownerid":    "u#testuser",
 			"date":       todayISO,
@@ -182,7 +183,7 @@ func TestUpsertActivity_Integration(t *testing.T) {
 	}
 
 	// Clean up
-	_, err := db_dg.Gamma(cleanup, map[string]string{})
+	_, err := GetDB().Gamma(cleanup, map[string]string{})
 	if err != nil {
 		t.Logf("cleanup warning: %v", err)
 	}

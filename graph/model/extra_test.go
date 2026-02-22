@@ -18,7 +18,7 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package model
+package model_test
 
 import (
 	"encoding/json"
@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"fractale/fractal6.go/internal/tools"
+	. "fractale/fractal6.go/graph/model"
 )
 
 func TestUserCreds(t *testing.T) {
