@@ -32,7 +32,7 @@ import (
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/internal/tools"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 /*
@@ -66,7 +66,7 @@ type EmailForm struct {
 // Handle user email responses. Receiving email response from email notifications.
 func Notifications(w http.ResponseWriter, r *http.Request) {
 	// Validate WebHook identity
-	if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
+	if err := ValidatePostalSignature(r, postalWebhookPK); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -99,7 +99,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-	createdAt := tools.Now()
+	createdAt := Now()
 	createdBy := model.UserRef{Username: &uctx.Username}
 
 	if isTid != "" { // Is a tension reply/comment
@@ -205,7 +205,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 // Handle email sent to orga. Convert email to tension.
 func Mailing(w http.ResponseWriter, r *http.Request) {
 	// Validate WebHook identity
-	if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
+	if err := ValidatePostalSignature(r, postalWebhookPK); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -222,7 +222,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "You need an account on Fractale to send email to organisation, please visit https://fractale.co \n\n"+err.Error(), 400)
 		return
 	}
-	createdAt := tools.Now()
+	createdAt := Now()
 	createdBy := model.User{Username: uctx.Username}
 
 	// Get the nameid of the targeted circle
@@ -268,7 +268,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Verify author can create tension
-	eventRef := tools.StructMap[model.EventRef](event)
+	eventRef := StructMap[model.EventRef](event)
 	ok, _, err := graph.ProcessEvent(uctx, &tension, &eventRef, nil, nil, true, false)
 	if !ok || err != nil {
 		http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 400)
@@ -276,7 +276,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create tension
-	tensionInput := tools.StructMap[model.AddTensionInput](tension)
+	tensionInput := StructMap[model.AddTensionInput](tension)
 	tid, err := db.GetDB().Add(*uctx, "tension", tensionInput)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
@@ -300,7 +300,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 // Handle Postal WebHook - redirect it to a matrix channel
 func PostalWebhook(w http.ResponseWriter, r *http.Request) {
 	// Validate WebHook identity
-	if err := tools.ValidatePostalSignature(r, postalWebhookPK); err != nil {
+	if err := ValidatePostalSignature(r, postalWebhookPK); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -312,7 +312,7 @@ func PostalWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = tools.MatrixJsonSend(string(body), matrixPostalRoom, matrixToken)
+	err = MatrixJsonSend(string(body), matrixPostalRoom, matrixToken)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return

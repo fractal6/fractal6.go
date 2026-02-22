@@ -25,7 +25,7 @@ import (
 	"reflect"
 	"testing"
 
-	"fractale/fractal6.go/internal/tools"
+	. "fractale/fractal6.go/internal/tools"
 	. "fractale/fractal6.go/graph/model"
 )
 
@@ -84,7 +84,7 @@ func TestUserCredsMap(t *testing.T) {
 	}
 
 	for _, test := range testcases {
-		got := tools.StructMap[UserCreds](test.input)
+		got := StructMap[UserCreds](test.input)
 		if !reflect.DeepEqual(got, test.want) {
 			t.Errorf("For p = %v, want %v. Got %v",
 				test.input, test.want, got)

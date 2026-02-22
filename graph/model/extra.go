@@ -21,7 +21,7 @@
 package model
 
 import (
-	"fractale/fractal6.go/internal/tools"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 //
@@ -303,7 +303,7 @@ func (notif EventNotif) GetExRoleType() string {
 //
 
 func (notif ContractNotif) IsEventEmailable(ui UserNotifInfo) bool {
-	ev := tools.StructMap[EventRef](notif.Contract.Event)
+	ev := StructMap[EventRef](notif.Contract.Event)
 	en := EventNotif{
 		Uctx:       notif.Uctx,
 		Tid:        notif.Tid,
