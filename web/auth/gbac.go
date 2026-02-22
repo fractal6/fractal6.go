@@ -62,28 +62,11 @@ func Authorize(ok bool, err error) error {
 	return nil
 }
 
-// Check that user satisfies strict condition (coordo roles on the given nodes)
-// @DEBUG: add a schema like validation for mandatory field when passing a list of NodeRef?
-// Mandatory field
-// - nameid
-func CheckNodesAuth(uctx *model.UserCtx, d any, passAll bool) (bool, error) {
+// CheckNodesAuth checks that user satisfies strict condition (coordo roles on the given nodes).
+// Mandatory field in each NodeRef: nameid.
+func CheckNodesAuth(uctx *model.UserCtx, nodes []model.NodeRef, passAll bool) (bool, error) {
 	var ok bool
 	var err error
-
-	nodes := []model.NodeRef{}
-	// Extract NodeRef from input data.
-	switch v := d.(type) {
-	case []model.NodeRef:
-		nodes = append(nodes, v...)
-	case []*model.NodeRef:
-		for _, n := range v {
-			nodes = append(nodes, *n)
-		}
-	case []string:
-		for _, n := range v {
-			nodes = append(nodes, model.NodeRef{Nameid: &n})
-		}
-	}
 
 	// Check @auth
 	// @optimize
@@ -148,7 +131,11 @@ func checkProjectNodeAuth(uctx *model.UserCtx, projectid string) (bool, error) {
 		// Allow access when the project has no linked nodes
 		return true, nil
 	}
-	return CheckNodesAuth(uctx, nameids, false)
+	nodes := make([]model.NodeRef, len(nameids))
+	for i, n := range nameids {
+		nodes[i] = model.NodeRef{Nameid: &n}
+	}
+	return CheckNodesAuth(uctx, nodes, false)
 }
 
 // HasCoordoAuth tells if the user has authority in the given node.

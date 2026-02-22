@@ -34,6 +34,32 @@ func unmarshalAny[T any](bytes []byte) (*T, error) {
 	return out, nil
 }
 
+// DerefSlice converts a slice of pointers []*T into a slice of values []T.
+func DerefSlice[T any](ptrs []*T) []T {
+	result := make([]T, len(ptrs))
+	for i, p := range ptrs {
+		result[i] = *p
+	}
+	return result
+}
+
+// InterfaceToSlice safely converts an any (expected to be []any)
+// into a typed []T slice. Elements that don't match type T are skipped.
+// Returns nil if in is nil or not a slice.
+func InterfaceToSlice[T any](in any) []T {
+	items, ok := in.([]any)
+	if !ok {
+		return nil
+	}
+	out := make([]T, 0, len(items))
+	for _, v := range items {
+		if typed, ok := v.(T); ok {
+			out = append(out, typed)
+		}
+	}
+	return out
+}
+
 //
 // COMMON
 //

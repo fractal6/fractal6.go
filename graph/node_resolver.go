@@ -92,7 +92,7 @@ func addNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver) (a
 			return nil, LogErr("Access denied", fmt.Errorf("rootnameid and nameid does not match."))
 		}
 		// Authorization with regards to the given nodes.
-		if err = auth.Authorize(auth.CheckNodesAuth(uctx, input.Nodes, true)); err != nil {
+		if err = auth.Authorize(auth.CheckNodesAuth(uctx, DerefSlice(input.Nodes), true)); err != nil {
 			return nil, err
 		}
 	}
@@ -132,7 +132,7 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 
 	// Get nodes in order to perform @auth rules against it
 	nodes := []model.NodeRef{}
-	nodesGiven := []*model.NodeRef{}
+	nodesGiven := []model.NodeRef{}
 	var x any
 	if len(input.Filter.ID) > 0 { // Updates with UID
 		x, err = db.GetDB().GetSubFieldById(input.Filter.ID[0], typeName+".nodes", "Node.nameid")
@@ -158,14 +158,14 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 
 	// Get given nodes
 	if input.Set != nil {
-		nodesGiven = append(nodesGiven, input.Set.Nodes...)
+		nodesGiven = append(nodesGiven, DerefSlice(input.Set.Nodes)...)
 	}
 	if input.Remove != nil {
 		// @auth debug: Only allow nodes to be removed...
 		if len(input.Remove.Nodes) == 0 {
 			return nil, LogErr("Access denied", fmt.Errorf("A node must be given."))
 		}
-		nodesGiven = append(nodesGiven, input.Remove.Nodes...)
+		nodesGiven = append(nodesGiven, DerefSlice(input.Remove.Nodes)...)
 	}
 
 	// Authorization with regards to nodes attributes.
