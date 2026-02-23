@@ -145,7 +145,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 
 	// Links the source tension
 	bid := db.GetDB().GetLastBlobId(tid)
-	err = db.GetDB().SetNodeSource(nameid, *bid)
+	_, err = db.GetDB().Meta("setNodeSource", map[string]string{"nameid": nameid, "bid": *bid})
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return

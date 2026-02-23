@@ -307,8 +307,7 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
 	}
 
 	// Check last node update date
-	DB := db.GetDB()
-	updatedAt_, e := DB.GetFieldByEq("Node.nameid", nid, "Node.updatedAt")
+	updatedAt_, e := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.updatedAt")
 	if e != nil {
 		return uctx, e
 	}
@@ -320,7 +319,7 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
 
 	// Update User context if node is newer
 	if IsOlder(uctx.Iat, updatedAt) {
-		u, e = DB.GetUctx("username", uctx.Username)
+		u, e = db.GetDB().GetUctx("username", uctx.Username)
 		// @DEBUG: UserCtx is update from their fields for propagation
 		uctx.Username = u.Username
 		uctx.Password = u.Password
@@ -354,7 +353,7 @@ func MaybeRefresh(uctx *model.UserCtx) (*model.UserCtx, error) {
 		}
 	} else {
 		// 3. Query the database
-		roles, err = db.GetDB().GetUserRoles(uctx.Username)
+		roles, err = db.Meta[*model.Node]("getUserRoles", map[string]string{"userid": uctx.Username})
 		if err != nil {
 			return nil, err
 		}

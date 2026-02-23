@@ -523,7 +523,7 @@ func (dg Dgraph) AddUserRole(username, nameid string) error {
 	return err
 }
 
-// RemoveUserRole remove a  role to the user roles list
+// RemoveUserRole remove a role to the user roles list
 func (dg Dgraph) RemoveUserRole(username, nameid string) error {
 	userInput := model.UpdateUserInput{
 		Filter: &model.UserFilter{Username: &model.StringHashFilterStringRegExpFilter{Eq: &username}},

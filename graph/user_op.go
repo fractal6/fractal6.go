@@ -127,7 +127,6 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 	if node.ID != "" {
 		// @debug: should delete instead...DelFieldById => `<x> <x> * .`
 		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
-		// err = db.GetDB().MaybeDeleteFirstLink(tension.ID, uctx.Username)
 	}
 
 	return true, err
@@ -137,8 +136,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType) error {
 	var uctxFs *model.UserCtx
 	var err error
-	DB := db.GetDB()
-	uctxFs, err = DB.GetUctx("username", username)
+	uctxFs, err = db.GetDB().GetUctx("username", username)
 	if err != nil {
 		return err
 	}
@@ -161,7 +159,7 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
 			err = db.GetDB().UpgradeMember(nid, model.RoleTypeGuest)
 		} else if len(roles) == 1 && (*roles[0].RoleType == model.RoleTypeGuest || *roles[0].RoleType == model.RoleTypePending) {
 			// Member is retiring
-			err = DB.UpgradeMember(nid, model.RoleTypeRetired)
+			err = db.GetDB().UpgradeMember(nid, model.RoleTypeRetired)
 			if err != nil {
 				return err
 			}
@@ -176,10 +174,10 @@ func maybeUpdateMembership(rootnameid string, username string, rt model.RoleType
 	if rt == model.RoleTypeMember {
 		if len(roles) == 1 {
 			// Upgrade to Guest
-			err = DB.UpgradeMember(nid, model.RoleTypeGuest)
+			err = db.GetDB().UpgradeMember(nid, model.RoleTypeGuest)
 		} else if len(roles) == 2 {
 			// Upgrade to Member
-			err = DB.UpgradeMember(nid, model.RoleTypeMember)
+			err = db.GetDB().UpgradeMember(nid, model.RoleTypeMember)
 		}
 		return err
 	}

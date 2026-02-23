@@ -262,7 +262,7 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 		}
 
 		// Assumes contract is either closed or cancelled.
-		err = db.GetDB().RewriteContractId(contract.ID)
+		_, err = db.GetDB().Meta("rewriteContractId", map[string]string{"cid": contract.ID})
 		if err != nil {
 			return false, contract, err
 		}
@@ -429,7 +429,9 @@ func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model
 	}
 	if ok { // Update blob archived flag
 		if *event.EventType == model.TensionEventBlobArchived {
-			err = db.GetDB().SetArchivedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.ArchiveAction(blob.Node.Type))
+			_, err = db.GetDB().Meta("setArchivedFlagBlob", map[string]string{
+				"bid": blob.ID, "flag": Now(), "tid": tension.ID, "action": string(tensionCharac.ArchiveAction(blob.Node.Type)),
+			})
 		} else if *event.EventType == model.TensionEventBlobUnarchived {
 			err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.EditAction(blob.Node.Type))
 		} else {
@@ -574,7 +576,7 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 
 		// DQL mutation (extra node update)
 		if nameid_old != nameid_new { // node is a role
-			err = db.GetDB().PatchNameid(nameid_old, nameid_new)
+			_, err = db.GetDB().Meta("patchNameid", map[string]string{"nameid_old": nameid_old, "nameid_new": nameid_new})
 			if err != nil {
 				return false, err
 			}

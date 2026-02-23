@@ -27,6 +27,7 @@ import (
 	"testing"
 
 	. "fractale/fractal6.go/db"
+	"fractale/fractal6.go/graph/model"
 )
 
 func TestCountHas_Integration(t *testing.T) {
@@ -147,7 +148,7 @@ func TestQueryDql_IntegrationRaw(t *testing.T) {
 
 func TestGetUserRoles_Integration(t *testing.T) {
 	t.Parallel()
-	roles, err := GetDB().GetUserRoles("testuser")
+	roles, err := Meta[*model.Node]("getUserRoles", map[string]string{"userid": "testuser"})
 	if err != nil {
 		t.Fatalf("GetUserRoles returned error: %v", err)
 	}

@@ -86,6 +86,18 @@ var dummyVars = map[string]string{
 	"authorsFilter":         "",
 	"excludeSelf":           "",
 	"extra_pre_vars":        "",
+	// Variables for converted ad-hoc mutations
+	"predicate":  "Node.name",
+	"predicate1": "Node.source",
+	"predicate2": "Node.nameid",
+	"objid":      "test-org#",
+	"bid":        "0x8",
+	"flag":       "2026-01-01T00:00:00Z",
+	"action":     "NewRole",
+	"roleType":   "Member",
+	"activityid": "u#user1#2026-01-01",
+	"ownerid":    "u#user1",
+	"date":       "2026-01-01T00:00:00Z",
 }
 
 // assertTemplateRenders parses raw as a Go template and verifies it renders

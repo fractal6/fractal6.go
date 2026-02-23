@@ -163,7 +163,10 @@ func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model
 		if err != nil {
 			return false, err
 		}
-		err = db.GetDB().SetSubFieldByEq("Node.nameid", nameid, "Node.role_ext", "RoleExt.role_type", value)
+		_, err = db.GetDB().Meta("setSubFieldByEq", map[string]string{
+			"fieldid": "Node.nameid", "objid": nameid,
+			"predicate1": "Node.role_ext", "predicate2": "RoleExt.role_type", "value": value,
+		})
 		if err != nil {
 			return false, err
 		}
@@ -496,7 +499,7 @@ func MaybeDeletePendingNode(username string, tension *model.Tension) error {
 		// REMOVING node have unattended effect (emitter missing)
 		//err := db.GetDB().RemoveUserRole(username, nid)
 		//if err != nil { return err }
-		//err = db.DB.Delete(db.DB.GetRootUctx(), "node", model.NodeFilter{
+		//err = db.GetDB().Delete(db.GetDB().GetRootUctx(), "node", model.NodeFilter{
 		//    Nameid: &model.StringHashFilterStringRegExpFilter{Eq:&nid},
 		//})
 		err = UnlinkUser(rootid, nid, username)
