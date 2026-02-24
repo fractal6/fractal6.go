@@ -690,7 +690,6 @@ func (dg Dgraph) GetUctxFull(fieldid string, userid string) (*model.UserCtx, err
 	return &user, err
 }
 
-
 // Returns matching User. Never return nil user without an error.
 func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) {
 	user, err := dg.GetUctxFull(fieldid, userid)
@@ -700,16 +699,7 @@ func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) 
 	if user == nil || user.Username == "" {
 		return nil, fmt.Errorf("User not found for '%s': %s", fieldid, userid)
 	}
-	// @deprecated: special role are processed in web/auth
-	// Filter special roles
-	//for i := 0; i < len(user.Roles); i++ {
-	//    if *user.Roles[i].RoleType == model.RoleTypeRetired ||
-	//    *user.Roles[i].RoleType == model.RoleTypeMember ||
-	//    *user.Roles[i].RoleType == model.RoleTypePending {
-	//        user.Roles = append(user.Roles[:i], user.Roles[i+1:]...)
-	//        i--
-	//    }
-	//}
+	// @note: special role are filtered out in web/auth
 	return user, err
 }
 
@@ -1133,6 +1123,13 @@ func (dg Dgraph) GetTensionsCount(q TensionQuery) (map[string]int, error) {
 	return nil, err
 }
 
+// tensionBlobRef is a decode target for GetLastBlobId DQL results.
+type tensionBlobRef struct {
+	Blobs []struct {
+		ID string `json:"id"`
+	} `json:"blobs"`
+}
+
 func (dg Dgraph) GetLastBlobId(tid string) *string {
 	maps := map[string]string{"tid": tid}
 	// Send request
@@ -1148,17 +1145,27 @@ func (dg Dgraph) GetLastBlobId(tid string) *string {
 		return nil
 	}
 
-	var bid string
-	if len(r.All) > 1 {
+	if len(r.All) != 1 {
 		return nil
-	} else if len(r.All) == 1 {
-		blobs := r.All[0]["Tension.blobs"].([]any)
-		if len(blobs) > 0 {
-			bid = blobs[0].(model.JsonAtom)["uid"].(string)
-		}
 	}
 
+	data, err := DecodeDql[tensionBlobRef](r.All[0])
+	if err != nil {
+		return nil
+	}
+
+	var bid string
+	if len(data.Blobs) > 0 {
+		bid = data.Blobs[0].ID
+	}
 	return &bid
+}
+
+// nodeChildRefs is a decode target for DQL queries returning children with uid only.
+type nodeChildRefs struct {
+	Children []struct {
+		ID string `json:"id"`
+	} `json:"children"`
 }
 
 // Get all coordo roles in the given circle with an user linked.
@@ -1180,16 +1187,22 @@ func (dg Dgraph) HasCoordos(nameid string) bool {
 		return false
 	}
 
-	var ok bool = false
-	if len(r.All) > 1 {
-		return ok
-	} else if len(r.All) == 1 {
-		c := r.All[0]["Node.children"]
-		if c != nil && len(c.([]any)) > 0 {
-			ok = true
-		}
+	if len(r.All) != 1 {
+		return false
 	}
-	return ok
+
+	data, err := DecodeDql[nodeChildRefs](r.All[0])
+	if err != nil {
+		return false
+	}
+	return len(data.Children) > 0
+}
+
+// nodeChildNameids is a decode target for GetChildren DQL results.
+type nodeChildNameids struct {
+	Children []struct {
+		Nameid string `json:"nameid"`
+	} `json:"children"`
 }
 
 // Get children
@@ -1211,16 +1224,23 @@ func (dg Dgraph) GetChildren(nameid string) ([]string, error) {
 		return nil, err
 	}
 
-	var data []string
 	if len(r.All) > 1 {
 		return nil, fmt.Errorf("Got multiple object for term: %s", nameid)
-	} else if len(r.All) == 1 {
-		c := r.All[0]["Node.children"].([]any)
-		for _, x := range c {
-			data = append(data, x.(model.JsonAtom)["Node.nameid"].(string))
-		}
 	}
-	return data, err
+	if len(r.All) != 1 {
+		return nil, nil
+	}
+
+	data, err := DecodeDql[nodeChildNameids](r.All[0])
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]string, 0, len(data.Children))
+	for _, c := range data.Children {
+		result = append(result, c.Nameid)
+	}
+	return result, nil
 }
 
 // Get path to root
@@ -1263,6 +1283,16 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
 	return data, err
 }
 
+// tensionSearchData is a decode target for GetTensionSearchData DQL results.
+type tensionSearchData struct {
+	Labels []struct {
+		Name string `json:"name"`
+	} `json:"labels"`
+	Comments []struct {
+		Message string `json:"message"`
+	} `json:"comments"`
+}
+
 // GetTensionSearchData fetches label names and the first comment text for a tension.
 // Used to build the denormalized Post.message search index.
 func (dg Dgraph) GetTensionSearchData(tid string) ([]string, string, error) {
@@ -1278,31 +1308,23 @@ func (dg Dgraph) GetTensionSearchData(tid string) ([]string, string, error) {
 		return nil, "", err
 	}
 
-	var labels []string
+	if len(r.All) != 1 {
+		return nil, "", nil
+	}
+
+	data, err := DecodeDql[tensionSearchData](r.All[0])
+	if err != nil {
+		return nil, "", err
+	}
+
+	labels := make([]string, 0, len(data.Labels))
+	for _, l := range data.Labels {
+		labels = append(labels, l.Name)
+	}
+
 	var firstComment string
-	if len(r.All) == 1 {
-		// Extract labels
-		if raw, ok := r.All[0]["Tension.labels"]; ok && raw != nil {
-			if items, ok := raw.([]any); ok {
-				for _, item := range items {
-					if m, ok := item.(model.JsonAtom); ok {
-						if name, ok := m["Label.name"].(string); ok {
-							labels = append(labels, name)
-						}
-					}
-				}
-			}
-		}
-		// Extract first comment message
-		if raw, ok := r.All[0]["Tension.comments"]; ok && raw != nil {
-			if items, ok := raw.([]any); ok && len(items) > 0 {
-				if m, ok := items[0].(model.JsonAtom); ok {
-					if msg, ok := m["message"].(string); ok {
-						firstComment = msg
-					}
-				}
-			}
-		}
+	if len(data.Comments) > 0 {
+		firstComment = data.Comments[0].Message
 	}
 
 	return labels, firstComment, nil
@@ -1339,8 +1361,6 @@ func (dg Dgraph) UpgradeMember(nameid string, roleType model.RoleType) error {
 	_, err := dg.Meta("upgradeMember", map[string]string{"nameid": nameid, "roleType": string(roleType)})
 	return err
 }
-
-
 
 // Deletions
 

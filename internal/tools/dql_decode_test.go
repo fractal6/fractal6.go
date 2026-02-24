@@ -247,6 +247,197 @@ func TestFirst_Struct(t *testing.T) {
 	}
 }
 
+// Tests below verify that DecodeDql correctly decodes the DQL response
+// shapes produced by refactored functions in db/dql.go.
+
+func TestDecodeDql_TensionSearchData(t *testing.T) {
+	// Simulates the DQL response shape from getTensionSearchData template:
+	//   Tension.labels { Label.name }
+	//   Tension.comments(first:1) { message: Post.message }
+	type tensionSearchData struct {
+		Labels   []struct{ Name string `json:"name"` } `json:"labels"`
+		Comments []struct{ Message string `json:"message"` } `json:"comments"`
+	}
+
+	t.Run("with_data", func(t *testing.T) {
+		raw := map[string]any{
+			"Tension.labels": []any{
+				map[string]any{"Label.name": "bug"},
+				map[string]any{"Label.name": "urgent"},
+			},
+			"Tension.comments": []any{
+				map[string]any{"message": "First comment"},
+			},
+		}
+		data, err := DecodeDql[tensionSearchData](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Labels) != 2 {
+			t.Fatalf("expected 2 labels, got %d", len(data.Labels))
+		}
+		if data.Labels[0].Name != "bug" {
+			t.Errorf("expected first label=bug, got %s", data.Labels[0].Name)
+		}
+		if data.Labels[1].Name != "urgent" {
+			t.Errorf("expected second label=urgent, got %s", data.Labels[1].Name)
+		}
+		if len(data.Comments) != 1 || data.Comments[0].Message != "First comment" {
+			t.Errorf("expected comment='First comment', got %+v", data.Comments)
+		}
+	})
+
+	t.Run("empty_result", func(t *testing.T) {
+		raw := map[string]any{}
+		data, err := DecodeDql[tensionSearchData](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Labels) != 0 {
+			t.Errorf("expected 0 labels, got %d", len(data.Labels))
+		}
+		if len(data.Comments) != 0 {
+			t.Errorf("expected 0 comments, got %d", len(data.Comments))
+		}
+	})
+
+	t.Run("labels_only", func(t *testing.T) {
+		raw := map[string]any{
+			"Tension.labels": []any{
+				map[string]any{"Label.name": "feature"},
+			},
+		}
+		data, err := DecodeDql[tensionSearchData](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Labels) != 1 || data.Labels[0].Name != "feature" {
+			t.Errorf("expected [feature], got %+v", data.Labels)
+		}
+		if len(data.Comments) != 0 {
+			t.Errorf("expected 0 comments, got %d", len(data.Comments))
+		}
+	})
+}
+
+func TestDecodeDql_TensionBlobRef(t *testing.T) {
+	// Simulates the DQL response shape from getLastBlobId template:
+	//   Tension.blobs(orderdesc: Post.createdAt, first: 1) { uid }
+	type tensionBlobRef struct {
+		Blobs []struct{ ID string `json:"id"` } `json:"blobs"`
+	}
+
+	t.Run("with_blob", func(t *testing.T) {
+		raw := map[string]any{
+			"Tension.blobs": []any{
+				map[string]any{"uid": "0xabc"},
+			},
+		}
+		data, err := DecodeDql[tensionBlobRef](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Blobs) != 1 || data.Blobs[0].ID != "0xabc" {
+			t.Errorf("expected blob id=0xabc, got %+v", data.Blobs)
+		}
+	})
+
+	t.Run("empty_blobs", func(t *testing.T) {
+		raw := map[string]any{
+			"Tension.blobs": []any{},
+		}
+		data, err := DecodeDql[tensionBlobRef](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Blobs) != 0 {
+			t.Errorf("expected 0 blobs, got %d", len(data.Blobs))
+		}
+	})
+}
+
+func TestDecodeDql_NodeChildRefs(t *testing.T) {
+	// Simulates the DQL response shape from getCoordos template:
+	//   Node.children @filter(...) { uid }
+	type nodeChildRefs struct {
+		Children []struct{ ID string `json:"id"` } `json:"children"`
+	}
+
+	t.Run("has_children", func(t *testing.T) {
+		raw := map[string]any{
+			"Node.children": []any{
+				map[string]any{"uid": "0x1"},
+				map[string]any{"uid": "0x2"},
+			},
+		}
+		data, err := DecodeDql[nodeChildRefs](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Children) != 2 {
+			t.Fatalf("expected 2 children, got %d", len(data.Children))
+		}
+		if data.Children[0].ID != "0x1" {
+			t.Errorf("expected first child id=0x1, got %s", data.Children[0].ID)
+		}
+	})
+
+	t.Run("no_children", func(t *testing.T) {
+		raw := map[string]any{}
+		data, err := DecodeDql[nodeChildRefs](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Children) != 0 {
+			t.Errorf("expected 0 children, got %d", len(data.Children))
+		}
+	})
+}
+
+func TestDecodeDql_NodeChildNameids(t *testing.T) {
+	// Simulates the DQL response shape from getChildren template:
+	//   Node.children @filter(...) { Node.nameid }
+	type nodeChildNameids struct {
+		Children []struct{ Nameid string `json:"nameid"` } `json:"children"`
+	}
+
+	t.Run("with_children", func(t *testing.T) {
+		raw := map[string]any{
+			"Node.children": []any{
+				map[string]any{"Node.nameid": "org#circle1"},
+				map[string]any{"Node.nameid": "org#circle2"},
+				map[string]any{"Node.nameid": "org##@user"},
+			},
+		}
+		data, err := DecodeDql[nodeChildNameids](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Children) != 3 {
+			t.Fatalf("expected 3 children, got %d", len(data.Children))
+		}
+		expected := []string{"org#circle1", "org#circle2", "org##@user"}
+		for i, want := range expected {
+			if data.Children[i].Nameid != want {
+				t.Errorf("child[%d]: expected %s, got %s", i, want, data.Children[i].Nameid)
+			}
+		}
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		raw := map[string]any{
+			"Node.children": []any{},
+		}
+		data, err := DecodeDql[nodeChildNameids](raw)
+		if err != nil {
+			t.Fatalf("DecodeDql error: %v", err)
+		}
+		if len(data.Children) != 0 {
+			t.Errorf("expected 0 children, got %d", len(data.Children))
+		}
+	})
+}
+
 func TestCleanDqlMap(t *testing.T) {
 	input := map[string]any{
 		"uid":           "0x5",
