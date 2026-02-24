@@ -90,7 +90,7 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 		tf = append(tf, fmt.Sprintf(`eq(Tension.type_, "%s")`, q.Type))
 	}
 	if q.Pattern != nil {
-		tf = append(tf, fmt.Sprintf(`anyoftext(Tension.title, "%s")`, *q.Pattern))
+		tf = append(tf, fmt.Sprintf(`(anyoftext(Tension.title, "%s") OR anyoftext(Post.message, "%s"))`, *q.Pattern, *q.Pattern))
 	}
 	if len(q.Authors) > 0 {
 		tf = append(tf, `has(Post.createdBy)`)

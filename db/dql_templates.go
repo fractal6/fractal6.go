@@ -633,4 +633,12 @@ var dqlQueries map[string]string = map[string]string{
             Tension.blobs (orderdesc: Post.createdAt, first: 1) { uid }
         }
     }`,
+	"getTensionSearchData": `{
+        all(func: uid({{.tid}})) {
+            Tension.labels { Label.name }
+            Tension.comments(first:1, orderasc: Post.createdAt) {
+                message: Post.message
+            }
+        }
+    }`,
 }

@@ -141,6 +141,7 @@ func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, e
 		return data, err
 	}
 	if ok {
+		go SyncTensionSearchMessage(id)
 		PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: id, History: history})
 		return data, err
 	}

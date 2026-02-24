@@ -268,7 +268,7 @@ func seedTestData() error {
 		_:tension <Tension.receiverid> "test-org" .
 		_:tension <Post.createdBy> _:user1 .
 		_:tension <Post.createdAt> "2026-01-01T00:00:00Z" .
-		_:tension <Post.message> "Initial tension message" .
+		_:tension <Post.message> "---\nbug\n---\n\nThis is the first comment on the test tension" .
 		_:org <Node.tensions_out> _:tension .
 		_:org <Node.tensions_in> _:tension .
 
@@ -288,6 +288,23 @@ func seedTestData() error {
 		_:event <Post.createdBy> _:user1 .
 		_:event <Post.createdAt> "2026-01-01T00:00:00Z" .
 		_:tension <Tension.history> _:event .
+
+		# Label on test-org, linked to tension
+		_:label <dgraph.type> "Label" .
+		_:label <Label.rootnameid> "test-org" .
+		_:label <Label.name> "bug" .
+		_:label <Label.color> "#d73a4a" .
+		_:tension <Tension.labels> _:label .
+		_:label <Label.tensions> _:tension .
+		_:org <Node.labels> _:label .
+		_:label <Label.nodes> _:org .
+
+		# Comment on tension
+		_:comment <dgraph.type> "Comment" .
+		_:comment <Post.createdBy> _:user1 .
+		_:comment <Post.createdAt> "2026-01-01T00:01:00Z" .
+		_:comment <Post.message> "This is the first comment on the test tension" .
+		_:tension <Tension.comments> _:comment .
 
 		# --- sec-org: Private organisation for security/visibility tests ---
 		_:secorg <dgraph.type> "Node" .

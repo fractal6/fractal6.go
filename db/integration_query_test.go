@@ -24,6 +24,7 @@ package db_test
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
 	. "fractale/fractal6.go/db"
@@ -178,4 +179,139 @@ func TestMeta_IntegrationGetNodeHistory(t *testing.T) {
 		t.Errorf("Meta(getNodeHistory) returned %d results, want >= 1", len(results))
 	}
 	t.Logf("Meta(getNodeHistory) returned %d events", len(results))
+}
+
+// getTensionUID is a test helper that returns the UID of the seed "Test tension".
+func getTensionUID(t *testing.T) string {
+	t.Helper()
+	tids, err := GetDB().GetIDs("Tension.title", "Test tension", nil, nil)
+	if err != nil {
+		t.Fatalf("GetIDs(Tension.title) returned error: %v", err)
+	}
+	if len(tids) == 0 {
+		t.Fatal("No tension found with title 'Test tension'")
+	}
+	return tids[0]
+}
+
+func TestGetTensionSearchData_Integration(t *testing.T) {
+	t.Parallel()
+	tid := getTensionUID(t)
+
+	t.Run("returns_labels_and_comment", func(t *testing.T) {
+		t.Parallel()
+		labels, firstComment, err := GetDB().GetTensionSearchData(tid)
+		if err != nil {
+			t.Fatalf("GetTensionSearchData returned error: %v", err)
+		}
+
+		// Seed data has label "bug" on this tension.
+		if len(labels) != 1 || labels[0] != "bug" {
+			t.Errorf("labels = %v, want [bug]", labels)
+		}
+
+		// Seed data has a comment "This is the first comment on the test tension".
+		if firstComment != "This is the first comment on the test tension" {
+			t.Errorf("firstComment = %q, want %q", firstComment, "This is the first comment on the test tension")
+		}
+	})
+
+	t.Run("nonexistent_uid", func(t *testing.T) {
+		t.Parallel()
+		labels, comment, err := GetDB().GetTensionSearchData("0xdeadbeef")
+		if err != nil {
+			t.Fatalf("GetTensionSearchData returned error: %v", err)
+		}
+		if len(labels) != 0 {
+			t.Errorf("labels = %v, want empty", labels)
+		}
+		if comment != "" {
+			t.Errorf("firstComment = %q, want empty", comment)
+		}
+	})
+}
+
+func TestGetTensions_PatternMatchesMessage_Integration(t *testing.T) {
+	t.Parallel()
+
+	// The seed data sets Post.message on the test tension to:
+	//   "---\nbug\n---\n\nThis is the first comment on the test tension"
+	// This lets us test searching by title vs message content.
+
+	status := model.TensionStatusOpen
+	q := TensionQuery{
+		Nameids:  []string{"test-org"},
+		First:    10,
+		Offset:   0,
+		Status:   &status,
+		Username: "testuser",
+	}
+
+	t.Run("match_title", func(t *testing.T) {
+		t.Parallel()
+		pattern := "tension"
+		qc := q
+		qc.Pattern = &pattern
+		tensions, err := GetDB().GetTensions(qc, "int")
+		if err != nil {
+			t.Fatalf("GetTensions returned error: %v", err)
+		}
+		if len(tensions) == 0 {
+			t.Error("GetTensions with title pattern returned 0 results, want >= 1")
+		}
+	})
+
+	t.Run("match_message", func(t *testing.T) {
+		t.Parallel()
+		// "comment" appears only in Post.message, not in Tension.title
+		pattern := "comment"
+		qc := q
+		qc.Pattern = &pattern
+		tensions, err := GetDB().GetTensions(qc, "int")
+		if err != nil {
+			t.Fatalf("GetTensions returned error: %v", err)
+		}
+		if len(tensions) == 0 {
+			t.Error("GetTensions with message pattern returned 0 results, want >= 1")
+		}
+	})
+
+	t.Run("no_match", func(t *testing.T) {
+		t.Parallel()
+		pattern := "zzzznonexistent"
+		qc := q
+		qc.Pattern = &pattern
+		tensions, err := GetDB().GetTensions(qc, "int")
+		if err != nil {
+			t.Fatalf("GetTensions returned error: %v", err)
+		}
+		if len(tensions) != 0 {
+			t.Errorf("GetTensions with non-matching pattern returned %d results, want 0", len(tensions))
+		}
+	})
+}
+
+func TestFormatTensionIntExtMap_PatternFilter(t *testing.T) {
+	t.Parallel()
+	pattern := "search term"
+	q := TensionQuery{
+		Nameids: []string{"test-org"},
+		First:   10,
+		Pattern: &pattern,
+		Username: "testuser",
+	}
+	maps, err := FormatTensionIntExtMap(q)
+	if err != nil {
+		t.Fatalf("FormatTensionIntExtMap returned error: %v", err)
+	}
+	tf := (*maps)["tensionFilter"]
+	if !strings.Contains(tf, "anyoftext(Tension.title,") {
+		t.Errorf("tensionFilter missing Tension.title check: %s", tf)
+	}
+	if !strings.Contains(tf, "anyoftext(Post.message,") {
+		t.Errorf("tensionFilter missing Post.message check: %s", tf)
+	}
+	if !strings.Contains(tf, " OR ") {
+		t.Errorf("tensionFilter missing OR between title and message: %s", tf)
+	}
 }

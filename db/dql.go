@@ -1263,6 +1263,51 @@ func (dg Dgraph) GetParents(nameid string) ([]string, error) {
 	return data, err
 }
 
+// GetTensionSearchData fetches label names and the first comment text for a tension.
+// Used to build the denormalized Post.message search index.
+func (dg Dgraph) GetTensionSearchData(tid string) ([]string, string, error) {
+	maps := map[string]string{"tid": tid}
+	res, err := dg.QueryDql("getTensionSearchData", maps)
+	if err != nil {
+		return nil, "", err
+	}
+
+	var r DqlResp
+	err = json.Unmarshal(res.Json, &r)
+	if err != nil {
+		return nil, "", err
+	}
+
+	var labels []string
+	var firstComment string
+	if len(r.All) == 1 {
+		// Extract labels
+		if raw, ok := r.All[0]["Tension.labels"]; ok && raw != nil {
+			if items, ok := raw.([]any); ok {
+				for _, item := range items {
+					if m, ok := item.(model.JsonAtom); ok {
+						if name, ok := m["Label.name"].(string); ok {
+							labels = append(labels, name)
+						}
+					}
+				}
+			}
+		}
+		// Extract first comment message
+		if raw, ok := r.All[0]["Tension.comments"]; ok && raw != nil {
+			if items, ok := raw.([]any); ok && len(items) > 0 {
+				if m, ok := items[0].(model.JsonAtom); ok {
+					if msg, ok := m["message"].(string); ok {
+						firstComment = msg
+					}
+				}
+			}
+		}
+	}
+
+	return labels, firstComment, nil
+}
+
 // DQL Mutations
 
 // SetFieldById set a predicate for the given node in the DB
