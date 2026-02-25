@@ -304,33 +304,6 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
 	return result, nil
 }
 
-// cleanDqlKey applies the same key transformation as CleanDqlMap for a single key:
-// strips the "Type." prefix and renames "uid" to "id".
-func cleanDqlKey(key string) string {
-	if i := strings.LastIndex(key, "."); i >= 0 {
-		key = key[i+1:]
-	}
-	if key == "uid" {
-		key = "id"
-	}
-	return key
-}
-
-// decodeField extracts field(s) from a single-result cleaned DQL map slice.
-// With a single field, returns the field value. With multiple fields, returns the entire map.
-func decodeField(results []map[string]any, fieldName string) (any, error) {
-	if len(results) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query: %s", fieldName)
-	}
-	if len(results) != 1 {
-		return nil, nil
-	}
-	if len(strings.Fields(fieldName)) > 1 {
-		return results[0], nil
-	}
-	return results[0][cleanDqlKey(fieldName)], nil
-}
-
 // Returns a field from id
 func (dg Dgraph) GetFieldById(id string, fieldName string) (any, error) {
 	results, err := dg.Meta("getFieldById", map[string]string{
@@ -340,7 +313,7 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return decodeField(results, fieldName)
+	return DecodeField(results, fieldName)
 }
 
 // Returns a field from objid
@@ -353,49 +326,7 @@ func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (a
 	if err != nil {
 		return nil, err
 	}
-	return decodeField(results, fieldName)
-}
-
-// decodeSubField extracts a sub-field from a single-result cleaned DQL map slice.
-// It handles both scalar (map[string]any) and list ([]any) sub-field values.
-// With multiple target fields, returns the nested map(s) directly; with a single field,
-// extracts that field's value.
-func decodeSubField(results []map[string]any, fieldNameSource, fieldNameTarget string) (any, error) {
-	if len(results) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query")
-	}
-	if len(results) != 1 {
-		return nil, nil
-	}
-
-	multiField := len(strings.Fields(fieldNameTarget)) > 1
-	cleanTarget := cleanDqlKey(fieldNameTarget)
-
-	switch x := results[0][cleanDqlKey(fieldNameSource)].(type) {
-	case map[string]any:
-		if multiField {
-			return x, nil
-		}
-		return x[cleanTarget], nil
-	case []any:
-		y := make([]any, 0, len(x))
-		for _, v := range x {
-			atom, ok := v.(map[string]any)
-			if !ok {
-				return nil, fmt.Errorf("decodeSubField: unexpected element type %T", v)
-			}
-			if multiField {
-				y = append(y, atom)
-			} else {
-				y = append(y, atom[cleanTarget])
-			}
-		}
-		return y, nil
-	case nil:
-		return nil, nil
-	default:
-		return nil, fmt.Errorf("decodeSubField: unexpected type %T", x)
-	}
+	return DecodeField(results, fieldName)
 }
 
 // Returns a subfield from uid
@@ -408,7 +339,7 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
 	if err != nil {
 		return nil, err
 	}
-	return decodeSubField(results, fieldNameSource, fieldNameTarget)
+	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
 }
 
 // Returns a subfield from Eq
@@ -422,7 +353,7 @@ func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource s
 	if err != nil {
 		return nil, err
 	}
-	return decodeSubField(results, fieldNameSource, fieldNameTarget)
+	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
 }
 
 func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, fieldNameTarget string) (any, error) {
@@ -437,33 +368,7 @@ func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, field
 	if err != nil {
 		return nil, err
 	}
-	return decodeSubField(results, fieldNameSource, fieldNameTarget)
-}
-
-// decodeSubSubField extracts a nested sub-sub-field from a single-result cleaned DQL map slice.
-// Traverses fieldNameSource -> fieldNameTarget -> subFieldNameTarget.
-// With multiple sub-target fields, returns the nested map; with a single field, extracts the value.
-func decodeSubSubField(results []map[string]any, fieldNameSource, fieldNameTarget, subFieldNameTarget string) (any, error) {
-	if len(results) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query")
-	}
-	if len(results) != 1 {
-		return nil, nil
-	}
-
-	x, ok := results[0][cleanDqlKey(fieldNameSource)].(map[string]any)
-	if !ok || x == nil {
-		return nil, nil
-	}
-	y, ok := x[cleanDqlKey(fieldNameTarget)].(map[string]any)
-	if !ok || y == nil {
-		return nil, nil
-	}
-
-	if len(strings.Fields(subFieldNameTarget)) > 1 {
-		return y, nil
-	}
-	return y[cleanDqlKey(subFieldNameTarget)], nil
+	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
 }
 
 // Returns a subsubfield from uid
@@ -477,7 +382,7 @@ func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldName
 	if err != nil {
 		return nil, err
 	}
-	return decodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
+	return DecodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
 }
 
 // Returns a subsubfield from Eq
@@ -492,7 +397,7 @@ func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSourc
 	if err != nil {
 		return nil, err
 	}
-	return decodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
+	return DecodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
 }
 
 func (dg Dgraph) GetShortestPath(from string, to string) (float64, error) {
@@ -748,20 +653,11 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([
 		return nil, err
 	}
 
-	data_dup, err := DecodeDql[[]model.Label](results)
+	data, err := DecodeDql[[]model.Label](results)
 	if err != nil {
 		return nil, err
 	}
-	// Remove duplicate based on Label.name
-	data := []model.Label{}
-	check := make(map[string]bool)
-	for _, d := range data_dup {
-		if _, v := check[d.Name]; !v {
-			check[d.Name] = true
-			data = append(data, d)
-		}
-	}
-	return data, err
+	return Dedupe(data, func(l model.Label) string { return l.Name }), nil
 }
 
 // Get all sub labels
@@ -775,20 +671,11 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string, includeSelf bool) ([
 		return nil, err
 	}
 
-	data_dup, err := DecodeDql[[]model.Label](results)
+	data, err := DecodeDql[[]model.Label](results)
 	if err != nil {
 		return nil, err
 	}
-	// Remove duplicate based on Label.name
-	data := []model.Label{}
-	check := make(map[string]bool)
-	for _, d := range data_dup {
-		if _, v := check[d.Name]; !v {
-			check[d.Name] = true
-			data = append(data, d)
-		}
-	}
-	return data, err
+	return Dedupe(data, func(l model.Label) string { return l.Name }), nil
 }
 
 // Get all top roles
@@ -802,20 +689,11 @@ func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]
 		return nil, err
 	}
 
-	data_dup, err := DecodeDql[[]model.RoleExt](results)
+	data, err := DecodeDql[[]model.RoleExt](results)
 	if err != nil {
 		return nil, err
 	}
-	// Remove duplicate based on RoleExt.name
-	data := []model.RoleExt{}
-	check := make(map[string]bool)
-	for _, d := range data_dup {
-		if _, v := check[d.Name]; !v {
-			check[d.Name] = true
-			data = append(data, d)
-		}
-	}
-	return data, err
+	return Dedupe(data, func(r model.RoleExt) string { return r.Name }), nil
 }
 
 // Get all sub roles
@@ -829,20 +707,11 @@ func (dg Dgraph) GetSubRoles(fieldid string, objid string, includeSelf bool) ([]
 		return nil, err
 	}
 
-	data_dup, err := DecodeDql[[]model.RoleExt](results)
+	data, err := DecodeDql[[]model.RoleExt](results)
 	if err != nil {
 		return nil, err
 	}
-	// Remove duplicate based on Label.name
-	data := []model.RoleExt{}
-	check := make(map[string]bool)
-	for _, d := range data_dup {
-		if _, v := check[d.Name]; !v {
-			check[d.Name] = true
-			data = append(data, d)
-		}
-	}
-	return data, err
+	return Dedupe(data, func(r model.RoleExt) string { return r.Name }), nil
 }
 
 // ProjectFull is a lightweight project representation for the sub_projects endpoint.

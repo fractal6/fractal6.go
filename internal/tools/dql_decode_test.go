@@ -247,6 +247,31 @@ func TestFirst_Struct(t *testing.T) {
 	}
 }
 
+func TestDedupe(t *testing.T) {
+	type item struct {
+		Name string
+		Val  int
+	}
+	items := []item{
+		{"a", 1}, {"b", 2}, {"a", 3}, {"c", 4}, {"b", 5},
+	}
+	got := Dedupe(items, func(i item) string { return i.Name })
+	if len(got) != 3 {
+		t.Fatalf("expected 3 items, got %d", len(got))
+	}
+	// First occurrence wins
+	if got[0].Val != 1 || got[1].Val != 2 || got[2].Val != 4 {
+		t.Errorf("expected vals [1,2,4], got [%d,%d,%d]", got[0].Val, got[1].Val, got[2].Val)
+	}
+}
+
+func TestDedupe_Empty(t *testing.T) {
+	got := Dedupe([]string{}, func(s string) string { return s })
+	if len(got) != 0 {
+		t.Errorf("expected empty, got %d", len(got))
+	}
+}
+
 // Tests below verify that DecodeDql correctly decodes the DQL response
 // shapes produced by refactored functions in db/dql.go.
 
