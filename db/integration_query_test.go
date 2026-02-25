@@ -291,6 +291,261 @@ func TestGetTensions_PatternMatchesMessage_Integration(t *testing.T) {
 	})
 }
 
+func TestGetFieldById_Integration(t *testing.T) {
+	t.Parallel()
+	tid := getTensionUID(t)
+
+	t.Run("single_field", func(t *testing.T) {
+		t.Parallel()
+		val, err := GetDB().GetFieldById(tid, "Tension.title")
+		if err != nil {
+			t.Fatalf("GetFieldById returned error: %v", err)
+		}
+		title, ok := val.(string)
+		if !ok {
+			t.Fatalf("expected string, got %T", val)
+		}
+		if title != "Test tension" {
+			t.Errorf("Tension.title = %q, want %q", title, "Test tension")
+		}
+	})
+
+	t.Run("multi_field", func(t *testing.T) {
+		t.Parallel()
+		val, err := GetDB().GetFieldById(tid, "Tension.title Tension.status")
+		if err != nil {
+			t.Fatalf("GetFieldById returned error: %v", err)
+		}
+		m, ok := val.(map[string]any)
+		if !ok {
+			t.Fatalf("expected map[string]any, got %T", val)
+		}
+		if m["title"] != "Test tension" {
+			t.Errorf("title = %v, want %q", m["title"], "Test tension")
+		}
+		if m["status"] != "Open" {
+			t.Errorf("status = %v, want %q", m["status"], "Open")
+		}
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		t.Parallel()
+		val, err := GetDB().GetFieldById("0xdeadbeef", "Tension.title")
+		if err != nil {
+			t.Fatalf("GetFieldById returned error: %v", err)
+		}
+		if val != nil {
+			t.Errorf("expected nil for nonexistent uid, got %v", val)
+		}
+	})
+}
+
+func TestGetFieldByEq_MultiField_Integration(t *testing.T) {
+	t.Parallel()
+	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.name Node.about")
+	if err != nil {
+		t.Fatalf("GetFieldByEq returned error: %v", err)
+	}
+	m, ok := val.(map[string]any)
+	if !ok {
+		t.Fatalf("expected map[string]any, got %T", val)
+	}
+	if m["name"] != "Test Org" {
+		t.Errorf("name = %v, want %q", m["name"], "Test Org")
+	}
+	if m["about"] != "A test organisation" {
+		t.Errorf("about = %v, want %q", m["about"], "A test organisation")
+	}
+}
+
+func TestGetSubFieldById_Integration(t *testing.T) {
+	t.Parallel()
+	tid := getTensionUID(t)
+
+	t.Run("scalar_result", func(t *testing.T) {
+		t.Parallel()
+		val, err := GetDB().GetSubFieldById(tid, "Post.createdBy", "User.username")
+		if err != nil {
+			t.Fatalf("GetSubFieldById returned error: %v", err)
+		}
+		username, ok := val.(string)
+		if !ok {
+			t.Fatalf("expected string, got %T", val)
+		}
+		if username != "testuser" {
+			t.Errorf("createdBy username = %q, want %q", username, "testuser")
+		}
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		t.Parallel()
+		val, err := GetDB().GetSubFieldById("0xdeadbeef", "Post.createdBy", "User.username")
+		if err != nil {
+			t.Fatalf("GetSubFieldById returned error: %v", err)
+		}
+		if val != nil {
+			t.Errorf("expected nil for nonexistent uid, got %v", val)
+		}
+	})
+}
+
+func TestGetSubFieldByEq_Integration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("scalar_result", func(t *testing.T) {
+		t.Parallel()
+		// test-org##@testuser has first_link -> testuser
+		val, err := GetDB().GetSubFieldByEq("Node.nameid", "test-org##@testuser", "Node.first_link", "User.username")
+		if err != nil {
+			t.Fatalf("GetSubFieldByEq returned error: %v", err)
+		}
+		username, ok := val.(string)
+		if !ok {
+			t.Fatalf("expected string, got %T", val)
+		}
+		if username != "testuser" {
+			t.Errorf("first_link username = %q, want %q", username, "testuser")
+		}
+	})
+
+	t.Run("list_result", func(t *testing.T) {
+		t.Parallel()
+		// test-org has children (roles + coordo), so children returns a list
+		val, err := GetDB().GetSubFieldByEq("Node.nameid", "test-org", "Node.children", "Node.nameid")
+		if err != nil {
+			t.Fatalf("GetSubFieldByEq returned error: %v", err)
+		}
+		list, ok := val.([]any)
+		if !ok {
+			t.Fatalf("expected []any, got %T", val)
+		}
+		if len(list) < 2 {
+			t.Errorf("expected >= 2 children, got %d", len(list))
+		}
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		t.Parallel()
+		val, err := GetDB().GetSubFieldByEq("Node.nameid", "nonexistent-org", "Node.first_link", "User.username")
+		if err != nil {
+			t.Fatalf("GetSubFieldByEq returned error: %v", err)
+		}
+		if val != nil {
+			t.Errorf("expected nil for nonexistent node, got %v", val)
+		}
+	})
+}
+
+func TestGetSubSubFieldByEq_Integration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("found", func(t *testing.T) {
+		t.Parallel()
+		// test-org has source (Blob) -> tension -> uid
+		val, err := GetDB().GetSubSubFieldByEq("Node.nameid", "test-org", "Node.source", "Blob.tension", "uid")
+		if err != nil {
+			t.Fatalf("GetSubSubFieldByEq returned error: %v", err)
+		}
+		uid, ok := val.(string)
+		if !ok {
+			t.Fatalf("expected string, got %T (%v)", val, val)
+		}
+		if uid == "" {
+			t.Error("expected non-empty uid for blob.tension")
+		}
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		t.Parallel()
+		val, err := GetDB().GetSubSubFieldByEq("Node.nameid", "nonexistent-org", "Node.source", "Blob.tension", "uid")
+		if err != nil {
+			t.Fatalf("GetSubSubFieldByEq returned error: %v", err)
+		}
+		if val != nil {
+			t.Errorf("expected nil for nonexistent node, got %v", val)
+		}
+	})
+}
+
+func TestGetParents_Integration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("child_role", func(t *testing.T) {
+		t.Parallel()
+		// test-org##@testuser's parent is test-org
+		parents, err := GetDB().GetParents("test-org##@testuser")
+		if err != nil {
+			t.Fatalf("GetParents returned error: %v", err)
+		}
+		if len(parents) == 0 {
+			t.Fatal("GetParents returned empty, want at least test-org")
+		}
+		found := false
+		for _, p := range parents {
+			if p == "test-org" {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("parents = %v, expected to contain %q", parents, "test-org")
+		}
+	})
+
+	t.Run("root_node", func(t *testing.T) {
+		t.Parallel()
+		// test-org is a root node, should have no parents
+		parents, err := GetDB().GetParents("test-org")
+		if err != nil {
+			t.Fatalf("GetParents returned error: %v", err)
+		}
+		if len(parents) != 0 {
+			t.Errorf("root node parents = %v, want empty", parents)
+		}
+	})
+
+	t.Run("nested_child", func(t *testing.T) {
+		t.Parallel()
+		// sec-org#secret-circle#:coordo -> sec-org#secret-circle -> sec-org
+		parents, err := GetDB().GetParents("sec-org#secret-circle#:coordo")
+		if err != nil {
+			t.Fatalf("GetParents returned error: %v", err)
+		}
+		if len(parents) < 2 {
+			t.Errorf("expected >= 2 parents in chain, got %v", parents)
+		}
+	})
+}
+
+func TestGetTopLabels_Integration(t *testing.T) {
+	t.Parallel()
+	// test-org has label "bug" directly attached.
+	// Note: fieldid is "nameid" (not "Node.nameid") because the DQL template builds "Node.{{.fieldid}}".
+	labels, err := GetDB().GetTopLabels("nameid", "test-org", true)
+	if err != nil {
+		t.Fatalf("GetTopLabels returned error: %v", err)
+	}
+	if len(labels) == 0 {
+		t.Fatal("GetTopLabels returned empty, expected at least 'bug'")
+	}
+	found := false
+	for _, l := range labels {
+		if l.Name == "bug" {
+			found = true
+			if l.Color == nil || *l.Color != "#d73a4a" {
+				t.Errorf("bug label color = %v, want %q", l.Color, "#d73a4a")
+			}
+		}
+	}
+	if !found {
+		names := make([]string, len(labels))
+		for i, l := range labels {
+			names[i] = l.Name
+		}
+		t.Errorf("labels = %v, expected to contain %q", names, "bug")
+	}
+}
+
 func TestFormatTensionIntExtMap_PatternFilter(t *testing.T) {
 	t.Parallel()
 	pattern := "search term"

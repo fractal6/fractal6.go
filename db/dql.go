@@ -304,323 +304,195 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
 	return result, nil
 }
 
+// cleanDqlKey applies the same key transformation as CleanDqlMap for a single key:
+// strips the "Type." prefix and renames "uid" to "id".
+func cleanDqlKey(key string) string {
+	if i := strings.LastIndex(key, "."); i >= 0 {
+		key = key[i+1:]
+	}
+	if key == "uid" {
+		key = "id"
+	}
+	return key
+}
+
+// decodeField extracts field(s) from a single-result cleaned DQL map slice.
+// With a single field, returns the field value. With multiple fields, returns the entire map.
+func decodeField(results []map[string]any, fieldName string) (any, error) {
+	if len(results) > 1 {
+		return nil, fmt.Errorf("Got multiple in DQL query: %s", fieldName)
+	}
+	if len(results) != 1 {
+		return nil, nil
+	}
+	if len(strings.Fields(fieldName)) > 1 {
+		return results[0], nil
+	}
+	return results[0][cleanDqlKey(fieldName)], nil
+}
+
 // Returns a field from id
 func (dg Dgraph) GetFieldById(id string, fieldName string) (any, error) {
-	// Format Query
-	maps := map[string]string{
+	results, err := dg.Meta("getFieldById", map[string]string{
 		"id":        id,
 		"fieldName": fieldName,
-	}
-	// Send request
-	res, err := dg.QueryDql("getFieldById", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	fields := strings.Split(strings.Trim(fieldName, " "), " ")
-
-	if len(r.All) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, id)
-	} else if len(r.All) == 1 {
-		if len(fields) > 1 {
-			return CleanDqlMap(r.All[0]), nil
-		} else {
-			return r.All[0][fieldName], nil
-		}
-	}
-	return nil, err
+	return decodeField(results, fieldName)
 }
 
 // Returns a field from objid
 func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (any, error) {
-	// Format Query
-	maps := map[string]string{
+	results, err := dg.Meta("getFieldByEq", map[string]string{
 		"fieldid":   fieldid,
 		"value":     objid,
 		"fieldName": fieldName,
-	}
-	// Send request
-	res, err := dg.QueryDql("getFieldByEq", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
+	return decodeField(results, fieldName)
+}
 
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
+// decodeSubField extracts a sub-field from a single-result cleaned DQL map slice.
+// It handles both scalar (map[string]any) and list ([]any) sub-field values.
+// With multiple target fields, returns the nested map(s) directly; with a single field,
+// extracts that field's value.
+func decodeSubField(results []map[string]any, fieldNameSource, fieldNameTarget string) (any, error) {
+	if len(results) > 1 {
+		return nil, fmt.Errorf("Got multiple in DQL query")
+	}
+	if len(results) != 1 {
+		return nil, nil
 	}
 
-	fields := strings.Split(strings.Trim(fieldName, " "), " ")
+	multiField := len(strings.Fields(fieldNameTarget)) > 1
+	cleanTarget := cleanDqlKey(fieldNameTarget)
 
-	if len(r.All) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query: %s %s", fieldName, objid)
-	} else if len(r.All) == 1 {
-		if len(fields) > 1 {
-			return CleanDqlMap(r.All[0]), nil
-		} else {
-			return r.All[0][fieldName], nil
+	switch x := results[0][cleanDqlKey(fieldNameSource)].(type) {
+	case map[string]any:
+		if multiField {
+			return x, nil
 		}
+		return x[cleanTarget], nil
+	case []any:
+		y := make([]any, 0, len(x))
+		for _, v := range x {
+			atom, ok := v.(map[string]any)
+			if !ok {
+				return nil, fmt.Errorf("decodeSubField: unexpected element type %T", v)
+			}
+			if multiField {
+				y = append(y, atom)
+			} else {
+				y = append(y, atom[cleanTarget])
+			}
+		}
+		return y, nil
+	case nil:
+		return nil, nil
+	default:
+		return nil, fmt.Errorf("decodeSubField: unexpected type %T", x)
 	}
-	return nil, err
 }
 
 // Returns a subfield from uid
 func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTarget string) (any, error) {
-	// Format Query
-	maps := map[string]string{
+	results, err := dg.Meta("getSubFieldById", map[string]string{
 		"id":              id,
 		"fieldNameSource": fieldNameSource,
 		"fieldNameTarget": fieldNameTarget,
-	}
-	// Send request
-	res, err := dg.QueryDql("getSubFieldById", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	fields := strings.Split(strings.Trim(fieldNameTarget, " "), " ")
-
-	if len(r.All) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query")
-	} else if len(r.All) == 1 {
-		switch x := r.All[0][fieldNameSource].(type) {
-		case model.JsonAtom:
-			if x != nil {
-				if len(fields) > 1 {
-					return CleanDqlMap(x), nil
-				} else {
-					return x[fieldNameTarget], nil
-				}
-			}
-		case []any:
-			if x != nil {
-				var y []any
-				for _, v := range x {
-					if len(fields) > 1 {
-						y = append(y, CleanDqlMap(v.(model.JsonAtom)))
-					} else {
-						y = append(y, v.(model.JsonAtom)[fieldNameTarget])
-					}
-				}
-				return y, nil
-			}
-		default:
-			return nil, fmt.Errorf("Decode type unknonwn: %T", x)
-		}
-	}
-	return nil, err
+	return decodeSubField(results, fieldNameSource, fieldNameTarget)
 }
 
 // Returns a subfield from Eq
 func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string) (any, error) {
-	// Format Query
-	maps := map[string]string{
+	results, err := dg.Meta("getSubFieldByEq", map[string]string{
 		"fieldid":         fieldid,
 		"value":           value,
 		"fieldNameSource": fieldNameSource,
 		"fieldNameTarget": fieldNameTarget,
-	}
-	// Send request
-	res, err := dg.QueryDql("getSubFieldByEq", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	fields := strings.Split(strings.Trim(fieldNameTarget, " "), " ")
-
-	if len(r.All) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query")
-	} else if len(r.All) == 1 {
-		switch x := r.All[0][fieldNameSource].(type) {
-		case model.JsonAtom:
-			if x != nil {
-				if len(fields) > 1 {
-					return CleanDqlMap(x), nil
-				} else {
-					return x[fieldNameTarget], nil
-				}
-			}
-		case []any:
-			if x != nil {
-				var y []any
-				for _, v := range x {
-					if len(fields) > 1 {
-						y = append(y, CleanDqlMap(v.(model.JsonAtom)))
-					} else {
-						y = append(y, v.(model.JsonAtom)[fieldNameTarget])
-					}
-				}
-				return y, nil
-			}
-		default:
-			return nil, fmt.Errorf("Decode type unknonwn: %T", x)
-		}
-	}
-	return nil, err
+	return decodeSubField(results, fieldNameSource, fieldNameTarget)
 }
 
 func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, fieldNameTarget string) (any, error) {
-	// Format Query
-	maps := map[string]string{
+	results, err := dg.Meta("getSubFieldByEq2", map[string]string{
 		"fieldid":         fieldid,
 		"value":           value,
 		"f2":              f2,
 		"v2":              v2,
 		"fieldNameSource": fieldNameSource,
 		"fieldNameTarget": fieldNameTarget,
-	}
-	// Send request
-	res, err := dg.QueryDql("getSubFieldByEq2", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
+	return decodeSubField(results, fieldNameSource, fieldNameTarget)
+}
 
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	fields := strings.Split(strings.Trim(fieldNameTarget, " "), " ")
-
-	if len(r.All) > 1 {
+// decodeSubSubField extracts a nested sub-sub-field from a single-result cleaned DQL map slice.
+// Traverses fieldNameSource -> fieldNameTarget -> subFieldNameTarget.
+// With multiple sub-target fields, returns the nested map; with a single field, extracts the value.
+func decodeSubSubField(results []map[string]any, fieldNameSource, fieldNameTarget, subFieldNameTarget string) (any, error) {
+	if len(results) > 1 {
 		return nil, fmt.Errorf("Got multiple in DQL query")
-	} else if len(r.All) == 1 {
-		switch x := r.All[0][fieldNameSource].(type) {
-		case model.JsonAtom:
-			if x != nil {
-				if len(fields) > 1 {
-					return CleanDqlMap(x), nil
-				} else {
-					return x[fieldNameTarget], nil
-				}
-			}
-		case []any:
-			if x != nil {
-				var y []any
-				for _, v := range x {
-					if len(fields) > 1 {
-						y = append(y, CleanDqlMap(v.(model.JsonAtom)))
-					} else {
-						y = append(y, v.(model.JsonAtom)[fieldNameTarget])
-					}
-				}
-				return y, nil
-			}
-		default:
-			return nil, fmt.Errorf("Decode type unknonwn: %T", x)
-		}
 	}
-	return nil, err
+	if len(results) != 1 {
+		return nil, nil
+	}
+
+	x, ok := results[0][cleanDqlKey(fieldNameSource)].(map[string]any)
+	if !ok || x == nil {
+		return nil, nil
+	}
+	y, ok := x[cleanDqlKey(fieldNameTarget)].(map[string]any)
+	if !ok || y == nil {
+		return nil, nil
+	}
+
+	if len(strings.Fields(subFieldNameTarget)) > 1 {
+		return y, nil
+	}
+	return y[cleanDqlKey(subFieldNameTarget)], nil
 }
 
 // Returns a subsubfield from uid
 func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (any, error) {
-	// Format Query
-	maps := map[string]string{
+	results, err := dg.Meta("getSubSubFieldById", map[string]string{
 		"id":                 id,
 		"fieldNameSource":    fieldNameSource,
 		"fieldNameTarget":    fieldNameTarget,
 		"subFieldNameTarget": subFieldNameTarget,
-	}
-	// Send request
-	res, err := dg.QueryDql("getSubSubFieldById", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	fields := strings.Split(strings.Trim(subFieldNameTarget, " "), " ")
-
-	if len(r.All) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query")
-	} else if len(r.All) == 1 {
-		x := r.All[0][fieldNameSource].(model.JsonAtom)
-		if x != nil {
-			y := x[fieldNameTarget].(model.JsonAtom)
-			if y != nil {
-				if len(fields) > 1 {
-					return CleanDqlMap(y), nil
-				} else {
-					return y[subFieldNameTarget], nil
-				}
-			}
-		}
-	}
-	return nil, err
+	return decodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
 }
 
 // Returns a subsubfield from Eq
 func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (any, error) {
-	// Format Query
-	maps := map[string]string{
+	results, err := dg.Meta("getSubSubFieldByEq", map[string]string{
 		"fieldid":            fieldid,
 		"value":              value,
 		"fieldNameSource":    fieldNameSource,
 		"fieldNameTarget":    fieldNameTarget,
 		"subFieldNameTarget": subFieldNameTarget,
-	}
-	// Send request
-	res, err := dg.QueryDql("getSubSubFieldByEq", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	fields := strings.Split(strings.Trim(subFieldNameTarget, " "), " ")
-
-	if len(r.All) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query")
-	} else if len(r.All) == 1 {
-		x := r.All[0][fieldNameSource].(model.JsonAtom)
-		if x != nil {
-			y := x[fieldNameTarget].(model.JsonAtom)
-			if y != nil {
-				if len(fields) > 1 {
-					return CleanDqlMap(y), nil
-				} else {
-					return y[subFieldNameTarget], nil
-				}
-			}
-		}
-	}
-	return nil, err
+	return decodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
 }
 
 func (dg Dgraph) GetShortestPath(from string, to string) (float64, error) {
@@ -848,7 +720,7 @@ func (dg Dgraph) GetSubNodes(fieldid string, objid string, includeSelf bool) ([]
 	if err != nil {
 		return nil, err
 	}
-	return DecodeDqlSlice[model.Node](results)
+	return DecodeDql[[]model.Node](results)
 }
 
 // Get all sub members
@@ -862,30 +734,21 @@ func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string, includeSelf 
 	if err != nil {
 		return nil, err
 	}
-	return DecodeDqlSlice[model.Node](results)
+	return DecodeDql[[]model.Node](results)
 }
 
 // Get all top labels
 func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([]model.Label, error) {
-	maps := map[string]string{
+	results, err := dg.Meta("getTopLabels", map[string]string{
 		"fieldid":     fieldid,
 		"objid":       objid,
 		"excludeSelf": excludeSelfFlag(includeSelf),
-	}
-	// Send request
-	res, err := dg.QueryDql("getTopLabels", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	data_dup, err := DecodeDql[[]model.Label](r.All)
+	data_dup, err := DecodeDql[[]model.Label](results)
 	if err != nil {
 		return nil, err
 	}
@@ -903,25 +766,16 @@ func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([
 
 // Get all sub labels
 func (dg Dgraph) GetSubLabels(fieldid string, objid string, includeSelf bool) ([]model.Label, error) {
-	maps := map[string]string{
+	results, err := dg.Meta("getSubLabels", map[string]string{
 		"fieldid":     fieldid,
 		"objid":       objid,
 		"excludeSelf": excludeSelfFlag(includeSelf),
-	}
-	// Send request
-	res, err := dg.QueryDql("getSubLabels", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	data_dup, err := DecodeDql[[]model.Label](r.All)
+	data_dup, err := DecodeDql[[]model.Label](results)
 	if err != nil {
 		return nil, err
 	}
@@ -939,25 +793,16 @@ func (dg Dgraph) GetSubLabels(fieldid string, objid string, includeSelf bool) ([
 
 // Get all top roles
 func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]model.RoleExt, error) {
-	maps := map[string]string{
+	results, err := dg.Meta("getTopRoles", map[string]string{
 		"fieldid":     fieldid,
 		"objid":       objid,
 		"excludeSelf": excludeSelfFlag(includeSelf),
-	}
-	// Send request
-	res, err := dg.QueryDql("getTopRoles", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	data_dup, err := DecodeDql[[]model.RoleExt](r.All)
+	data_dup, err := DecodeDql[[]model.RoleExt](results)
 	if err != nil {
 		return nil, err
 	}
@@ -975,25 +820,16 @@ func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]
 
 // Get all sub roles
 func (dg Dgraph) GetSubRoles(fieldid string, objid string, includeSelf bool) ([]model.RoleExt, error) {
-	maps := map[string]string{
+	results, err := dg.Meta("getSubRoles", map[string]string{
 		"fieldid":     fieldid,
 		"objid":       objid,
 		"excludeSelf": excludeSelfFlag(includeSelf),
-	}
-	// Send request
-	res, err := dg.QueryDql("getSubRoles", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil, err
-	}
-
-	data_dup, err := DecodeDql[[]model.RoleExt](r.All)
+	data_dup, err := DecodeDql[[]model.RoleExt](results)
 	if err != nil {
 		return nil, err
 	}
@@ -1029,7 +865,7 @@ func (dg Dgraph) GetSubProjects(fieldid string, objid string, includeSelf bool) 
 	if err != nil {
 		return nil, err
 	}
-	return DecodeDqlSlice[ProjectFull](results)
+	return DecodeDql[[]ProjectFull](results)
 }
 
 func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, error) {
@@ -1243,44 +1079,56 @@ func (dg Dgraph) GetChildren(nameid string) ([]string, error) {
 	return result, nil
 }
 
+// nodeParentNameids is a decode target for GetParents DQL results.
+// The @recurse + @normalize query may return nameid as a string (single parent)
+// or []any (multiple ancestors), so Nameid is typed as any.
+type nodeParentNameids struct {
+	Parent []struct {
+		Nameid any `json:"nameid"`
+	} `json:"parent"`
+}
+
 // Get path to root
 func (dg Dgraph) GetParents(nameid string) ([]string, error) {
-	// Format Query
-	maps := map[string]string{
+	res, err := dg.QueryDql("getParents", map[string]string{
 		"nameid": nameid,
-	}
-	// Send request
-	res, err := dg.QueryDql("getParents", maps)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	// Decode response
 	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
+	if err = json.Unmarshal(res.Json, &r); err != nil {
 		return nil, err
 	}
 
-	var data []string
 	if len(r.All) > 1 {
 		return nil, fmt.Errorf("Got multiple object for term: %s", nameid)
-	} else if len(r.All) == 1 {
-		// f%$*µ%ing decoding
-		parents := r.All[0]["Node.parent"]
-		if parents == nil {
-			return data, err
-		}
-		switch p := parents.([]any)[0].(model.JsonAtom)["Node.nameid"].(type) {
-		case []any:
-			for _, x := range p {
-				data = append(data, x.(string))
+	}
+	if len(r.All) != 1 {
+		return nil, nil
+	}
+
+	data, err := DecodeDql[nodeParentNameids](r.All[0])
+	if err != nil {
+		return nil, err
+	}
+	if len(data.Parent) == 0 {
+		return nil, nil
+	}
+
+	var result []string
+	switch v := data.Parent[0].Nameid.(type) {
+	case string:
+		result = append(result, v)
+	case []any:
+		for _, x := range v {
+			if s, ok := x.(string); ok {
+				result = append(result, s)
 			}
-		case string:
-			data = append(data, p)
 		}
 	}
-	return data, err
+	return result, nil
 }
 
 // tensionSearchData is a decode target for GetTensionSearchData DQL results.
@@ -1431,7 +1279,7 @@ func Meta[T any](f string, maps map[string]string) ([]T, error) {
 	if err != nil {
 		return nil, err
 	}
-	return DecodeDqlSlice[T](results)
+	return DecodeDql[[]T](results)
 }
 
 // Gamma executes a custom DQL query/mutation and decodes results into typed values.
@@ -1440,5 +1288,5 @@ func Gamma[T any](q QueryMut, maps map[string]string) ([]T, error) {
 	if err != nil {
 		return nil, err
 	}
-	return DecodeDqlSlice[T](results)
+	return DecodeDql[[]T](results)
 }

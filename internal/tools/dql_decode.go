@@ -22,22 +22,10 @@ package tools
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"strings"
 )
-
-// DecodeDqlSlice converts a slice of raw DQL maps into typed values using DecodeDql.
-func DecodeDqlSlice[T any](results []map[string]any) ([]T, error) {
-	out := make([]T, 0, len(results))
-	for _, m := range results {
-		v, err := DecodeDql[T](m)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, v)
-	}
-	return out, nil
-}
 
 // DecodeDql decodes a DQL result into a typed value.
 // raw can be map[string]any (single record) or []map[string]any (slice).
@@ -60,7 +48,7 @@ func DecodeDql[T any](raw any) (T, error) {
 		}
 		cleaned = out
 	default:
-		cleaned = raw
+		return result, fmt.Errorf("DecodeDql: unsupported input type %T", raw)
 	}
 	b, err := json.Marshal(cleaned)
 	if err != nil {
@@ -70,14 +58,30 @@ func DecodeDql[T any](raw any) (T, error) {
 	return result, err
 }
 
+// cleanSlice applies a map-cleaning function recursively to []any elements.
+// Non-map elements are copied as-is.
+func cleanSlice(s []any, fn func(map[string]any) map[string]any) []any {
+	out := make([]any, len(s))
+	for i, x := range s {
+		if elem, ok := x.(map[string]any); ok {
+			out[i] = fn(elem)
+		} else {
+			out[i] = x
+		}
+	}
+	return out
+}
+
 // CleanDqlMap applies deep DQL name cleaning to a raw DQL result map.
 // Strips composite prefixes ("Node.name" → "name"), renames "uid" → "id",
 // and recursively cleans nested maps and arrays.
 func CleanDqlMap(m map[string]any) map[string]any {
 	out := make(map[string]any, len(m))
 	for k, v := range m {
-		ks := strings.Split(k, ".")
-		nk := ks[len(ks)-1]
+		nk := k
+		if i := strings.LastIndex(k, "."); i >= 0 {
+			nk = k[i+1:]
+		}
 
 		if nk == "uid" {
 			nk = "id"
@@ -88,12 +92,9 @@ func CleanDqlMap(m map[string]any) map[string]any {
 		case map[string]any:
 			nv = CleanDqlMap(CleanAliasedMap(t))
 		case []any:
-			for i, x := range t {
-				if m, ok := x.(map[string]any); ok {
-					t[i] = CleanDqlMap(CleanAliasedMap(m))
-				}
-			}
-			nv = t
+			nv = cleanSlice(t, func(elem map[string]any) map[string]any {
+				return CleanDqlMap(CleanAliasedMap(elem))
+			})
 		default:
 			nv = t
 		}
@@ -105,17 +106,15 @@ func CleanDqlMap(m map[string]any) map[string]any {
 
 var endDigits = regexp.MustCompile(`[0-9]+$`)
 
-// CleanAliasedMap copy the input map by renaming all the keys
+// CleanAliasedMap copies the input map by renaming all the keys
 // recursively by removing trailing integers.
 // @DEBUG: how to better handle aliasing (check gqlgen)
 func CleanAliasedMap(m map[string]any) map[string]any {
 	out := make(map[string]any, len(m))
 	for k, v := range m {
-		var nk string
-		if IsDigit(k[len(k)-1]) {
+		nk := k
+		if len(k) > 0 && IsDigit(k[len(k)-1]) {
 			nk = endDigits.ReplaceAllString(k, "")
-		} else {
-			nk = k
 		}
 
 		var nv any
@@ -123,12 +122,7 @@ func CleanAliasedMap(m map[string]any) map[string]any {
 		case map[string]any:
 			nv = CleanAliasedMap(t)
 		case []any:
-			for i, x := range t {
-				if m, ok := x.(map[string]any); ok {
-					t[i] = CleanAliasedMap(m)
-				}
-			}
-			nv = t
+			nv = cleanSlice(t, CleanAliasedMap)
 		default:
 			nv = t
 		}

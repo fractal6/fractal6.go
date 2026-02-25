@@ -10,7 +10,7 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 | 6 | DQL template injection safety | High | Medium | Critical |
 | 5 | Structured error handling | High | Medium | High |
 | 1 | Split dql.go | Medium | Low | High |
-| 4 | Remove dot-imports | Medium | Low | High |
+| 4 | ~~Remove dot-imports~~ | Medium | Low | High |
 | 8 | Extract business logic from hooks | High | High | High |
 | 3 | Replace reflection with generics | Medium | Medium | Medium (mostly done) |
 | 14 | Database interface abstraction | Medium | Medium | Medium |
@@ -30,9 +30,9 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 **Problem:** `dql.go` is the largest source file. It mixes DQL query templates, payload strings, query execution methods, and data transformation utilities in a single file.
 
 **Recommendation:**
-- Extract DQL templates into a `db/dql_templates.go` (or use embedded `.dql` files with `//go:embed`)
-- Extract payload definitions into `db/payloads.go`
-- Keep execution methods (`Meta()`, `Gamma()`, `QueryDql()`, generic helpers `Meta[T]`/`Gamma[T]`/`First[T]`) in `dql.go`
+- ~~Extract DQL templates into a `db/dql_templates.go` (or use embedded `.dql` files with `//go:embed`)~~
+- ~~Extract payload definitions into `db/payloads.go`~~
+- ~~Keep execution methods (`Meta()`, `Gamma()`, `QueryDql()`, generic helpers `Meta[T]`/`Gamma[T]`/`First[T]`) in `dql.go`~~
 - ~~Extract data mapping helpers (`CleanCompositeName`, `Map2Struct` wrappers) into `db/mappers.go`~~ (Done: `DecodeDql[T]` generic helper in `internal/tools/dql_decode.go` replaces all DQL mapstructure boilerplate)
 
 **Benefit:** Easier navigation, clear separation between query definitions and execution logic. The existing `@refactor` comment at line 38 already acknowledges this need.
@@ -67,7 +67,7 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 - Register typed handlers per @meta field instead of relying on runtime type switching
 - ~~Replace `Map2Struct` reflection with explicit struct mapping functions for known types (`Event`, `EventCount`)~~ (Done: `Map2Struct` now uses `json.Marshal/Unmarshal`, `meta()` uses `reflect.New` + JSON)
 - ~~Migrate standalone `Map2Struct` callers to `DecodeDql[T]`~~ (Done: all call sites migrated; `Map2Struct` deleted)
-- ~~Factorize `Meta1`/`Gamma1` into generic package-level `db.Meta[T]`/`db.Gamma[T]` + `First[T]`~~ (Done: `Meta1`/`Gamma1` deleted; all call sites migrated to `First(db.Meta[T](...))` or `First(db.Gamma[T](...))`; `First[T]` and `DecodeDqlSlice[T]` moved to `internal/tools/dql_decode.go`)
+- ~~Factorize `Meta1`/`Gamma1` into generic package-level `db.Meta[T]`/`db.Gamma[T]` + `First[T]`~~ (Done: `Meta1`/`Gamma1` deleted; all call sites migrated to `First(db.Meta[T](...))` or `First(db.Gamma[T](...))`; `First[T]` and `DecodeDql[T]` moved to `internal/tools/dql_decode.go`; `DecodeDqlSlice` removed — unified on `DecodeDql[[]T]`)
 
 **Current state:** The DQL data mapping layer is now fully generic. The remaining reflection is in `meta()` (resolver.go) which dynamically dispatches `@meta` field results — this requires either per-field typed handlers or staying with reflection since `@meta` operates on schema-declared types unknown at compile time.
 
@@ -75,18 +75,6 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 
 ---
 
-## 4. Eliminate Dot-Import of `tools` Package
-
-**Problem:** The `tools` package is imported with dot-import (`. "fractale/fractal6.go/internal/tools"`) across nearly every package (`graph/`, `db/`, `web/auth/`). This pollutes the namespace and makes it hard to trace where functions come from.
-
-**Recommendation:**
-- Replace `. "fractale/fractal6.go/internal/tools"` with `"fractale/fractal6.go/internal/tools"` (or alias like `t "..."`)
-- Prefix all calls with `tools.` (e.g., `tools.LogErr(...)`, `tools.CleanString(...)`)
-- Consider splitting `internal/tools/` into focused packages (`internal/tools/strutil`, `internal/tools/errutil`, `internal/tools/crypto`)
-
-**Benefit:** Explicit dependencies, easier code navigation with IDE tooling, prevents accidental name collisions.
-
----
 
 ## 5. Structured Error Handling
 

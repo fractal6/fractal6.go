@@ -140,14 +140,14 @@ func TestDecodeDql_EmptySlice(t *testing.T) {
 	}
 }
 
-func TestDecodeDqlSlice_MultipleRecords(t *testing.T) {
+func TestDecodeDql_MultipleRecords(t *testing.T) {
 	input := []map[string]any{
 		{"name": "alice", "username": "alice123"},
 		{"name": "bob", "username": "bob456"},
 	}
-	results, err := DecodeDqlSlice[map[string]any](input)
+	results, err := DecodeDql[[]map[string]any](input)
 	if err != nil {
-		t.Fatalf("DecodeDqlSlice error: %v", err)
+		t.Fatalf("DecodeDql slice error: %v", err)
 	}
 	if len(results) != 2 {
 		t.Fatalf("expected 2 results, got %d", len(results))
@@ -160,17 +160,17 @@ func TestDecodeDqlSlice_MultipleRecords(t *testing.T) {
 	}
 }
 
-func TestDecodeDqlSlice_EmptySlice(t *testing.T) {
-	results, err := DecodeDqlSlice[map[string]any]([]map[string]any{})
+func TestDecodeDql_EmptySliceFromMaps(t *testing.T) {
+	results, err := DecodeDql[[]map[string]any]([]map[string]any{})
 	if err != nil {
-		t.Fatalf("DecodeDqlSlice error: %v", err)
+		t.Fatalf("DecodeDql slice error: %v", err)
 	}
 	if len(results) != 0 {
 		t.Errorf("expected empty results, got %d", len(results))
 	}
 }
 
-func TestDecodeDqlSlice_TypedStruct(t *testing.T) {
+func TestDecodeDql_TypedStructSlice(t *testing.T) {
 	input := []map[string]any{
 		{
 			"uid":         "0x1",
@@ -178,9 +178,9 @@ func TestDecodeDqlSlice_TypedStruct(t *testing.T) {
 			"Node.name":   "Circle",
 		},
 	}
-	results, err := DecodeDqlSlice[model.Node](input)
+	results, err := DecodeDql[[]model.Node](input)
 	if err != nil {
-		t.Fatalf("DecodeDqlSlice typed error: %v", err)
+		t.Fatalf("DecodeDql typed slice error: %v", err)
 	}
 	if len(results) != 1 {
 		t.Fatalf("expected 1 result, got %d", len(results))

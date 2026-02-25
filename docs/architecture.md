@@ -511,7 +511,7 @@ col, err := First(db.Gamma[ProjectColumnLoc](QueryColumnLoc, maps))
 tension, err := First(db.Meta[model.Tension]("getTensionSimple", maps))
 ```
 
-`db.Meta[T]` and `db.Gamma[T]` call `GetDB()` internally and use `DecodeDqlSlice[T]` (from `internal/tools/dql_decode.go`) for JSON-based type conversion. `First[T]` and `DecodeDqlSlice[T]` live in `internal/tools/dql_decode.go` as pure generic helpers with no db dependency. These coexist with the untyped `(dg Dgraph).Meta()` / `(dg Dgraph).Gamma()` methods, which are still used for mutations that discard results or need raw map access (e.g., `resolver.go` reflection-based `meta()`).
+`db.Meta[T]` and `db.Gamma[T]` call `GetDB()` internally and use `DecodeDql[[]T]` (from `internal/tools/dql_decode.go`) for JSON-based type conversion. `First[T]` and `DecodeDql[T]` live in `internal/tools/dql_decode.go` as pure generic helpers with no db dependency. These coexist with the untyped `(dg Dgraph).Meta()` / `(dg Dgraph).Gamma()` methods, which are still used for mutations that discard results or need raw map access (e.g., `resolver.go` reflection-based `meta()`).
 
 ### Connection Setup
 
