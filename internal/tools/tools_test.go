@@ -139,3 +139,25 @@ func TestStructMap_Roundtrip(t *testing.T) {
 		t.Errorf("expected rootnameid=org in map, got %v", m["rootnameid"])
 	}
 }
+
+func TestCleanDqlKey(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		in, want string
+	}{
+		{"Node.name", "name"},
+		{"Node.nameid", "nameid"},
+		{"Post.createdBy", "createdBy"},
+		{"User.username", "username"},
+		{"Tension.type_", "type_"},
+		{"uid", "id"},
+		{"name", "name"}, // no prefix
+		{"a.b.c", "c"},   // multiple dots, takes last
+		{"Node.first_link", "first_link"},
+	}
+	for _, tt := range tests {
+		if got := CleanDqlKey(tt.in); got != tt.want {
+			t.Errorf("CleanDqlKey(%q) = %q, want %q", tt.in, got, tt.want)
+		}
+	}
+}

@@ -32,163 +32,54 @@ import (
 	. "fractale/fractal6.go/internal/tools"
 )
 
-// @refactor: modularize generic function (GetFilterBy*) (returns (any, error}
-//            as Traverse([list of key to traver], [list of payload to get])
-//  Use Meta() for all other queries... (return []any)
-
-// @uture: with Go.18 rewrite this module with generics
 //
-// make QueryMut and Queries/Mutations {
-//      Q string // query blocks
-//      S string // mutations block (for dql mutaitons)
-//      T expected type/
-// }
-//
-// rewrite Meta and Meta_patch for as the main generic function to uses the librairies of queries,
-// replacing all the singular functions here.
-
-//
-// Gprc/DQL requests
+// DQL requests
 //
 
-// Count count the number of object in fieldName attribute for given type and id
+// Count counts the number of objects in fieldName attribute for given type and id.
 // Returns: int or -1 if nothing is found.
 func (dg Dgraph) Count(id string, fieldName string) int {
-	// Format Query
-	maps := map[string]string{
+	res, err := dg.QueryDql("count", map[string]string{
 		"id": id, "fieldName": fieldName,
-	}
-	// Send request
-	res, err := dg.QueryDql("count", maps)
+	})
 	if err != nil {
 		log.Printf("Error in db.Count: %v", err)
 		return -1
 	}
-
-	// Decode response
-	var r DqlRespCount
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		log.Printf("Error in db.Count: %v", err)
-		return -1
-	}
-
-	// Extract result
-	if len(r.All) == 0 {
-		return -1
-	}
-
-	values := make([]int, 0, len(r.All[0]))
-	for _, v := range r.All[0] {
-		values = append(values, v)
-	}
-
-	return values[0]
+	return unmarshalCountResp(res)
 }
 
 func (dg Dgraph) Count2(f1, v1, f2, v2, fieldName string) int {
-	// Format Query
-	maps := map[string]string{
-		"f1":        f1,
-		"v1":        v1,
-		"f2":        f2,
-		"v2":        v2,
-		"fieldName": fieldName,
-	}
-	// Send request
-	res, err := dg.QueryDql("count2", maps)
+	res, err := dg.QueryDql("count2", map[string]string{
+		"f1": f1, "v1": v1, "f2": f2, "v2": v2, "fieldName": fieldName,
+	})
 	if err != nil {
 		log.Printf("Error in db.Count2: %v", err)
 		return -1
 	}
-
-	// Decode response
-	var r DqlRespCount
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		log.Printf("Error in db.Count2: %v", err)
-		return -1
-	}
-
-	// Extract result
-	if len(r.All) == 0 {
-		return -1
-	}
-
-	values := make([]int, 0, len(r.All[0]))
-	for _, v := range r.All[0] {
-		values = append(values, v)
-	}
-
-	return values[0]
+	return unmarshalCountResp(res)
 }
 
 func (dg Dgraph) CountHas(fieldName string) int {
-	// Format Query
-	maps := map[string]string{
+	res, err := dg.QueryDql("countHas", map[string]string{
 		"fieldName": fieldName,
-	}
-	// Send request
-	res, err := dg.QueryDql("countHas", maps)
+	})
 	if err != nil {
 		log.Printf("Error in db.CountHas: %v", err)
 		return -1
 	}
-
-	// Decode response
-	var r DqlRespCount
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		log.Printf("Error in db.CountHas: %v", err)
-		return -1
-	}
-
-	// Extract result
-	if len(r.All) == 0 {
-		return -1
-	}
-
-	values := make([]int, 0, len(r.All[0]))
-	for _, v := range r.All[0] {
-		values = append(values, v)
-	}
-
-	return values[0]
+	return unmarshalCountResp(res)
 }
 
 func (dg Dgraph) CountHas2(fieldName, f2, v2 string) int {
-	// Format Query
-	maps := map[string]string{
-		"fieldName": fieldName,
-		"f2":        f2,
-		"v2":        v2,
-	}
-	// Send request
-	res, err := dg.QueryDql("countHas2", maps)
+	res, err := dg.QueryDql("countHas2", map[string]string{
+		"fieldName": fieldName, "f2": f2, "v2": v2,
+	})
 	if err != nil {
 		log.Printf("Error in db.CountHas2: %v", err)
 		return -1
 	}
-
-	// Decode response
-	var r DqlRespCount
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		log.Printf("Error in db.CountHas2: %v", err)
-		return -1
-	}
-
-	// Extract result
-	if len(r.All) == 0 {
-		return -1
-	}
-
-	values := make([]int, 0, len(r.All[0]))
-	for _, v := range r.All[0] {
-		values = append(values, v)
-	}
-
-	return values[0]
+	return unmarshalCountResp(res)
 }
 
 func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]any, error) {
@@ -231,7 +122,6 @@ func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]any, er
 
 // Probe if an object exists.
 func (dg Dgraph) Exists(fieldName string, value string, filter *string) (bool, error) {
-	// Format Query
 	maps := map[string]string{
 		"fieldName": fieldName,
 		"value":     value,
@@ -240,14 +130,11 @@ func (dg Dgraph) Exists(fieldName string, value string, filter *string) (bool, e
 	if filter != nil {
 		maps["filter"] = fmt.Sprintf(`@filter(%s)`, *filter)
 	}
-	// Send request
 	res, err := dg.QueryDql("exists", maps)
 	if err != nil {
 		return false, err
 	}
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return false, err
 	}
@@ -256,19 +143,14 @@ func (dg Dgraph) Exists(fieldName string, value string, filter *string) (bool, e
 
 // IsChild returns true is a node parent has the given child.
 func (dg Dgraph) IsChild(parent, child string) (bool, error) {
-	// Format Query
-	maps := map[string]string{
+	res, err := dg.QueryDql("isChild", map[string]string{
 		"parent": parent,
 		"child":  child,
-	}
-	// Send request
-	res, err := dg.QueryDql("isChild", maps)
+	})
 	if err != nil {
 		return false, err
 	}
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return false, err
 	}
@@ -277,8 +159,6 @@ func (dg Dgraph) IsChild(parent, child string) (bool, error) {
 
 // Returns the uids of the objects if found.
 func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue *string) ([]string, error) {
-	result := []string{}
-	// Format Query
 	maps := map[string]string{
 		"fieldName": fieldName,
 		"value":     value,
@@ -287,17 +167,15 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
 	if filterName != nil {
 		maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, *filterName, *filterValue)
 	}
-	// Send request
 	res, err := dg.QueryDql("getID", maps)
 	if err != nil {
-		return result, err
+		return nil, err
 	}
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
-		return result, err
+		return nil, err
 	}
+	result := make([]string, 0, len(r.All))
 	for _, x := range r.All {
 		result = append(result, x["uid"].(string))
 	}
@@ -401,55 +279,39 @@ func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSourc
 }
 
 func (dg Dgraph) GetShortestPath(from string, to string) (float64, error) {
-	weight := 0.0
-	// Format Query
-	maps := map[string]string{
-		"from": from,
-		"to":   to,
-	}
-	// Send request
-	res, err := dg.QueryDql("getShortestPath", maps)
+	res, err := dg.QueryDql("getShortestPath", map[string]string{
+		"from": from, "to": to,
+	})
 	if err != nil {
-		return weight, err
+		return 0, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
-		return weight, err
+		return 0, err
 	}
 
 	if len(r.All) > 1 {
-		return weight, fmt.Errorf("Got multiple in DQL query")
-	} else if len(r.All) == 1 {
+		return 0, fmt.Errorf("Got multiple in DQL query")
+	}
+	if len(r.All) == 1 {
 		weight, ok := r.All[0]["weight"].(float64)
 		if !ok {
-			return weight, fmt.Errorf("Cannot extract weight from shortest path query")
-		} else {
-			return weight, err
+			return 0, fmt.Errorf("Cannot extract weight from shortest path query")
 		}
+		return weight, nil
 	}
-	return weight, err
+	return 0, nil
 }
 
 // Returns the user context
 func (dg Dgraph) GetUctxFull(fieldid string, userid string) (*model.UserCtx, error) {
-	// Format Query
-	maps := map[string]string{
-		"fieldid": fieldid,
-		"userid":  userid,
-		"payload": userCtxPayload,
-	}
-	// Send request
-	res, err := dg.QueryDql("getUser", maps)
+	res, err := dg.QueryDql("getUser", map[string]string{
+		"fieldid": fieldid, "userid": userid, "payload": userCtxPayload,
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return nil, err
 	}
@@ -482,7 +344,6 @@ func (dg Dgraph) GetUctx(fieldid string, userid string) (*model.UserCtx, error) 
 
 // Returns the matching nodes
 func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
-	// Format Query
 	maps := map[string]string{
 		"regex": regex,
 		"payload": `{
@@ -491,32 +352,25 @@ func (dg Dgraph) GetNodes(regex string, isRoot bool) ([]model.Node, error) {
         }`,
 	}
 
-	// Send request
-	var res *api.Response
-	var err error
+	var op string
 	if isRoot {
-		res, err = dg.QueryDql("getNodesRoot", maps)
+		op = "getNodesRoot"
 	} else {
-		res, err = dg.QueryDql("getNodes", maps)
+		op = "getNodes"
 	}
+	res, err := dg.QueryDql(op, maps)
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return nil, err
 	}
-
-	data, err := DecodeDql[[]model.Node](r.All)
-	return data, err
+	return DecodeDql[[]model.Node](r.All)
 }
 
 // Returns the tension hook content
 func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.Tension, error) {
-	// Format Query
 	var maps map[string]string
 	if withBlob {
 		var blobFilter string
@@ -536,15 +390,11 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
 		}
 	}
 
-	// Send request
 	res, err := dg.QueryDql("getTensionHook", maps)
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return nil, err
 	}
@@ -569,13 +419,11 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
 
 // Returns the contract hook content
 func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
-	// Format Query
 	maps := map[string]string{
 		"id":      cid,
 		"payload": "{" + contractHookPayload + "}",
 	}
 
-	// Send request
 	var q string
 	if strings.Contains(cid, "#") {
 		q = "getContractHook2"
@@ -586,10 +434,7 @@ func (dg Dgraph) GetContractHook(cid string) (*model.Contract, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return nil, err
 	}
@@ -790,16 +635,11 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return nil, err
 	}
-
-	data, err := DecodeDql[[]model.TensionRef](r.All)
-	return data, err
+	return DecodeDql[[]model.TensionRef](r.All)
 }
 
 func (dg Dgraph) GetTensionsCount(q TensionQuery) (map[string]int, error) {
@@ -836,21 +676,12 @@ type tensionBlobRef struct {
 }
 
 func (dg Dgraph) GetLastBlobId(tid string) *string {
-	maps := map[string]string{"tid": tid}
-	// Send request
-	res, err := dg.QueryDql("getLastBlobId", maps)
+	res, err := dg.QueryDql("getLastBlobId", map[string]string{"tid": tid})
 	if err != nil {
 		return nil
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return nil
-	}
-
-	if len(r.All) != 1 {
+	r, err := unmarshalDqlResp(res)
+	if err != nil || len(r.All) != 1 {
 		return nil
 	}
 
@@ -875,24 +706,12 @@ type nodeChildRefs struct {
 
 // Get all coordo roles in the given circle with an user linked.
 func (dg Dgraph) HasCoordos(nameid string) bool {
-	// Format Query
-	maps := map[string]string{
-		"nameid": nameid,
-	}
-	// Send request
-	res, err := dg.QueryDql("getCoordos", maps)
+	res, err := dg.QueryDql("getCoordos", map[string]string{"nameid": nameid})
 	if err != nil {
 		return false
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
-	if err != nil {
-		return false
-	}
-
-	if len(r.All) != 1 {
+	r, err := unmarshalDqlResp(res)
+	if err != nil || len(r.All) != 1 {
 		return false
 	}
 
@@ -912,19 +731,11 @@ type nodeChildNameids struct {
 
 // Get children
 func (dg Dgraph) GetChildren(nameid string) ([]string, error) {
-	// Format Query
-	maps := map[string]string{
-		"nameid": nameid,
-	}
-	// Send request
-	res, err := dg.QueryDql("getChildren", maps)
+	res, err := dg.QueryDql("getChildren", map[string]string{"nameid": nameid})
 	if err != nil {
 		return nil, err
 	}
-
-	// Decode response
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return nil, err
 	}
@@ -959,15 +770,12 @@ type nodeParentNameids struct {
 
 // Get path to root
 func (dg Dgraph) GetParents(nameid string) ([]string, error) {
-	res, err := dg.QueryDql("getParents", map[string]string{
-		"nameid": nameid,
-	})
+	res, err := dg.QueryDql("getParents", map[string]string{"nameid": nameid})
 	if err != nil {
 		return nil, err
 	}
-
-	var r DqlResp
-	if err = json.Unmarshal(res.Json, &r); err != nil {
+	r, err := unmarshalDqlResp(res)
+	if err != nil {
 		return nil, err
 	}
 
@@ -1013,14 +821,11 @@ type tensionSearchData struct {
 // GetTensionSearchData fetches label names and the first comment text for a tension.
 // Used to build the denormalized Post.message search index.
 func (dg Dgraph) GetTensionSearchData(tid string) ([]string, string, error) {
-	maps := map[string]string{"tid": tid}
-	res, err := dg.QueryDql("getTensionSearchData", maps)
+	res, err := dg.QueryDql("getTensionSearchData", map[string]string{"tid": tid})
 	if err != nil {
 		return nil, "", err
 	}
-
-	var r DqlResp
-	err = json.Unmarshal(res.Json, &r)
+	r, err := unmarshalDqlResp(res)
 	if err != nil {
 		return nil, "", err
 	}
@@ -1126,13 +931,40 @@ func (dg Dgraph) DeepDelete(t string, id string) error {
 // Generic DQL helpers
 //
 
-// decodeDqlResp decodes an api.Response into cleaned DQL result maps.
-func decodeDqlResp(res *api.Response) ([]map[string]any, error) {
-	if res == nil {
-		return nil, nil
-	}
+// unmarshalDqlResp unmarshals an api.Response into raw DQL result maps (no cleaning).
+// Use this when passing results to DecodeDql which applies CleanDqlMap internally.
+func unmarshalDqlResp(res *api.Response) (DqlResp, error) {
 	var r DqlResp
+	if res == nil {
+		return r, nil
+	}
 	if err := json.Unmarshal(res.Json, &r); err != nil {
+		return r, err
+	}
+	return r, nil
+}
+
+// unmarshalCountResp unmarshals an api.Response into a count result
+// and returns the first count value, or -1 if empty/error.
+func unmarshalCountResp(res *api.Response) int {
+	var r DqlRespCount
+	if err := json.Unmarshal(res.Json, &r); err != nil {
+		return -1
+	}
+	if len(r.All) == 0 {
+		return -1
+	}
+	for _, v := range r.All[0] {
+		return v
+	}
+	return -1
+}
+
+// decodeDqlResp decodes an api.Response into cleaned DQL result maps.
+// Used by Meta()/Gamma() which return pre-cleaned maps.
+func decodeDqlResp(res *api.Response) ([]map[string]any, error) {
+	r, err := unmarshalDqlResp(res)
+	if err != nil || len(r.All) == 0 {
 		return nil, err
 	}
 	out := make([]map[string]any, len(r.All))

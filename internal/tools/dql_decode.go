@@ -72,11 +72,11 @@ func cleanSlice(s []any, fn func(map[string]any) map[string]any) []any {
 	return out
 }
 
-// CleanDqlKey strips the "Type." prefix from a DQL field key and renames "uid" to "id".
+// cleanDqlKey strips the "Type." prefix from a DQL field key and renames "uid" to "id".
 //
-//	CleanDqlKey("Node.nameid") → "nameid"
-//	CleanDqlKey("uid")         → "id"
-func CleanDqlKey(key string) string {
+//	cleanDqlKey("Node.nameid") → "nameid"
+//	cleanDqlKey("uid")         → "id"
+func cleanDqlKey(key string) string {
 	if i := strings.LastIndex(key, "."); i >= 0 {
 		key = key[i+1:]
 	}
@@ -92,7 +92,7 @@ func CleanDqlKey(key string) string {
 func CleanDqlMap(m map[string]any) map[string]any {
 	out := make(map[string]any, len(m))
 	for k, v := range m {
-		nk := CleanDqlKey(k)
+		nk := cleanDqlKey(k)
 
 		var nv any
 		switch t := v.(type) {
@@ -152,7 +152,7 @@ func DecodeField(results []map[string]any, fieldName string) (any, error) {
 	if len(strings.Fields(fieldName)) > 1 {
 		return results[0], nil
 	}
-	return results[0][CleanDqlKey(fieldName)], nil
+	return results[0][cleanDqlKey(fieldName)], nil
 }
 
 // DecodeSubField extracts a sub-field from a single-result cleaned DQL map slice.
@@ -168,9 +168,9 @@ func DecodeSubField(results []map[string]any, fieldNameSource, fieldNameTarget s
 	}
 
 	multiField := len(strings.Fields(fieldNameTarget)) > 1
-	cleanTarget := CleanDqlKey(fieldNameTarget)
+	cleanTarget := cleanDqlKey(fieldNameTarget)
 
-	switch x := results[0][CleanDqlKey(fieldNameSource)].(type) {
+	switch x := results[0][cleanDqlKey(fieldNameSource)].(type) {
 	case map[string]any:
 		if multiField {
 			return x, nil
@@ -209,11 +209,11 @@ func DecodeSubSubField(results []map[string]any, fieldNameSource, fieldNameTarge
 		return nil, nil
 	}
 
-	x, ok := results[0][CleanDqlKey(fieldNameSource)].(map[string]any)
+	x, ok := results[0][cleanDqlKey(fieldNameSource)].(map[string]any)
 	if !ok || x == nil {
 		return nil, nil
 	}
-	y, ok := x[CleanDqlKey(fieldNameTarget)].(map[string]any)
+	y, ok := x[cleanDqlKey(fieldNameTarget)].(map[string]any)
 	if !ok || y == nil {
 		return nil, nil
 	}
@@ -221,7 +221,7 @@ func DecodeSubSubField(results []map[string]any, fieldNameSource, fieldNameTarge
 	if len(strings.Fields(subFieldNameTarget)) > 1 {
 		return y, nil
 	}
-	return y[CleanDqlKey(subFieldNameTarget)], nil
+	return y[cleanDqlKey(subFieldNameTarget)], nil
 }
 
 // Dedupe removes duplicate items from a slice, keeping the first occurrence.
