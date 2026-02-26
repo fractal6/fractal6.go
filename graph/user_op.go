@@ -81,7 +81,7 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 			return false, LogErr("access denied", fmt.Errorf("Doh, you have active roles in this organisation. Please leave your roles first."))
 		} else if *node.RoleType == model.RoleTypePending {
 			return false, LogErr("access denied", fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation."))
-		} else if *node.RoleType == model.RoleTypePending {
+		} else if *node.RoleType == model.RoleTypeRetired {
 			return false, LogErr("access denied", fmt.Errorf("You are already retired from this role."))
 		} else if *node.RoleType == model.RoleTypeOwner {
 			// Owner can leave if not alone

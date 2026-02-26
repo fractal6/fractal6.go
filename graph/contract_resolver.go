@@ -124,7 +124,7 @@ func addContractHook(ctx context.Context, obj any, next graphql.Resolver) (any, 
 	}
 	id := data.(*model.AddContractPayload).Contract[0].ID
 	tid := *input.Tension.ID
-	cid := *&input.Contractid
+	cid := input.Contractid
 
 	// Validate and process Blob Event
 	event := StructMap[model.EventRef](*input.Event)
@@ -205,7 +205,7 @@ func updateContractHook(ctx context.Context, obj any, next graphql.Resolver) (an
 				return data, err
 			}
 			// Notify users by email
-			if input.Set.Comments != nil && len(input.Set.Comments) > 0 {
+			if len(input.Set.Comments) > 0 {
 				PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: contract.Tension.ID, Contract: contract, ContractEvent: model.NewComment})
 			}
 			return data, err
@@ -235,7 +235,7 @@ func deleteContractHook(ctx context.Context, obj any, next graphql.Resolver) (an
 
 	// AUTHORIZATION
 	// --
-	var ok bool = false
+	var ok bool
 	// isAuthor
 	author, err := db.GetDB().GetSubFieldById(ids[0], "Post.createdBy", "User.username")
 	if err != nil {

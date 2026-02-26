@@ -34,19 +34,17 @@ import (
 // Take action based on the given Event. The targeted tension is fetch (see TensionHookPayload).
 // All events in History must pass.
 func contractEventHook(uctx *model.UserCtx, cid, tid string, event *model.EventRef, bid *string) (bool, *model.Contract, error) {
-	var ok bool = true
+	var ok bool
 	var err error
-	var tension *model.Tension
 	if event == nil {
 		return false, nil, fmt.Errorf("No event given.")
 	}
-	if tension == nil {
-		// Fetch Tension, target Node and blob charac (last if bid undefined)
-		// @DEBUG: blob is not always needed (Moving non node tension, Invite, etc)
-		tension, err = db.GetDB().GetTensionHook(tid, true, nil)
-		if err != nil {
-			return false, nil, err
-		}
+
+	// Fetch Tension, target Node and blob charac (last if bid undefined)
+	// @DEBUG: blob is not always needed (Moving non node tension, Invite, etc)
+	tension, err := db.GetDB().GetTensionHook(tid, true, nil)
+	if err != nil {
+		return false, nil, err
 	}
 
 	// Fetch the contract
@@ -138,14 +136,14 @@ func voteEventHook(uctx *model.UserCtx, cid string) (bool, *model.Contract, erro
 
 // HasContractRight check if user has validation rights (Coordo right like).
 func HasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, error) {
-	event := StructMap[model.EventRef](contract.Event)
-
 	if contract == nil {
 		return false, fmt.Errorf("Contract not found")
 	}
 	if contract.Tension == nil {
 		return false, fmt.Errorf("Tension not found in contract")
 	}
+
+	event := StructMap[model.EventRef](contract.Event)
 
 	// Get linked tension
 	tension, err := db.GetDB().GetTensionHook(contract.Tension.ID, false, nil)

@@ -109,35 +109,6 @@ func setContextWith(ctx context.Context, obj any, n string) (context.Context, st
 	return ctx, val, err
 }
 
-func getNestedObj(obj any, field string) any {
-	var source model.JsonAtom
-	var target any
-
-	source = obj.(model.JsonAtom)
-	fields := strings.Split(field, ".")
-
-	for i, f := range fields {
-		target = source[f]
-		if target == nil {
-			return nil
-		}
-		if i < len(fields)-1 {
-			source = target.(model.JsonAtom)
-		}
-	}
-
-	return target
-}
-
-func get(obj model.JsonAtom, field string, deflt any) any {
-	v := obj[field]
-	if v == nil {
-		return deflt
-	}
-
-	return v
-}
-
 //
 // qqlgen code to extract fields
 //
@@ -164,7 +135,7 @@ func GetNestedPreloads(ctx *graphql.RequestContext, fields []graphql.CollectedFi
 				preloads = append(preloads, fmt.Sprintf("... on %s {", *currentEnum))
 			} else if *currentEnum != f.ObjectDefinition.Name {
 				currentEnum = &f.ObjectDefinition.Name
-				preloads = append(preloads, fmt.Sprintf("}"))
+				preloads = append(preloads, "}")
 				preloads = append(preloads, fmt.Sprintf("... on %s {", *currentEnum))
 			}
 		}

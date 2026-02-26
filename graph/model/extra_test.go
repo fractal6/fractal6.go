@@ -55,7 +55,7 @@ func TestUserCreds(t *testing.T) {
 		var got UserCreds
 		err := json.Unmarshal(b, &got)
 		if err != nil {
-			t.Errorf(err.Error())
+			t.Error(err)
 		}
 
 		if !reflect.DeepEqual(got, test.want) {

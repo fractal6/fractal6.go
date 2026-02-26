@@ -124,7 +124,7 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 		if err != nil {
 			return ok, err
 		}
-		if parentIsArchived != nil && parentIsArchived.(bool) == true {
+		if parentIsArchived != nil && parentIsArchived.(bool) {
 			return ok, fmt.Errorf("Cannot unarchive node with archived parent. Please unarchive parent first.")
 		}
 		archiveFlag = strconv.FormatBool(false)
@@ -475,7 +475,9 @@ func MaybeAddPendingNode(username string, tension *model.Tension) (bool, error) 
 		err = db.GetDB().AddUserRole(username, nid)
 		ok = true
 	} else if node["first_link"] == nil {
-		err = db.GetDB().AddUserRole(username, nid)
+		if err = db.GetDB().AddUserRole(username, nid); err != nil {
+			return ok, err
+		}
 		err = db.GetDB().UpgradeMember(nid, model.RoleTypePending)
 	} else if node["role_type"].(string) == string(model.RoleTypeRetired) {
 		err = db.GetDB().UpgradeMember(nid, model.RoleTypePending)

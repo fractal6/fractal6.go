@@ -107,7 +107,7 @@ func DelUser(args []string) {
 	if err != nil {
 		panic(err)
 	} else if g == nil {
-		g, err = auth.CreateNewUser(ghost)
+		_, err = auth.CreateNewUser(ghost)
 		if err != nil {
 			panic(err)
 		}

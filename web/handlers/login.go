@@ -69,6 +69,10 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 
 	// Try to get PendingUser
 	pending_, err := db.GetDB().GetFieldByEq("PendingUser.email", creds.Email, "uid PendingUser.updatedAt")
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	pending, _ := pending_.(model.JsonAtom)
 
 	// Delay to prevent attack and user creation hijacking

@@ -895,25 +895,25 @@ func (dg Dgraph) DeepDelete(t string, id string) error {
 
 	switch t {
 	case "tension":
-		reverse = fmt.Sprintf(`
+		reverse = `
             uid(rid_emitter) <Node.tensions_out> uid(id) .
             uid(rid_receiver) <Node.tensions_in> uid(id) .
-        `)
+        `
 	case "contract":
-		reverse = fmt.Sprintf(`
+		reverse = `
             uid(rid) <Tension.contracts> uid(id) .
             uid(candidates) <User.contracts> uid(id) .
             uid(user_pending) <PendingUser.contracts> uid(id) .
             uid(nodes) <Node.contracts> uid(votes) .
             uid(members) <User.events> uid(desync_events) .
             uid(desync_events) * * .
-        `)
+        `
 	default:
 		return fmt.Errorf("delete query not implemented for this type %s", t)
 	}
 
 	maps := map[string]string{"id": id}
-	query = dg.getDqlQuery("delete"+strings.Title(t), maps)
+	query = dg.getDqlQuery("delete"+strings.ToUpper(t[:1])+t[1:], maps)
 	mu := fmt.Sprintf(`
         %s
         uid(all_ids) * * .

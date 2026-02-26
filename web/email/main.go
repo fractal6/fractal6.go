@@ -541,12 +541,11 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		switch notif.Contract.Status {
 		case model.ContractStatusOpen:
 			if ui.Reason == model.ReasonIsInvited {
-				orga_name := recv
-				if x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name"); err != nil {
+				x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name")
+				if err != nil {
 					return err
-				} else {
-					orga_name = x.(string)
 				}
+				orga_name := x.(string)
 				subject = fmt.Sprintf("[%s] You are invited to this organisation", recv)
 				payload = fmt.Sprintf(`Hi%s,<br><br> You have been invited by %s to join the organisation <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
                 Please click the link below to accept or reject the invitation:<br><a href="%s">%s</a>`, rcpt_name, author, recv, orga_name, url_redirect, url_redirect)

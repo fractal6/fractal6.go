@@ -26,11 +26,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
-	re "regexp"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	re "regexp"
 )
 
 func IsDigit(s byte) bool {
@@ -117,7 +118,7 @@ func ToGoNameFormat(name string) string {
 	}
 	var l []string
 	for _, s := range strings.Split(name, "_") {
-		l = append(l, strings.Title(s))
+		l = append(l, strings.ToUpper(s[:1])+s[1:])
 	}
 	goName := strings.Join(l, "")
 	return goName

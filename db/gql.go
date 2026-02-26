@@ -120,7 +120,7 @@ var gqlQueries map[string]string = map[string]string{
 
 // Query data using GQL dgraph API. @auth rules will apply.
 func (dg Dgraph) Query(uctx model.UserCtx, vertex string, k string, values []string, queryGraph string) ([]map[string]string, error) {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "query" + Vertex
 
 	var i int
@@ -160,7 +160,7 @@ func (dg Dgraph) Query(uctx model.UserCtx, vertex string, k string, values []str
 
 // Get a new vertex (NOT USED YET...)
 func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string, graph string) (any, error) {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "get" + Vertex
 	queryGraph := graph
 
@@ -188,7 +188,7 @@ func (dg Dgraph) Get(uctx model.UserCtx, vertex string, input map[string]string,
 
 // Add a new vertex
 func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input any) (string, error) {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "add" + Vertex
 	inputType := "Add" + Vertex + "Input"
 	queryGraph := vertex + ` { id }`
@@ -218,7 +218,7 @@ func (dg Dgraph) Add(uctx model.UserCtx, vertex string, input any) (string, erro
 
 // Update a vertex
 func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input any) error {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "update" + Vertex
 	inputType := "Update" + Vertex + "Input"
 	queryGraph := vertex + ` { id }`
@@ -243,7 +243,7 @@ func (dg Dgraph) Update(uctx model.UserCtx, vertex string, input any) error {
 
 // Delete a vertex
 func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input any) error {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "delete" + Vertex
 	inputType := Vertex + "Filter"
 	queryGraph := vertex + ` { id }`
@@ -272,7 +272,7 @@ func (dg Dgraph) Delete(uctx model.UserCtx, vertex string, input any) error {
 
 // Add multiple new vertex
 func (dg Dgraph) AddMany(uctx model.UserCtx, vertex string, input any) ([]string, error) {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "add" + Vertex
 	inputType := "Add" + Vertex + "Input"
 	queryGraph := vertex + ` { id }`
@@ -357,14 +357,13 @@ func GetDirectives(pg string) (string, string) {
 
 // Query codec, to be used in the resolver functions
 func (dg Dgraph) QueryExtra(uctx model.UserCtx, vertex string, filter any, order any, first *int, offset *int, qg string, data any) error {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "query" + Vertex
 	filterType := Vertex + "Filter"
 	orderType := Vertex + "Order"
 
 	// Build the string request
-	var queryInput string
-	queryInput = `(filter: $filter, order: $order, first: $first, offset: $offset)`
+	queryInput := `(filter: $filter, order: $order, first: $first, offset: $offset)`
 
 	// Marshal the inputs
 	filter_ := struct {
@@ -395,7 +394,7 @@ func (dg Dgraph) QueryExtra(uctx model.UserCtx, vertex string, filter any, order
 
 // Add codec, to be used in the resolver functions
 func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input any, upsert *bool, qg string, data any) error {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "add" + Vertex
 	inputType := "Add" + Vertex + "Input"
 	// queryGraph := vertex + " {" + qgraph + "}"
@@ -437,7 +436,7 @@ func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input any, upsert *
 
 // Update codec, to be used in the resolver functions
 func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input any, qg string, data any) error {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "update" + Vertex
 	inputType := "Update" + Vertex + "Input"
 	// queryGraph := vertex + " {" + qgraph + "}"
@@ -473,7 +472,7 @@ func (dg Dgraph) UpdateExtra(uctx model.UserCtx, vertex string, input any, qg st
 
 // Delete codec, to be used in the resolver functions
 func (dg Dgraph) DeleteExtra(uctx model.UserCtx, vertex string, input any, qg string, data any) error {
-	Vertex := strings.Title(vertex)
+	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "delete" + Vertex
 	inputType := Vertex + "Filter"
 	// queryGraph := vertex + " {" + qgraph + "}"

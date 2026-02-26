@@ -220,22 +220,6 @@ func Init() gen.Config {
 	return c
 }
 
-// https://stackoverflow.com/questions/58468134/how-to-compose-functions-in-go
-// @generics
-// @debug: do not workd with resolvers
-func compose(manyv ...func(ctx context.Context, obj any, next graphql.Resolver) (any, error)) func(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-	return func(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-		var err error
-		for _, v := range manyv {
-			obj, err = v(ctx, obj, next)
-			if err != nil {
-				return obj, err
-			}
-		}
-		return obj, err
-	}
-}
-
 func ExtractInputs[T any](ctx context.Context, inputs *[]T) {
 	a := graphql.GetResolverContext(ctx).Args["input"]
 	ExtractSlice(a, inputs)
@@ -481,14 +465,6 @@ func setContextWithID(ctx context.Context, obj any, next graphql.Resolver) (any,
 		if err != nil {
 			return nil, err
 		}
-	}
-	return next(ctx)
-}
-
-func setContextWithNameid(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-	ctx, _, err := setContextWith(ctx, obj, "nameid")
-	if err != nil {
-		return nil, err
 	}
 	return next(ctx)
 }

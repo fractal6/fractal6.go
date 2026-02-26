@@ -41,6 +41,7 @@ import (
 	"github.com/dgraph-io/dgo/v200"
 	"github.com/dgraph-io/dgo/v200/protos/api"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
@@ -100,7 +101,7 @@ type GraphQLError struct {
 }
 
 func (e *GraphQLError) Error() string {
-	return fmt.Sprintf("%s", e.msg)
+	return e.msg
 }
 
 //
@@ -218,7 +219,7 @@ func (dg Dgraph) getDqlQuery(op string, m map[string]string) string {
 
 // Get the grpc Dgraph client.
 func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
-	conn, err := grpc.Dial(dg.grpcAddr, grpc.WithInsecure())
+	conn, err := grpc.NewClient(dg.grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal("While trying to dial gRPC: ", err)
 	}
@@ -322,6 +323,9 @@ func (dg Dgraph) BuildGqlToken(uctx model.UserCtx, t time.Duration) string {
 // Post send a post request to the Graphql client.
 func (dg Dgraph) postql(uctx model.UserCtx, data []byte, res any) error {
 	req, err := http.NewRequest("POST", dg.gqlAddr, bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
 	req.Header.Set("Content-Type", "application/json")
 
 	// Set dgraph token
@@ -453,7 +457,6 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 		if strings.Contains(string(gqlErr), "Please retry") {
 			// Retry up to 10 times
 			for i := 0; i < 10; i++ {
-				fmt.Println(i)
 				// Random sleep between 10 and 100 ms
 				sleepTime := time.Duration(10+rand.Intn(91)) * time.Millisecond
 				time.Sleep(sleepTime)
@@ -462,15 +465,14 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 				res = &GqlRes{}
 				err = dg.postql(uctx, []byte(q), res)
 
-				// If no error or different error, break the loop
-				if res.Errors != nil {
-					gqlErr, _ = json.Marshal(res.Errors)
-
-					if !strings.Contains(string(gqlErr), "Please retry") {
-						break
-					}
+				// If success or different error, stop retrying
+				if res.Errors == nil {
+					break
 				}
-				break
+				gqlErr, _ = json.Marshal(res.Errors)
+				if !strings.Contains(string(gqlErr), "Please retry") {
+					break
+				}
 			}
 		}
 	}

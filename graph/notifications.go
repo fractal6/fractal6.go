@@ -115,8 +115,6 @@ func PushHistory(notif *model.EventNotif) error {
 
 // Notify users for Event events, where events can be batch of event.
 func PushEventNotifications(notif model.EventNotif) error {
-	var errs []error // keep track of the error on the patch
-
 	// Push event in tension event history
 	err := PushHistory(&notif)
 	if err != nil {
@@ -284,9 +282,6 @@ func PushEventNotifications(notif model.EventNotif) error {
 			ui.Eid = eid
 			err = email.SendEventNotificationEmail(ui, notif)
 			if err != nil {
-				errs = append(errs, err)
-				// LogErr("Email error", err)
-				// err = nil
 				return err
 			}
 		}
@@ -297,7 +292,6 @@ func PushEventNotifications(notif model.EventNotif) error {
 
 // Notify users for Contract event.
 func PushContractNotifications(notif model.ContractNotif) error {
-	var errs []error // keep track of the error on the patch
 	// Only the event with an ID will be notified.
 	var eventBatch []*model.EventKindRef
 	var createdAt string
@@ -444,7 +438,6 @@ func PushContractNotifications(notif model.ContractNotif) error {
 			err = email.SendContractNotificationEmail(ui, notif)
 			if err != nil {
 				LogErr("Email error", err)
-				errs = append(errs, err)
 				err = nil
 			}
 		}

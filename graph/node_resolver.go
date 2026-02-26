@@ -113,6 +113,9 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	protecteds := []string{"Label", "RoleExt"}
 	isProtected := false
 	_, typeName, _, err := queryTypeFromGraphqlContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 	for _, obj := range protecteds {
 		if typeName == obj {
 			isProtected = true
