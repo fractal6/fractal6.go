@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.8.6] - 2026-02-28
+
+### Features
+
+- Tension search now also matches on comments and labels, making it easier to find what you are looking for.
+- New import tool to onboard an organisation from a HolaSpirit spreadsheet.
+
+### Bug Fixes
+
+- Fixed project contributors visibility and authorization.
+- Fixed various correctness bugs caught by linting.
+
+### Improvements
+
+- REST API routes and handlers have been reorganized.
+- Replaced several internal libraries with Go generics, reducing dependencies and boilerplate code.
+- Modularized and split DQL queries for better maintainability.
+- Improved test structure to avoid circular imports.
+
+
 ## [0.8.6] - 2026-02-17
 
 ### Features
