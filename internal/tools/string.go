@@ -244,3 +244,39 @@ func SplitCamelCase(src string) (entries []string) {
 func Humanize(src string) (t string) {
 	return strings.Join(SplitCamelCase(src), " ")
 }
+
+// NameidEncoder sanitizes a string for use as a nameid component.
+// Mirrors the frontend (Elm) nameidEncoder: replaces separator-like chars with '-',
+// removes bracket-like chars with '_', and collapses consecutive '-' or '_'.
+func NameidEncoder(s string) string {
+	s = strings.TrimSpace(s)
+	s = strings.ToLower(s)
+
+	var buf strings.Builder
+	buf.Grow(len(s))
+	for _, c := range s {
+		switch c {
+		case ' ', '/', '=', '?', '#', '&', '|', '%', '\\':
+			buf.WriteByte('-')
+		case '@', '(', ')', '<', '>', '[', ']', '{', '}', '"', '`', '\'':
+			buf.WriteByte('_')
+		default:
+			buf.WriteRune(c)
+		}
+	}
+	result := buf.String()
+	result = cleanDup(result, "-")
+	result = cleanDup(result, "_")
+	return result
+}
+
+// cleanDup collapses consecutive occurrences of sep into a single one
+// and trims leading/trailing sep.
+func cleanDup(s, sep string) string {
+	double := sep + sep
+	for strings.Contains(s, double) {
+		s = strings.ReplaceAll(s, double, sep)
+	}
+	s = strings.Trim(s, sep)
+	return s
+}

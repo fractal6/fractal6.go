@@ -50,6 +50,33 @@ func TestFindUsername(t *testing.T) {
 	}
 }
 
+func TestNameidEncoder(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"Simple Name", "simple-name"},
+		{"Cercle d'Ancrage UdN (CA)", "cercle-d_ancrage-udn-_ca"},
+		{"Com&Médias", "com-médias"},
+		{"Offres inter-orga", "offres-inter-orga"},
+		{"RH - Richesses Humaines", "rh-richesses-humaines"},
+		{"  spaces  around  ", "spaces-around"},
+		{"a///b", "a-b"},
+		{"hello@world", "hello_world"},
+		{"a(b)c", "a_b_c"},
+		{"test#hash&amp", "test-hash-amp"},
+		{"already-clean", "already-clean"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := NameidEncoder(tt.input)
+			if got != tt.want {
+				t.Errorf("NameidEncoder(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFindTension(t *testing.T) {
 	testcases := []struct {
 		input string

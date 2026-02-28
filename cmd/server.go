@@ -148,6 +148,7 @@ func RunServer() {
 
 			// Organisation
 			r.Post("/createorga", handle6.CreateOrga)
+			r.Post("/createorga/spreadsheet", handle6.ImportOrga)
 			r.Post("/setusercanjoin", handle6.SetUserCanJoin)
 			r.Post("/setguestcancreatetension", handle6.SetGuestCanCreateTension)
 			r.Post("/setlexicon", handle6.SetLexicon)
