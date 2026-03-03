@@ -26,7 +26,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
-	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -50,13 +49,11 @@ func CleanString(data string, quote bool) string {
 	return d
 }
 
-// @DEBUG: better way to encode a json string ?
+// QuoteString escapes a string for safe embedding inside a JSON string value.
 func QuoteString(data string) string {
-	// Quote
-	d := strconv.Quote(data)
-	// remove surrounding quote !
-	d = d[1 : len(d)-1]
-	return d
+	b, _ := json.Marshal(data)
+	// Strip surrounding quotes added by json.Marshal
+	return string(b[1 : len(b)-1])
 }
 
 func PrettyString(str string) (string, error) {
