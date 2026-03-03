@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/tools"
 )
 
 func TestHtmlToMarkdown(t *testing.T) {
@@ -67,9 +68,9 @@ func TestHtmlToMarkdown(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := htmlToMarkdown(tt.input)
+			got := tools.HTMLToMarkdown(tt.input)
 			if got != tt.expected {
-				t.Errorf("htmlToMarkdown(%q):\n  got:  %q\n  want: %q", tt.input, got, tt.expected)
+				t.Errorf("tools.HTMLToMarkdown(%q):\n  got:  %q\n  want: %q", tt.input, got, tt.expected)
 			}
 		})
 	}

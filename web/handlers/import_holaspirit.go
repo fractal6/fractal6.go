@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/tools"
 )
 
 // holaCircleRow holds the parsed fields from a "Circles & Roles" row.
@@ -99,9 +100,9 @@ func parseHolaCirclesSheet(sheets map[string][][]string) ([]holaCircleRow, error
 			roleID:     getCol(row, colIdx, "Role ID"),
 			roleName:   getCol(row, colIdx, "Role"),
 			isCircle:   strings.EqualFold(getCol(row, colIdx, "IsCircle"), "TRUE"),
-			purpose:    htmlToMarkdown(getCol(row, colIdx, "Purpose")),
-			domains:    htmlToMarkdown(getCol(row, colIdx, "Domains")),
-			accountab:  htmlToMarkdown(getCol(row, colIdx, "Accountabilities")),
+			purpose:    tools.HTMLToMarkdown(getCol(row, colIdx, "Purpose")),
+			domains:    tools.HTMLToMarkdown(getCol(row, colIdx, "Domains")),
+			accountab:  tools.HTMLToMarkdown(getCol(row, colIdx, "Accountabilities")),
 			template:   strings.EqualFold(getCol(row, colIdx, "Template"), "TRUE"),
 		}
 		// Strategy column (may be named "Stratégie" or "Strategy")
@@ -109,7 +110,7 @@ func parseHolaCirclesSheet(sheets map[string][][]string) ([]holaCircleRow, error
 		if strat == "" {
 			strat = getCol(row, colIdx, "Strategy")
 		}
-		r.strategy = htmlToMarkdown(strat)
+		r.strategy = tools.HTMLToMarkdown(strat)
 		// Parse Created timestamp
 		if cs := getCol(row, colIdx, "Created"); cs != "" {
 			if t, err := time.Parse("2006-01-02 15:04:05.999999", cs); err == nil {
@@ -157,7 +158,7 @@ func parseHolaPoliciesSheet(sheets map[string][][]string) ([]holaPolicyRow, erro
 			roleID:     getCol(row, colIdx, "Role ID"),
 			roleName:   getCol(row, colIdx, "Role"),
 			policyName: getCol(row, colIdx, "Policy"),
-			policyDesc: htmlToMarkdown(getCol(row, colIdx, "Description")),
+			policyDesc: tools.HTMLToMarkdown(getCol(row, colIdx, "Description")),
 		}
 		result = append(result, r)
 	}

@@ -147,12 +147,14 @@ func SendVerificationEmail(email, token string) error {
 	</body>
     </html>`, url_redirect, url_redirect)
 
+	plainContent := tools.HTMLToMarkdown(content)
 	body := fmt.Sprintf(`{
         "from": "Fractale <noreply@`+DOMAIN+`>",
         "to": ["%s"],
         "subject": "Activate your account at `+DOMAIN+`",
-        "html_body": "%s"
-    }`, email, tools.CleanString(content, true))
+        "html_body": "%s",
+        "plain_body": "%s"
+    }`, email, tools.CleanString(content, true), tools.QuoteString(plainContent))
 
 	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
 	req.Header.Set("Content-Type", "application/json")
@@ -188,12 +190,14 @@ func SendResetEmail(email, token string) error {
 	</body>
     </html>`, url_redirect, url_redirect)
 
+	plainContent := tools.HTMLToMarkdown(content)
 	body := fmt.Sprintf(`{
         "from": "Fractale <noreply@`+DOMAIN+`>",
         "to": ["%s"],
         "subject": "Reset your password at `+DOMAIN+`",
-        "html_body": "%s"
-    }`, email, tools.CleanString(content, true))
+        "html_body": "%s",
+        "plain_body": "%s"
+    }`, email, tools.CleanString(content, true), tools.QuoteString(plainContent))
 
 	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
 	req.Header.Set("Content-Type", "application/json")
@@ -239,12 +243,14 @@ func SendOwnerGrantedEmail(username, nameid, orgName string) error {
 	</body>
     </html>`, orgUrl, orgName, nameid, memberUrl)
 
+	plainContent := tools.HTMLToMarkdown(content)
 	body := fmt.Sprintf(`{
         "from": "Fractale <noreply@`+DOMAIN+`>",
         "to": ["%s"],
         "subject": "Ownership of %s was granted",
-        "html_body": "%s"
-    }`, email, orgName, tools.CleanString(content, true))
+        "html_body": "%s",
+        "plain_body": "%s"
+    }`, email, orgName, tools.CleanString(content, true), tools.QuoteString(plainContent))
 
 	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
 	req.Header.Set("Content-Type", "application/json")
@@ -451,17 +457,19 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     <head> <meta charset="utf-8"> </head>
     <body> %s </body>
     </html>`, payload)
+	plainContent := tools.HTMLToMarkdown(content)
 
 	body = fmt.Sprintf(`{
         "from": "%s <notifications@`+DOMAIN+`>",
         "to": ["%s"],
         "subject": "%s",
         "html_body": "%s",
+        "plain_body": "%s",
         "headers": {
             "In-Reply-To": "<tension/%s@`+DOMAIN+`>",
             "References": "<tension/%s@`+DOMAIN+`>"
         }
-    }`, author, email, tools.CleanString(subject, true), tools.CleanString(content, true), notif.Tid, notif.Tid)
+    }`, author, email, tools.CleanString(subject, true), tools.CleanString(content, true), tools.QuoteString(plainContent), notif.Tid, notif.Tid)
 	// @TODO; "List-Unsubscribe": "<%s>"
 	// see https://github.com/postalserver/postal/issues/2788
 	// Other fields: http://apiv1.postalserver.io/controllers/send/message
@@ -619,17 +627,19 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     <head> <meta charset="utf-8"> </head>
     <body> %s </body>
     </html>`, payload)
+	plainContent := tools.HTMLToMarkdown(content)
 
 	body = fmt.Sprintf(`{
         "from": "%s <notifications@`+DOMAIN+`>",
         "to": ["%s"],
         "subject": "%s",
         "html_body": "%s",
+        "plain_body": "%s",
         "headers": {
             "In-Reply-To": "<contract/%s@`+DOMAIN+`>",
             "References": "<contract/%s@`+DOMAIN+`>"
         }
-    }`, author, email, subject, tools.CleanString(content, true), notif.Contract.ID, notif.Contract.ID)
+    }`, author, email, subject, tools.CleanString(content, true), tools.QuoteString(plainContent), notif.Contract.ID, notif.Contract.ID)
 
 	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
 	req.Header.Set("Content-Type", "application/json")
