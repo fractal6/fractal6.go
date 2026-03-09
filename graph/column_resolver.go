@@ -254,7 +254,7 @@ func updateProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 
 	// Extract data identifiers the value before moving
 	id := input.Filter.ID[0]
-	projectid := ""
+	var projectid string
 	if input.Set.Pos != nil {
 		isMoved = true
 		oldColumn, err = First(db.Gamma[ProjectColumnLoc](QueryColumnLoc, map[string]string{"colid": id}))
@@ -266,6 +266,9 @@ func updateProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 		x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
 		if err != nil {
 			return nil, err
+		}
+		if x == nil {
+			return nil, fmt.Errorf("project not found for column %s", id)
 		}
 		projectid = x.(string)
 	}

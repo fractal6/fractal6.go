@@ -146,6 +146,9 @@ func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bo
 		if err != nil {
 			return false, LogErr("Internal error", err)
 		}
+		if mode_ == nil {
+			return false, fmt.Errorf("node not found: %s", nameid)
+		}
 		m := model.NodeMode(mode_.(string))
 		mode = &m
 	}

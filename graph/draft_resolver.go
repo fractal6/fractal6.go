@@ -67,6 +67,9 @@ func updateProjectDraftHook(ctx context.Context, obj any, next graphql.Resolver)
 		if err != nil {
 			return nil, err
 		}
+		if draft.CreatedBy == nil {
+			return nil, fmt.Errorf("draft not found: %s", id)
+		}
 
 		// Authorize author
 		if uctx.Username == draft.CreatedBy.Username {
@@ -74,6 +77,9 @@ func updateProjectDraftHook(ctx context.Context, obj any, next graphql.Resolver)
 		}
 
 		// Check project auth
+		if draft.ProjectStatus == nil || draft.ProjectStatus.Project == nil {
+			return nil, fmt.Errorf("project not found for draft %s", id)
+		}
 		if err = auth.Authorize(auth.CheckProjectAuth(uctx, draft.ProjectStatus.Project.ID)); err != nil {
 			return nil, err
 		}

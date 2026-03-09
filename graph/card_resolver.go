@@ -85,6 +85,9 @@ func addProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (an
 		if err != nil {
 			return nil, err
 		}
+		if x == nil {
+			return nil, fmt.Errorf("project not found for column %s", *input.Pc.ID)
+		}
 		projectid := x.(string)
 
 		// Check project auth
@@ -218,22 +221,17 @@ func updateProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 	oldCard := ProjectCardLoc{}
 	if input.Set != nil && len(input.Filter.ID) == 1 {
 		id := input.Filter.ID[0]
-		projectid := ""
-		if input.Set.Pos != nil && input.Set.Pc != nil {
-			// Extract the value before moving
-			isMoved = true
-			oldCard, err = First(db.Gamma[ProjectCardLoc](QueryCardLoc, map[string]string{"cardid": id}))
-			if err != nil {
-				return nil, err
-			}
-			projectid = oldCard.Projectid
-		} else {
-			x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
-			if err != nil {
-				return nil, err
-			}
-			projectid = x.(string)
+		oldCard, err = First(db.Gamma[ProjectCardLoc](QueryCardLoc, map[string]string{"cardid": id}))
+		if err != nil {
+			return nil, err
 		}
+		if oldCard.Projectid == "" {
+			return nil, fmt.Errorf("project not found for card %s", id)
+		}
+		if input.Set.Pos != nil && input.Set.Pc != nil {
+			isMoved = true
+		}
+		projectid := oldCard.Projectid
 
 		// Check project auth
 		if err = auth.Authorize(auth.CheckProjectAuth(uctx, projectid)); err != nil {
