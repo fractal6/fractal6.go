@@ -592,16 +592,17 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 	var op string
 	var isLight bool = false
 	var payload string
-	if type_ == "light" {
+	switch type_ {
+case "light":
 		op = "getTensionInt"
 		isLight = true
-	} else if type_ == "int" {
+	case "int":
 		op = "getTensionInt"
-	} else if type_ == "ext" {
+	case "ext":
 		op = "getTensionExt"
-	} else if type_ == "all" {
+	case "all":
 		op = "getTensionAll"
-	} else {
+	default:
 		panic("Unknow type (tension query)")
 	}
 

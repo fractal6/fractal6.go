@@ -21,6 +21,7 @@
 package graph
 
 import (
+	"slices"
 	"context"
 	"fmt"
 
@@ -116,12 +117,9 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	if err != nil {
 		return nil, err
 	}
-	for _, obj := range protecteds {
-		if typeName == obj {
+	if slices.Contains(protecteds, typeName) {
 			isProtected = true
-			break
 		}
-	}
 
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)

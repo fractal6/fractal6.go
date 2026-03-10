@@ -381,7 +381,8 @@ func addVoteHook(ctx context.Context, obj any, next graphql.Resolver) (any, erro
 		return d, err
 	}
 
-	if contract.Status == model.ContractStatusCanceled {
+	switch contract.Status {
+case model.ContractStatusCanceled:
 		// Eventually reset the pending node state
 		if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
 			for _, c := range contract.Candidates {
@@ -399,7 +400,7 @@ func addVoteHook(ctx context.Context, obj any, next graphql.Resolver) (any, erro
 			to = append(to, p.Node.FirstLink.Username)
 		}
 		PublishNotifEvent(model.NotifNotif{Uctx: uctx, Tid: &contract.Tension.ID, Cid: &contract.ID, Msg: msg, To: to})
-	} else if contract.Status == model.ContractStatusClosed {
+	case model.ContractStatusClosed:
 		PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: contract.Tension.ID, Contract: contract, ContractEvent: model.CloseContract})
 	}
 

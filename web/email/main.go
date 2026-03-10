@@ -280,7 +280,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	var body string
 	var author string
 	var payload string
-	var recv string = strings.Replace(notif.Receiverid, "#", "/", -1)
+	var recv string = strings.ReplaceAll(notif.Receiverid, "#", "/")
 	var title string = notif.Title
 	var message string = notif.Msg
 	// Recipient email
@@ -439,16 +439,17 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	payload += fmt.Sprintf(`—
     <div style="color:#666;font-size:small">You are receiving this because %s.<br>
     <a href="%s">View it on Fractale</a>`, ui.Reason.ToText(), url_redirect)
-	if ui.Reason == model.ReasonIsSubscriber {
+	switch ui.Reason {
+	case model.ReasonIsSubscriber:
 		url_unsubscribe = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s?unsubscribe=email", notif.Rootnameid, notif.Tid)
 		payload += fmt.Sprintf(`, reply to this email directly, or <a href="%s">unsubscribe</a>.</div>`, url_unsubscribe)
-	} else if ui.Reason == model.ReasonIsAnnouncement {
+	case model.ReasonIsAnnouncement:
 		url_unsubscribe = fmt.Sprintf("https://"+DOMAIN+"/tension/%s/%s?unwatch=email", notif.Rootnameid, notif.Tid)
 		payload += fmt.Sprintf(`, or <a href="%s">unsubscribe</a> from all announcements for this organisation.</div>`, url_unsubscribe)
-	} else if ui.Reason == model.ReasonIsAlert {
+	case model.ReasonIsAlert:
 		url_leave = fmt.Sprintf("https://"+DOMAIN+"/m/%s", notif.Rootnameid)
 		payload += fmt.Sprintf(`, reply to this email directly or <a href="%s">leave this organisation</a> to stop receiving these alerts.</div>`, url_leave)
-	} else {
+	default:
 		payload += " or reply to this email directly.</div>"
 	}
 
@@ -502,7 +503,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	var rcpt_name string
 	var author string
 	var payload string
-	var recv string = strings.Replace(notif.Receiverid, "#", "/", -1)
+	var recv string = strings.ReplaceAll(notif.Receiverid, "#", "/")
 	// Recipient email
 	var email string = ui.User.Email
 	if email == "" {
@@ -548,7 +549,8 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	case model.NewContract:
 		switch notif.Contract.Status {
 		case model.ContractStatusOpen:
-			if ui.Reason == model.ReasonIsInvited {
+			switch ui.Reason {
+			case model.ReasonIsInvited:
 				x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name")
 				if err != nil {
 					return err
@@ -557,11 +559,11 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 				subject = fmt.Sprintf("[%s] You are invited to this organisation", recv)
 				payload = fmt.Sprintf(`Hi%s,<br><br> You have been invited by %s to join the organisation <a style="color:#002e62;font-weight: 600;" href="https://`+DOMAIN+`/o/%s">%s</a>.<br><br>
                 Please click the link below to accept or reject the invitation:<br><a href="%s">%s</a>`, rcpt_name, author, recv, orga_name, url_redirect, url_redirect)
-			} else if ui.Reason == model.ReasonIsLinkCandidate {
+			case model.ReasonIsLinkCandidate:
 				subject = fmt.Sprintf("[%s] You have a new role invitation", recv)
 				payload = fmt.Sprintf(`Hi%s,<br><br> You have been invited by %s to take a new role.<br><br>
                 Please click the link below to accept or reject the invitation:<br><a href="%s">%s</a>`, rcpt_name, author, url_redirect, url_redirect)
-			} else {
+			default:
 				subject = fmt.Sprintf("[%s][%s] A pending contract needs your attention", recv, e.ToContractText())
 				payload = fmt.Sprintf(`Hi%s,<br><br>
                 A vote is needed to process a pending contract.<br><br>

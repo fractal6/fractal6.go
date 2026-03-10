@@ -96,7 +96,8 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 
 	var archiveFlag string
 
-	if eventType == model.TensionEventBlobArchived {
+	switch eventType {
+case model.TensionEventBlobArchived:
 		// Archive
 		// --
 		// Check that circle has no children
@@ -116,7 +117,7 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 			// Ignored error if node.FirstLink does not exist (likely to be ""...)
 			UnlinkUser(rootnameid, nameid, *node.FirstLink)
 		}
-	} else if eventType == model.TensionEventBlobUnarchived {
+	case model.TensionEventBlobUnarchived:
 		// Unarchive
 		// --
 		// Check that parent node is not archived
@@ -128,7 +129,7 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 			return ok, fmt.Errorf("Cannot unarchive node with archived parent. Please unarchive parent first.")
 		}
 		archiveFlag = strconv.FormatBool(false)
-	} else {
+	default:
 		return false, fmt.Errorf("bad tension event '%s'.", string(eventType))
 	}
 
@@ -255,7 +256,8 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 		return false, err
 	}
 
-	if *event.EventType == model.TensionEventMemberLinked {
+	switch *event.EventType {
+case model.TensionEventMemberLinked:
 		// Link user
 		// --
 		if firstLink != nil {
@@ -265,7 +267,7 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 		if err != nil {
 			return false, err
 		}
-	} else if *event.EventType == model.TensionEventMemberUnlinked {
+	case model.TensionEventMemberUnlinked:
 		// UnLink user
 		// --
 		err = UnlinkUser(rootnameid, nameid, *event.Old)
@@ -310,12 +312,13 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
 		// RoleType Hook
 		nodeType := *node.Type
 		roleType := node.RoleType
-		if nodeType == model.NodeTypeRole {
+		switch nodeType {
+case model.NodeTypeRole:
 			// Validate input
 			if roleType == nil {
 				err = fmt.Errorf("role must have a RoleType.")
 			}
-		} else if nodeType == model.NodeTypeCircle {
+		case model.NodeTypeCircle:
 			// pass
 		}
 	}

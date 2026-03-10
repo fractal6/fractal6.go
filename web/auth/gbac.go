@@ -187,9 +187,10 @@ func CheckUserAuth(uctx *model.UserCtx, nameid string, mode model.NodeMode) (boo
 		return true, err
 	}
 
-	if mode == model.NodeModeAgile {
+	switch mode {
+case model.NodeModeAgile:
 		ok = UserHasRole(uctx, nid) >= 0
-	} else if mode == model.NodeModeCoordinated {
+	case model.NodeModeCoordinated:
 		ok = UserHasCoordoRole(uctx, nid) >= 0
 	}
 

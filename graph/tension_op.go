@@ -432,13 +432,14 @@ func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model
 		return ok, err
 	}
 	if ok { // Update blob archived flag
-		if *event.EventType == model.TensionEventBlobArchived {
+		switch *event.EventType {
+case model.TensionEventBlobArchived:
 			_, err = db.GetDB().Meta("setArchivedFlagBlob", map[string]string{
 				"bid": blob.ID, "flag": Now(), "tid": tension.ID, "action": string(tensionCharac.ArchiveAction(blob.Node.Type)),
 			})
-		} else if *event.EventType == model.TensionEventBlobUnarchived {
+		case model.TensionEventBlobUnarchived:
 			err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.EditAction(blob.Node.Type))
-		} else {
+		default:
 			err = fmt.Errorf("bad tension event '%s'.", string(*event.EventType))
 		}
 	}

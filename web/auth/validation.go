@@ -359,9 +359,10 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
 	n_public := 0
 	n_private := 0
 	for _, n := range nodes {
-		if n.Visibility == model.NodeVisibilityPublic {
+		switch n.Visibility {
+case model.NodeVisibilityPublic:
 			n_public += 1
-		} else if n.Visibility == model.NodeVisibilityPrivate {
+		case model.NodeVisibilityPrivate:
 			n_private += 1
 		}
 	}

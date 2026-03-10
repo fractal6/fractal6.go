@@ -231,7 +231,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "RECIPIENT EMAIL NOT FOUND", 400)
 		return
 	}
-	receiverid := strings.Replace(strings.Split(toEmail.Address, "@")[0], "/", "#", -1)
+	receiverid := strings.ReplaceAll(strings.Split(toEmail.Address, "@")[0], "/", "#")
 	filter := `eq(Node.isArchived, false)`
 	if ex, _ := db.GetDB().Exists("Node.nameid", receiverid, &filter); !ex {
 		http.Error(w, "NAMEID NOT FOUND", 400)
