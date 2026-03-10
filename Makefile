@@ -84,6 +84,22 @@ test-integration-clean: test-integration test-integration-down
 
 test-all: test test-integration-clean
 
+diagnostics:
+	echo "golangci-lint diagnostics:"
+	golangci-lint run ./...
+	echo "gopls diagnostics:"
+	gopls check $(command find . -name '*.go' -not -path './vendor/*' -not -path './graph/generated/*')
+
+codeactions:
+	@command find . -name '*.go' -not -path './vendor/*' -not -path './graph/generated/*' -not -path './schema/gram/*' | while read f; do \
+		out=$$(gopls codeaction -kind=quickfix -exec -diff "$$f" 2>/dev/null); \
+		if [ -n "$$out" ]; then \
+			echo "=== $$f ==="; \
+			echo "$$out"; \
+			echo; \
+		fi; \
+	done
+
 #
 # Generate Graphql code and schema
 #
