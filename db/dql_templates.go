@@ -79,7 +79,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
 	"getFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) {
+        all(func: eq({{.fieldid}}, "{{.value}}")) {{.filter}} {
             {{.fieldName}}
         }
     }`,
@@ -91,14 +91,7 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
 	"getSubFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}}
-            }
-        }
-    }`,
-	"getSubFieldByEq2": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) @filter(eq({{.f2}}, "{{.v2}}")) {
+        all(func: eq({{.fieldid}}, "{{.value}}")) {{.filter}} {
             {{.fieldNameSource}} {
                 {{.fieldNameTarget}}
             }

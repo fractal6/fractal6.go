@@ -194,13 +194,18 @@ func (dg Dgraph) GetFieldById(id string, fieldName string) (any, error) {
 	return DecodeField(results, fieldName)
 }
 
-// Returns a field from objid
-func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string) (any, error) {
-	results, err := dg.Meta("getFieldByEq", map[string]string{
+// Returns a field from objid. Optional filter pair (filterField, filterValue) adds @filter(eq(...)).
+func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string, filter ...string) (any, error) {
+	maps := map[string]string{
 		"fieldid":   fieldid,
 		"value":     objid,
 		"fieldName": fieldName,
-	})
+		"filter":    "",
+	}
+	if len(filter) == 2 {
+		maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, filter[0], filter[1])
+	}
+	results, err := dg.Meta("getFieldByEq", maps)
 	if err != nil {
 		return nil, err
 	}
@@ -220,29 +225,19 @@ func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTar
 	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
 }
 
-// Returns a subfield from Eq
-func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string) (any, error) {
-	results, err := dg.Meta("getSubFieldByEq", map[string]string{
+// Returns a subfield from Eq. Optional filter pair (filterField, filterValue) adds @filter(eq(...)).
+func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, filter ...string) (any, error) {
+	maps := map[string]string{
 		"fieldid":         fieldid,
 		"value":           value,
 		"fieldNameSource": fieldNameSource,
 		"fieldNameTarget": fieldNameTarget,
-	})
-	if err != nil {
-		return nil, err
+		"filter":          "",
 	}
-	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
-}
-
-func (dg Dgraph) GetSubFieldByEq2(fieldid, value, f2, v2, fieldNameSource, fieldNameTarget string) (any, error) {
-	results, err := dg.Meta("getSubFieldByEq2", map[string]string{
-		"fieldid":         fieldid,
-		"value":           value,
-		"f2":              f2,
-		"v2":              v2,
-		"fieldNameSource": fieldNameSource,
-		"fieldNameTarget": fieldNameTarget,
-	})
+	if len(filter) == 2 {
+		maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, filter[0], filter[1])
+	}
+	results, err := dg.Meta("getSubFieldByEq", maps)
 	if err != nil {
 		return nil, err
 	}

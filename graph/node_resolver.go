@@ -21,9 +21,9 @@
 package graph
 
 import (
-	"slices"
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/99designs/gqlgen/graphql"
 
@@ -118,8 +118,8 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 		return nil, err
 	}
 	if slices.Contains(protecteds, typeName) {
-			isProtected = true
-		}
+		isProtected = true
+	}
 
 	// Get User context
 	ctx, uctx, err := auth.GetUserContext(ctx)
@@ -140,10 +140,10 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	} else { // Update from hash names
 		if typeName == "Project" && input.Filter.Parentnameid.Eq != nil && input.Filter.Nameid.Eq != nil {
 			// Project like artefacts
-			x, err = db.GetDB().GetSubFieldByEq2(typeName+".nameid", *input.Filter.Nameid.Eq, typeName+".parentnameid", *input.Filter.Parentnameid.Eq, typeName+".nodes", "Node.nameid")
+			x, err = db.GetDB().GetSubFieldByEq(typeName+".nameid", *input.Filter.Nameid.Eq, typeName+".nodes", "Node.nameid", typeName+".parentnameid", *input.Filter.Parentnameid.Eq)
 		} else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {
 			// Other Artefacts update from hash names
-			x, err = db.GetDB().GetSubFieldByEq2(typeName+".name", *input.Filter.Name.Eq, typeName+".rootnameid", *input.Filter.Rootnameid.Eq, typeName+".nodes", "Node.nameid")
+			x, err = db.GetDB().GetSubFieldByEq(typeName+".name", *input.Filter.Name.Eq, typeName+".nodes", "Node.nameid", typeName+".rootnameid", *input.Filter.Rootnameid.Eq)
 		} else {
 			return nil, LogErr("Access denied", fmt.Errorf("invalid filter to update node artefact."))
 		}
@@ -180,7 +180,7 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	}
 
 	// If an artefact is protected and is linked to multiple nodes,
-	// Only allow updates if user has auth in the node with the shortest path.
+	// Only allow updates if user has auth in the node with the shortest path to root.
 	if input.Set != nil && isProtected && len(nodes) > 1 {
 		mode := model.NodeModeCoordinated
 		rootnameid, _ := codec.Nid2rootid(*nodes[0].Nameid)
@@ -207,6 +207,53 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 
 	}
 
+	// Get project data for potential reparenting
+	var projectId, projectParentnameid string
+	if typeName == "Project" && input.Remove != nil && len(input.Remove.Nodes) > 0 {
+		var pData any
+		if len(input.Filter.ID) > 0 {
+			pData, err = db.GetDB().GetFieldById(input.Filter.ID[0], "uid Project.parentnameid Project.rootnameid")
+		} else if input.Filter.Parentnameid != nil && input.Filter.Parentnameid.Eq != nil &&
+			input.Filter.Nameid != nil && input.Filter.Nameid.Eq != nil {
+			pData, err = db.GetDB().GetFieldByEq(
+				"Project.nameid", *input.Filter.Nameid.Eq,
+				"uid Project.parentnameid Project.rootnameid",
+				"Project.parentnameid", *input.Filter.Parentnameid.Eq,
+			)
+		}
+		if err != nil {
+			return nil, LogErr("Internal error", err)
+		}
+		if pData != nil {
+			p := StructMap[struct{ Id, Parentnameid, Rootnameid string }](pData)
+			projectId = p.Id
+			projectParentnameid = p.Parentnameid
+		}
+	}
+
+	// Prevent removing all nodes from a Project, and prepare reparenting data
+	var removedSet map[string]bool
+	var parentRemoved bool
+	if typeName == "Project" && input.Remove != nil && len(input.Remove.Nodes) > 0 {
+		added := 0
+		if input.Set != nil {
+			added = len(input.Set.Nodes)
+		}
+		if len(nodes)+added-len(input.Remove.Nodes) <= 0 {
+			return nil, LogErr("Access denied", fmt.Errorf("Cannot remove the last node from a project."))
+		}
+
+		removedSet = make(map[string]bool)
+		for _, node := range input.Remove.Nodes {
+			if node.Nameid != nil {
+				removedSet[*node.Nameid] = true
+				if *node.Nameid == projectParentnameid {
+					parentRemoved = true
+				}
+			}
+		}
+	}
+
 	// Get value prior mutation
 	isRelabeling := typeName == "Label" && len(input.Filter.ID) > 0 && input.Set != nil && (input.Set.Name != nil || input.Set.Color != nil)
 	old := struct{ Name, Color, Rootnameid string }{}
@@ -226,7 +273,24 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	}
 
 	// Post-processing:
+	// - Re-parent project if its parent node was removed from nodes
 	// - Rename unlink labels
+
+	if parentRemoved && projectId != "" {
+		for _, node := range nodes {
+			if node.Nameid != nil && !removedSet[*node.Nameid] {
+				newParentnameid := *node.Nameid
+				newRootnameid, _ := codec.Nid2rootid(newParentnameid)
+				if err = db.GetDB().SetFieldById(projectId, "Project.parentnameid", newParentnameid); err != nil {
+					return data, LogErr("Internal error", err)
+				}
+				if err = db.GetDB().SetFieldById(projectId, "Project.rootnameid", newRootnameid); err != nil {
+					return data, LogErr("Internal error", err)
+				}
+				break
+			}
+		}
+	}
 
 	// Update the Label event in tension history as data is hardcoded on new/old value.
 	// @debug/perf: run this asynchronously and after next()

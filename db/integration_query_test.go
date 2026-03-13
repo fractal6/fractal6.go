@@ -436,6 +436,50 @@ func TestGetSubFieldByEq_Integration(t *testing.T) {
 	})
 }
 
+func TestGetFieldByEqWithFilter_Integration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("found", func(t *testing.T) {
+		t.Parallel()
+		// Query the "private-project" project by nameid + parentnameid filter
+		val, err := GetDB().GetFieldByEq(
+			"Project.nameid", "private-project",
+			"uid Project.rootnameid",
+			"Project.parentnameid", "sec-org#private-circle",
+		)
+		if err != nil {
+			t.Fatalf("GetFieldByEq with filter returned error: %v", err)
+		}
+		m, ok := val.(map[string]any)
+		if !ok {
+			t.Fatalf("expected map[string]any, got %T", val)
+		}
+		uid, _ := m["id"].(string)
+		if uid == "" {
+			t.Error("expected non-empty uid")
+		}
+		rootnameid, _ := m["rootnameid"].(string)
+		if rootnameid != "sec-org" {
+			t.Errorf("rootnameid = %q, want %q", rootnameid, "sec-org")
+		}
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		t.Parallel()
+		val, err := GetDB().GetFieldByEq(
+			"Project.nameid", "nonexistent-project",
+			"uid Project.rootnameid",
+			"Project.parentnameid", "sec-org",
+		)
+		if err != nil {
+			t.Fatalf("GetFieldByEq with filter returned error: %v", err)
+		}
+		if val != nil {
+			t.Errorf("expected nil for nonexistent project, got %v", val)
+		}
+	})
+}
+
 func TestGetSubSubFieldByEq_Integration(t *testing.T) {
 	t.Parallel()
 

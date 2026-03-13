@@ -131,6 +131,80 @@ func TestGamma_Integration(t *testing.T) {
 	_ = GetDB().SetFieldByEq("Node.nameid", "test-org", "Node.about", "A test organisation")
 }
 
+func TestProjectReparent_Integration(t *testing.T) {
+	// Simulate the reparenting logic: when a node matching parentnameid
+	// is removed from Project.nodes, parentnameid should be updated to a remaining node.
+
+	// Get the private-project's UID via GetFieldByEq with filter
+	pData, err := GetDB().GetFieldByEq(
+		"Project.nameid", "private-project",
+		"uid Project.parentnameid Project.rootnameid",
+		"Project.parentnameid", "sec-org#private-circle",
+	)
+	if err != nil {
+		t.Fatalf("GetFieldByEq returned error: %v", err)
+	}
+	if pData == nil {
+		t.Fatal("private-project not found")
+	}
+	m := pData.(map[string]any)
+	projectUID := m["id"].(string)
+
+	// Add the root node (sec-org) as a second node reference on the project
+	addNode := QueryMut{
+		Q: `query {
+			proj as var(func: uid(` + projectUID + `))
+			root as var(func: eq(Node.nameid, "sec-org"))
+		}`,
+		M: []X{{
+			S: `uid(proj) <Project.nodes> uid(root) .
+				uid(root) <Node.projects> uid(proj) .`,
+		}},
+	}
+	_, err = GetDB().Gamma(addNode, map[string]string{})
+	if err != nil {
+		t.Fatalf("failed to add second node: %v", err)
+	}
+
+	// Now simulate reparenting: set parentnameid to the root node
+	err = GetDB().SetFieldById(projectUID, "Project.parentnameid", "sec-org")
+	if err != nil {
+		t.Fatalf("SetFieldById(parentnameid) returned error: %v", err)
+	}
+
+	// Verify the change
+	val, err := GetDB().GetFieldByEq(
+		"Project.nameid", "private-project",
+		"Project.parentnameid",
+		"Project.parentnameid", "sec-org",
+	)
+	if err != nil {
+		t.Fatalf("GetFieldByEq returned error: %v", err)
+	}
+	parentnameid, ok := val.(string)
+	if !ok {
+		t.Fatalf("expected string, got %T", val)
+	}
+	if parentnameid != "sec-org" {
+		t.Errorf("parentnameid = %q, want %q", parentnameid, "sec-org")
+	}
+
+	// Restore original values
+	_ = GetDB().SetFieldById(projectUID, "Project.parentnameid", "sec-org#private-circle")
+	// Remove the extra node reference
+	rmNode := QueryMut{
+		Q: `query {
+			proj as var(func: uid(` + projectUID + `))
+			root as var(func: eq(Node.nameid, "sec-org"))
+		}`,
+		M: []X{{
+			D: `uid(proj) <Project.nodes> uid(root) .
+				uid(root) <Node.projects> uid(proj) .`,
+		}},
+	}
+	_, _ = GetDB().Gamma(rmNode, map[string]string{})
+}
+
 func TestUpsertActivity_Integration(t *testing.T) {
 	today := time.Now().UTC().Format("2006-01-02")
 	todayISO := today + "T00:00:00Z"
