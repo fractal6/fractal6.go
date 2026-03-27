@@ -58,6 +58,7 @@ type EmailForm struct {
 	To         string `json:"rcpt_to"`
 	Title      string `json:"subject"`
 	Msg        string `json:"plain_body"`
+	HtmlMsg    string `json:"html_body"`
 	References string `json:"references"`
 	// AttachmentQuantity int  `json:"attachment_quantity"`
 	// Attachments []string    `json:"attachments"`
@@ -75,6 +76,14 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 	var form EmailForm
 	if !decodeBody(w, r, &form) {
 		return
+	}
+
+	// Prefer html_body to avoid email line-wrapping artifacts in plain_body
+	msg := form.Msg
+	if form.HtmlMsg != "" {
+		if converted := HTMLToMarkdown(form.HtmlMsg); converted != "" {
+			msg = converted
+		}
 	}
 
 	// Determine where from and to where it goes
@@ -127,7 +136,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 				Comments: []*model.CommentRef{{
 					CreatedAt: &createdAt,
 					CreatedBy: &createdBy,
-					Message:   &form.Msg,
+					Message:   &msg,
 				}},
 			},
 		})
@@ -177,7 +186,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 				Comments: []*model.CommentRef{{
 					CreatedAt: &createdAt,
 					CreatedBy: &createdBy,
-					Message:   &form.Msg,
+					Message:   &msg,
 				}},
 			},
 		})
@@ -214,6 +223,14 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 	var form EmailForm
 	if !decodeBody(w, r, &form) {
 		return
+	}
+
+	// Prefer html_body to avoid email line-wrapping artifacts in plain_body
+	msg := form.Msg
+	if form.HtmlMsg != "" {
+		if converted := HTMLToMarkdown(form.HtmlMsg); converted != "" {
+			msg = converted
+		}
 	}
 
 	// Get author
@@ -261,7 +278,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 			{
 				CreatedAt: createdAt,
 				CreatedBy: &createdBy,
-				Message:   form.Msg,
+				Message:   msg,
 			},
 		},
 		Subscribers: []*model.User{{Username: uctx.Username}},
