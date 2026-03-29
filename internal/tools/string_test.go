@@ -77,6 +77,64 @@ func TestNameidEncoder(t *testing.T) {
 	}
 }
 
+func TestStripEmailQuote(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "no quote",
+			input:    "Hello, this is my reply.",
+			expected: "Hello, this is my reply.",
+		},
+		{
+			name:     "english quote at end",
+			input:    "Here is my reply.\n\nOn Mon, 27 Mar 2026 at 10:00, Alice <alice@example.com> wrote:\n> Original message\n> second line",
+			expected: "Here is my reply.",
+		},
+		{
+			name:     "french quote at end",
+			input:    "Voici ma réponse.\n\nLe lun. 27 mars 2026 à 10:00, Alice <alice@example.com> a écrit :\n> Message original\n> deuxième ligne",
+			expected: "Voici ma réponse.",
+		},
+		{
+			name:     "french ecrit without accent",
+			input:    "Ma réponse.\n\nLe 27 mars 2026, Bob a ecrit:\n> texte",
+			expected: "Ma réponse.",
+		},
+		{
+			name:     "quote at start with > lines",
+			input:    "On Mon, 27 Mar 2026, Alice wrote:\n> quoted line\n> another quoted\n\nMy actual reply here.",
+			expected: "My actual reply here.",
+		},
+		{
+			name:     "quote in the middle not stripped",
+			input:    "Before.\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> quoted\n\nAfter this line.",
+			expected: "Before.\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> quoted\n\nAfter this line.",
+		},
+		{
+			name:     "blank lines between quoted lines at end",
+			input:    "Reply.\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> line 1\n\n> line 2",
+			expected: "Reply.",
+		},
+		{
+			name:     "only quote returns original",
+			input:    "On Mon, 27 Mar 2026, Alice wrote:\n> everything is quoted",
+			expected: "On Mon, 27 Mar 2026, Alice wrote:\n> everything is quoted",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := StripEmailQuote(tt.input)
+			if got != tt.expected {
+				t.Errorf("StripEmailQuote():\n  got:  %q\n  want: %q", got, tt.expected)
+			}
+		})
+	}
+}
+
 func TestFindTension(t *testing.T) {
 	testcases := []struct {
 		input string

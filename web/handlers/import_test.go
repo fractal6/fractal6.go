@@ -64,11 +64,79 @@ func TestHtmlToMarkdown(t *testing.T) {
 			input:    "<p>This is <strong>important</strong> text</p>",
 			expected: "This is **important** text",
 		},
+		{
+			name:     "inline code",
+			input:    "<p>Use <code>fmt.Println</code> here</p>",
+			expected: "Use `fmt.Println` here",
+		},
+		{
+			name:     "fenced code block",
+			input:    "<pre><code>func main() {\n  fmt.Println(\"hi\")\n}</code></pre>",
+			expected: "```\nfunc main() {\n  fmt.Println(\"hi\")\n}\n```",
+		},
+		{
+			name:     "strikethrough del",
+			input:    "<p><del>removed</del></p>",
+			expected: "~~removed~~",
+		},
+		{
+			name:     "strikethrough s",
+			input:    "<p><s>struck</s></p>",
+			expected: "~~struck~~",
+		},
+		{
+			name:     "blockquote",
+			input:    "<blockquote><p>quoted text</p></blockquote>",
+			expected: "> quoted text",
+		},
+		{
+			name:     "horizontal rule",
+			input:    "<p>above</p><hr><p>below</p>",
+			expected: "above\n\n---\n\nbelow",
+		},
+		{
+			name:     "image",
+			input:    `<img src="https://example.com/img.png" alt="logo">`,
+			expected: "![logo](https://example.com/img.png)",
+		},
+		{
+			name:     "h5",
+			input:    "<h5>Title Five</h5>",
+			expected: "##### Title Five",
+		},
+		{
+			name:     "h6",
+			input:    "<h6>Title Six</h6>",
+			expected: "###### Title Six",
+		},
+		{
+			name:     "ordered list",
+			input:    "<ol><li>first</li><li>second</li></ol>",
+			expected: "1. first\n2. second",
+		},
+		{
+			name:     "nested unordered list",
+			input:    "<ul><li>a<ul><li>a1</li><li>a2</li></ul></li><li>b</li></ul>",
+			expected: "- a\n  - a1\n  - a2\n- b",
+		},
+		{
+			name:     "simple table",
+			input:    "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>",
+			expected: "| Name | Age |\n| --- | --- |\n| Alice | 30 |",
+		},
+		{
+			name:     "details with summary",
+			input:    "<details><summary>More info</summary><p>Hidden content</p></details>",
+			expected: "<details>\n<summary>More info</summary>\n\nHidden content\n\n</details>",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tools.HTMLToMarkdown(tt.input)
+			got, err := tools.HTMLToMarkdown(tt.input)
+			if err != nil {
+				t.Fatalf("tools.HTMLToMarkdown(%q): unexpected error: %v", tt.input, err)
+			}
 			if got != tt.expected {
 				t.Errorf("tools.HTMLToMarkdown(%q):\n  got:  %q\n  want: %q", tt.input, got, tt.expected)
 			}

@@ -109,6 +109,75 @@ func FindTensions(msg string) []string {
 	return match
 }
 
+// reEmailQuoteHeader matches the "On ... wrote:" (EN) or "Le ... a écrit :" (FR)
+// header that email clients insert before the quoted original message.
+var reEmailQuoteHeader = re.MustCompile(`(?im)^(>?\s*)?(On\s.+wrote\s*:|Le\s.+a\s+[eé]crit\s*:)\s*$`)
+
+// StripEmailQuote removes the quoted reply portion from an email body.
+// It only strips when the quoted block (header + ">" lines) sits at
+// the very start or very end of the message.
+func StripEmailQuote(msg string) string {
+	lines := strings.Split(msg, "\n")
+
+	// Collect all header line indices.
+	var headerIndices []int
+	for i, line := range lines {
+		if reEmailQuoteHeader.MatchString(line) {
+			headerIndices = append(headerIndices, i)
+		}
+	}
+	if len(headerIndices) == 0 {
+		return msg
+	}
+
+	// Case 1: quote at the start — header on first non-blank line,
+	// followed by ">" lines / blank lines, then the user's reply.
+	first := headerIndices[0]
+	atStart := true
+	for i := 0; i < first; i++ {
+		if strings.TrimSpace(lines[i]) != "" {
+			atStart = false
+			break
+		}
+	}
+	if atStart {
+		// Walk past the quoted block (blank lines + ">" prefixed lines).
+		end := first + 1
+		for end < len(lines) {
+			t := strings.TrimSpace(lines[end])
+			if t == "" || strings.HasPrefix(t, ">") {
+				end++
+				continue
+			}
+			break
+		}
+		if result := strings.TrimSpace(strings.Join(lines[end:], "\n")); result != "" {
+			return result
+		}
+	}
+
+	// Case 2: quote at the end — use the last header.
+	// Everything after it until EOF must be blank or ">" prefixed.
+	last := headerIndices[len(headerIndices)-1]
+	allQuote := true
+	for i := last + 1; i < len(lines); i++ {
+		t := strings.TrimSpace(lines[i])
+		if t == "" || strings.HasPrefix(t, ">") {
+			continue
+		}
+		allQuote = false
+		break
+	}
+	if allQuote {
+		if result := strings.TrimSpace(strings.Join(lines[:last], "\n")); result != "" {
+			return result
+		}
+	}
+
+	// Quote is in the middle or stripping would leave nothing — keep as-is.
+	return msg
+}
+
 func ToGoNameFormat(name string) string {
 	if name == "id" {
 		return "ID"

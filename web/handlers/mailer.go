@@ -81,10 +81,12 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 	// Prefer html_body to avoid email line-wrapping artifacts in plain_body
 	msg := form.Msg
 	if form.HtmlMsg != "" {
-		if converted := HTMLToMarkdown(form.HtmlMsg); converted != "" {
+		if converted, err := HTMLToMarkdown(form.HtmlMsg); err == nil && converted != "" {
 			msg = converted
 		}
 	}
+	// Strip quoted original message from the reply
+	msg = StripEmailQuote(msg)
 
 	// Determine where from and to where it goes
 	var isTid string
@@ -228,10 +230,12 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 	// Prefer html_body to avoid email line-wrapping artifacts in plain_body
 	msg := form.Msg
 	if form.HtmlMsg != "" {
-		if converted := HTMLToMarkdown(form.HtmlMsg); converted != "" {
+		if converted, err := HTMLToMarkdown(form.HtmlMsg); err == nil && converted != "" {
 			msg = converted
 		}
 	}
+	// Strip quoted original message from the reply
+	msg = StripEmailQuote(msg)
 
 	// Get author
 	uctx, err := db.GetDB().GetUctx("email", form.From)

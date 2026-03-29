@@ -147,7 +147,7 @@ func SendVerificationEmail(email, token string) error {
 	</body>
     </html>`, url_redirect, url_redirect)
 
-	plainContent := tools.HTMLToMarkdown(content)
+	plainContent, _ := tools.HTMLToMarkdown(content)
 	body := fmt.Sprintf(`{
         "from": "Fractale <noreply@`+DOMAIN+`>",
         "to": ["%s"],
@@ -190,7 +190,7 @@ func SendResetEmail(email, token string) error {
 	</body>
     </html>`, url_redirect, url_redirect)
 
-	plainContent := tools.HTMLToMarkdown(content)
+	plainContent, _ := tools.HTMLToMarkdown(content)
 	body := fmt.Sprintf(`{
         "from": "Fractale <noreply@`+DOMAIN+`>",
         "to": ["%s"],
@@ -243,7 +243,7 @@ func SendOwnerGrantedEmail(username, nameid, orgName string) error {
 	</body>
     </html>`, orgUrl, orgName, nameid, memberUrl)
 
-	plainContent := tools.HTMLToMarkdown(content)
+	plainContent, _ := tools.HTMLToMarkdown(content)
 	body := fmt.Sprintf(`{
         "from": "Fractale <noreply@`+DOMAIN+`>",
         "to": ["%s"],
@@ -458,7 +458,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     <head> <meta charset="utf-8"> </head>
     <body> %s </body>
     </html>`, payload)
-	plainContent := tools.HTMLToMarkdown(content)
+	plainContent, _ := tools.HTMLToMarkdown(content)
 
 	body = fmt.Sprintf(`{
         "from": "%s <notifications@`+DOMAIN+`>",
@@ -629,7 +629,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     <head> <meta charset="utf-8"> </head>
     <body> %s </body>
     </html>`, payload)
-	plainContent := tools.HTMLToMarkdown(content)
+	plainContent, _ := tools.HTMLToMarkdown(content)
 
 	body = fmt.Sprintf(`{
         "from": "%s <notifications@`+DOMAIN+`>",
