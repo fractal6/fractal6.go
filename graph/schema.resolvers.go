@@ -120,7 +120,8 @@ func (r *mutationResolver) UpdateTensionTemplate(ctx context.Context, input mode
 
 // DeleteTensionTemplate is the resolver for the deleteTensionTemplate field.
 func (r *mutationResolver) DeleteTensionTemplate(ctx context.Context, filter model.TensionTemplateFilter) (data *model.DeleteTensionTemplatePayload, errors error) {
-	panic(fmt.Errorf("not implemented"))
+	errors = r.DgraphDeleteBridge(ctx, filter, &data)
+	return data, errors
 }
 
 // AddProject is the resolver for the addProject field.

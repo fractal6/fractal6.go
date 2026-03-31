@@ -211,14 +211,15 @@ type TensionTemplate @auth(
 ) @hook_ {
   id: ID!
   rootnameid: String!  @search(by: [hash])
-  name: String!       @search(by: [hash, term]) @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
-  nodes: [Node!]      @hasInverse(field: tension_templates) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  name: String!        @search(by: [hash, term]) @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [Node!]       @hasInverse(field: tension_templates) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean!         @x_alter
   # Payload
-  title: String!    @x_alter
-  comment: String!    @x_alter
-  type_: TensionType! @x_alter
-  labels: [Label!]    @x_alter(r:"ref")
-  assignees: [User!]  @x_alter(r:"ref")
+  title: String!       @x_alter
+  comment: String!     @x_alter
+  type_: TensionType!  @x_alter
+  labels: [Label!]     @x_alter(r:"ref")
+  assignees: [User!]   @x_alter(r:"ref")
 }
 
 type Project @auth(

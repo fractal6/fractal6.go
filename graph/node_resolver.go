@@ -323,3 +323,46 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 
 	return data, err
 }
+
+// Delete "Artefact" - Must be coordo
+func deleteNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
+	_, typeName, _, err := queryTypeFromGraphqlContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get User context
+	ctx, uctx, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return nil, LogErr("Access denied", err)
+	}
+
+	// Validate filter
+	var filter FilterArtefactInput
+	ExtractFilter(ctx, &filter)
+
+	// Get nodes linked to the artefact
+	var x any
+	if len(filter.ID) > 0 {
+		x, err = db.GetDB().GetSubFieldById(filter.ID[0], typeName+".nodes", "Node.nameid")
+	} else if filter.Name != nil && filter.Name.Eq != nil && filter.Rootnameid != nil && filter.Rootnameid.Eq != nil {
+		x, err = db.GetDB().GetSubFieldByEq(typeName+".name", *filter.Name.Eq, typeName+".nodes", "Node.nameid", typeName+".rootnameid", *filter.Rootnameid.Eq)
+	} else {
+		return nil, LogErr("Access denied", fmt.Errorf("invalid filter to delete node artefact."))
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	nodes := []model.NodeRef{}
+	for _, nameid := range InterfaceToSlice[string](x) {
+		nodes = append(nodes, model.NodeRef{Nameid: &nameid})
+	}
+
+	// Authorization with regards to linked nodes
+	if err = auth.Authorize(auth.CheckNodesAuth(uctx, nodes, false)); err != nil {
+		return nil, err
+	}
+
+	return next(ctx)
+}

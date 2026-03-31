@@ -737,7 +737,7 @@ This is a deliberate design choice: only types that need to be exposed through t
 |--------|----------------|
 | `DgraphAddBridge` | Label, RoleExt, TensionTemplate, Project, ProjectColumn, ProjectCard, Tension, Reaction, Contract, Vote |
 | `DgraphUpdateBridge` | Label, RoleExt, TensionTemplate, Project, ProjectColumn, ProjectCard, Tension, Comment, ProjectDraft, User, Contract, UserEvent |
-| `DgraphDeleteBridge` | ProjectColumn, ProjectCard, Comment, Reaction, Contract |
+| `DgraphDeleteBridge` | TensionTemplate, ProjectColumn, ProjectCard, Comment, Reaction, Contract |
 | `DgraphBridgeRaw` | GetNode, GetTension, GetUser, GetProject, GetTensionTemplate, GetProjectColumn, GetContract, AggregateProject |
 | `DgraphQueryBridge` | QueryNode, QueryLabel, QueryTensionTemplate, QueryTension, QueryUser |
 
