@@ -37,6 +37,9 @@ type MutationResolver interface {
 	AddRoleExt(ctx context.Context, input []*model.AddRoleExtInput) (*model.AddRoleExtPayload, error)
 	UpdateRoleExt(ctx context.Context, input model.UpdateRoleExtInput) (*model.UpdateRoleExtPayload, error)
 	DeleteRoleExt(ctx context.Context, filter model.RoleExtFilter) (*model.DeleteRoleExtPayload, error)
+	AddTensionTemplate(ctx context.Context, input []*model.AddTensionTemplateInput) (*model.AddTensionTemplatePayload, error)
+	UpdateTensionTemplate(ctx context.Context, input model.UpdateTensionTemplateInput) (*model.UpdateTensionTemplatePayload, error)
+	DeleteTensionTemplate(ctx context.Context, filter model.TensionTemplateFilter) (*model.DeleteTensionTemplatePayload, error)
 	AddProject(ctx context.Context, input []*model.AddProjectInput) (*model.AddProjectPayload, error)
 	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*model.UpdateProjectPayload, error)
 	DeleteProject(ctx context.Context, filter model.ProjectFilter) (*model.DeleteProjectPayload, error)
@@ -121,6 +124,9 @@ type QueryResolver interface {
 	GetRoleExt(ctx context.Context, id string) (*model.RoleExt, error)
 	QueryRoleExt(ctx context.Context, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) ([]*model.RoleExt, error)
 	AggregateRoleExt(ctx context.Context, filter *model.RoleExtFilter) (*model.RoleExtAggregateResult, error)
+	GetTensionTemplate(ctx context.Context, id string) (*model.TensionTemplate, error)
+	QueryTensionTemplate(ctx context.Context, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) ([]*model.TensionTemplate, error)
+	AggregateTensionTemplate(ctx context.Context, filter *model.TensionTemplateFilter) (*model.TensionTemplateAggregateResult, error)
 	GetProject(ctx context.Context, id string) (*model.Project, error)
 	QueryProject(ctx context.Context, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) ([]*model.Project, error)
 	AggregateProject(ctx context.Context, filter *model.ProjectFilter) (*model.ProjectAggregateResult, error)
@@ -1742,6 +1748,48 @@ func (ec *executionContext) field_AddTensionPayload_tension_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_AddTensionTemplatePayload_tensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionTemplateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionTemplateOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOTensionTemplateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_AddUserEventPayload_userEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3299,6 +3347,48 @@ func (ec *executionContext) field_DeleteTensionPayload_tension_args(ctx context.
 	return args, nil
 }
 
+func (ec *executionContext) field_DeleteTensionTemplatePayload_tensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionTemplateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionTemplateOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOTensionTemplateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_DeleteUserEventPayload_userEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4154,6 +4244,38 @@ func (ec *executionContext) field_Mutation_addRoleExt_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addTensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*model.AddTensionTemplateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNAddTensionTemplateInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionTemplateInputᚄ(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addTensionTemplateInput == nil {
+				return nil, errors.New("directive hook_addTensionTemplateInput is not implemented")
+			}
+			return ec.directives.Hook_addTensionTemplateInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.([]*model.AddTensionTemplateInput); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.AddTensionTemplateInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4778,6 +4900,36 @@ func (ec *executionContext) field_Mutation_deleteRoleExt_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteTensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.TensionTemplateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNTensionTemplateFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteTensionTemplateInput == nil {
+				return nil, errors.New("directive hook_deleteTensionTemplateInput is not implemented")
+			}
+			return ec.directives.Hook_deleteTensionTemplateInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.TensionTemplateFilter); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.TensionTemplateFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5372,6 +5524,36 @@ func (ec *executionContext) field_Mutation_updateRoleExt_args(ctx context.Contex
 			arg0 = data
 		} else {
 			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateRoleExtInput`, tmp))
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateTensionTemplateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalNUpdateTensionTemplateInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionTemplateInput(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateTensionTemplateInput == nil {
+				return nil, errors.New("directive hook_updateTensionTemplateInput is not implemented")
+			}
+			return ec.directives.Hook_updateTensionTemplateInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(model.UpdateTensionTemplateInput); ok {
+			arg0 = data
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be fractale/fractal6.go/graph/model.UpdateTensionTemplateInput`, tmp))
 		}
 	}
 	args["input"] = arg0
@@ -5996,6 +6178,63 @@ func (ec *executionContext) field_Node_source_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_tension_templatesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionTemplateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_tension_templates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionTemplateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionTemplateOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOTensionTemplateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
 	return args, nil
 }
 
@@ -7256,6 +7495,21 @@ func (ec *executionContext) field_Query_aggregateRoleExt_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_aggregateTensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionTemplateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_aggregateTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7641,6 +7895,21 @@ func (ec *executionContext) field_Query_getReaction_args(ctx context.Context, ra
 }
 
 func (ec *executionContext) field_Query_getRoleExt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getTensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -8852,6 +9121,65 @@ func (ec *executionContext) field_Query_queryRoleExt_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_queryTensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionTemplateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		directive0 := func(ctx context.Context) (interface{}, error) {
+			return ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, tmp)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_queryTensionTemplateInput == nil {
+				return nil, errors.New("directive hook_queryTensionTemplateInput is not implemented")
+			}
+			return ec.directives.Hook_queryTensionTemplateInput(ctx, rawArgs, directive0)
+		}
+
+		tmp, err = directive1(ctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if data, ok := tmp.(*model.TensionTemplateFilter); ok {
+			arg0 = data
+		} else if tmp == nil {
+			arg0 = nil
+		} else {
+			return nil, graphql.ErrorOnPath(ctx, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionTemplateFilter`, tmp))
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionTemplateOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOTensionTemplateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_queryTension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -9231,6 +9559,177 @@ func (ec *executionContext) field_RoleExt_rolesAggregate_args(ctx context.Contex
 }
 
 func (ec *executionContext) field_RoleExt_roles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.NodeOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalONodeOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_TensionTemplate_assigneesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_TensionTemplate_assignees_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.UserOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOUserOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_TensionTemplate_labelsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.LabelFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_TensionTemplate_labels_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.LabelFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOLabelFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.LabelOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOLabelOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_TensionTemplate_nodesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_TensionTemplate_nodes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.NodeFilter
@@ -10803,6 +11302,48 @@ func (ec *executionContext) field_UpdateTensionPayload_tension_args(ctx context.
 	if tmp, ok := rawArgs["order"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
 		arg1, err = ec.unmarshalOTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_UpdateTensionTemplatePayload_tensionTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionTemplateFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionTemplateOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOTensionTemplateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrder(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -13178,18 +13719,18 @@ func (ec *executionContext) fieldContext_AddLabelPayload_label(ctx context.Conte
 				return ec.fieldContext_Label_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Label_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Label_nodes(ctx, field)
 			case "description":
 				return ec.fieldContext_Label_description(ctx, field)
 			case "color":
 				return ec.fieldContext_Label_color(ctx, field)
 			case "tensions":
 				return ec.fieldContext_Label_tensions(ctx, field)
-			case "nodes":
-				return ec.fieldContext_Label_nodes(ctx, field)
-			case "tensionsAggregate":
-				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_Label_nodesAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
 		},
@@ -13539,18 +14080,22 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -13575,14 +14120,16 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -14635,6 +15182,8 @@ func (ec *executionContext) fieldContext_AddRoleExtPayload_roleExt(ctx context.C
 				return ec.fieldContext_RoleExt_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_RoleExt_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_RoleExt_nodes(ctx, field)
 			case "about":
 				return ec.fieldContext_RoleExt_about(ctx, field)
 			case "role_type":
@@ -14645,12 +15194,10 @@ func (ec *executionContext) fieldContext_AddRoleExtPayload_roleExt(ctx context.C
 				return ec.fieldContext_RoleExt_mandate(ctx, field)
 			case "roles":
 				return ec.fieldContext_RoleExt_roles(ctx, field)
-			case "nodes":
-				return ec.fieldContext_RoleExt_nodes(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_RoleExt_nodesAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type RoleExt", field.Name)
 		},
@@ -14850,6 +15397,121 @@ func (ec *executionContext) _AddTensionPayload_numUids(ctx context.Context, fiel
 func (ec *executionContext) fieldContext_AddTensionPayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AddTensionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddTensionTemplatePayload_tensionTemplate(ctx context.Context, field graphql.CollectedField, obj *model.AddTensionTemplatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddTensionTemplatePayload_tensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionTemplate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TensionTemplate)
+	fc.Result = res
+	return ec.marshalOTensionTemplate2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddTensionTemplatePayload_tensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddTensionTemplatePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TensionTemplate_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
+			case "is_recursive":
+				return ec.fieldContext_TensionTemplate_is_recursive(ctx, field)
+			case "title":
+				return ec.fieldContext_TensionTemplate_title(ctx, field)
+			case "comment":
+				return ec.fieldContext_TensionTemplate_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_TensionTemplate_type_(ctx, field)
+			case "labels":
+				return ec.fieldContext_TensionTemplate_labels(ctx, field)
+			case "assignees":
+				return ec.fieldContext_TensionTemplate_assignees(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_TensionTemplate_nodesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_TensionTemplate_labelsAggregate(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_TensionTemplate_assigneesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AddTensionTemplatePayload_tensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AddTensionTemplatePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.AddTensionTemplatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AddTensionTemplatePayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AddTensionTemplatePayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AddTensionTemplatePayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -20191,18 +20853,18 @@ func (ec *executionContext) fieldContext_DeleteLabelPayload_label(ctx context.Co
 				return ec.fieldContext_Label_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Label_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Label_nodes(ctx, field)
 			case "description":
 				return ec.fieldContext_Label_description(ctx, field)
 			case "color":
 				return ec.fieldContext_Label_color(ctx, field)
 			case "tensions":
 				return ec.fieldContext_Label_tensions(ctx, field)
-			case "nodes":
-				return ec.fieldContext_Label_nodes(ctx, field)
-			case "tensionsAggregate":
-				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_Label_nodesAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
 		},
@@ -20666,18 +21328,22 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -20702,14 +21368,16 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -22279,6 +22947,8 @@ func (ec *executionContext) fieldContext_DeleteRoleExtPayload_roleExt(ctx contex
 				return ec.fieldContext_RoleExt_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_RoleExt_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_RoleExt_nodes(ctx, field)
 			case "about":
 				return ec.fieldContext_RoleExt_about(ctx, field)
 			case "role_type":
@@ -22289,12 +22959,10 @@ func (ec *executionContext) fieldContext_DeleteRoleExtPayload_roleExt(ctx contex
 				return ec.fieldContext_RoleExt_mandate(ctx, field)
 			case "roles":
 				return ec.fieldContext_RoleExt_roles(ctx, field)
-			case "nodes":
-				return ec.fieldContext_RoleExt_nodes(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_RoleExt_nodesAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type RoleExt", field.Name)
 		},
@@ -22570,6 +23238,159 @@ func (ec *executionContext) _DeleteTensionPayload_numUids(ctx context.Context, f
 func (ec *executionContext) fieldContext_DeleteTensionPayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteTensionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteTensionTemplatePayload_tensionTemplate(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTensionTemplatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteTensionTemplatePayload_tensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionTemplate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TensionTemplate)
+	fc.Result = res
+	return ec.marshalOTensionTemplate2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteTensionTemplatePayload_tensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteTensionTemplatePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TensionTemplate_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
+			case "is_recursive":
+				return ec.fieldContext_TensionTemplate_is_recursive(ctx, field)
+			case "title":
+				return ec.fieldContext_TensionTemplate_title(ctx, field)
+			case "comment":
+				return ec.fieldContext_TensionTemplate_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_TensionTemplate_type_(ctx, field)
+			case "labels":
+				return ec.fieldContext_TensionTemplate_labels(ctx, field)
+			case "assignees":
+				return ec.fieldContext_TensionTemplate_assignees(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_TensionTemplate_nodesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_TensionTemplate_labelsAggregate(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_TensionTemplate_assigneesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_DeleteTensionTemplatePayload_tensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteTensionTemplatePayload_msg(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTensionTemplatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteTensionTemplatePayload_msg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteTensionTemplatePayload_msg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteTensionTemplatePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteTensionTemplatePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTensionTemplatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteTensionTemplatePayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteTensionTemplatePayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteTensionTemplatePayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -25286,6 +26107,159 @@ func (ec *executionContext) fieldContext_Label_name(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Label_nodes(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Label_nodes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Label",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Node_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Node_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Node_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Node_updatedAt(ctx, field)
+			case "nameid":
+				return ec.fieldContext_Node_nameid(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
+			case "isRoot":
+				return ec.fieldContext_Node_isRoot(ctx, field)
+			case "parent":
+				return ec.fieldContext_Node_parent(ctx, field)
+			case "type_":
+				return ec.fieldContext_Node_type_(ctx, field)
+			case "tensions_out":
+				return ec.fieldContext_Node_tensions_out(ctx, field)
+			case "tensions_in":
+				return ec.fieldContext_Node_tensions_in(ctx, field)
+			case "visibility":
+				return ec.fieldContext_Node_visibility(ctx, field)
+			case "mode":
+				return ec.fieldContext_Node_mode(ctx, field)
+			case "rights":
+				return ec.fieldContext_Node_rights(ctx, field)
+			case "isArchived":
+				return ec.fieldContext_Node_isArchived(ctx, field)
+			case "isPersonal":
+				return ec.fieldContext_Node_isPersonal(ctx, field)
+			case "userCanJoin":
+				return ec.fieldContext_Node_userCanJoin(ctx, field)
+			case "guestCanCreateTension":
+				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
+			case "children":
+				return ec.fieldContext_Node_children(ctx, field)
+			case "projects":
+				return ec.fieldContext_Node_projects(ctx, field)
+			case "pinned":
+				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
+			case "role_ext":
+				return ec.fieldContext_Node_role_ext(ctx, field)
+			case "role_type":
+				return ec.fieldContext_Node_role_type(ctx, field)
+			case "color":
+				return ec.fieldContext_Node_color(ctx, field)
+			case "first_link":
+				return ec.fieldContext_Node_first_link(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Node_contracts(ctx, field)
+			case "events_history":
+				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
+			case "cascade_directive":
+				return ec.fieldContext_Node_cascade_directive(ctx, field)
+			case "tensions_outAggregate":
+				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
+			case "tensions_inAggregate":
+				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
+			case "childrenAggregate":
+				return ec.fieldContext_Node_childrenAggregate(ctx, field)
+			case "projectsAggregate":
+				return ec.fieldContext_Node_projectsAggregate(ctx, field)
+			case "pinnedAggregate":
+				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "events_historyAggregate":
+				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Label_nodes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Label_description(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Label_description(ctx, field)
 	if err != nil {
@@ -25477,238 +26451,6 @@ func (ec *executionContext) fieldContext_Label_tensions(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Label_nodes(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Label_nodes(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Nodes, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Node)
-	fc.Result = res
-	return ec.marshalONode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Label",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Node_id(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Node_createdBy(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Node_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "nameid":
-				return ec.fieldContext_Node_nameid(ctx, field)
-			case "rootnameid":
-				return ec.fieldContext_Node_rootnameid(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
-			case "isRoot":
-				return ec.fieldContext_Node_isRoot(ctx, field)
-			case "parent":
-				return ec.fieldContext_Node_parent(ctx, field)
-			case "type_":
-				return ec.fieldContext_Node_type_(ctx, field)
-			case "tensions_out":
-				return ec.fieldContext_Node_tensions_out(ctx, field)
-			case "tensions_in":
-				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "visibility":
-				return ec.fieldContext_Node_visibility(ctx, field)
-			case "mode":
-				return ec.fieldContext_Node_mode(ctx, field)
-			case "rights":
-				return ec.fieldContext_Node_rights(ctx, field)
-			case "isArchived":
-				return ec.fieldContext_Node_isArchived(ctx, field)
-			case "isPersonal":
-				return ec.fieldContext_Node_isPersonal(ctx, field)
-			case "userCanJoin":
-				return ec.fieldContext_Node_userCanJoin(ctx, field)
-			case "guestCanCreateTension":
-				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
-			case "lexicon":
-				return ec.fieldContext_Node_lexicon(ctx, field)
-			case "watchers":
-				return ec.fieldContext_Node_watchers(ctx, field)
-			case "children":
-				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
-			case "projects":
-				return ec.fieldContext_Node_projects(ctx, field)
-			case "pinned":
-				return ec.fieldContext_Node_pinned(ctx, field)
-			case "role_ext":
-				return ec.fieldContext_Node_role_ext(ctx, field)
-			case "role_type":
-				return ec.fieldContext_Node_role_type(ctx, field)
-			case "color":
-				return ec.fieldContext_Node_color(ctx, field)
-			case "first_link":
-				return ec.fieldContext_Node_first_link(ctx, field)
-			case "contracts":
-				return ec.fieldContext_Node_contracts(ctx, field)
-			case "events_history":
-				return ec.fieldContext_Node_events_history(ctx, field)
-			case "activity":
-				return ec.fieldContext_Node_activity(ctx, field)
-			case "cascade_directive":
-				return ec.fieldContext_Node_cascade_directive(ctx, field)
-			case "tensions_outAggregate":
-				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
-			case "tensions_inAggregate":
-				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
-			case "watchersAggregate":
-				return ec.fieldContext_Node_watchersAggregate(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Node_projectsAggregate(ctx, field)
-			case "pinnedAggregate":
-				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
-			case "contractsAggregate":
-				return ec.fieldContext_Node_contractsAggregate(ctx, field)
-			case "events_historyAggregate":
-				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
-			case "activityAggregate":
-				return ec.fieldContext_Node_activityAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Label_nodes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Label_tensionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Label_tensionsAggregate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TensionsAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.TensionAggregateResult)
-	fc.Result = res
-	return ec.marshalOTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Label_tensionsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Label",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_TensionAggregateResult_count(ctx, field)
-			case "createdAtMin":
-				return ec.fieldContext_TensionAggregateResult_createdAtMin(ctx, field)
-			case "createdAtMax":
-				return ec.fieldContext_TensionAggregateResult_createdAtMax(ctx, field)
-			case "updatedAtMin":
-				return ec.fieldContext_TensionAggregateResult_updatedAtMin(ctx, field)
-			case "updatedAtMax":
-				return ec.fieldContext_TensionAggregateResult_updatedAtMax(ctx, field)
-			case "messageMin":
-				return ec.fieldContext_TensionAggregateResult_messageMin(ctx, field)
-			case "messageMax":
-				return ec.fieldContext_TensionAggregateResult_messageMax(ctx, field)
-			case "emitteridMin":
-				return ec.fieldContext_TensionAggregateResult_emitteridMin(ctx, field)
-			case "emitteridMax":
-				return ec.fieldContext_TensionAggregateResult_emitteridMax(ctx, field)
-			case "receiveridMin":
-				return ec.fieldContext_TensionAggregateResult_receiveridMin(ctx, field)
-			case "receiveridMax":
-				return ec.fieldContext_TensionAggregateResult_receiveridMax(ctx, field)
-			case "titleMin":
-				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
-			case "titleMax":
-				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
-			case "n_commentsMin":
-				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
-			case "n_commentsMax":
-				return ec.fieldContext_TensionAggregateResult_n_commentsMax(ctx, field)
-			case "n_commentsSum":
-				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
-			case "n_commentsAvg":
-				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Label_tensionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Label_nodesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Label_nodesAggregate(ctx, field)
 	if err != nil {
@@ -25796,6 +26538,91 @@ func (ec *executionContext) fieldContext_Label_nodesAggregate(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Label_nodesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Label_tensionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Label) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Label_tensionsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Label_tensionsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Label",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_TensionAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_TensionAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_TensionAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_TensionAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_TensionAggregateResult_updatedAtMax(ctx, field)
+			case "messageMin":
+				return ec.fieldContext_TensionAggregateResult_messageMin(ctx, field)
+			case "messageMax":
+				return ec.fieldContext_TensionAggregateResult_messageMax(ctx, field)
+			case "emitteridMin":
+				return ec.fieldContext_TensionAggregateResult_emitteridMin(ctx, field)
+			case "emitteridMax":
+				return ec.fieldContext_TensionAggregateResult_emitteridMax(ctx, field)
+			case "receiveridMin":
+				return ec.fieldContext_TensionAggregateResult_receiveridMin(ctx, field)
+			case "receiveridMax":
+				return ec.fieldContext_TensionAggregateResult_receiveridMax(ctx, field)
+			case "titleMin":
+				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
+			case "titleMax":
+				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
+			case "n_commentsMin":
+				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
+			case "n_commentsMax":
+				return ec.fieldContext_TensionAggregateResult_n_commentsMax(ctx, field)
+			case "n_commentsSum":
+				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
+			case "n_commentsAvg":
+				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Label_tensionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -27843,6 +28670,233 @@ func (ec *executionContext) fieldContext_Mutation_deleteRoleExt(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteRoleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addTensionTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addTensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().AddTensionTemplate(rctx, fc.Args["input"].([]*model.AddTensionTemplateInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_addTensionTemplate == nil {
+				return nil, errors.New("directive hook_addTensionTemplate is not implemented")
+			}
+			return ec.directives.Hook_addTensionTemplate(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.AddTensionTemplatePayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.AddTensionTemplatePayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AddTensionTemplatePayload)
+	fc.Result = res
+	return ec.marshalOAddTensionTemplatePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionTemplatePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addTensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tensionTemplate":
+				return ec.fieldContext_AddTensionTemplatePayload_tensionTemplate(ctx, field)
+			case "numUids":
+				return ec.fieldContext_AddTensionTemplatePayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AddTensionTemplatePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addTensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateTensionTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateTensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateTensionTemplate(rctx, fc.Args["input"].(model.UpdateTensionTemplateInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_updateTensionTemplate == nil {
+				return nil, errors.New("directive hook_updateTensionTemplate is not implemented")
+			}
+			return ec.directives.Hook_updateTensionTemplate(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.UpdateTensionTemplatePayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UpdateTensionTemplatePayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateTensionTemplatePayload)
+	fc.Result = res
+	return ec.marshalOUpdateTensionTemplatePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionTemplatePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateTensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tensionTemplate":
+				return ec.fieldContext_UpdateTensionTemplatePayload_tensionTemplate(ctx, field)
+			case "numUids":
+				return ec.fieldContext_UpdateTensionTemplatePayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateTensionTemplatePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateTensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteTensionTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteTensionTemplate(rctx, fc.Args["filter"].(model.TensionTemplateFilter))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Hook_deleteTensionTemplate == nil {
+				return nil, errors.New("directive hook_deleteTensionTemplate is not implemented")
+			}
+			return ec.directives.Hook_deleteTensionTemplate(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.DeleteTensionTemplatePayload); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.DeleteTensionTemplatePayload`, tmp)
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteTensionTemplatePayload)
+	fc.Result = res
+	return ec.marshalODeleteTensionTemplatePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteTensionTemplatePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteTensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tensionTemplate":
+				return ec.fieldContext_DeleteTensionTemplatePayload_tensionTemplate(ctx, field)
+			case "msg":
+				return ec.fieldContext_DeleteTensionTemplatePayload_msg(ctx, field)
+			case "numUids":
+				return ec.fieldContext_DeleteTensionTemplatePayload_numUids(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteTensionTemplatePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteTensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -32704,18 +33758,22 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -32740,14 +33798,16 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -33359,6 +34419,44 @@ func (ec *executionContext) fieldContext_Node_lexicon(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Node_isTemplateTensionOnly(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsTemplateTensionOnly, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_isTemplateTensionOnly(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Node_watchers(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_watchers(ctx, field)
 	if err != nil {
@@ -33559,18 +34657,22 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -33595,14 +34697,16 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -33621,148 +34725,6 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_children_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_labels(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_labels(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Labels, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Label)
-	fc.Result = res
-	return ec.marshalOLabel2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_labels(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Label_id(ctx, field)
-			case "rootnameid":
-				return ec.fieldContext_Label_rootnameid(ctx, field)
-			case "name":
-				return ec.fieldContext_Label_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Label_description(ctx, field)
-			case "color":
-				return ec.fieldContext_Label_color(ctx, field)
-			case "tensions":
-				return ec.fieldContext_Label_tensions(ctx, field)
-			case "nodes":
-				return ec.fieldContext_Label_nodes(ctx, field)
-			case "tensionsAggregate":
-				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
-			case "nodesAggregate":
-				return ec.fieldContext_Label_nodesAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_labels_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_roles(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_roles(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Roles, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.RoleExt)
-	fc.Result = res
-	return ec.marshalORoleExt2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_roles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_RoleExt_id(ctx, field)
-			case "rootnameid":
-				return ec.fieldContext_RoleExt_rootnameid(ctx, field)
-			case "name":
-				return ec.fieldContext_RoleExt_name(ctx, field)
-			case "about":
-				return ec.fieldContext_RoleExt_about(ctx, field)
-			case "role_type":
-				return ec.fieldContext_RoleExt_role_type(ctx, field)
-			case "color":
-				return ec.fieldContext_RoleExt_color(ctx, field)
-			case "mandate":
-				return ec.fieldContext_RoleExt_mandate(ctx, field)
-			case "roles":
-				return ec.fieldContext_RoleExt_roles(ctx, field)
-			case "nodes":
-				return ec.fieldContext_RoleExt_nodes(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
-			case "nodesAggregate":
-				return ec.fieldContext_RoleExt_nodesAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type RoleExt", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_roles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -33971,6 +34933,225 @@ func (ec *executionContext) fieldContext_Node_pinned(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Node_labels(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_labels(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Labels, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Label)
+	fc.Result = res
+	return ec.marshalOLabel2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_labels(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Label_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_Label_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_Label_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Label_nodes(ctx, field)
+			case "description":
+				return ec.fieldContext_Label_description(ctx, field)
+			case "color":
+				return ec.fieldContext_Label_color(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Label_tensions(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_Label_nodesAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_labels_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_roles(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_roles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Roles, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.RoleExt)
+	fc.Result = res
+	return ec.marshalORoleExt2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_roles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_RoleExt_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_RoleExt_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_RoleExt_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_RoleExt_nodes(ctx, field)
+			case "about":
+				return ec.fieldContext_RoleExt_about(ctx, field)
+			case "role_type":
+				return ec.fieldContext_RoleExt_role_type(ctx, field)
+			case "color":
+				return ec.fieldContext_RoleExt_color(ctx, field)
+			case "mandate":
+				return ec.fieldContext_RoleExt_mandate(ctx, field)
+			case "roles":
+				return ec.fieldContext_RoleExt_roles(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_RoleExt_nodesAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RoleExt", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_roles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_tension_templates(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_tension_templates(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionTemplates, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TensionTemplate)
+	fc.Result = res
+	return ec.marshalOTensionTemplate2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_tension_templates(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TensionTemplate_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
+			case "is_recursive":
+				return ec.fieldContext_TensionTemplate_is_recursive(ctx, field)
+			case "title":
+				return ec.fieldContext_TensionTemplate_title(ctx, field)
+			case "comment":
+				return ec.fieldContext_TensionTemplate_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_TensionTemplate_type_(ctx, field)
+			case "labels":
+				return ec.fieldContext_TensionTemplate_labels(ctx, field)
+			case "assignees":
+				return ec.fieldContext_TensionTemplate_assignees(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_TensionTemplate_nodesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_TensionTemplate_labelsAggregate(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_TensionTemplate_assigneesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_tension_templates_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Node_role_ext(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_role_ext(ctx, field)
 	if err != nil {
@@ -34010,6 +35191,8 @@ func (ec *executionContext) fieldContext_Node_role_ext(ctx context.Context, fiel
 				return ec.fieldContext_RoleExt_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_RoleExt_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_RoleExt_nodes(ctx, field)
 			case "about":
 				return ec.fieldContext_RoleExt_about(ctx, field)
 			case "role_type":
@@ -34020,12 +35203,10 @@ func (ec *executionContext) fieldContext_Node_role_ext(ctx context.Context, fiel
 				return ec.fieldContext_RoleExt_mandate(ctx, field)
 			case "roles":
 				return ec.fieldContext_RoleExt_roles(ctx, field)
-			case "nodes":
-				return ec.fieldContext_RoleExt_nodes(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_RoleExt_nodesAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type RoleExt", field.Name)
 		},
@@ -34892,144 +36073,6 @@ func (ec *executionContext) fieldContext_Node_childrenAggregate(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Node_labelsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_labelsAggregate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.LabelsAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.LabelAggregateResult)
-	fc.Result = res
-	return ec.marshalOLabelAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_labelsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_LabelAggregateResult_count(ctx, field)
-			case "rootnameidMin":
-				return ec.fieldContext_LabelAggregateResult_rootnameidMin(ctx, field)
-			case "rootnameidMax":
-				return ec.fieldContext_LabelAggregateResult_rootnameidMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_LabelAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_LabelAggregateResult_nameMax(ctx, field)
-			case "descriptionMin":
-				return ec.fieldContext_LabelAggregateResult_descriptionMin(ctx, field)
-			case "descriptionMax":
-				return ec.fieldContext_LabelAggregateResult_descriptionMax(ctx, field)
-			case "colorMin":
-				return ec.fieldContext_LabelAggregateResult_colorMin(ctx, field)
-			case "colorMax":
-				return ec.fieldContext_LabelAggregateResult_colorMax(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type LabelAggregateResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_labelsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Node_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_rolesAggregate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RolesAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.RoleExtAggregateResult)
-	fc.Result = res
-	return ec.marshalORoleExtAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_rolesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_RoleExtAggregateResult_count(ctx, field)
-			case "rootnameidMin":
-				return ec.fieldContext_RoleExtAggregateResult_rootnameidMin(ctx, field)
-			case "rootnameidMax":
-				return ec.fieldContext_RoleExtAggregateResult_rootnameidMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_RoleExtAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_RoleExtAggregateResult_nameMax(ctx, field)
-			case "aboutMin":
-				return ec.fieldContext_RoleExtAggregateResult_aboutMin(ctx, field)
-			case "aboutMax":
-				return ec.fieldContext_RoleExtAggregateResult_aboutMax(ctx, field)
-			case "colorMin":
-				return ec.fieldContext_RoleExtAggregateResult_colorMin(ctx, field)
-			case "colorMax":
-				return ec.fieldContext_RoleExtAggregateResult_colorMax(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type RoleExtAggregateResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Node_rolesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Node_projectsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_projectsAggregate(ctx, field)
 	if err != nil {
@@ -35190,6 +36233,213 @@ func (ec *executionContext) fieldContext_Node_pinnedAggregate(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_pinnedAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_labelsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_labelsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LabelsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.LabelAggregateResult)
+	fc.Result = res
+	return ec.marshalOLabelAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_labelsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_LabelAggregateResult_count(ctx, field)
+			case "rootnameidMin":
+				return ec.fieldContext_LabelAggregateResult_rootnameidMin(ctx, field)
+			case "rootnameidMax":
+				return ec.fieldContext_LabelAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_LabelAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_LabelAggregateResult_nameMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_LabelAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_LabelAggregateResult_descriptionMax(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_LabelAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_LabelAggregateResult_colorMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LabelAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_labelsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_rolesAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RolesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.RoleExtAggregateResult)
+	fc.Result = res
+	return ec.marshalORoleExtAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_rolesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_RoleExtAggregateResult_count(ctx, field)
+			case "rootnameidMin":
+				return ec.fieldContext_RoleExtAggregateResult_rootnameidMin(ctx, field)
+			case "rootnameidMax":
+				return ec.fieldContext_RoleExtAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_RoleExtAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_RoleExtAggregateResult_nameMax(ctx, field)
+			case "aboutMin":
+				return ec.fieldContext_RoleExtAggregateResult_aboutMin(ctx, field)
+			case "aboutMax":
+				return ec.fieldContext_RoleExtAggregateResult_aboutMax(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_RoleExtAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_RoleExtAggregateResult_colorMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type RoleExtAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_rolesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_tension_templatesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionTemplatesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionTemplateAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionTemplateAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_tension_templatesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_TensionTemplateAggregateResult_count(ctx, field)
+			case "rootnameidMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_rootnameidMin(ctx, field)
+			case "rootnameidMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_nameMax(ctx, field)
+			case "titleMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_titleMin(ctx, field)
+			case "titleMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_titleMax(ctx, field)
+			case "commentMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_commentMin(ctx, field)
+			case "commentMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_commentMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionTemplateAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_tension_templatesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -40607,18 +41857,22 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -40643,14 +41897,16 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -44993,18 +46249,22 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -45029,14 +46289,16 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -45140,18 +46402,22 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -45176,14 +46442,16 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -45762,18 +47030,18 @@ func (ec *executionContext) fieldContext_Query_getLabel(ctx context.Context, fie
 				return ec.fieldContext_Label_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Label_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Label_nodes(ctx, field)
 			case "description":
 				return ec.fieldContext_Label_description(ctx, field)
 			case "color":
 				return ec.fieldContext_Label_color(ctx, field)
 			case "tensions":
 				return ec.fieldContext_Label_tensions(ctx, field)
-			case "nodes":
-				return ec.fieldContext_Label_nodes(ctx, field)
-			case "tensionsAggregate":
-				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_Label_nodesAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
 		},
@@ -45831,18 +47099,18 @@ func (ec *executionContext) fieldContext_Query_queryLabel(ctx context.Context, f
 				return ec.fieldContext_Label_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Label_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Label_nodes(ctx, field)
 			case "description":
 				return ec.fieldContext_Label_description(ctx, field)
 			case "color":
 				return ec.fieldContext_Label_color(ctx, field)
 			case "tensions":
 				return ec.fieldContext_Label_tensions(ctx, field)
-			case "nodes":
-				return ec.fieldContext_Label_nodes(ctx, field)
-			case "tensionsAggregate":
-				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_Label_nodesAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
 		},
@@ -45969,6 +47237,8 @@ func (ec *executionContext) fieldContext_Query_getRoleExt(ctx context.Context, f
 				return ec.fieldContext_RoleExt_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_RoleExt_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_RoleExt_nodes(ctx, field)
 			case "about":
 				return ec.fieldContext_RoleExt_about(ctx, field)
 			case "role_type":
@@ -45979,12 +47249,10 @@ func (ec *executionContext) fieldContext_Query_getRoleExt(ctx context.Context, f
 				return ec.fieldContext_RoleExt_mandate(ctx, field)
 			case "roles":
 				return ec.fieldContext_RoleExt_roles(ctx, field)
-			case "nodes":
-				return ec.fieldContext_RoleExt_nodes(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_RoleExt_nodesAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type RoleExt", field.Name)
 		},
@@ -46042,6 +47310,8 @@ func (ec *executionContext) fieldContext_Query_queryRoleExt(ctx context.Context,
 				return ec.fieldContext_RoleExt_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_RoleExt_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_RoleExt_nodes(ctx, field)
 			case "about":
 				return ec.fieldContext_RoleExt_about(ctx, field)
 			case "role_type":
@@ -46052,12 +47322,10 @@ func (ec *executionContext) fieldContext_Query_queryRoleExt(ctx context.Context,
 				return ec.fieldContext_RoleExt_mandate(ctx, field)
 			case "roles":
 				return ec.fieldContext_RoleExt_roles(ctx, field)
-			case "nodes":
-				return ec.fieldContext_RoleExt_nodes(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_RoleExt_nodesAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type RoleExt", field.Name)
 		},
@@ -46139,6 +47407,229 @@ func (ec *executionContext) fieldContext_Query_aggregateRoleExt(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_aggregateRoleExt_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getTensionTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetTensionTemplate(rctx, fc.Args["id"].(string))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionTemplate)
+	fc.Result = res
+	return ec.marshalOTensionTemplate2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getTensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TensionTemplate_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
+			case "is_recursive":
+				return ec.fieldContext_TensionTemplate_is_recursive(ctx, field)
+			case "title":
+				return ec.fieldContext_TensionTemplate_title(ctx, field)
+			case "comment":
+				return ec.fieldContext_TensionTemplate_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_TensionTemplate_type_(ctx, field)
+			case "labels":
+				return ec.fieldContext_TensionTemplate_labels(ctx, field)
+			case "assignees":
+				return ec.fieldContext_TensionTemplate_assignees(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_TensionTemplate_nodesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_TensionTemplate_labelsAggregate(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_TensionTemplate_assigneesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getTensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_queryTensionTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryTensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryTensionTemplate(rctx, fc.Args["filter"].(*model.TensionTemplateFilter), fc.Args["order"].(*model.TensionTemplateOrder), fc.Args["first"].(*int), fc.Args["offset"].(*int))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TensionTemplate)
+	fc.Result = res
+	return ec.marshalOTensionTemplate2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryTensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TensionTemplate_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
+			case "is_recursive":
+				return ec.fieldContext_TensionTemplate_is_recursive(ctx, field)
+			case "title":
+				return ec.fieldContext_TensionTemplate_title(ctx, field)
+			case "comment":
+				return ec.fieldContext_TensionTemplate_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_TensionTemplate_type_(ctx, field)
+			case "labels":
+				return ec.fieldContext_TensionTemplate_labels(ctx, field)
+			case "assignees":
+				return ec.fieldContext_TensionTemplate_assignees(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_TensionTemplate_nodesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_TensionTemplate_labelsAggregate(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_TensionTemplate_assigneesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryTensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_aggregateTensionTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_aggregateTensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AggregateTensionTemplate(rctx, fc.Args["filter"].(*model.TensionTemplateFilter))
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionTemplateAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionTemplateAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_aggregateTensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_TensionTemplateAggregateResult_count(ctx, field)
+			case "rootnameidMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_rootnameidMin(ctx, field)
+			case "rootnameidMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_nameMax(ctx, field)
+			case "titleMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_titleMin(ctx, field)
+			case "titleMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_titleMax(ctx, field)
+			case "commentMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_commentMin(ctx, field)
+			case "commentMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_commentMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionTemplateAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_aggregateTensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -51377,6 +52868,159 @@ func (ec *executionContext) fieldContext_RoleExt_name(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _RoleExt_nodes(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RoleExt_nodes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Node_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Node_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Node_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Node_updatedAt(ctx, field)
+			case "nameid":
+				return ec.fieldContext_Node_nameid(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
+			case "isRoot":
+				return ec.fieldContext_Node_isRoot(ctx, field)
+			case "parent":
+				return ec.fieldContext_Node_parent(ctx, field)
+			case "type_":
+				return ec.fieldContext_Node_type_(ctx, field)
+			case "tensions_out":
+				return ec.fieldContext_Node_tensions_out(ctx, field)
+			case "tensions_in":
+				return ec.fieldContext_Node_tensions_in(ctx, field)
+			case "visibility":
+				return ec.fieldContext_Node_visibility(ctx, field)
+			case "mode":
+				return ec.fieldContext_Node_mode(ctx, field)
+			case "rights":
+				return ec.fieldContext_Node_rights(ctx, field)
+			case "isArchived":
+				return ec.fieldContext_Node_isArchived(ctx, field)
+			case "isPersonal":
+				return ec.fieldContext_Node_isPersonal(ctx, field)
+			case "userCanJoin":
+				return ec.fieldContext_Node_userCanJoin(ctx, field)
+			case "guestCanCreateTension":
+				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
+			case "children":
+				return ec.fieldContext_Node_children(ctx, field)
+			case "projects":
+				return ec.fieldContext_Node_projects(ctx, field)
+			case "pinned":
+				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
+			case "role_ext":
+				return ec.fieldContext_Node_role_ext(ctx, field)
+			case "role_type":
+				return ec.fieldContext_Node_role_type(ctx, field)
+			case "color":
+				return ec.fieldContext_Node_color(ctx, field)
+			case "first_link":
+				return ec.fieldContext_Node_first_link(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Node_contracts(ctx, field)
+			case "events_history":
+				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
+			case "cascade_directive":
+				return ec.fieldContext_Node_cascade_directive(ctx, field)
+			case "tensions_outAggregate":
+				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
+			case "tensions_inAggregate":
+				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
+			case "childrenAggregate":
+				return ec.fieldContext_Node_childrenAggregate(ctx, field)
+			case "projectsAggregate":
+				return ec.fieldContext_Node_projectsAggregate(ctx, field)
+			case "pinnedAggregate":
+				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "events_historyAggregate":
+				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_RoleExt_nodes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _RoleExt_about(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_RoleExt_about(ctx, field)
 	if err != nil {
@@ -51634,18 +53278,22 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -51670,14 +53318,16 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -51696,246 +53346,6 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_RoleExt_roles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _RoleExt_nodes(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_RoleExt_nodes(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Nodes, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Node)
-	fc.Result = res
-	return ec.marshalONode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "RoleExt",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Node_id(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Node_createdBy(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Node_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Node_updatedAt(ctx, field)
-			case "nameid":
-				return ec.fieldContext_Node_nameid(ctx, field)
-			case "rootnameid":
-				return ec.fieldContext_Node_rootnameid(ctx, field)
-			case "source":
-				return ec.fieldContext_Node_source(ctx, field)
-			case "name":
-				return ec.fieldContext_Node_name(ctx, field)
-			case "about":
-				return ec.fieldContext_Node_about(ctx, field)
-			case "skills":
-				return ec.fieldContext_Node_skills(ctx, field)
-			case "isRoot":
-				return ec.fieldContext_Node_isRoot(ctx, field)
-			case "parent":
-				return ec.fieldContext_Node_parent(ctx, field)
-			case "type_":
-				return ec.fieldContext_Node_type_(ctx, field)
-			case "tensions_out":
-				return ec.fieldContext_Node_tensions_out(ctx, field)
-			case "tensions_in":
-				return ec.fieldContext_Node_tensions_in(ctx, field)
-			case "visibility":
-				return ec.fieldContext_Node_visibility(ctx, field)
-			case "mode":
-				return ec.fieldContext_Node_mode(ctx, field)
-			case "rights":
-				return ec.fieldContext_Node_rights(ctx, field)
-			case "isArchived":
-				return ec.fieldContext_Node_isArchived(ctx, field)
-			case "isPersonal":
-				return ec.fieldContext_Node_isPersonal(ctx, field)
-			case "userCanJoin":
-				return ec.fieldContext_Node_userCanJoin(ctx, field)
-			case "guestCanCreateTension":
-				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
-			case "lexicon":
-				return ec.fieldContext_Node_lexicon(ctx, field)
-			case "watchers":
-				return ec.fieldContext_Node_watchers(ctx, field)
-			case "children":
-				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
-			case "projects":
-				return ec.fieldContext_Node_projects(ctx, field)
-			case "pinned":
-				return ec.fieldContext_Node_pinned(ctx, field)
-			case "role_ext":
-				return ec.fieldContext_Node_role_ext(ctx, field)
-			case "role_type":
-				return ec.fieldContext_Node_role_type(ctx, field)
-			case "color":
-				return ec.fieldContext_Node_color(ctx, field)
-			case "first_link":
-				return ec.fieldContext_Node_first_link(ctx, field)
-			case "contracts":
-				return ec.fieldContext_Node_contracts(ctx, field)
-			case "events_history":
-				return ec.fieldContext_Node_events_history(ctx, field)
-			case "activity":
-				return ec.fieldContext_Node_activity(ctx, field)
-			case "cascade_directive":
-				return ec.fieldContext_Node_cascade_directive(ctx, field)
-			case "tensions_outAggregate":
-				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
-			case "tensions_inAggregate":
-				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
-			case "watchersAggregate":
-				return ec.fieldContext_Node_watchersAggregate(ctx, field)
-			case "childrenAggregate":
-				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
-			case "projectsAggregate":
-				return ec.fieldContext_Node_projectsAggregate(ctx, field)
-			case "pinnedAggregate":
-				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
-			case "contractsAggregate":
-				return ec.fieldContext_Node_contractsAggregate(ctx, field)
-			case "events_historyAggregate":
-				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
-			case "activityAggregate":
-				return ec.fieldContext_Node_activityAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_RoleExt_nodes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _RoleExt_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RolesAggregate, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.NodeAggregateResult)
-	fc.Result = res
-	return ec.marshalONodeAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_RoleExt_rolesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "RoleExt",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "count":
-				return ec.fieldContext_NodeAggregateResult_count(ctx, field)
-			case "createdAtMin":
-				return ec.fieldContext_NodeAggregateResult_createdAtMin(ctx, field)
-			case "createdAtMax":
-				return ec.fieldContext_NodeAggregateResult_createdAtMax(ctx, field)
-			case "updatedAtMin":
-				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
-			case "updatedAtMax":
-				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
-			case "nameidMin":
-				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
-			case "nameidMax":
-				return ec.fieldContext_NodeAggregateResult_nameidMax(ctx, field)
-			case "rootnameidMin":
-				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
-			case "rootnameidMax":
-				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
-			case "nameMin":
-				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
-			case "nameMax":
-				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
-			case "aboutMin":
-				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
-			case "aboutMax":
-				return ec.fieldContext_NodeAggregateResult_aboutMax(ctx, field)
-			case "rightsMin":
-				return ec.fieldContext_NodeAggregateResult_rightsMin(ctx, field)
-			case "rightsMax":
-				return ec.fieldContext_NodeAggregateResult_rightsMax(ctx, field)
-			case "rightsSum":
-				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
-			case "rightsAvg":
-				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
-			case "lexiconMin":
-				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
-			case "lexiconMax":
-				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
-			case "colorMin":
-				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
-			case "colorMax":
-				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_RoleExt_rolesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -52029,6 +53439,99 @@ func (ec *executionContext) fieldContext_RoleExt_nodesAggregate(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_RoleExt_nodesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RoleExt_rolesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.RoleExt) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RolesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RoleExt_rolesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RoleExt",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_NodeAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_NodeAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_NodeAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
+			case "nameidMin":
+				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
+			case "nameidMax":
+				return ec.fieldContext_NodeAggregateResult_nameidMax(ctx, field)
+			case "rootnameidMin":
+				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
+			case "rootnameidMax":
+				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
+			case "aboutMin":
+				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
+			case "aboutMax":
+				return ec.fieldContext_NodeAggregateResult_aboutMax(ctx, field)
+			case "rightsMin":
+				return ec.fieldContext_NodeAggregateResult_rightsMin(ctx, field)
+			case "rightsMax":
+				return ec.fieldContext_NodeAggregateResult_rightsMax(ctx, field)
+			case "rightsSum":
+				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
+			case "rightsAvg":
+				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_RoleExt_rolesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -52459,18 +53962,22 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -52495,14 +54002,16 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -52650,18 +54159,22 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -52686,14 +54199,16 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -53080,18 +54595,18 @@ func (ec *executionContext) fieldContext_Tension_labels(ctx context.Context, fie
 				return ec.fieldContext_Label_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Label_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Label_nodes(ctx, field)
 			case "description":
 				return ec.fieldContext_Label_description(ctx, field)
 			case "color":
 				return ec.fieldContext_Label_color(ctx, field)
 			case "tensions":
 				return ec.fieldContext_Label_tensions(ctx, field)
-			case "nodes":
-				return ec.fieldContext_Label_nodes(ctx, field)
-			case "tensionsAggregate":
-				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_Label_nodesAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
 		},
@@ -55334,6 +56849,1233 @@ func (ec *executionContext) fieldContext_TensionAggregateResult_n_commentsAvg(_ 
 	return fc, nil
 }
 
+func (ec *executionContext) _TensionTemplate_id(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_rootnameid(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rootnameid, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_rootnameid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_name(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_nodes(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_nodes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Node_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Node_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Node_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Node_updatedAt(ctx, field)
+			case "nameid":
+				return ec.fieldContext_Node_nameid(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
+			case "isRoot":
+				return ec.fieldContext_Node_isRoot(ctx, field)
+			case "parent":
+				return ec.fieldContext_Node_parent(ctx, field)
+			case "type_":
+				return ec.fieldContext_Node_type_(ctx, field)
+			case "tensions_out":
+				return ec.fieldContext_Node_tensions_out(ctx, field)
+			case "tensions_in":
+				return ec.fieldContext_Node_tensions_in(ctx, field)
+			case "visibility":
+				return ec.fieldContext_Node_visibility(ctx, field)
+			case "mode":
+				return ec.fieldContext_Node_mode(ctx, field)
+			case "rights":
+				return ec.fieldContext_Node_rights(ctx, field)
+			case "isArchived":
+				return ec.fieldContext_Node_isArchived(ctx, field)
+			case "isPersonal":
+				return ec.fieldContext_Node_isPersonal(ctx, field)
+			case "userCanJoin":
+				return ec.fieldContext_Node_userCanJoin(ctx, field)
+			case "guestCanCreateTension":
+				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
+			case "children":
+				return ec.fieldContext_Node_children(ctx, field)
+			case "projects":
+				return ec.fieldContext_Node_projects(ctx, field)
+			case "pinned":
+				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
+			case "role_ext":
+				return ec.fieldContext_Node_role_ext(ctx, field)
+			case "role_type":
+				return ec.fieldContext_Node_role_type(ctx, field)
+			case "color":
+				return ec.fieldContext_Node_color(ctx, field)
+			case "first_link":
+				return ec.fieldContext_Node_first_link(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Node_contracts(ctx, field)
+			case "events_history":
+				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
+			case "cascade_directive":
+				return ec.fieldContext_Node_cascade_directive(ctx, field)
+			case "tensions_outAggregate":
+				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
+			case "tensions_inAggregate":
+				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
+			case "childrenAggregate":
+				return ec.fieldContext_Node_childrenAggregate(ctx, field)
+			case "projectsAggregate":
+				return ec.fieldContext_Node_projectsAggregate(ctx, field)
+			case "pinnedAggregate":
+				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "events_historyAggregate":
+				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_TensionTemplate_nodes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_is_recursive(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_is_recursive(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRecursive, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_is_recursive(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_title(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_comment(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_comment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comment, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_comment(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_type_(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_type_(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.TensionType)
+	fc.Result = res
+	return ec.marshalNTensionType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_type_(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type TensionType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_labels(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_labels(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Labels, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Label)
+	fc.Result = res
+	return ec.marshalOLabel2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_labels(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Label_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_Label_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_Label_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Label_nodes(ctx, field)
+			case "description":
+				return ec.fieldContext_Label_description(ctx, field)
+			case "color":
+				return ec.fieldContext_Label_color(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Label_tensions(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_Label_nodesAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_TensionTemplate_labels_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_assignees(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_assignees(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Assignees, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_assignees(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "lastAck":
+				return ec.fieldContext_User_lastAck(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "bio":
+				return ec.fieldContext_User_bio(ctx, field)
+			case "location":
+				return ec.fieldContext_User_location(ctx, field)
+			case "utc":
+				return ec.fieldContext_User_utc(ctx, field)
+			case "links":
+				return ec.fieldContext_User_links(ctx, field)
+			case "skills":
+				return ec.fieldContext_User_skills(ctx, field)
+			case "notifyByEmail":
+				return ec.fieldContext_User_notifyByEmail(ctx, field)
+			case "lang":
+				return ec.fieldContext_User_lang(ctx, field)
+			case "subscriptions":
+				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
+			case "rights":
+				return ec.fieldContext_User_rights(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "tensions_created":
+				return ec.fieldContext_User_tensions_created(ctx, field)
+			case "tensions_assigned":
+				return ec.fieldContext_User_tensions_assigned(ctx, field)
+			case "contracts":
+				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
+			case "events":
+				return ec.fieldContext_User_events(ctx, field)
+			case "markAllAsRead":
+				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
+			case "subscriptionsAggregate":
+				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_User_rolesAggregate(ctx, field)
+			case "tensions_createdAggregate":
+				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
+			case "tensions_assignedAggregate":
+				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
+			case "eventsAggregate":
+				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_TensionTemplate_assignees_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_nodesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_nodesAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NodesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.NodeAggregateResult)
+	fc.Result = res
+	return ec.marshalONodeAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_nodesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_NodeAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_NodeAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_NodeAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_NodeAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_NodeAggregateResult_updatedAtMax(ctx, field)
+			case "nameidMin":
+				return ec.fieldContext_NodeAggregateResult_nameidMin(ctx, field)
+			case "nameidMax":
+				return ec.fieldContext_NodeAggregateResult_nameidMax(ctx, field)
+			case "rootnameidMin":
+				return ec.fieldContext_NodeAggregateResult_rootnameidMin(ctx, field)
+			case "rootnameidMax":
+				return ec.fieldContext_NodeAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_NodeAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_NodeAggregateResult_nameMax(ctx, field)
+			case "aboutMin":
+				return ec.fieldContext_NodeAggregateResult_aboutMin(ctx, field)
+			case "aboutMax":
+				return ec.fieldContext_NodeAggregateResult_aboutMax(ctx, field)
+			case "rightsMin":
+				return ec.fieldContext_NodeAggregateResult_rightsMin(ctx, field)
+			case "rightsMax":
+				return ec.fieldContext_NodeAggregateResult_rightsMax(ctx, field)
+			case "rightsSum":
+				return ec.fieldContext_NodeAggregateResult_rightsSum(ctx, field)
+			case "rightsAvg":
+				return ec.fieldContext_NodeAggregateResult_rightsAvg(ctx, field)
+			case "lexiconMin":
+				return ec.fieldContext_NodeAggregateResult_lexiconMin(ctx, field)
+			case "lexiconMax":
+				return ec.fieldContext_NodeAggregateResult_lexiconMax(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_NodeAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_NodeAggregateResult_colorMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NodeAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_TensionTemplate_nodesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_labelsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_labelsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LabelsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.LabelAggregateResult)
+	fc.Result = res
+	return ec.marshalOLabelAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_labelsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_LabelAggregateResult_count(ctx, field)
+			case "rootnameidMin":
+				return ec.fieldContext_LabelAggregateResult_rootnameidMin(ctx, field)
+			case "rootnameidMax":
+				return ec.fieldContext_LabelAggregateResult_rootnameidMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_LabelAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_LabelAggregateResult_nameMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_LabelAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_LabelAggregateResult_descriptionMax(ctx, field)
+			case "colorMin":
+				return ec.fieldContext_LabelAggregateResult_colorMin(ctx, field)
+			case "colorMax":
+				return ec.fieldContext_LabelAggregateResult_colorMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LabelAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_TensionTemplate_labelsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplate_assigneesAggregate(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_assigneesAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AssigneesAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserAggregateResult)
+	fc.Result = res
+	return ec.marshalOUserAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_assigneesAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_UserAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_UserAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_UserAggregateResult_createdAtMax(ctx, field)
+			case "lastAckMin":
+				return ec.fieldContext_UserAggregateResult_lastAckMin(ctx, field)
+			case "lastAckMax":
+				return ec.fieldContext_UserAggregateResult_lastAckMax(ctx, field)
+			case "usernameMin":
+				return ec.fieldContext_UserAggregateResult_usernameMin(ctx, field)
+			case "usernameMax":
+				return ec.fieldContext_UserAggregateResult_usernameMax(ctx, field)
+			case "nameMin":
+				return ec.fieldContext_UserAggregateResult_nameMin(ctx, field)
+			case "nameMax":
+				return ec.fieldContext_UserAggregateResult_nameMax(ctx, field)
+			case "emailMin":
+				return ec.fieldContext_UserAggregateResult_emailMin(ctx, field)
+			case "emailMax":
+				return ec.fieldContext_UserAggregateResult_emailMax(ctx, field)
+			case "passwordMin":
+				return ec.fieldContext_UserAggregateResult_passwordMin(ctx, field)
+			case "passwordMax":
+				return ec.fieldContext_UserAggregateResult_passwordMax(ctx, field)
+			case "bioMin":
+				return ec.fieldContext_UserAggregateResult_bioMin(ctx, field)
+			case "bioMax":
+				return ec.fieldContext_UserAggregateResult_bioMax(ctx, field)
+			case "locationMin":
+				return ec.fieldContext_UserAggregateResult_locationMin(ctx, field)
+			case "locationMax":
+				return ec.fieldContext_UserAggregateResult_locationMax(ctx, field)
+			case "utcMin":
+				return ec.fieldContext_UserAggregateResult_utcMin(ctx, field)
+			case "utcMax":
+				return ec.fieldContext_UserAggregateResult_utcMax(ctx, field)
+			case "markAllAsReadMin":
+				return ec.fieldContext_UserAggregateResult_markAllAsReadMin(ctx, field)
+			case "markAllAsReadMax":
+				return ec.fieldContext_UserAggregateResult_markAllAsReadMax(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_TensionTemplate_assigneesAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_count(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_rootnameidMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_rootnameidMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RootnameidMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_rootnameidMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_rootnameidMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_rootnameidMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RootnameidMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_rootnameidMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_nameMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_nameMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NameMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_nameMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_nameMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_nameMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NameMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_nameMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_titleMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_titleMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TitleMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_titleMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_titleMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_titleMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TitleMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_titleMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_commentMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_commentMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CommentMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_commentMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_commentMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_commentMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CommentMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_commentMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateActivityPayload_activity(ctx context.Context, field graphql.CollectedField, obj *model.UpdateActivityPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateActivityPayload_activity(ctx, field)
 	if err != nil {
@@ -56205,18 +58947,18 @@ func (ec *executionContext) fieldContext_UpdateLabelPayload_label(ctx context.Co
 				return ec.fieldContext_Label_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_Label_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Label_nodes(ctx, field)
 			case "description":
 				return ec.fieldContext_Label_description(ctx, field)
 			case "color":
 				return ec.fieldContext_Label_color(ctx, field)
 			case "tensions":
 				return ec.fieldContext_Label_tensions(ctx, field)
-			case "nodes":
-				return ec.fieldContext_Label_nodes(ctx, field)
-			case "tensionsAggregate":
-				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_Label_nodesAggregate(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Label_tensionsAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Label", field.Name)
 		},
@@ -56566,18 +59308,22 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -56602,14 +59348,16 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -57761,6 +60509,8 @@ func (ec *executionContext) fieldContext_UpdateRoleExtPayload_roleExt(ctx contex
 				return ec.fieldContext_RoleExt_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_RoleExt_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_RoleExt_nodes(ctx, field)
 			case "about":
 				return ec.fieldContext_RoleExt_about(ctx, field)
 			case "role_type":
@@ -57771,12 +60521,10 @@ func (ec *executionContext) fieldContext_UpdateRoleExtPayload_roleExt(ctx contex
 				return ec.fieldContext_RoleExt_mandate(ctx, field)
 			case "roles":
 				return ec.fieldContext_RoleExt_roles(ctx, field)
-			case "nodes":
-				return ec.fieldContext_RoleExt_nodes(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			case "nodesAggregate":
 				return ec.fieldContext_RoleExt_nodesAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_RoleExt_rolesAggregate(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type RoleExt", field.Name)
 		},
@@ -57976,6 +60724,121 @@ func (ec *executionContext) _UpdateTensionPayload_numUids(ctx context.Context, f
 func (ec *executionContext) fieldContext_UpdateTensionPayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UpdateTensionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateTensionTemplatePayload_tensionTemplate(ctx context.Context, field graphql.CollectedField, obj *model.UpdateTensionTemplatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateTensionTemplatePayload_tensionTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionTemplate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TensionTemplate)
+	fc.Result = res
+	return ec.marshalOTensionTemplate2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateTensionTemplatePayload_tensionTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTensionTemplatePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_TensionTemplate_id(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
+			case "name":
+				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "nodes":
+				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
+			case "is_recursive":
+				return ec.fieldContext_TensionTemplate_is_recursive(ctx, field)
+			case "title":
+				return ec.fieldContext_TensionTemplate_title(ctx, field)
+			case "comment":
+				return ec.fieldContext_TensionTemplate_comment(ctx, field)
+			case "type_":
+				return ec.fieldContext_TensionTemplate_type_(ctx, field)
+			case "labels":
+				return ec.fieldContext_TensionTemplate_labels(ctx, field)
+			case "assignees":
+				return ec.fieldContext_TensionTemplate_assignees(ctx, field)
+			case "nodesAggregate":
+				return ec.fieldContext_TensionTemplate_nodesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_TensionTemplate_labelsAggregate(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_TensionTemplate_assigneesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_UpdateTensionTemplatePayload_tensionTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateTensionTemplatePayload_numUids(ctx context.Context, field graphql.CollectedField, obj *model.UpdateTensionTemplatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateTensionTemplatePayload_numUids(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumUids, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateTensionTemplatePayload_numUids(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTensionTemplatePayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -59282,18 +62145,22 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -59318,14 +62185,16 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -59495,18 +62364,22 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -59531,14 +62404,16 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -63020,18 +65895,22 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
 			case "lexicon":
 				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
 			case "watchers":
 				return ec.fieldContext_Node_watchers(ctx, field)
 			case "children":
 				return ec.fieldContext_Node_children(ctx, field)
-			case "labels":
-				return ec.fieldContext_Node_labels(ctx, field)
-			case "roles":
-				return ec.fieldContext_Node_roles(ctx, field)
 			case "projects":
 				return ec.fieldContext_Node_projects(ctx, field)
 			case "pinned":
 				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
 			case "role_ext":
 				return ec.fieldContext_Node_role_ext(ctx, field)
 			case "role_type":
@@ -63056,14 +65935,16 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_watchersAggregate(ctx, field)
 			case "childrenAggregate":
 				return ec.fieldContext_Node_childrenAggregate(ctx, field)
-			case "labelsAggregate":
-				return ec.fieldContext_Node_labelsAggregate(ctx, field)
-			case "rolesAggregate":
-				return ec.fieldContext_Node_rolesAggregate(ctx, field)
 			case "projectsAggregate":
 				return ec.fieldContext_Node_projectsAggregate(ctx, field)
 			case "pinnedAggregate":
 				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
 			case "contractsAggregate":
 				return ec.fieldContext_Node_contractsAggregate(ctx, field)
 			case "events_historyAggregate":
@@ -64887,7 +67768,7 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "name", "description", "color", "tensions", "nodes"}
+	fieldsInOrder := [...]string{"rootnameid", "name", "nodes", "description", "color", "tensions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -64953,6 +67834,44 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "description":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -64997,44 +67916,6 @@ func (ec *executionContext) unmarshalInputAddLabelInput(ctx context.Context, obj
 				return it, err
 			}
 			it.Tensions = data
-		case "nodes":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.Nodes = data
-			} else if tmp == nil {
-				it.Nodes = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		}
 	}
 
@@ -65265,7 +68146,7 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -65426,6 +68307,13 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.Lexicon = data
+		case "isTemplateTensionOnly":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isTemplateTensionOnly"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsTemplateTensionOnly = data
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -65440,20 +68328,6 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.Children = data
-		case "labels":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
-			data, err := ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Labels = data
-		case "roles":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
-			data, err := ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Roles = data
 		case "projects":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
 			data, err := ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
@@ -65489,6 +68363,27 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "labels":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+			data, err := ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Labels = data
+		case "roles":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
+			data, err := ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Roles = data
+		case "tension_templates":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_templates"))
+			data, err := ec.unmarshalOTensionTemplateRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TensionTemplates = data
 		case "role_ext":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
 			data, err := ec.unmarshalORoleExtRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
@@ -66564,7 +69459,7 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "name", "about", "role_type", "color", "mandate", "roles", "nodes"}
+	fieldsInOrder := [...]string{"rootnameid", "name", "nodes", "about", "role_type", "color", "mandate", "roles"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -66630,6 +69525,44 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "about":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -66688,44 +69621,6 @@ func (ec *executionContext) unmarshalInputAddRoleExtInput(ctx context.Context, o
 				return it, err
 			}
 			it.Roles = data
-		case "nodes":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.Nodes = data
-			} else if tmp == nil {
-				it.Nodes = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		}
 	}
 
@@ -67164,6 +70059,197 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, err
 			}
 			it.NComments = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddTensionTemplateInput(ctx context.Context, obj interface{}) (model.AddTensionTemplateInput, error) {
+	var it model.AddTensionTemplateInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"rootnameid", "name", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "rootnameid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rootnameid = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "rootnameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Name = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "is_recursive":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_recursive"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsRecursive = data
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
+		case "comment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Comment = data
+		case "type_":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			data, err := ec.unmarshalNTensionType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
+		case "labels":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.LabelRef); ok {
+				it.Labels = data
+			} else if tmp == nil {
+				it.Labels = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.LabelRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "assignees":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.UserRef); ok {
+				it.Assignees = data
+			} else if tmp == nil {
+				it.Assignees = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -71802,7 +74888,7 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "name", "description", "color", "tensions", "nodes"}
+	fieldsInOrder := [...]string{"rootnameid", "name", "nodes", "description", "color", "tensions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -71885,6 +74971,44 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "description":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -71946,44 +75070,6 @@ func (ec *executionContext) unmarshalInputLabelPatch(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "nodes":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.Nodes = data
-			} else if tmp == nil {
-				it.Nodes = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		}
 	}
 
@@ -71997,7 +75083,7 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "name", "description", "color", "tensions", "nodes"}
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "nodes", "description", "color", "tensions"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72072,6 +75158,44 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "description":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -72131,44 +75255,6 @@ func (ec *executionContext) unmarshalInputLabelRef(ctx context.Context, obj inte
 				it.Tensions = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "nodes":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.Nodes = data
-			} else if tmp == nil {
-				it.Nodes = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		}
@@ -73222,7 +76308,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73707,6 +76793,28 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "isTemplateTensionOnly":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isTemplateTensionOnly"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.IsTemplateTensionOnly = data
+			} else if tmp == nil {
+				it.IsTemplateTensionOnly = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -73753,6 +76861,54 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				it.Children = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "projects":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.ProjectRef); ok {
+				it.Projects = data
+			} else if tmp == nil {
+				it.Projects = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "pinned":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pinned"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.TensionRef); ok {
+				it.Pinned = data
+			} else if tmp == nil {
+				it.Pinned = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "labels":
@@ -73803,10 +76959,10 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.RoleExtRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "projects":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
+		case "tension_templates":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_templates"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
+				return ec.unmarshalOTensionTemplateRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateRefᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
 				if ec.directives.X_patch_ro == nil {
@@ -73819,36 +76975,12 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-			if data, ok := tmp.([]*model.ProjectRef); ok {
-				it.Projects = data
+			if data, ok := tmp.([]*model.TensionTemplateRef); ok {
+				it.TensionTemplates = data
 			} else if tmp == nil {
-				it.Projects = nil
+				it.TensionTemplates = nil
 			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ProjectRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "pinned":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pinned"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOTensionRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.TensionRef); ok {
-				it.Pinned = data
-			} else if tmp == nil {
-				it.Pinned = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionTemplateRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "role_ext":
@@ -74052,7 +77184,7 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "watchers", "children", "labels", "roles", "projects", "pinned", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -74220,6 +77352,13 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Lexicon = data
+		case "isTemplateTensionOnly":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isTemplateTensionOnly"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsTemplateTensionOnly = data
 		case "watchers":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("watchers"))
 			data, err := ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
@@ -74234,20 +77373,6 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Children = data
-		case "labels":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
-			data, err := ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Labels = data
-		case "roles":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
-			data, err := ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Roles = data
 		case "projects":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projects"))
 			data, err := ec.unmarshalOProjectRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐProjectRefᚄ(ctx, v)
@@ -74283,6 +77408,27 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "labels":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+			data, err := ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Labels = data
+		case "roles":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roles"))
+			data, err := ec.unmarshalORoleExtRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Roles = data
+		case "tension_templates":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension_templates"))
+			data, err := ec.unmarshalOTensionTemplateRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateRefᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TensionTemplates = data
 		case "role_ext":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_ext"))
 			data, err := ec.unmarshalORoleExtRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleExtRef(ctx, v)
@@ -78528,7 +81674,7 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "name", "about", "role_type", "color", "mandate", "roles", "nodes"}
+	fieldsInOrder := [...]string{"rootnameid", "name", "nodes", "about", "role_type", "color", "mandate", "roles"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -78611,6 +81757,44 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "about":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -78686,44 +81870,6 @@ func (ec *executionContext) unmarshalInputRoleExtPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "nodes":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.Nodes = data
-			} else if tmp == nil {
-				it.Nodes = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		}
 	}
 
@@ -78737,7 +81883,7 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "name", "about", "role_type", "color", "mandate", "roles", "nodes"}
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "nodes", "about", "role_type", "color", "mandate", "roles"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -78812,6 +81958,44 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "about":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("about"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
@@ -78883,44 +82067,6 @@ func (ec *executionContext) unmarshalInputRoleExtRef(ctx context.Context, obj in
 				it.Roles = data
 			} else if tmp == nil {
 				it.Roles = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "nodes":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
-			}
-
-			tmp, err := directive2(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.([]*model.NodeRef); ok {
-				it.Nodes = data
-			} else if tmp == nil {
-				it.Nodes = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -80557,6 +83703,524 @@ func (ec *executionContext) unmarshalInputTensionStatus_hash(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputTensionTemplateFilter(ctx context.Context, obj interface{}) (model.TensionTemplateFilter, error) {
+	var it model.TensionTemplateFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "has", "and", "or", "not"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "rootnameid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
+			data, err := ec.unmarshalOStringHashFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rootnameid = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOStringHashFilter_StringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringTermFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "has":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
+			data, err := ec.unmarshalOTensionTemplateHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Has = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOTensionTemplateFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOTensionTemplateFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTensionTemplateOrder(ctx context.Context, obj interface{}) (model.TensionTemplateOrder, error) {
+	var it model.TensionTemplateOrder
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"asc", "desc", "then"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "asc":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("asc"))
+			data, err := ec.unmarshalOTensionTemplateOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Asc = data
+		case "desc":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			data, err := ec.unmarshalOTensionTemplateOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrderable(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Desc = data
+		case "then":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("then"))
+			data, err := ec.unmarshalOTensionTemplateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrder(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Then = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTensionTemplatePatch(ctx context.Context, obj interface{}) (model.TensionTemplatePatch, error) {
+	var it model.TensionTemplatePatch
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"rootnameid", "name", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "rootnameid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Rootnameid = data
+			} else if tmp == nil {
+				it.Rootnameid = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "rootnameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Name = data
+			} else if tmp == nil {
+				it.Name = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "is_recursive":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_recursive"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsRecursive = data
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
+		case "comment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Comment = data
+		case "type_":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			data, err := ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
+		case "labels":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.LabelRef); ok {
+				it.Labels = data
+			} else if tmp == nil {
+				it.Labels = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.LabelRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "assignees":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.UserRef); ok {
+				it.Assignees = data
+			} else if tmp == nil {
+				it.Assignees = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputTensionTemplateRef(ctx context.Context, obj interface{}) (model.TensionTemplateRef, error) {
+	var it model.TensionTemplateRef
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "rootnameid":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rootnameid"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rootnameid = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
+				if err != nil {
+					return nil, err
+				}
+				f, err := ec.unmarshalOString2ᚖstring(ctx, "rootnameid")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 1)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Name = data
+			} else if tmp == nil {
+				it.Name = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "nodes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodes"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "oneByOne")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+			directive2 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, nil)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.NodeRef); ok {
+				it.Nodes = data
+			} else if tmp == nil {
+				it.Nodes = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "is_recursive":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("is_recursive"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsRecursive = data
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
+		case "comment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Comment = data
+		case "type_":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type_"))
+			data, err := ec.unmarshalOTensionType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
+		case "labels":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOLabelRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐLabelRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.LabelRef); ok {
+				it.Labels = data
+			} else if tmp == nil {
+				it.Labels = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.LabelRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "assignees":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRefᚄ(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "ref")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]*model.UserRef); ok {
+				it.Assignees = data
+			} else if tmp == nil {
+				it.Assignees = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputTensionType_hash(ctx context.Context, obj interface{}) (model.TensionTypeHash, error) {
 	var it model.TensionTypeHash
 	asMap := map[string]interface{}{}
@@ -81565,6 +85229,47 @@ func (ec *executionContext) unmarshalInputUpdateTensionInput(ctx context.Context
 		case "remove":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
 			data, err := ec.unmarshalOTensionPatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionPatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Remove = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateTensionTemplateInput(ctx context.Context, obj interface{}) (model.UpdateTensionTemplateInput, error) {
+	var it model.UpdateTensionTemplateInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter", "set", "remove"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			data, err := ec.unmarshalNTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Filter = data
+		case "set":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("set"))
+			data, err := ec.unmarshalOTensionTemplatePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplatePatch(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Set = data
+		case "remove":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("remove"))
+			data, err := ec.unmarshalOTensionTemplatePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplatePatch(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -85119,6 +88824,44 @@ func (ec *executionContext) _AddTensionPayload(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var addTensionTemplatePayloadImplementors = []string{"AddTensionTemplatePayload"}
+
+func (ec *executionContext) _AddTensionTemplatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddTensionTemplatePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, addTensionTemplatePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AddTensionTemplatePayload")
+		case "tensionTemplate":
+			out.Values[i] = ec._AddTensionTemplatePayload_tensionTemplate(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._AddTensionTemplatePayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var addUserEventPayloadImplementors = []string{"AddUserEventPayload"}
 
 func (ec *executionContext) _AddUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.AddUserEventPayload) graphql.Marshaler {
@@ -86706,6 +90449,46 @@ func (ec *executionContext) _DeleteTensionPayload(ctx context.Context, sel ast.S
 	return out
 }
 
+var deleteTensionTemplatePayloadImplementors = []string{"DeleteTensionTemplatePayload"}
+
+func (ec *executionContext) _DeleteTensionTemplatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteTensionTemplatePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteTensionTemplatePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteTensionTemplatePayload")
+		case "tensionTemplate":
+			out.Values[i] = ec._DeleteTensionTemplatePayload_tensionTemplate(ctx, field, obj)
+		case "msg":
+			out.Values[i] = ec._DeleteTensionTemplatePayload_msg(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._DeleteTensionTemplatePayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deleteUserEventPayloadImplementors = []string{"DeleteUserEventPayload"}
 
 func (ec *executionContext) _DeleteUserEventPayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteUserEventPayload) graphql.Marshaler {
@@ -87204,18 +90987,18 @@ func (ec *executionContext) _Label(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "nodes":
+			out.Values[i] = ec._Label_nodes(ctx, field, obj)
 		case "description":
 			out.Values[i] = ec._Label_description(ctx, field, obj)
 		case "color":
 			out.Values[i] = ec._Label_color(ctx, field, obj)
 		case "tensions":
 			out.Values[i] = ec._Label_tensions(ctx, field, obj)
-		case "nodes":
-			out.Values[i] = ec._Label_nodes(ctx, field, obj)
-		case "tensionsAggregate":
-			out.Values[i] = ec._Label_tensionsAggregate(ctx, field, obj)
 		case "nodesAggregate":
 			out.Values[i] = ec._Label_nodesAggregate(ctx, field, obj)
+		case "tensionsAggregate":
+			out.Values[i] = ec._Label_tensionsAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -87522,6 +91305,18 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteRoleExt":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteRoleExt(ctx, field)
+			})
+		case "addTensionTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addTensionTemplate(ctx, field)
+			})
+		case "updateTensionTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateTensionTemplate(ctx, field)
+			})
+		case "deleteTensionTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteTensionTemplate(ctx, field)
 			})
 		case "addProject":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -87899,18 +91694,22 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_guestCanCreateTension(ctx, field, obj)
 		case "lexicon":
 			out.Values[i] = ec._Node_lexicon(ctx, field, obj)
+		case "isTemplateTensionOnly":
+			out.Values[i] = ec._Node_isTemplateTensionOnly(ctx, field, obj)
 		case "watchers":
 			out.Values[i] = ec._Node_watchers(ctx, field, obj)
 		case "children":
 			out.Values[i] = ec._Node_children(ctx, field, obj)
-		case "labels":
-			out.Values[i] = ec._Node_labels(ctx, field, obj)
-		case "roles":
-			out.Values[i] = ec._Node_roles(ctx, field, obj)
 		case "projects":
 			out.Values[i] = ec._Node_projects(ctx, field, obj)
 		case "pinned":
 			out.Values[i] = ec._Node_pinned(ctx, field, obj)
+		case "labels":
+			out.Values[i] = ec._Node_labels(ctx, field, obj)
+		case "roles":
+			out.Values[i] = ec._Node_roles(ctx, field, obj)
+		case "tension_templates":
+			out.Values[i] = ec._Node_tension_templates(ctx, field, obj)
 		case "role_ext":
 			out.Values[i] = ec._Node_role_ext(ctx, field, obj)
 		case "role_type":
@@ -87935,14 +91734,16 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_watchersAggregate(ctx, field, obj)
 		case "childrenAggregate":
 			out.Values[i] = ec._Node_childrenAggregate(ctx, field, obj)
-		case "labelsAggregate":
-			out.Values[i] = ec._Node_labelsAggregate(ctx, field, obj)
-		case "rolesAggregate":
-			out.Values[i] = ec._Node_rolesAggregate(ctx, field, obj)
 		case "projectsAggregate":
 			out.Values[i] = ec._Node_projectsAggregate(ctx, field, obj)
 		case "pinnedAggregate":
 			out.Values[i] = ec._Node_pinnedAggregate(ctx, field, obj)
+		case "labelsAggregate":
+			out.Values[i] = ec._Node_labelsAggregate(ctx, field, obj)
+		case "rolesAggregate":
+			out.Values[i] = ec._Node_rolesAggregate(ctx, field, obj)
+		case "tension_templatesAggregate":
+			out.Values[i] = ec._Node_tension_templatesAggregate(ctx, field, obj)
 		case "contractsAggregate":
 			out.Values[i] = ec._Node_contractsAggregate(ctx, field, obj)
 		case "events_historyAggregate":
@@ -89659,6 +93460,63 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getTensionTemplate":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getTensionTemplate(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "queryTensionTemplate":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryTensionTemplate(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "aggregateTensionTemplate":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_aggregateTensionTemplate(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "getProject":
 			field := field
 
@@ -90982,6 +94840,8 @@ func (ec *executionContext) _RoleExt(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "nodes":
+			out.Values[i] = ec._RoleExt_nodes(ctx, field, obj)
 		case "about":
 			out.Values[i] = ec._RoleExt_about(ctx, field, obj)
 		case "role_type":
@@ -90995,12 +94855,10 @@ func (ec *executionContext) _RoleExt(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._RoleExt_mandate(ctx, field, obj)
 		case "roles":
 			out.Values[i] = ec._RoleExt_roles(ctx, field, obj)
-		case "nodes":
-			out.Values[i] = ec._RoleExt_nodes(ctx, field, obj)
-		case "rolesAggregate":
-			out.Values[i] = ec._RoleExt_rolesAggregate(ctx, field, obj)
 		case "nodesAggregate":
 			out.Values[i] = ec._RoleExt_nodesAggregate(ctx, field, obj)
+		case "rolesAggregate":
+			out.Values[i] = ec._RoleExt_rolesAggregate(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -91249,6 +95107,139 @@ func (ec *executionContext) _TensionAggregateResult(ctx context.Context, sel ast
 			out.Values[i] = ec._TensionAggregateResult_n_commentsSum(ctx, field, obj)
 		case "n_commentsAvg":
 			out.Values[i] = ec._TensionAggregateResult_n_commentsAvg(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var tensionTemplateImplementors = []string{"TensionTemplate"}
+
+func (ec *executionContext) _TensionTemplate(ctx context.Context, sel ast.SelectionSet, obj *model.TensionTemplate) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tensionTemplateImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TensionTemplate")
+		case "id":
+			out.Values[i] = ec._TensionTemplate_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "rootnameid":
+			out.Values[i] = ec._TensionTemplate_rootnameid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._TensionTemplate_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "nodes":
+			out.Values[i] = ec._TensionTemplate_nodes(ctx, field, obj)
+		case "is_recursive":
+			out.Values[i] = ec._TensionTemplate_is_recursive(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "title":
+			out.Values[i] = ec._TensionTemplate_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "comment":
+			out.Values[i] = ec._TensionTemplate_comment(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "type_":
+			out.Values[i] = ec._TensionTemplate_type_(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "labels":
+			out.Values[i] = ec._TensionTemplate_labels(ctx, field, obj)
+		case "assignees":
+			out.Values[i] = ec._TensionTemplate_assignees(ctx, field, obj)
+		case "nodesAggregate":
+			out.Values[i] = ec._TensionTemplate_nodesAggregate(ctx, field, obj)
+		case "labelsAggregate":
+			out.Values[i] = ec._TensionTemplate_labelsAggregate(ctx, field, obj)
+		case "assigneesAggregate":
+			out.Values[i] = ec._TensionTemplate_assigneesAggregate(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var tensionTemplateAggregateResultImplementors = []string{"TensionTemplateAggregateResult"}
+
+func (ec *executionContext) _TensionTemplateAggregateResult(ctx context.Context, sel ast.SelectionSet, obj *model.TensionTemplateAggregateResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tensionTemplateAggregateResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TensionTemplateAggregateResult")
+		case "count":
+			out.Values[i] = ec._TensionTemplateAggregateResult_count(ctx, field, obj)
+		case "rootnameidMin":
+			out.Values[i] = ec._TensionTemplateAggregateResult_rootnameidMin(ctx, field, obj)
+		case "rootnameidMax":
+			out.Values[i] = ec._TensionTemplateAggregateResult_rootnameidMax(ctx, field, obj)
+		case "nameMin":
+			out.Values[i] = ec._TensionTemplateAggregateResult_nameMin(ctx, field, obj)
+		case "nameMax":
+			out.Values[i] = ec._TensionTemplateAggregateResult_nameMax(ctx, field, obj)
+		case "titleMin":
+			out.Values[i] = ec._TensionTemplateAggregateResult_titleMin(ctx, field, obj)
+		case "titleMax":
+			out.Values[i] = ec._TensionTemplateAggregateResult_titleMax(ctx, field, obj)
+		case "commentMin":
+			out.Values[i] = ec._TensionTemplateAggregateResult_commentMin(ctx, field, obj)
+		case "commentMax":
+			out.Values[i] = ec._TensionTemplateAggregateResult_commentMax(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -92161,6 +96152,44 @@ func (ec *executionContext) _UpdateTensionPayload(ctx context.Context, sel ast.S
 			out.Values[i] = ec._UpdateTensionPayload_tension(ctx, field, obj)
 		case "numUids":
 			out.Values[i] = ec._UpdateTensionPayload_numUids(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateTensionTemplatePayloadImplementors = []string{"UpdateTensionTemplatePayload"}
+
+func (ec *executionContext) _UpdateTensionTemplatePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateTensionTemplatePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateTensionTemplatePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateTensionTemplatePayload")
+		case "tensionTemplate":
+			out.Values[i] = ec._UpdateTensionTemplatePayload_tensionTemplate(ctx, field, obj)
+		case "numUids":
+			out.Values[i] = ec._UpdateTensionTemplatePayload_numUids(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -93415,6 +97444,28 @@ func (ec *executionContext) unmarshalNAddTensionInput2ᚖfractaleᚋfractal6ᚗg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddTensionTemplateInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionTemplateInputᚄ(ctx context.Context, v interface{}) ([]*model.AddTensionTemplateInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.AddTensionTemplateInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddTensionTemplateInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionTemplateInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddTensionTemplateInput2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionTemplateInput(ctx context.Context, v interface{}) (*model.AddTensionTemplateInput, error) {
+	res, err := ec.unmarshalInputAddTensionTemplateInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddUserEventInput2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventInputᚄ(ctx context.Context, v interface{}) ([]*model.AddUserEventInput, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -94446,6 +98497,31 @@ func (ec *executionContext) marshalNTensionStatus2fractaleᚋfractal6ᚗgoᚋgra
 	return v
 }
 
+func (ec *executionContext) marshalNTensionTemplate2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx context.Context, sel ast.SelectionSet, v *model.TensionTemplate) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TensionTemplate(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNTensionTemplateFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx context.Context, v interface{}) (model.TensionTemplateFilter, error) {
+	res, err := ec.unmarshalInputTensionTemplateFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx context.Context, v interface{}) (*model.TensionTemplateFilter, error) {
+	res, err := ec.unmarshalInputTensionTemplateFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNTensionTemplateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateRef(ctx context.Context, v interface{}) (*model.TensionTemplateRef, error) {
+	res, err := ec.unmarshalInputTensionTemplateRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNTensionType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx context.Context, v interface{}) (model.TensionType, error) {
 	var res model.TensionType
 	err := res.UnmarshalGQL(v)
@@ -94573,6 +98649,11 @@ func (ec *executionContext) unmarshalNUpdateRoleExtInput2fractaleᚋfractal6ᚗg
 
 func (ec *executionContext) unmarshalNUpdateTensionInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionInput(ctx context.Context, v interface{}) (model.UpdateTensionInput, error) {
 	res, err := ec.unmarshalInputUpdateTensionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateTensionTemplateInput2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionTemplateInput(ctx context.Context, v interface{}) (model.UpdateTensionTemplateInput, error) {
+	res, err := ec.unmarshalInputUpdateTensionTemplateInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -95185,6 +99266,13 @@ func (ec *executionContext) marshalOAddTensionPayload2ᚖfractaleᚋfractal6ᚗg
 		return graphql.Null
 	}
 	return ec._AddTensionPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAddTensionTemplatePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddTensionTemplatePayload(ctx context.Context, sel ast.SelectionSet, v *model.AddTensionTemplatePayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AddTensionTemplatePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAddUserEventPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐAddUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.AddUserEventPayload) graphql.Marshaler {
@@ -96820,6 +100908,13 @@ func (ec *executionContext) marshalODeleteTensionPayload2ᚖfractaleᚋfractal6�
 		return graphql.Null
 	}
 	return ec._DeleteTensionPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteTensionTemplatePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteTensionTemplatePayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteTensionTemplatePayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteTensionTemplatePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalODeleteUserEventPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDeleteUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteUserEventPayload) graphql.Marshaler {
@@ -102653,6 +106748,265 @@ func (ec *executionContext) unmarshalOTensionStatus_hash2ᚖfractaleᚋfractal6�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOTensionTemplate2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx context.Context, sel ast.SelectionSet, v []*model.TensionTemplate) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOTensionTemplate2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOTensionTemplate2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TensionTemplate) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTensionTemplate2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOTensionTemplate2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplate(ctx context.Context, sel ast.SelectionSet, v *model.TensionTemplate) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TensionTemplate(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOTensionTemplateAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.TensionTemplateAggregateResult) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TensionTemplateAggregateResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTensionTemplateFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx context.Context, v interface{}) ([]*model.TensionTemplateFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.TensionTemplateFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOTensionTemplateFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateFilter(ctx context.Context, v interface{}) (*model.TensionTemplateFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTensionTemplateFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOTensionTemplateHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx context.Context, v interface{}) ([]*model.TensionTemplateHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.TensionTemplateHasFilter, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOTensionTemplateHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOTensionTemplateHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx context.Context, sel ast.SelectionSet, v []*model.TensionTemplateHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOTensionTemplateHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOTensionTemplateHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx context.Context, v interface{}) (*model.TensionTemplateHasFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.TensionTemplateHasFilter)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTensionTemplateHasFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx context.Context, sel ast.SelectionSet, v *model.TensionTemplateHasFilter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOTensionTemplateOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrder(ctx context.Context, v interface{}) (*model.TensionTemplateOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTensionTemplateOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOTensionTemplateOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrderable(ctx context.Context, v interface{}) (*model.TensionTemplateOrderable, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.TensionTemplateOrderable)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTensionTemplateOrderable2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateOrderable(ctx context.Context, sel ast.SelectionSet, v *model.TensionTemplateOrderable) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOTensionTemplatePatch2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplatePatch(ctx context.Context, v interface{}) (*model.TensionTemplatePatch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputTensionTemplatePatch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOTensionTemplateRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateRefᚄ(ctx context.Context, v interface{}) ([]*model.TensionTemplateRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.TensionTemplateRef, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNTensionTemplateRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateRef(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) unmarshalOTensionType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionType(ctx context.Context, v interface{}) ([]*model.TensionType, error) {
 	if v == nil {
 		return nil, nil
@@ -102904,6 +107258,13 @@ func (ec *executionContext) marshalOUpdateTensionPayload2ᚖfractaleᚋfractal6�
 		return graphql.Null
 	}
 	return ec._UpdateTensionPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOUpdateTensionTemplatePayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateTensionTemplatePayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateTensionTemplatePayload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._UpdateTensionTemplatePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUpdateUserEventPayload2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUpdateUserEventPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateUserEventPayload) graphql.Marshaler {

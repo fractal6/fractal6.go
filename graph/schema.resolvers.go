@@ -106,6 +106,23 @@ func (r *mutationResolver) DeleteRoleExt(ctx context.Context, filter model.RoleE
 	panic(fmt.Errorf("not implemented"))
 }
 
+// AddTensionTemplate is the resolver for the addTensionTemplate field.
+func (r *mutationResolver) AddTensionTemplate(ctx context.Context, input []*model.AddTensionTemplateInput) (data *model.AddTensionTemplatePayload, errors error) {
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
+	return data, errors
+}
+
+// UpdateTensionTemplate is the resolver for the updateTensionTemplate field.
+func (r *mutationResolver) UpdateTensionTemplate(ctx context.Context, input model.UpdateTensionTemplateInput) (data *model.UpdateTensionTemplatePayload, errors error) {
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
+	return data, errors
+}
+
+// DeleteTensionTemplate is the resolver for the deleteTensionTemplate field.
+func (r *mutationResolver) DeleteTensionTemplate(ctx context.Context, filter model.TensionTemplateFilter) (data *model.DeleteTensionTemplatePayload, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 // AddProject is the resolver for the addProject field.
 func (r *mutationResolver) AddProject(ctx context.Context, input []*model.AddProjectInput) (data *model.AddProjectPayload, errors error) {
 	errors = r.DgraphAddBridge(ctx, input, nil, &data)
@@ -536,6 +553,23 @@ func (r *queryResolver) QueryRoleExt(ctx context.Context, filter *model.RoleExtF
 
 // AggregateRoleExt is the resolver for the aggregateRoleExt field.
 func (r *queryResolver) AggregateRoleExt(ctx context.Context, filter *model.RoleExtFilter) (data *model.RoleExtAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+// GetTensionTemplate is the resolver for the getTensionTemplate field.
+func (r *queryResolver) GetTensionTemplate(ctx context.Context, id string) (data *model.TensionTemplate, errors error) {
+	errors = r.DgraphBridgeRaw(ctx, &data)
+	return data, errors
+}
+
+// QueryTensionTemplate is the resolver for the queryTensionTemplate field.
+func (r *queryResolver) QueryTensionTemplate(ctx context.Context, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) (data []*model.TensionTemplate, errors error) {
+	errors = r.DgraphQueryBridge(ctx, filter, order, first, offset, &data)
+	return data, errors
+}
+
+// AggregateTensionTemplate is the resolver for the aggregateTensionTemplate field.
+func (r *queryResolver) AggregateTensionTemplate(ctx context.Context, filter *model.TensionTemplateFilter) (data *model.TensionTemplateAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

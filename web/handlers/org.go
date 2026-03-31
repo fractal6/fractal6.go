@@ -68,6 +68,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 	isPersonal := true
 	var userCanJoin bool
 	var guestCanCreateTension bool = true
+	var isTemplateTensionOnly bool = false
 	visibility := model.NodeVisibilityPublic
 	mode := model.NodeModeCoordinated
 
@@ -108,6 +109,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 		IsArchived:            false,
 		UserCanJoin:           &userCanJoin,
 		GuestCanCreateTension: &guestCanCreateTension,
+		IsTemplateTensionOnly: &isTemplateTensionOnly,
 		// Common
 		CreatedAt: Now(),
 		CreatedBy: &model.UserRef{Username: &uctx.Username},
@@ -244,6 +246,39 @@ func SetGuestCanCreateTension(w http.ResponseWriter, r *http.Request) {
 	// Set the value
 	val := strconv.FormatBool(form.Val)
 	err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.guestCanCreateTension", val)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	w.Write([]byte(val))
+}
+
+func SetIsTemplateTensionOnly(w http.ResponseWriter, r *http.Request) {
+	// Get form data
+	form := struct {
+		Nameid string
+		Val    bool
+	}{}
+	if !decodeBody(w, r, &form) {
+		return
+	}
+
+	// Check if uctx has rights in nameid (is coordo)
+	nameid := form.Nameid
+	_, uctx, err := auth.GetUserContext(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	if i := auth.UserHasCoordoRole(uctx, nameid); i < 0 {
+		http.Error(w, "Only coordinators of the circle can do this.", 400)
+		return
+	}
+
+	// Set the value
+	val := strconv.FormatBool(form.Val)
+	err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.isTemplateTensionOnly", val)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

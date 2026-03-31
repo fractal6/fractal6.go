@@ -11,6 +11,12 @@ directive @hook_updateRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_updateRoleExt on FIELD_DEFINITION
 directive @hook_deleteRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_deleteRoleExt on FIELD_DEFINITION
+directive @hook_addTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_addTensionTemplate on FIELD_DEFINITION
+directive @hook_updateTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_updateTensionTemplate on FIELD_DEFINITION
+directive @hook_deleteTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_deleteTensionTemplate on FIELD_DEFINITION
 directive @hook_addProjectInput on ARGUMENT_DEFINITION
 directive @hook_addProject on FIELD_DEFINITION
 directive @hook_updateProjectInput on ARGUMENT_DEFINITION
@@ -75,6 +81,8 @@ directive @hook_getLabelInput on ARGUMENT_DEFINITION
 directive @hook_queryLabelInput on ARGUMENT_DEFINITION
 directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
+directive @hook_getTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_queryTensionTemplateInput on ARGUMENT_DEFINITION
 directive @hook_getProjectInput on ARGUMENT_DEFINITION
 directive @hook_queryProjectInput on ARGUMENT_DEFINITION
 directive @hook_getProjectColumnInput on ARGUMENT_DEFINITION
@@ -159,12 +167,14 @@ type Node {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   lexicon: String
+  isTemplateTensionOnly: Boolean
   watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
-  roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
   projects(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project!]
   pinned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
+  tension_templates(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate!]
   role_ext(filter: RoleExtFilter): RoleExt
   role_type: RoleType
   color: String
@@ -178,10 +188,11 @@ type Node {
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
   watchersAggregate(filter: UserFilter): UserAggregateResult
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
-  labelsAggregate(filter: LabelFilter): LabelAggregateResult
-  rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   projectsAggregate(filter: ProjectFilter): ProjectAggregateResult
   pinnedAggregate(filter: TensionFilter): TensionAggregateResult
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
+  tension_templatesAggregate(filter: TensionTemplateFilter): TensionTemplateAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
   events_historyAggregate(filter: EventFilter): EventAggregateResult
   activityAggregate(filter: ActivityFilter): ActivityAggregateResult
@@ -215,28 +226,45 @@ type Label {
   id: ID!
   rootnameid: String!
   name: String!
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   description: String
   color: String
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
 
-  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
+  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
 }
 
 type RoleExt {
   id: ID!
   rootnameid: String!
   name: String!
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   about: String
   role_type: RoleType!
   color: String
   mandate(filter: MandateFilter): Mandate
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
 
-  rolesAggregate(filter: NodeFilter): NodeAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
+  rolesAggregate(filter: NodeFilter): NodeAggregateResult
+}
+
+type TensionTemplate {
+  id: ID!
+  rootnameid: String!
+  name: String!
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  is_recursive: Boolean!
+  title: String!
+  comment: String!
+  type_: TensionType!
+  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
+
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  assigneesAggregate(filter: UserFilter): UserAggregateResult
 }
 
 type Project {
@@ -716,33 +744,33 @@ enum Lang {
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @lambda on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @cascade(fields: [String]) on FIELD
-
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 type ActivityAggregateResult {
   count: Int
@@ -920,10 +948,10 @@ type AddEventPayload {
 input AddLabelInput {
   rootnameid: String!
   name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   description: String @x_alter(r:"maxLen", n:280)
   color: String
   tensions: [TensionRef!]
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type AddLabelPayload {
@@ -986,12 +1014,14 @@ input AddNodeInput {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   lexicon: String
+  isTemplateTensionOnly: Boolean
   watchers: [UserRef!]
   children: [NodeRef!]
-  labels: [LabelRef!]
-  roles: [RoleExtRef!]
   projects: [ProjectRef!]
   pinned: [TensionRef!] @x_add(r:"ref")
+  labels: [LabelRef!]
+  roles: [RoleExtRef!]
+  tension_templates: [TensionTemplateRef!]
   role_ext: RoleExtRef
   role_type: RoleType
   color: String
@@ -1140,12 +1170,12 @@ type AddReactionPayload {
 input AddRoleExtInput {
   rootnameid: String!
   name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType!
   color: String
   mandate: MandateRef
   roles: [NodeRef!]
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type AddRoleExtPayload {
@@ -1180,6 +1210,23 @@ input AddTensionInput {
 
 type AddTensionPayload {
   tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
+  numUids: Int
+}
+
+input AddTensionTemplateInput {
+  rootnameid: String!
+  name: String! @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean!
+  title: String!
+  comment: String!
+  type_: TensionType!
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
+}
+
+type AddTensionTemplatePayload {
+  tensionTemplate(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
   numUids: Int
 }
 
@@ -1746,6 +1793,12 @@ type DeleteTensionPayload {
   numUids: Int
 }
 
+type DeleteTensionTemplatePayload {
+  tensionTemplate(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
+  msg: String
+  numUids: Int
+}
+
 type DeleteUserEventPayload {
   userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
   msg: String
@@ -2087,10 +2140,10 @@ input LabelFilter {
 enum LabelHasFilter {
   rootnameid
   name
+  nodes
   description
   color
   tensions
-  nodes
 }
 
 input LabelOrder {
@@ -2109,20 +2162,20 @@ enum LabelOrderable {
 input LabelPatch {
   rootnameid: String @x_patch_ro
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   description: String @x_alter(r:"maxLen", n:280)
   color: String
   tensions: [TensionRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input LabelRef {
   id: ID
   rootnameid: String
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   description: String @x_alter(r:"maxLen", n:280)
   color: String
   tensions: [TensionRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type MandateAggregateResult {
@@ -2213,6 +2266,9 @@ type Mutation {
   addRoleExt(input: [AddRoleExtInput!]! @hook_addRoleExtInput): AddRoleExtPayload @hook_addRoleExt
   updateRoleExt(input: UpdateRoleExtInput! @hook_updateRoleExtInput): UpdateRoleExtPayload @hook_updateRoleExt
   deleteRoleExt(filter: RoleExtFilter! @hook_deleteRoleExtInput): DeleteRoleExtPayload @hook_deleteRoleExt
+  addTensionTemplate(input: [AddTensionTemplateInput!]! @hook_addTensionTemplateInput): AddTensionTemplatePayload @hook_addTensionTemplate
+  updateTensionTemplate(input: UpdateTensionTemplateInput! @hook_updateTensionTemplateInput): UpdateTensionTemplatePayload @hook_updateTensionTemplate
+  deleteTensionTemplate(filter: TensionTemplateFilter! @hook_deleteTensionTemplateInput): DeleteTensionTemplatePayload @hook_deleteTensionTemplate
   addProject(input: [AddProjectInput!]! @hook_addProjectInput): AddProjectPayload @hook_addProject
   updateProject(input: UpdateProjectInput! @hook_updateProjectInput): UpdateProjectPayload @hook_updateProject
   deleteProject(filter: ProjectFilter! @hook_deleteProjectInput): DeleteProjectPayload @hook_deleteProject
@@ -2438,12 +2494,14 @@ enum NodeHasFilter {
   userCanJoin
   guestCanCreateTension
   lexicon
+  isTemplateTensionOnly
   watchers
   children
-  labels
-  roles
   projects
   pinned
+  labels
+  roles
+  tension_templates
   role_ext
   role_type
   color
@@ -2499,12 +2557,14 @@ input NodePatch {
   userCanJoin: Boolean @x_patch_ro
   guestCanCreateTension: Boolean @x_patch_ro
   lexicon: String @x_patch_ro
+  isTemplateTensionOnly: Boolean @x_patch_ro
   watchers: [UserRef!] @x_patch_ro
   children: [NodeRef!] @x_patch_ro
-  labels: [LabelRef!] @x_patch_ro
-  roles: [RoleExtRef!] @x_patch_ro
   projects: [ProjectRef!] @x_patch_ro
   pinned: [TensionRef!] @x_patch_ro
+  labels: [LabelRef!] @x_patch_ro
+  roles: [RoleExtRef!] @x_patch_ro
+  tension_templates: [TensionTemplateRef!] @x_patch_ro
   role_ext: RoleExtRef @x_patch_ro
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
@@ -2539,12 +2599,14 @@ input NodeRef {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   lexicon: String
+  isTemplateTensionOnly: Boolean
   watchers: [UserRef!]
   children: [NodeRef!]
-  labels: [LabelRef!]
-  roles: [RoleExtRef!]
   projects: [ProjectRef!]
   pinned: [TensionRef!] @x_add(r:"ref")
+  labels: [LabelRef!]
+  roles: [RoleExtRef!]
+  tension_templates: [TensionTemplateRef!]
   role_ext: RoleExtRef
   role_type: RoleType
   color: String
@@ -3181,6 +3243,9 @@ type Query {
   getRoleExt(id: ID!): RoleExt
   queryRoleExt(filter: RoleExtFilter @hook_queryRoleExtInput, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
   aggregateRoleExt(filter: RoleExtFilter): RoleExtAggregateResult
+  getTensionTemplate(id: ID!): TensionTemplate
+  queryTensionTemplate(filter: TensionTemplateFilter @hook_queryTensionTemplateInput, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
+  aggregateTensionTemplate(filter: TensionTemplateFilter): TensionTemplateAggregateResult
   getProject(id: ID!): Project
   queryProject(filter: ProjectFilter @hook_queryProjectInput, order: ProjectOrder, first: Int, offset: Int): [Project]
   aggregateProject(filter: ProjectFilter): ProjectAggregateResult
@@ -3320,12 +3385,12 @@ input RoleExtFilter {
 enum RoleExtHasFilter {
   rootnameid
   name
+  nodes
   about
   role_type
   color
   mandate
   roles
-  nodes
 }
 
 input RoleExtOrder {
@@ -3344,24 +3409,24 @@ enum RoleExtOrderable {
 input RoleExtPatch {
   rootnameid: String @x_patch_ro
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType
   color: String
   mandate: MandateRef
   roles: [NodeRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input RoleExtRef {
   id: ID
   rootnameid: String
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType
   color: String
   mandate: MandateRef
   roles: [NodeRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input RoleType_hash {
@@ -3551,6 +3616,78 @@ input TensionRef {
 input TensionStatus_hash {
   eq: TensionStatus
   in: [TensionStatus]
+}
+
+type TensionTemplateAggregateResult {
+  count: Int
+  rootnameidMin: String
+  rootnameidMax: String
+  nameMin: String
+  nameMax: String
+  titleMin: String
+  titleMax: String
+  commentMin: String
+  commentMax: String
+}
+
+input TensionTemplateFilter {
+  id: [ID!]
+  rootnameid: StringHashFilter
+  name: StringHashFilter_StringTermFilter
+  has: [TensionTemplateHasFilter]
+  and: [TensionTemplateFilter]
+  or: [TensionTemplateFilter]
+  not: TensionTemplateFilter
+}
+
+enum TensionTemplateHasFilter {
+  rootnameid
+  name
+  nodes
+  is_recursive
+  title
+  comment
+  type_
+  labels
+  assignees
+}
+
+input TensionTemplateOrder {
+  asc: TensionTemplateOrderable
+  desc: TensionTemplateOrderable
+  then: TensionTemplateOrder
+}
+
+enum TensionTemplateOrderable {
+  rootnameid
+  name
+  title
+  comment
+}
+
+input TensionTemplatePatch {
+  rootnameid: String @x_patch_ro
+  name: String @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean
+  title: String
+  comment: String
+  type_: TensionType
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
+}
+
+input TensionTemplateRef {
+  id: ID
+  rootnameid: String
+  name: String @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean
+  title: String
+  comment: String
+  type_: TensionType
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
 }
 
 input TensionType_hash {
@@ -3819,6 +3956,17 @@ input UpdateTensionInput {
 
 type UpdateTensionPayload {
   tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
+  numUids: Int
+}
+
+input UpdateTensionTemplateInput {
+  filter: TensionTemplateFilter!
+  set: TensionTemplatePatch
+  remove: TensionTemplatePatch
+}
+
+type UpdateTensionTemplatePayload {
+  tensionTemplate(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
   numUids: Int
 }
 

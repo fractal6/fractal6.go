@@ -122,6 +122,16 @@ func Init() gen.Config {
 	c.Directives.Hook_addLabel = addNodeArtefactHook
 	c.Directives.Hook_updateLabel = updateNodeArtefactHook
 	c.Directives.Hook_deleteLabel = nothing
+	// TensionTemplate
+	c.Directives.Hook_getTensionTemplateInput = nothing
+	c.Directives.Hook_queryTensionTemplateInput = nothing
+	c.Directives.Hook_addTensionTemplateInput = nothing
+	c.Directives.Hook_updateTensionTemplateInput = setContextWithID // used by @unique
+	c.Directives.Hook_deleteTensionTemplateInput = nothing
+	// --
+	c.Directives.Hook_addTensionTemplate = addNodeArtefactHook
+	c.Directives.Hook_updateTensionTemplate = updateNodeArtefactHook
+	c.Directives.Hook_deleteTensionTemplate = nothing
 	// Project
 	c.Directives.Hook_getProjectInput = nothing
 	c.Directives.Hook_queryProjectInput = nothing

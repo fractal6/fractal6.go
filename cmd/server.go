@@ -152,6 +152,7 @@ func RunServer() {
 			r.Post("/setusercanjoin", handle6.SetUserCanJoin)
 			r.Post("/setguestcancreatetension", handle6.SetGuestCanCreateTension)
 			r.Post("/setlexicon", handle6.SetLexicon)
+			r.Post("/setistemplatetensiononly", handle6.SetIsTemplateTensionOnly)
 
 			// Special
 			r.Post("/makeowner", handle6.MakeOwner)

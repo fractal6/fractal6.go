@@ -38,134 +38,142 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	Auth                          func(ctx context.Context, obj interface{}, next graphql.Resolver, password *model.AuthRule, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
-	CacheControl                  func(ctx context.Context, obj interface{}, next graphql.Resolver, maxAge int) (res interface{}, err error)
-	Cascade                       func(ctx context.Context, obj interface{}, next graphql.Resolver, fields []*string) (res interface{}, err error)
-	Custom                        func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP, dql *string) (res interface{}, err error)
-	Dgraph                        func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
-	Generate                      func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.GenerateQueryParams, mutation *model.GenerateMutationParams, subscription *bool) (res interface{}, err error)
-	HasInverse                    func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
-	Hidden                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addComment               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addCommentInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addContract              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addContractInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addLabel                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addLabelInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProject               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectCard           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectCardInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectColumn         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectColumnInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectDraft          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectDraftInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addProjectInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addReaction              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addReactionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addRoleExt               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addRoleExtInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addTension               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addTensionInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addUser                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addUserInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addVote                  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_addVoteInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteComment            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteCommentInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteContract           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteContractInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteLabel              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteLabelInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProject            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectCard        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectCardInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectColumn      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectColumnInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectDraft       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectDraftInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteProjectInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteReaction           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteReactionInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteRoleExt            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteRoleExtInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteTension            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteTensionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteUser               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteUserInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteVote               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_deleteVoteInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getCommentInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getContractInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getLabelInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getProjectCardInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getProjectColumnInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getProjectDraftInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getProjectInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getReactionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getRoleExtInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getTensionInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getUserInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_getVoteInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryCommentInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryContractInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryLabelInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryProjectCardInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryProjectColumnInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryProjectDraftInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryProjectInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryReactionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryRoleExtInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryTensionInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryUserInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_queryVoteInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateComment            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateCommentInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateContract           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateContractInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateLabel              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateLabelInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProject            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectCard        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectCardInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectColumn      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectColumnInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectDraft       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectDraftInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateProjectInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateReaction           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateReactionInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateRoleExt            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateRoleExtInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateTension            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateTensionInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateUser               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateUserInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateVote               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Hook_updateVoteInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Id                            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	IsContractValidator           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Lambda                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	LambdaOnMutate                func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
-	Meta                          func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k []string) (res interface{}, err error)
-	Private                       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	Remote                        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	RemoteResponse                func(ctx context.Context, obj interface{}, next graphql.Resolver, name *string) (res interface{}, err error)
-	Search                        func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
-	Secret                        func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
-	W_add                         func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	W_alter                       func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	W_meta_patch                  func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
-	W_patch                       func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	W_remove                      func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	W_set                         func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
-	WithSubscription              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	X_add                         func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
-	X_alter                       func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
-	X_patch                       func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
-	X_patch_ro                    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	X_remove                      func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
-	X_ro                          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
-	X_set                         func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	Auth                            func(ctx context.Context, obj interface{}, next graphql.Resolver, password *model.AuthRule, query *model.AuthRule, add *model.AuthRule, update *model.AuthRule, delete *model.AuthRule) (res interface{}, err error)
+	CacheControl                    func(ctx context.Context, obj interface{}, next graphql.Resolver, maxAge int) (res interface{}, err error)
+	Cascade                         func(ctx context.Context, obj interface{}, next graphql.Resolver, fields []*string) (res interface{}, err error)
+	Custom                          func(ctx context.Context, obj interface{}, next graphql.Resolver, http *model.CustomHTTP, dql *string) (res interface{}, err error)
+	Dgraph                          func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg *string, pred *string) (res interface{}, err error)
+	Generate                        func(ctx context.Context, obj interface{}, next graphql.Resolver, query *model.GenerateQueryParams, mutation *model.GenerateMutationParams, subscription *bool) (res interface{}, err error)
+	HasInverse                      func(ctx context.Context, obj interface{}, next graphql.Resolver, field string) (res interface{}, err error)
+	Hidden                          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addComment                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addCommentInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addContract                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addContractInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addLabel                   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addLabelInput              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProject                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectCard             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectCardInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectColumn           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectColumnInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectDraft            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectDraftInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addReaction                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addReactionInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addRoleExt                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addRoleExtInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTension                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTensionInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTensionTemplate         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addTensionTemplateInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addUser                    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addUserInput               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addVote                    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addVoteInput               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteComment              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteCommentInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteContract             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteContractInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteLabel                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteLabelInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProject              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectCard          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectCardInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectColumn        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectColumnInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectDraft         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectDraftInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteReaction             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteReactionInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteRoleExt              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteRoleExtInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTension              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTensionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTensionTemplate      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteTensionTemplateInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteUser                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteUserInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteVote                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteVoteInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getCommentInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getContractInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getLabelInput              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectCardInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectColumnInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectDraftInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getReactionInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getRoleExtInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getTensionInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getTensionTemplateInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getUserInput               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getVoteInput               func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryCommentInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryContractInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryLabelInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectCardInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectColumnInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectDraftInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryReactionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryRoleExtInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryTensionInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryTensionTemplateInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryUserInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryVoteInput             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateComment              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateCommentInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateContract             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateContractInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateLabel                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateLabelInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProject              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectCard          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectCardInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectColumn        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectColumnInput   func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectDraft         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectDraftInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateReaction             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateReactionInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateRoleExt              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateRoleExtInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTension              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTensionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTensionTemplate      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateTensionTemplateInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateUser                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateUserInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateVote                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateVoteInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Id                              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	IsContractValidator             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Lambda                          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	LambdaOnMutate                  func(ctx context.Context, obj interface{}, next graphql.Resolver, add *bool, update *bool, delete *bool) (res interface{}, err error)
+	Meta                            func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k []string) (res interface{}, err error)
+	Private                         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Remote                          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	RemoteResponse                  func(ctx context.Context, obj interface{}, next graphql.Resolver, name *string) (res interface{}, err error)
+	Search                          func(ctx context.Context, obj interface{}, next graphql.Resolver, by []model.DgraphIndex) (res interface{}, err error)
+	Secret                          func(ctx context.Context, obj interface{}, next graphql.Resolver, field string, pred *string) (res interface{}, err error)
+	W_add                           func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_alter                         func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_meta_patch                    func(ctx context.Context, obj interface{}, next graphql.Resolver, f string, k *string) (res interface{}, err error)
+	W_patch                         func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_remove                        func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	W_set                           func(ctx context.Context, obj interface{}, next graphql.Resolver, a string) (res interface{}, err error)
+	WithSubscription                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	X_add                           func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	X_alter                         func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	X_patch                         func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	X_patch_ro                      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	X_remove                        func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
+	X_ro                            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	X_set                           func(ctx context.Context, obj interface{}, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -304,6 +312,11 @@ type ComplexityRoot struct {
 	AddTensionPayload struct {
 		NumUids func(childComplexity int) int
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+	}
+
+	AddTensionTemplatePayload struct {
+		NumUids         func(childComplexity int) int
+		TensionTemplate func(childComplexity int, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) int
 	}
 
 	AddUserEventPayload struct {
@@ -567,6 +580,12 @@ type ComplexityRoot struct {
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 	}
 
+	DeleteTensionTemplatePayload struct {
+		Msg             func(childComplexity int) int
+		NumUids         func(childComplexity int) int
+		TensionTemplate func(childComplexity int, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) int
+	}
+
 	DeleteUserEventPayload struct {
 		Msg       func(childComplexity int) int
 		NumUids   func(childComplexity int) int
@@ -726,6 +745,7 @@ type ComplexityRoot struct {
 		AddReaction             func(childComplexity int, input []*model.AddReactionInput, upsert *bool) int
 		AddRoleExt              func(childComplexity int, input []*model.AddRoleExtInput) int
 		AddTension              func(childComplexity int, input []*model.AddTensionInput) int
+		AddTensionTemplate      func(childComplexity int, input []*model.AddTensionTemplateInput) int
 		AddUser                 func(childComplexity int, input []*model.AddUserInput, upsert *bool) int
 		AddUserEvent            func(childComplexity int, input []*model.AddUserEventInput) int
 		AddUserRights           func(childComplexity int, input []*model.AddUserRightsInput) int
@@ -754,6 +774,7 @@ type ComplexityRoot struct {
 		DeleteReaction          func(childComplexity int, filter model.ReactionFilter) int
 		DeleteRoleExt           func(childComplexity int, filter model.RoleExtFilter) int
 		DeleteTension           func(childComplexity int, filter model.TensionFilter) int
+		DeleteTensionTemplate   func(childComplexity int, filter model.TensionTemplateFilter) int
 		DeleteUser              func(childComplexity int, filter model.UserFilter) int
 		DeleteUserEvent         func(childComplexity int, filter model.UserEventFilter) int
 		DeleteUserRights        func(childComplexity int, filter model.UserRightsFilter) int
@@ -782,6 +803,7 @@ type ComplexityRoot struct {
 		UpdateReaction          func(childComplexity int, input model.UpdateReactionInput) int
 		UpdateRoleExt           func(childComplexity int, input model.UpdateRoleExtInput) int
 		UpdateTension           func(childComplexity int, input model.UpdateTensionInput) int
+		UpdateTensionTemplate   func(childComplexity int, input model.UpdateTensionTemplateInput) int
 		UpdateUser              func(childComplexity int, input model.UpdateUserInput) int
 		UpdateUserEvent         func(childComplexity int, input model.UpdateUserEventInput) int
 		UpdateUserRights        func(childComplexity int, input model.UpdateUserRightsInput) int
@@ -789,54 +811,57 @@ type ComplexityRoot struct {
 	}
 
 	Node struct {
-		About                  func(childComplexity int) int
-		Activity               func(childComplexity int, from *string, to *string) int
-		ActivityAggregate      func(childComplexity int, filter *model.ActivityFilter) int
-		CascadeDirective       func(childComplexity int) int
-		Children               func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		ChildrenAggregate      func(childComplexity int, filter *model.NodeFilter) int
-		Color                  func(childComplexity int) int
-		Contracts              func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
-		ContractsAggregate     func(childComplexity int, filter *model.VoteFilter) int
-		CreatedAt              func(childComplexity int) int
-		CreatedBy              func(childComplexity int, filter *model.UserFilter) int
-		EventsHistory          func(childComplexity int, query *string) int
-		EventsHistoryAggregate func(childComplexity int, filter *model.EventFilter) int
-		FirstLink              func(childComplexity int, filter *model.UserFilter) int
-		GuestCanCreateTension  func(childComplexity int) int
-		ID                     func(childComplexity int) int
-		IsArchived             func(childComplexity int) int
-		IsPersonal             func(childComplexity int) int
-		IsRoot                 func(childComplexity int) int
-		Labels                 func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		LabelsAggregate        func(childComplexity int, filter *model.LabelFilter) int
-		Lexicon                func(childComplexity int) int
-		Mode                   func(childComplexity int) int
-		Name                   func(childComplexity int) int
-		Nameid                 func(childComplexity int) int
-		Parent                 func(childComplexity int, filter *model.NodeFilter) int
-		Pinned                 func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		PinnedAggregate        func(childComplexity int, filter *model.TensionFilter) int
-		Projects               func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
-		ProjectsAggregate      func(childComplexity int, filter *model.ProjectFilter) int
-		Rights                 func(childComplexity int) int
-		RoleExt                func(childComplexity int, filter *model.RoleExtFilter) int
-		RoleType               func(childComplexity int) int
-		Roles                  func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
-		RolesAggregate         func(childComplexity int, filter *model.RoleExtFilter) int
-		Rootnameid             func(childComplexity int) int
-		Skills                 func(childComplexity int) int
-		Source                 func(childComplexity int, filter *model.BlobFilter) int
-		TensionsIn             func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsInAggregate    func(childComplexity int, filter *model.TensionFilter) int
-		TensionsOut            func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsOutAggregate   func(childComplexity int, filter *model.TensionFilter) int
-		Type                   func(childComplexity int) int
-		UpdatedAt              func(childComplexity int) int
-		UserCanJoin            func(childComplexity int) int
-		Visibility             func(childComplexity int) int
-		Watchers               func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		WatchersAggregate      func(childComplexity int, filter *model.UserFilter) int
+		About                     func(childComplexity int) int
+		Activity                  func(childComplexity int, from *string, to *string) int
+		ActivityAggregate         func(childComplexity int, filter *model.ActivityFilter) int
+		CascadeDirective          func(childComplexity int) int
+		Children                  func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		ChildrenAggregate         func(childComplexity int, filter *model.NodeFilter) int
+		Color                     func(childComplexity int) int
+		Contracts                 func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
+		ContractsAggregate        func(childComplexity int, filter *model.VoteFilter) int
+		CreatedAt                 func(childComplexity int) int
+		CreatedBy                 func(childComplexity int, filter *model.UserFilter) int
+		EventsHistory             func(childComplexity int, query *string) int
+		EventsHistoryAggregate    func(childComplexity int, filter *model.EventFilter) int
+		FirstLink                 func(childComplexity int, filter *model.UserFilter) int
+		GuestCanCreateTension     func(childComplexity int) int
+		ID                        func(childComplexity int) int
+		IsArchived                func(childComplexity int) int
+		IsPersonal                func(childComplexity int) int
+		IsRoot                    func(childComplexity int) int
+		IsTemplateTensionOnly     func(childComplexity int) int
+		Labels                    func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate           func(childComplexity int, filter *model.LabelFilter) int
+		Lexicon                   func(childComplexity int) int
+		Mode                      func(childComplexity int) int
+		Name                      func(childComplexity int) int
+		Nameid                    func(childComplexity int) int
+		Parent                    func(childComplexity int, filter *model.NodeFilter) int
+		Pinned                    func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		PinnedAggregate           func(childComplexity int, filter *model.TensionFilter) int
+		Projects                  func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
+		ProjectsAggregate         func(childComplexity int, filter *model.ProjectFilter) int
+		Rights                    func(childComplexity int) int
+		RoleExt                   func(childComplexity int, filter *model.RoleExtFilter) int
+		RoleType                  func(childComplexity int) int
+		Roles                     func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
+		RolesAggregate            func(childComplexity int, filter *model.RoleExtFilter) int
+		Rootnameid                func(childComplexity int) int
+		Skills                    func(childComplexity int) int
+		Source                    func(childComplexity int, filter *model.BlobFilter) int
+		TensionTemplates          func(childComplexity int, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) int
+		TensionTemplatesAggregate func(childComplexity int, filter *model.TensionTemplateFilter) int
+		TensionsIn                func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsInAggregate       func(childComplexity int, filter *model.TensionFilter) int
+		TensionsOut               func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsOutAggregate      func(childComplexity int, filter *model.TensionFilter) int
+		Type                      func(childComplexity int) int
+		UpdatedAt                 func(childComplexity int) int
+		UserCanJoin               func(childComplexity int) int
+		Visibility                func(childComplexity int) int
+		Watchers                  func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		WatchersAggregate         func(childComplexity int, filter *model.UserFilter) int
 	}
 
 	NodeAggregateResult struct {
@@ -1139,6 +1164,7 @@ type ComplexityRoot struct {
 		AggregateReaction          func(childComplexity int, filter *model.ReactionFilter) int
 		AggregateRoleExt           func(childComplexity int, filter *model.RoleExtFilter) int
 		AggregateTension           func(childComplexity int, filter *model.TensionFilter) int
+		AggregateTensionTemplate   func(childComplexity int, filter *model.TensionTemplateFilter) int
 		AggregateUser              func(childComplexity int, filter *model.UserFilter) int
 		AggregateUserEvent         func(childComplexity int, filter *model.UserEventFilter) int
 		AggregateUserRights        func(childComplexity int, filter *model.UserRightsFilter) int
@@ -1162,6 +1188,7 @@ type ComplexityRoot struct {
 		GetReaction                func(childComplexity int, id *string, reactionid *string) int
 		GetRoleExt                 func(childComplexity int, id string) int
 		GetTension                 func(childComplexity int, id string) int
+		GetTensionTemplate         func(childComplexity int, id string) int
 		GetUser                    func(childComplexity int, id *string, username *string, email *string) int
 		GetUserEvent               func(childComplexity int, id string) int
 		GetVote                    func(childComplexity int, id *string, voteid *string) int
@@ -1189,6 +1216,7 @@ type ComplexityRoot struct {
 		QueryReaction              func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
 		QueryRoleExt               func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 		QueryTension               func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		QueryTensionTemplate       func(childComplexity int, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) int
 		QueryUser                  func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
 		QueryUserEvent             func(childComplexity int, filter *model.UserEventFilter, order *model.UserEventOrder, first *int, offset *int) int
 		QueryUserRights            func(childComplexity int, filter *model.UserRightsFilter, order *model.UserRightsOrder, first *int, offset *int) int
@@ -1292,6 +1320,34 @@ type ComplexityRoot struct {
 		TitleMin      func(childComplexity int) int
 		UpdatedAtMax  func(childComplexity int) int
 		UpdatedAtMin  func(childComplexity int) int
+	}
+
+	TensionTemplate struct {
+		Assignees          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		AssigneesAggregate func(childComplexity int, filter *model.UserFilter) int
+		Comment            func(childComplexity int) int
+		ID                 func(childComplexity int) int
+		IsRecursive        func(childComplexity int) int
+		Labels             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate    func(childComplexity int, filter *model.LabelFilter) int
+		Name               func(childComplexity int) int
+		Nodes              func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		NodesAggregate     func(childComplexity int, filter *model.NodeFilter) int
+		Rootnameid         func(childComplexity int) int
+		Title              func(childComplexity int) int
+		Type               func(childComplexity int) int
+	}
+
+	TensionTemplateAggregateResult struct {
+		CommentMax    func(childComplexity int) int
+		CommentMin    func(childComplexity int) int
+		Count         func(childComplexity int) int
+		NameMax       func(childComplexity int) int
+		NameMin       func(childComplexity int) int
+		RootnameidMax func(childComplexity int) int
+		RootnameidMin func(childComplexity int) int
+		TitleMax      func(childComplexity int) int
+		TitleMin      func(childComplexity int) int
 	}
 
 	UpdateActivityPayload struct {
@@ -1412,6 +1468,11 @@ type ComplexityRoot struct {
 	UpdateTensionPayload struct {
 		NumUids func(childComplexity int) int
 		Tension func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+	}
+
+	UpdateTensionTemplatePayload struct {
+		NumUids         func(childComplexity int) int
+		TensionTemplate func(childComplexity int, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) int
 	}
 
 	UpdateUserEventPayload struct {
@@ -2123,6 +2184,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddTensionTemplatePayload.numUids":
+		if e.complexity.AddTensionTemplatePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddTensionTemplatePayload.NumUids(childComplexity), true
+
+	case "AddTensionTemplatePayload.tensionTemplate":
+		if e.complexity.AddTensionTemplatePayload.TensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_AddTensionTemplatePayload_tensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddTensionTemplatePayload.TensionTemplate(childComplexity, args["filter"].(*model.TensionTemplateFilter), args["order"].(*model.TensionTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddUserEventPayload.numUids":
 		if e.complexity.AddUserEventPayload.NumUids == nil {
@@ -3420,6 +3500,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "DeleteTensionTemplatePayload.msg":
+		if e.complexity.DeleteTensionTemplatePayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteTensionTemplatePayload.Msg(childComplexity), true
+
+	case "DeleteTensionTemplatePayload.numUids":
+		if e.complexity.DeleteTensionTemplatePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteTensionTemplatePayload.NumUids(childComplexity), true
+
+	case "DeleteTensionTemplatePayload.tensionTemplate":
+		if e.complexity.DeleteTensionTemplatePayload.TensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteTensionTemplatePayload_tensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteTensionTemplatePayload.TensionTemplate(childComplexity, args["filter"].(*model.TensionTemplateFilter), args["order"].(*model.TensionTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteUserEventPayload.msg":
 		if e.complexity.DeleteUserEventPayload.Msg == nil {
 			break
@@ -4381,6 +4487,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddTension(childComplexity, args["input"].([]*model.AddTensionInput)), true
 
+	case "Mutation.addTensionTemplate":
+		if e.complexity.Mutation.AddTensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addTensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddTensionTemplate(childComplexity, args["input"].([]*model.AddTensionTemplateInput)), true
+
 	case "Mutation.addUser":
 		if e.complexity.Mutation.AddUser == nil {
 			break
@@ -4716,6 +4834,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteTension(childComplexity, args["filter"].(model.TensionFilter)), true
+
+	case "Mutation.deleteTensionTemplate":
+		if e.complexity.Mutation.DeleteTensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTensionTemplate(childComplexity, args["filter"].(model.TensionTemplateFilter)), true
 
 	case "Mutation.deleteUser":
 		if e.complexity.Mutation.DeleteUser == nil {
@@ -5053,6 +5183,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateTension(childComplexity, args["input"].(model.UpdateTensionInput)), true
 
+	case "Mutation.updateTensionTemplate":
+		if e.complexity.Mutation.UpdateTensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateTensionTemplate(childComplexity, args["input"].(model.UpdateTensionTemplateInput)), true
+
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
 			break
@@ -5284,6 +5426,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Node.IsRoot(childComplexity), true
 
+	case "Node.isTemplateTensionOnly":
+		if e.complexity.Node.IsTemplateTensionOnly == nil {
+			break
+		}
+
+		return e.complexity.Node.IsTemplateTensionOnly(childComplexity), true
+
 	case "Node.labels":
 		if e.complexity.Node.Labels == nil {
 			break
@@ -5471,6 +5620,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.Source(childComplexity, args["filter"].(*model.BlobFilter)), true
+
+	case "Node.tension_templates":
+		if e.complexity.Node.TensionTemplates == nil {
+			break
+		}
+
+		args, err := ec.field_Node_tension_templates_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.TensionTemplates(childComplexity, args["filter"].(*model.TensionTemplateFilter), args["order"].(*model.TensionTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.tension_templatesAggregate":
+		if e.complexity.Node.TensionTemplatesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_tension_templatesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.TensionTemplatesAggregate(childComplexity, args["filter"].(*model.TensionTemplateFilter)), true
 
 	case "Node.tensions_in":
 		if e.complexity.Node.TensionsIn == nil {
@@ -7441,6 +7614,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateTension(childComplexity, args["filter"].(*model.TensionFilter)), true
 
+	case "Query.aggregateTensionTemplate":
+		if e.complexity.Query.AggregateTensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateTensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateTensionTemplate(childComplexity, args["filter"].(*model.TensionTemplateFilter)), true
+
 	case "Query.aggregateUser":
 		if e.complexity.Query.AggregateUser == nil {
 			break
@@ -7716,6 +7901,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetTension(childComplexity, args["id"].(string)), true
+
+	case "Query.getTensionTemplate":
+		if e.complexity.Query.GetTensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getTensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTensionTemplate(childComplexity, args["id"].(string)), true
 
 	case "Query.getUser":
 		if e.complexity.Query.GetUser == nil {
@@ -8040,6 +8237,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryTension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryTensionTemplate":
+		if e.complexity.Query.QueryTensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryTensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryTensionTemplate(childComplexity, args["filter"].(*model.TensionTemplateFilter), args["order"].(*model.TensionTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryUser":
 		if e.complexity.Query.QueryUser == nil {
@@ -8796,6 +9005,190 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TensionAggregateResult.UpdatedAtMin(childComplexity), true
 
+	case "TensionTemplate.assignees":
+		if e.complexity.TensionTemplate.Assignees == nil {
+			break
+		}
+
+		args, err := ec.field_TensionTemplate_assignees_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.TensionTemplate.Assignees(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "TensionTemplate.assigneesAggregate":
+		if e.complexity.TensionTemplate.AssigneesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_TensionTemplate_assigneesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.TensionTemplate.AssigneesAggregate(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "TensionTemplate.comment":
+		if e.complexity.TensionTemplate.Comment == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplate.Comment(childComplexity), true
+
+	case "TensionTemplate.id":
+		if e.complexity.TensionTemplate.ID == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplate.ID(childComplexity), true
+
+	case "TensionTemplate.is_recursive":
+		if e.complexity.TensionTemplate.IsRecursive == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplate.IsRecursive(childComplexity), true
+
+	case "TensionTemplate.labels":
+		if e.complexity.TensionTemplate.Labels == nil {
+			break
+		}
+
+		args, err := ec.field_TensionTemplate_labels_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.TensionTemplate.Labels(childComplexity, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "TensionTemplate.labelsAggregate":
+		if e.complexity.TensionTemplate.LabelsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_TensionTemplate_labelsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.TensionTemplate.LabelsAggregate(childComplexity, args["filter"].(*model.LabelFilter)), true
+
+	case "TensionTemplate.name":
+		if e.complexity.TensionTemplate.Name == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplate.Name(childComplexity), true
+
+	case "TensionTemplate.nodes":
+		if e.complexity.TensionTemplate.Nodes == nil {
+			break
+		}
+
+		args, err := ec.field_TensionTemplate_nodes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.TensionTemplate.Nodes(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "TensionTemplate.nodesAggregate":
+		if e.complexity.TensionTemplate.NodesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_TensionTemplate_nodesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.TensionTemplate.NodesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "TensionTemplate.rootnameid":
+		if e.complexity.TensionTemplate.Rootnameid == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplate.Rootnameid(childComplexity), true
+
+	case "TensionTemplate.title":
+		if e.complexity.TensionTemplate.Title == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplate.Title(childComplexity), true
+
+	case "TensionTemplate.type_":
+		if e.complexity.TensionTemplate.Type == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplate.Type(childComplexity), true
+
+	case "TensionTemplateAggregateResult.commentMax":
+		if e.complexity.TensionTemplateAggregateResult.CommentMax == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.CommentMax(childComplexity), true
+
+	case "TensionTemplateAggregateResult.commentMin":
+		if e.complexity.TensionTemplateAggregateResult.CommentMin == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.CommentMin(childComplexity), true
+
+	case "TensionTemplateAggregateResult.count":
+		if e.complexity.TensionTemplateAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.Count(childComplexity), true
+
+	case "TensionTemplateAggregateResult.nameMax":
+		if e.complexity.TensionTemplateAggregateResult.NameMax == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.NameMax(childComplexity), true
+
+	case "TensionTemplateAggregateResult.nameMin":
+		if e.complexity.TensionTemplateAggregateResult.NameMin == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.NameMin(childComplexity), true
+
+	case "TensionTemplateAggregateResult.rootnameidMax":
+		if e.complexity.TensionTemplateAggregateResult.RootnameidMax == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.RootnameidMax(childComplexity), true
+
+	case "TensionTemplateAggregateResult.rootnameidMin":
+		if e.complexity.TensionTemplateAggregateResult.RootnameidMin == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.RootnameidMin(childComplexity), true
+
+	case "TensionTemplateAggregateResult.titleMax":
+		if e.complexity.TensionTemplateAggregateResult.TitleMax == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.TitleMax(childComplexity), true
+
+	case "TensionTemplateAggregateResult.titleMin":
+		if e.complexity.TensionTemplateAggregateResult.TitleMin == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.TitleMin(childComplexity), true
+
 	case "UpdateActivityPayload.activity":
 		if e.complexity.UpdateActivityPayload.Activity == nil {
 			break
@@ -9251,6 +9644,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateTensionPayload.Tension(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdateTensionTemplatePayload.numUids":
+		if e.complexity.UpdateTensionTemplatePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateTensionTemplatePayload.NumUids(childComplexity), true
+
+	case "UpdateTensionTemplatePayload.tensionTemplate":
+		if e.complexity.UpdateTensionTemplatePayload.TensionTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateTensionTemplatePayload_tensionTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateTensionTemplatePayload.TensionTemplate(childComplexity, args["filter"].(*model.TensionTemplateFilter), args["order"].(*model.TensionTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "UpdateUserEventPayload.numUids":
 		if e.complexity.UpdateUserEventPayload.NumUids == nil {
@@ -10167,6 +10579,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAddReactionInput,
 		ec.unmarshalInputAddRoleExtInput,
 		ec.unmarshalInputAddTensionInput,
+		ec.unmarshalInputAddTensionTemplateInput,
 		ec.unmarshalInputAddUserEventInput,
 		ec.unmarshalInputAddUserInput,
 		ec.unmarshalInputAddUserRightsInput,
@@ -10306,6 +10719,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputTensionPatch,
 		ec.unmarshalInputTensionRef,
 		ec.unmarshalInputTensionStatus_hash,
+		ec.unmarshalInputTensionTemplateFilter,
+		ec.unmarshalInputTensionTemplateOrder,
+		ec.unmarshalInputTensionTemplatePatch,
+		ec.unmarshalInputTensionTemplateRef,
 		ec.unmarshalInputTensionType_hash,
 		ec.unmarshalInputUpdateActivityInput,
 		ec.unmarshalInputUpdateBlobInput,
@@ -10331,6 +10748,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateReactionInput,
 		ec.unmarshalInputUpdateRoleExtInput,
 		ec.unmarshalInputUpdateTensionInput,
+		ec.unmarshalInputUpdateTensionTemplateInput,
 		ec.unmarshalInputUpdateUserEventInput,
 		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputUpdateUserRightsInput,
@@ -10464,6 +10882,12 @@ directive @hook_updateRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_updateRoleExt on FIELD_DEFINITION
 directive @hook_deleteRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_deleteRoleExt on FIELD_DEFINITION
+directive @hook_addTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_addTensionTemplate on FIELD_DEFINITION
+directive @hook_updateTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_updateTensionTemplate on FIELD_DEFINITION
+directive @hook_deleteTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_deleteTensionTemplate on FIELD_DEFINITION
 directive @hook_addProjectInput on ARGUMENT_DEFINITION
 directive @hook_addProject on FIELD_DEFINITION
 directive @hook_updateProjectInput on ARGUMENT_DEFINITION
@@ -10528,6 +10952,8 @@ directive @hook_getLabelInput on ARGUMENT_DEFINITION
 directive @hook_queryLabelInput on ARGUMENT_DEFINITION
 directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
+directive @hook_getTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_queryTensionTemplateInput on ARGUMENT_DEFINITION
 directive @hook_getProjectInput on ARGUMENT_DEFINITION
 directive @hook_queryProjectInput on ARGUMENT_DEFINITION
 directive @hook_getProjectColumnInput on ARGUMENT_DEFINITION
@@ -10612,12 +11038,14 @@ type Node {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   lexicon: String
+  isTemplateTensionOnly: Boolean
   watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
-  roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
   projects(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project!]
   pinned(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
+  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
+  tension_templates(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate!]
   role_ext(filter: RoleExtFilter): RoleExt
   role_type: RoleType
   color: String
@@ -10631,10 +11059,11 @@ type Node {
   tensions_inAggregate(filter: TensionFilter): TensionAggregateResult
   watchersAggregate(filter: UserFilter): UserAggregateResult
   childrenAggregate(filter: NodeFilter): NodeAggregateResult
-  labelsAggregate(filter: LabelFilter): LabelAggregateResult
-  rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   projectsAggregate(filter: ProjectFilter): ProjectAggregateResult
   pinnedAggregate(filter: TensionFilter): TensionAggregateResult
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
+  tension_templatesAggregate(filter: TensionTemplateFilter): TensionTemplateAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
   events_historyAggregate(filter: EventFilter): EventAggregateResult
   activityAggregate(filter: ActivityFilter): ActivityAggregateResult
@@ -10668,28 +11097,45 @@ type Label {
   id: ID!
   rootnameid: String!
   name: String!
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   description: String
   color: String
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
 
-  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
+  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
 }
 
 type RoleExt {
   id: ID!
   rootnameid: String!
   name: String!
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   about: String
   role_type: RoleType!
   color: String
   mandate(filter: MandateFilter): Mandate
   roles(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
-  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
 
-  rolesAggregate(filter: NodeFilter): NodeAggregateResult
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
+  rolesAggregate(filter: NodeFilter): NodeAggregateResult
+}
+
+type TensionTemplate {
+  id: ID!
+  rootnameid: String!
+  name: String!
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  is_recursive: Boolean!
+  title: String!
+  comment: String!
+  type_: TensionType!
+  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
+
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  assigneesAggregate(filter: UserFilter): UserAggregateResult
 }
 
 type Project {
@@ -11169,33 +11615,33 @@ enum Lang {
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @lambda on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @cascade(fields: [String]) on FIELD
-
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 type ActivityAggregateResult {
   count: Int
@@ -11373,10 +11819,10 @@ type AddEventPayload {
 input AddLabelInput {
   rootnameid: String!
   name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   description: String @x_alter(r:"maxLen", n:280)
   color: String
   tensions: [TensionRef!]
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type AddLabelPayload {
@@ -11439,12 +11885,14 @@ input AddNodeInput {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   lexicon: String
+  isTemplateTensionOnly: Boolean
   watchers: [UserRef!]
   children: [NodeRef!]
-  labels: [LabelRef!]
-  roles: [RoleExtRef!]
   projects: [ProjectRef!]
   pinned: [TensionRef!] @x_add(r:"ref")
+  labels: [LabelRef!]
+  roles: [RoleExtRef!]
+  tension_templates: [TensionTemplateRef!]
   role_ext: RoleExtRef
   role_type: RoleType
   color: String
@@ -11593,12 +12041,12 @@ type AddReactionPayload {
 input AddRoleExtInput {
   rootnameid: String!
   name: String! @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType!
   color: String
   mandate: MandateRef
   roles: [NodeRef!]
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type AddRoleExtPayload {
@@ -11633,6 +12081,23 @@ input AddTensionInput {
 
 type AddTensionPayload {
   tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
+  numUids: Int
+}
+
+input AddTensionTemplateInput {
+  rootnameid: String!
+  name: String! @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean!
+  title: String!
+  comment: String!
+  type_: TensionType!
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
+}
+
+type AddTensionTemplatePayload {
+  tensionTemplate(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
   numUids: Int
 }
 
@@ -12199,6 +12664,12 @@ type DeleteTensionPayload {
   numUids: Int
 }
 
+type DeleteTensionTemplatePayload {
+  tensionTemplate(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
+  msg: String
+  numUids: Int
+}
+
 type DeleteUserEventPayload {
   userEvent(filter: UserEventFilter, order: UserEventOrder, first: Int, offset: Int): [UserEvent]
   msg: String
@@ -12540,10 +13011,10 @@ input LabelFilter {
 enum LabelHasFilter {
   rootnameid
   name
+  nodes
   description
   color
   tensions
-  nodes
 }
 
 input LabelOrder {
@@ -12562,20 +13033,20 @@ enum LabelOrderable {
 input LabelPatch {
   rootnameid: String @x_patch_ro
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   description: String @x_alter(r:"maxLen", n:280)
   color: String
   tensions: [TensionRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input LabelRef {
   id: ID
   rootnameid: String
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   description: String @x_alter(r:"maxLen", n:280)
   color: String
   tensions: [TensionRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type MandateAggregateResult {
@@ -12666,6 +13137,9 @@ type Mutation {
   addRoleExt(input: [AddRoleExtInput!]! @hook_addRoleExtInput): AddRoleExtPayload @hook_addRoleExt
   updateRoleExt(input: UpdateRoleExtInput! @hook_updateRoleExtInput): UpdateRoleExtPayload @hook_updateRoleExt
   deleteRoleExt(filter: RoleExtFilter! @hook_deleteRoleExtInput): DeleteRoleExtPayload @hook_deleteRoleExt
+  addTensionTemplate(input: [AddTensionTemplateInput!]! @hook_addTensionTemplateInput): AddTensionTemplatePayload @hook_addTensionTemplate
+  updateTensionTemplate(input: UpdateTensionTemplateInput! @hook_updateTensionTemplateInput): UpdateTensionTemplatePayload @hook_updateTensionTemplate
+  deleteTensionTemplate(filter: TensionTemplateFilter! @hook_deleteTensionTemplateInput): DeleteTensionTemplatePayload @hook_deleteTensionTemplate
   addProject(input: [AddProjectInput!]! @hook_addProjectInput): AddProjectPayload @hook_addProject
   updateProject(input: UpdateProjectInput! @hook_updateProjectInput): UpdateProjectPayload @hook_updateProject
   deleteProject(filter: ProjectFilter! @hook_deleteProjectInput): DeleteProjectPayload @hook_deleteProject
@@ -12891,12 +13365,14 @@ enum NodeHasFilter {
   userCanJoin
   guestCanCreateTension
   lexicon
+  isTemplateTensionOnly
   watchers
   children
-  labels
-  roles
   projects
   pinned
+  labels
+  roles
+  tension_templates
   role_ext
   role_type
   color
@@ -12952,12 +13428,14 @@ input NodePatch {
   userCanJoin: Boolean @x_patch_ro
   guestCanCreateTension: Boolean @x_patch_ro
   lexicon: String @x_patch_ro
+  isTemplateTensionOnly: Boolean @x_patch_ro
   watchers: [UserRef!] @x_patch_ro
   children: [NodeRef!] @x_patch_ro
-  labels: [LabelRef!] @x_patch_ro
-  roles: [RoleExtRef!] @x_patch_ro
   projects: [ProjectRef!] @x_patch_ro
   pinned: [TensionRef!] @x_patch_ro
+  labels: [LabelRef!] @x_patch_ro
+  roles: [RoleExtRef!] @x_patch_ro
+  tension_templates: [TensionTemplateRef!] @x_patch_ro
   role_ext: RoleExtRef @x_patch_ro
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
@@ -12992,12 +13470,14 @@ input NodeRef {
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   lexicon: String
+  isTemplateTensionOnly: Boolean
   watchers: [UserRef!]
   children: [NodeRef!]
-  labels: [LabelRef!]
-  roles: [RoleExtRef!]
   projects: [ProjectRef!]
   pinned: [TensionRef!] @x_add(r:"ref")
+  labels: [LabelRef!]
+  roles: [RoleExtRef!]
+  tension_templates: [TensionTemplateRef!]
   role_ext: RoleExtRef
   role_type: RoleType
   color: String
@@ -13634,6 +14114,9 @@ type Query {
   getRoleExt(id: ID!): RoleExt
   queryRoleExt(filter: RoleExtFilter @hook_queryRoleExtInput, order: RoleExtOrder, first: Int, offset: Int): [RoleExt]
   aggregateRoleExt(filter: RoleExtFilter): RoleExtAggregateResult
+  getTensionTemplate(id: ID!): TensionTemplate
+  queryTensionTemplate(filter: TensionTemplateFilter @hook_queryTensionTemplateInput, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
+  aggregateTensionTemplate(filter: TensionTemplateFilter): TensionTemplateAggregateResult
   getProject(id: ID!): Project
   queryProject(filter: ProjectFilter @hook_queryProjectInput, order: ProjectOrder, first: Int, offset: Int): [Project]
   aggregateProject(filter: ProjectFilter): ProjectAggregateResult
@@ -13773,12 +14256,12 @@ input RoleExtFilter {
 enum RoleExtHasFilter {
   rootnameid
   name
+  nodes
   about
   role_type
   color
   mandate
   roles
-  nodes
 }
 
 input RoleExtOrder {
@@ -13797,24 +14280,24 @@ enum RoleExtOrderable {
 input RoleExtPatch {
   rootnameid: String @x_patch_ro
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType
   color: String
   mandate: MandateRef
   roles: [NodeRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input RoleExtRef {
   id: ID
   rootnameid: String
   name: String @w_alter(a:"lower") @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   about: String @x_alter(r:"maxLen", n:280)
   role_type: RoleType
   color: String
   mandate: MandateRef
   roles: [NodeRef!] @x_ro
-  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 input RoleType_hash {
@@ -14004,6 +14487,78 @@ input TensionRef {
 input TensionStatus_hash {
   eq: TensionStatus
   in: [TensionStatus]
+}
+
+type TensionTemplateAggregateResult {
+  count: Int
+  rootnameidMin: String
+  rootnameidMax: String
+  nameMin: String
+  nameMax: String
+  titleMin: String
+  titleMax: String
+  commentMin: String
+  commentMax: String
+}
+
+input TensionTemplateFilter {
+  id: [ID!]
+  rootnameid: StringHashFilter
+  name: StringHashFilter_StringTermFilter
+  has: [TensionTemplateHasFilter]
+  and: [TensionTemplateFilter]
+  or: [TensionTemplateFilter]
+  not: TensionTemplateFilter
+}
+
+enum TensionTemplateHasFilter {
+  rootnameid
+  name
+  nodes
+  is_recursive
+  title
+  comment
+  type_
+  labels
+  assignees
+}
+
+input TensionTemplateOrder {
+  asc: TensionTemplateOrderable
+  desc: TensionTemplateOrderable
+  then: TensionTemplateOrder
+}
+
+enum TensionTemplateOrderable {
+  rootnameid
+  name
+  title
+  comment
+}
+
+input TensionTemplatePatch {
+  rootnameid: String @x_patch_ro
+  name: String @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean
+  title: String
+  comment: String
+  type_: TensionType
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
+}
+
+input TensionTemplateRef {
+  id: ID
+  rootnameid: String
+  name: String @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean
+  title: String
+  comment: String
+  type_: TensionType
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
 }
 
 input TensionType_hash {
@@ -14272,6 +14827,17 @@ input UpdateTensionInput {
 
 type UpdateTensionPayload {
   tension(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension]
+  numUids: Int
+}
+
+input UpdateTensionTemplateInput {
+  filter: TensionTemplateFilter!
+  set: TensionTemplatePatch
+  remove: TensionTemplatePatch
+}
+
+type UpdateTensionTemplatePayload {
+  tensionTemplate(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
   numUids: Int
 }
 

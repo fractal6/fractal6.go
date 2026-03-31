@@ -80,14 +80,28 @@ type Node @auth(
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   lexicon: String
+  isTemplateTensionOnly: Boolean
+
   # Watchers
   watchers: [User!] @hasInverse(field: watching)
+
+  # Data templates
+
 
   # Circle only...is a branch
   """
   List of chidren Node
   """
   children: [Node!] @hasInverse(field: parent) # @DEBUG union for multi edge graph
+
+  # Linked Ressources
+  """ List of projects """
+  projects: [Project!]
+  """ List of pinned tensions """
+  pinned: [Tension!] @x_add(r:"ref")
+
+
+  # Template data
   """
   Record of available labels in this circle.
   Available labels means that there are visible when creating and editing tension for example.
@@ -98,10 +112,11 @@ type Node @auth(
   Available roles means that there are visible when creating and editing new roles in a circle.
   """
   roles: [RoleExt!]
-  """ List of projects """
-  projects: [Project!]
-  """ List of pinned tensions """
-  pinned: [Tension!] @x_add(r:"ref")
+  """
+  Record of available template tensions.
+  Available tensions means that there are visible when creating new tension.
+  """
+  tension_templates: [TensionTemplate!] @hasInverse(field: nodes)
 
   # Role only... is a Leaf
   role_ext: RoleExt
@@ -161,10 +176,11 @@ type Label @auth(
   id: ID!
   rootnameid: String!  @search(by: [hash])
   name: String!        @search(by: [hash, term]) @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1) @w_alter(a:"lower")
+  nodes: [Node!]       @hasInverse(field: labels) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  # Payload
   description: String  @x_alter(r:"maxLen", n:280)
   color: String        @x_alter
   tensions: [Tension!] @hasInverse(field: labels) @x_ro
-  nodes: [Node!]       @hasInverse(field: labels) @x_alter(r:"oneByOne") @x_alter(r:"ref")
 }
 
 type RoleExt @auth(
@@ -175,15 +191,34 @@ type RoleExt @auth(
   id: ID!
   rootnameid: String!  @search(by: [hash])
   name: String!        @search(by: [hash, term]) @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1) @w_alter(a:"lower")
+  nodes: [Node!]       @hasInverse(field: roles) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  # Payload
   about: String        @x_alter(r:"maxLen", n:280)
   role_type: RoleType! @x_alter
   color: String        @x_alter
   mandate: Mandate     @x_alter
   roles: [Node!]       @hasInverse(field: role_ext) @x_ro
-  nodes: [Node!]       @hasInverse(field: roles) @x_alter(r:"oneByOne") @x_alter(r:"ref")
 
   # period of validity ? @future
   # validatedBy  ? @future (vote process...)
+}
+
+type TensionTemplate @auth(
+  query: <<query-tension-template>>,
+  add: <<alter-tension-template>>,
+  update: <<alter-tension-template>>,
+  delete: <<alter-tension-template>>
+) @hook_ {
+  id: ID!
+  rootnameid: String!  @search(by: [hash])
+  name: String!       @search(by: [hash, term]) @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  nodes: [Node!]      @hasInverse(field: tension_templates) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  # Payload
+  title: String!    @x_alter
+  comment: String!    @x_alter
+  type_: TensionType! @x_alter
+  labels: [Label!]    @x_alter(r:"ref")
+  assignees: [User!]  @x_alter(r:"ref")
 }
 
 type Project @auth(

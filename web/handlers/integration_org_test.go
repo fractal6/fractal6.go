@@ -144,6 +144,34 @@ func TestSetGuestCanCreateTension_Success(t *testing.T) {
 	requireStatus(t, rr, http.StatusOK)
 }
 
+func TestSetIsTemplateTensionOnly_Success(t *testing.T) {
+	// Login as testuser (coordinator of test-org)
+	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)
+
+	// Set isTemplateTensionOnly to true
+	rr := doRequest("POST", "/auth/setistemplatetensiononly", map[string]any{
+		"nameid": "test-org",
+		"val":    true,
+	}, jwtCookie)
+	requireStatus(t, rr, http.StatusOK)
+
+	// Verify in DB
+	val, err := db.GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.isTemplateTensionOnly")
+	if err != nil {
+		t.Fatalf("failed to query Node.isTemplateTensionOnly: %v", err)
+	}
+	if boolVal, ok := val.(bool); !ok || boolVal != true {
+		t.Errorf("expected isTemplateTensionOnly=true, got %v", val)
+	}
+
+	// Restore to false
+	rr = doRequest("POST", "/auth/setistemplatetensiononly", map[string]any{
+		"nameid": "test-org",
+		"val":    false,
+	}, jwtCookie)
+	requireStatus(t, rr, http.StatusOK)
+}
+
 func TestSetLexicon_Success(t *testing.T) {
 	// Login as testuser (owner of test-org)
 	jwtCookie := loginAs(testutil.TestUser, testutil.TestPassword)

@@ -162,6 +162,7 @@ The schema is defined in `schema/graphql/fractal6.graphql`. Core types:
 | `User` | Platform user with roles, subscriptions, events |
 | `Label` | Categorisation tag for tensions |
 | `RoleExt` | Template role definition reusable across circles |
+| `TensionTemplate` | Pre-filled tension template scoped to circles |
 | `Project` | Kanban-style project with columns, cards, fields |
 
 
@@ -734,11 +735,11 @@ This is a deliberate design choice: only types that need to be exposed through t
 
 | Bridge | Activated Types |
 |--------|----------------|
-| `DgraphAddBridge` | Label, RoleExt, Project, ProjectColumn, ProjectCard, Tension, Reaction, Contract, Vote |
-| `DgraphUpdateBridge` | Label, RoleExt, Project, ProjectColumn, ProjectCard, Tension, Comment, ProjectDraft, User, Contract, UserEvent |
+| `DgraphAddBridge` | Label, RoleExt, TensionTemplate, Project, ProjectColumn, ProjectCard, Tension, Reaction, Contract, Vote |
+| `DgraphUpdateBridge` | Label, RoleExt, TensionTemplate, Project, ProjectColumn, ProjectCard, Tension, Comment, ProjectDraft, User, Contract, UserEvent |
 | `DgraphDeleteBridge` | ProjectColumn, ProjectCard, Comment, Reaction, Contract |
-| `DgraphBridgeRaw` | GetNode, GetTension, GetUser, GetProject, GetProjectColumn, GetContract, AggregateProject |
-| `DgraphQueryBridge` | QueryNode, QueryLabel, QueryTension, QueryUser |
+| `DgraphBridgeRaw` | GetNode, GetTension, GetUser, GetProject, GetTensionTemplate, GetProjectColumn, GetContract, AggregateProject |
+| `DgraphQueryBridge` | QueryNode, QueryLabel, QueryTensionTemplate, QueryTension, QueryUser |
 
 ### Dgraph Bridges (`graph/dgraph_resolver.go`)
 
@@ -797,7 +798,7 @@ Each `*_resolver.go` file contains the hook implementations for a domain:
 | File | Hooks | Domain |
 |------|-------|--------|
 | `tension_resolver.go` | `addTensionHook`, `updateTensionHook` | Tension lifecycle + event processing |
-| `node_resolver.go` | `addNodeArtefactHook`, `updateNodeArtefactHook` | Label/RoleExt/Project auth + CRUD |
+| `node_resolver.go` | `addNodeArtefactHook`, `updateNodeArtefactHook` | Label/RoleExt/TensionTemplate/Project auth + CRUD |
 | `contract_resolver.go` | `addContractInputHook`, `addContractHook`, `updateContractHook`, `deleteContractHook` | Contract lifecycle + voting |
 | `card_resolver.go` | `addProjectCardHook`, `updateProjectCardHook`, `deleteProjectCardHook` | Card position management |
 | `column_resolver.go` | `addProjectColumnHook`, `updateProjectColumnHook`, `deleteProjectColumnHook` | Column position management |

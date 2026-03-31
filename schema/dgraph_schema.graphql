@@ -92,12 +92,14 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   userCanJoin: Boolean
   guestCanCreateTension: Boolean
   lexicon: String
+  isTemplateTensionOnly: Boolean
   watchers: [User!] @hasInverse(field: watching)
   children: [Node!] @hasInverse(field: parent)
-  labels: [Label!]
-  roles: [RoleExt!]
   projects: [Project!]
   pinned: [Tension!]
+  labels: [Label!]
+  roles: [RoleExt!]
+  tension_templates: [TensionTemplate!] @hasInverse(field: nodes)
   role_ext: RoleExt
   role_type: RoleType @search
   color: String
@@ -156,10 +158,10 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   id: ID!
   rootnameid: String! @search(by:[hash])
   name: String! @search(by:[hash, term])
+  nodes: [Node!] @hasInverse(field: labels)
   description: String
   color: String
   tensions: [Tension!] @hasInverse(field: labels)
-  nodes: [Node!] @hasInverse(field: labels)
 }
 
 type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -186,12 +188,50 @@ type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   id: ID!
   rootnameid: String! @search(by:[hash])
   name: String! @search(by:[hash, term])
+  nodes: [Node!] @hasInverse(field: roles)
   about: String
   role_type: RoleType!
   color: String
   mandate: Mandate
   roles: [Node!] @hasInverse(field: role_ext)
-  nodes: [Node!] @hasInverse(field: roles)
+}
+
+type TensionTemplate @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query {
+        queryTensionTemplate {
+          nodes(filter: {visibility: {eq: Public}}) { id }
+        }
+    }"""
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryTensionTemplate(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryTensionTemplate(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryTensionTemplate(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, delete:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryTensionTemplate(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}) {
+  id: ID!
+  rootnameid: String! @search(by:[hash])
+  name: String! @search(by:[hash, term])
+  nodes: [Node!] @hasInverse(field: tension_templates)
+  is_recursive: Boolean!
+  title: String!
+  comment: String!
+  type_: TensionType!
+  labels: [Label!]
+  assignees: [User!]
 }
 
 type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
