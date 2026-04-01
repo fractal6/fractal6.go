@@ -1326,6 +1326,7 @@ type ComplexityRoot struct {
 		Assignees          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
 		AssigneesAggregate func(childComplexity int, filter *model.UserFilter) int
 		Comment            func(childComplexity int) int
+		Description        func(childComplexity int) int
 		ID                 func(childComplexity int) int
 		IsRecursive        func(childComplexity int) int
 		Labels             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
@@ -1339,15 +1340,17 @@ type ComplexityRoot struct {
 	}
 
 	TensionTemplateAggregateResult struct {
-		CommentMax    func(childComplexity int) int
-		CommentMin    func(childComplexity int) int
-		Count         func(childComplexity int) int
-		NameMax       func(childComplexity int) int
-		NameMin       func(childComplexity int) int
-		RootnameidMax func(childComplexity int) int
-		RootnameidMin func(childComplexity int) int
-		TitleMax      func(childComplexity int) int
-		TitleMin      func(childComplexity int) int
+		CommentMax     func(childComplexity int) int
+		CommentMin     func(childComplexity int) int
+		Count          func(childComplexity int) int
+		DescriptionMax func(childComplexity int) int
+		DescriptionMin func(childComplexity int) int
+		NameMax        func(childComplexity int) int
+		NameMin        func(childComplexity int) int
+		RootnameidMax  func(childComplexity int) int
+		RootnameidMin  func(childComplexity int) int
+		TitleMax       func(childComplexity int) int
+		TitleMin       func(childComplexity int) int
 	}
 
 	UpdateActivityPayload struct {
@@ -9036,6 +9039,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TensionTemplate.Comment(childComplexity), true
 
+	case "TensionTemplate.description":
+		if e.complexity.TensionTemplate.Description == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplate.Description(childComplexity), true
+
 	case "TensionTemplate.id":
 		if e.complexity.TensionTemplate.ID == nil {
 			break
@@ -9146,6 +9156,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TensionTemplateAggregateResult.Count(childComplexity), true
+
+	case "TensionTemplateAggregateResult.descriptionMax":
+		if e.complexity.TensionTemplateAggregateResult.DescriptionMax == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.DescriptionMax(childComplexity), true
+
+	case "TensionTemplateAggregateResult.descriptionMin":
+		if e.complexity.TensionTemplateAggregateResult.DescriptionMin == nil {
+			break
+		}
+
+		return e.complexity.TensionTemplateAggregateResult.DescriptionMin(childComplexity), true
 
 	case "TensionTemplateAggregateResult.nameMax":
 		if e.complexity.TensionTemplateAggregateResult.NameMax == nil {
@@ -11125,6 +11149,7 @@ type TensionTemplate {
   id: ID!
   rootnameid: String!
   name: String!
+  description: String
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   is_recursive: Boolean!
   title: String!
@@ -11613,35 +11638,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @lambda on FIELD_DEFINITION
 
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 type ActivityAggregateResult {
   count: Int
@@ -12086,7 +12111,8 @@ type AddTensionPayload {
 
 input AddTensionTemplateInput {
   rootnameid: String!
-  name: String! @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  name: String! @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"minLen", n:3)
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   is_recursive: Boolean!
   title: String!
@@ -14495,6 +14521,8 @@ type TensionTemplateAggregateResult {
   rootnameidMax: String
   nameMin: String
   nameMax: String
+  descriptionMin: String
+  descriptionMax: String
   titleMin: String
   titleMax: String
   commentMin: String
@@ -14504,7 +14532,6 @@ type TensionTemplateAggregateResult {
 input TensionTemplateFilter {
   id: [ID!]
   rootnameid: StringHashFilter
-  name: StringHashFilter_StringTermFilter
   has: [TensionTemplateHasFilter]
   and: [TensionTemplateFilter]
   or: [TensionTemplateFilter]
@@ -14514,6 +14541,7 @@ input TensionTemplateFilter {
 enum TensionTemplateHasFilter {
   rootnameid
   name
+  description
   nodes
   is_recursive
   title
@@ -14532,13 +14560,15 @@ input TensionTemplateOrder {
 enum TensionTemplateOrderable {
   rootnameid
   name
+  description
   title
   comment
 }
 
 input TensionTemplatePatch {
   rootnameid: String @x_patch_ro
-  name: String @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  name: String @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"minLen", n:3)
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   is_recursive: Boolean
   title: String
@@ -14551,7 +14581,8 @@ input TensionTemplatePatch {
 input TensionTemplateRef {
   id: ID
   rootnameid: String
-  name: String @x_alter(r:"unique", f:"rootnameid") @x_alter(r:"minLen", n:1)
+  name: String @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"minLen", n:3)
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   is_recursive: Boolean
   title: String

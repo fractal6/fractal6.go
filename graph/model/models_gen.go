@@ -454,6 +454,7 @@ type AddTensionPayload struct {
 type AddTensionTemplateInput struct {
 	Rootnameid  string      `json:"rootnameid"`
 	Name        string      `json:"name"`
+	Description *string     `json:"description,omitempty"`
 	Nodes       []*NodeRef  `json:"nodes,omitempty"`
 	IsRecursive bool        `json:"is_recursive"`
 	Title       string      `json:"title"`
@@ -2549,6 +2550,7 @@ type TensionTemplate struct {
 	ID                 string                `json:"id"`
 	Rootnameid         string                `json:"rootnameid"`
 	Name               string                `json:"name"`
+	Description        *string               `json:"description,omitempty"`
 	Nodes              []*Node               `json:"nodes,omitempty"`
 	IsRecursive        bool                  `json:"is_recursive"`
 	Title              string                `json:"title"`
@@ -2562,25 +2564,26 @@ type TensionTemplate struct {
 }
 
 type TensionTemplateAggregateResult struct {
-	Count         *int    `json:"count,omitempty"`
-	RootnameidMin *string `json:"rootnameidMin,omitempty"`
-	RootnameidMax *string `json:"rootnameidMax,omitempty"`
-	NameMin       *string `json:"nameMin,omitempty"`
-	NameMax       *string `json:"nameMax,omitempty"`
-	TitleMin      *string `json:"titleMin,omitempty"`
-	TitleMax      *string `json:"titleMax,omitempty"`
-	CommentMin    *string `json:"commentMin,omitempty"`
-	CommentMax    *string `json:"commentMax,omitempty"`
+	Count          *int    `json:"count,omitempty"`
+	RootnameidMin  *string `json:"rootnameidMin,omitempty"`
+	RootnameidMax  *string `json:"rootnameidMax,omitempty"`
+	NameMin        *string `json:"nameMin,omitempty"`
+	NameMax        *string `json:"nameMax,omitempty"`
+	DescriptionMin *string `json:"descriptionMin,omitempty"`
+	DescriptionMax *string `json:"descriptionMax,omitempty"`
+	TitleMin       *string `json:"titleMin,omitempty"`
+	TitleMax       *string `json:"titleMax,omitempty"`
+	CommentMin     *string `json:"commentMin,omitempty"`
+	CommentMax     *string `json:"commentMax,omitempty"`
 }
 
 type TensionTemplateFilter struct {
-	ID         []string                          `json:"id,omitempty"`
-	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
-	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
-	Has        []*TensionTemplateHasFilter       `json:"has,omitempty"`
-	And        []*TensionTemplateFilter          `json:"and,omitempty"`
-	Or         []*TensionTemplateFilter          `json:"or,omitempty"`
-	Not        *TensionTemplateFilter            `json:"not,omitempty"`
+	ID         []string                    `json:"id,omitempty"`
+	Rootnameid *StringHashFilter           `json:"rootnameid,omitempty"`
+	Has        []*TensionTemplateHasFilter `json:"has,omitempty"`
+	And        []*TensionTemplateFilter    `json:"and,omitempty"`
+	Or         []*TensionTemplateFilter    `json:"or,omitempty"`
+	Not        *TensionTemplateFilter      `json:"not,omitempty"`
 }
 
 type TensionTemplateOrder struct {
@@ -2592,6 +2595,7 @@ type TensionTemplateOrder struct {
 type TensionTemplatePatch struct {
 	Rootnameid  *string      `json:"rootnameid,omitempty"`
 	Name        *string      `json:"name,omitempty"`
+	Description *string      `json:"description,omitempty"`
 	Nodes       []*NodeRef   `json:"nodes,omitempty"`
 	IsRecursive *bool        `json:"is_recursive,omitempty"`
 	Title       *string      `json:"title,omitempty"`
@@ -2605,6 +2609,7 @@ type TensionTemplateRef struct {
 	ID          *string      `json:"id,omitempty"`
 	Rootnameid  *string      `json:"rootnameid,omitempty"`
 	Name        *string      `json:"name,omitempty"`
+	Description *string      `json:"description,omitempty"`
 	Nodes       []*NodeRef   `json:"nodes,omitempty"`
 	IsRecursive *bool        `json:"is_recursive,omitempty"`
 	Title       *string      `json:"title,omitempty"`
@@ -6528,6 +6533,7 @@ type TensionTemplateHasFilter string
 const (
 	TensionTemplateHasFilterRootnameid  TensionTemplateHasFilter = "rootnameid"
 	TensionTemplateHasFilterName        TensionTemplateHasFilter = "name"
+	TensionTemplateHasFilterDescription TensionTemplateHasFilter = "description"
 	TensionTemplateHasFilterNodes       TensionTemplateHasFilter = "nodes"
 	TensionTemplateHasFilterIsRecursive TensionTemplateHasFilter = "is_recursive"
 	TensionTemplateHasFilterTitle       TensionTemplateHasFilter = "title"
@@ -6540,6 +6546,7 @@ const (
 var AllTensionTemplateHasFilter = []TensionTemplateHasFilter{
 	TensionTemplateHasFilterRootnameid,
 	TensionTemplateHasFilterName,
+	TensionTemplateHasFilterDescription,
 	TensionTemplateHasFilterNodes,
 	TensionTemplateHasFilterIsRecursive,
 	TensionTemplateHasFilterTitle,
@@ -6551,7 +6558,7 @@ var AllTensionTemplateHasFilter = []TensionTemplateHasFilter{
 
 func (e TensionTemplateHasFilter) IsValid() bool {
 	switch e {
-	case TensionTemplateHasFilterRootnameid, TensionTemplateHasFilterName, TensionTemplateHasFilterNodes, TensionTemplateHasFilterIsRecursive, TensionTemplateHasFilterTitle, TensionTemplateHasFilterComment, TensionTemplateHasFilterType, TensionTemplateHasFilterLabels, TensionTemplateHasFilterAssignees:
+	case TensionTemplateHasFilterRootnameid, TensionTemplateHasFilterName, TensionTemplateHasFilterDescription, TensionTemplateHasFilterNodes, TensionTemplateHasFilterIsRecursive, TensionTemplateHasFilterTitle, TensionTemplateHasFilterComment, TensionTemplateHasFilterType, TensionTemplateHasFilterLabels, TensionTemplateHasFilterAssignees:
 		return true
 	}
 	return false
@@ -6581,22 +6588,24 @@ func (e TensionTemplateHasFilter) MarshalGQL(w io.Writer) {
 type TensionTemplateOrderable string
 
 const (
-	TensionTemplateOrderableRootnameid TensionTemplateOrderable = "rootnameid"
-	TensionTemplateOrderableName       TensionTemplateOrderable = "name"
-	TensionTemplateOrderableTitle      TensionTemplateOrderable = "title"
-	TensionTemplateOrderableComment    TensionTemplateOrderable = "comment"
+	TensionTemplateOrderableRootnameid  TensionTemplateOrderable = "rootnameid"
+	TensionTemplateOrderableName        TensionTemplateOrderable = "name"
+	TensionTemplateOrderableDescription TensionTemplateOrderable = "description"
+	TensionTemplateOrderableTitle       TensionTemplateOrderable = "title"
+	TensionTemplateOrderableComment     TensionTemplateOrderable = "comment"
 )
 
 var AllTensionTemplateOrderable = []TensionTemplateOrderable{
 	TensionTemplateOrderableRootnameid,
 	TensionTemplateOrderableName,
+	TensionTemplateOrderableDescription,
 	TensionTemplateOrderableTitle,
 	TensionTemplateOrderableComment,
 }
 
 func (e TensionTemplateOrderable) IsValid() bool {
 	switch e {
-	case TensionTemplateOrderableRootnameid, TensionTemplateOrderableName, TensionTemplateOrderableTitle, TensionTemplateOrderableComment:
+	case TensionTemplateOrderableRootnameid, TensionTemplateOrderableName, TensionTemplateOrderableDescription, TensionTemplateOrderableTitle, TensionTemplateOrderableComment:
 		return true
 	}
 	return false

@@ -15446,6 +15446,8 @@ func (ec *executionContext) fieldContext_AddTensionTemplatePayload_tensionTempla
 				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "description":
+				return ec.fieldContext_TensionTemplate_description(ctx, field)
 			case "nodes":
 				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
 			case "is_recursive":
@@ -23287,6 +23289,8 @@ func (ec *executionContext) fieldContext_DeleteTensionTemplatePayload_tensionTem
 				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "description":
+				return ec.fieldContext_TensionTemplate_description(ctx, field)
 			case "nodes":
 				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
 			case "is_recursive":
@@ -35114,6 +35118,8 @@ func (ec *executionContext) fieldContext_Node_tension_templates(ctx context.Cont
 				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "description":
+				return ec.fieldContext_TensionTemplate_description(ctx, field)
 			case "nodes":
 				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
 			case "is_recursive":
@@ -36420,6 +36426,10 @@ func (ec *executionContext) fieldContext_Node_tension_templatesAggregate(ctx con
 				return ec.fieldContext_TensionTemplateAggregateResult_nameMin(ctx, field)
 			case "nameMax":
 				return ec.fieldContext_TensionTemplateAggregateResult_nameMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_descriptionMax(ctx, field)
 			case "titleMin":
 				return ec.fieldContext_TensionTemplateAggregateResult_titleMin(ctx, field)
 			case "titleMax":
@@ -47452,6 +47462,8 @@ func (ec *executionContext) fieldContext_Query_getTensionTemplate(ctx context.Co
 				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "description":
+				return ec.fieldContext_TensionTemplate_description(ctx, field)
 			case "nodes":
 				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
 			case "is_recursive":
@@ -47529,6 +47541,8 @@ func (ec *executionContext) fieldContext_Query_queryTensionTemplate(ctx context.
 				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "description":
+				return ec.fieldContext_TensionTemplate_description(ctx, field)
 			case "nodes":
 				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
 			case "is_recursive":
@@ -47610,6 +47624,10 @@ func (ec *executionContext) fieldContext_Query_aggregateTensionTemplate(ctx cont
 				return ec.fieldContext_TensionTemplateAggregateResult_nameMin(ctx, field)
 			case "nameMax":
 				return ec.fieldContext_TensionTemplateAggregateResult_nameMax(ctx, field)
+			case "descriptionMin":
+				return ec.fieldContext_TensionTemplateAggregateResult_descriptionMin(ctx, field)
+			case "descriptionMax":
+				return ec.fieldContext_TensionTemplateAggregateResult_descriptionMax(ctx, field)
 			case "titleMin":
 				return ec.fieldContext_TensionTemplateAggregateResult_titleMin(ctx, field)
 			case "titleMax":
@@ -56972,6 +56990,44 @@ func (ec *executionContext) fieldContext_TensionTemplate_name(_ context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _TensionTemplate_description(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplate_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplate_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _TensionTemplate_nodes(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplate) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_TensionTemplate_nodes(ctx, field)
 	if err != nil {
@@ -57912,6 +57968,82 @@ func (ec *executionContext) _TensionTemplateAggregateResult_nameMax(ctx context.
 }
 
 func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_nameMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_descriptionMin(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_descriptionMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DescriptionMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_descriptionMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TensionTemplateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TensionTemplateAggregateResult_descriptionMax(ctx context.Context, field graphql.CollectedField, obj *model.TensionTemplateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TensionTemplateAggregateResult_descriptionMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DescriptionMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TensionTemplateAggregateResult_descriptionMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TensionTemplateAggregateResult",
 		Field:      field,
@@ -60773,6 +60905,8 @@ func (ec *executionContext) fieldContext_UpdateTensionTemplatePayload_tensionTem
 				return ec.fieldContext_TensionTemplate_rootnameid(ctx, field)
 			case "name":
 				return ec.fieldContext_TensionTemplate_name(ctx, field)
+			case "description":
+				return ec.fieldContext_TensionTemplate_description(ctx, field)
 			case "nodes":
 				return ec.fieldContext_TensionTemplate_nodes(ctx, field)
 			case "is_recursive":
@@ -70072,7 +70206,7 @@ func (ec *executionContext) unmarshalInputAddTensionTemplateInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "name", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
+	fieldsInOrder := [...]string{"rootnameid", "name", "description", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -70090,20 +70224,6 @@ func (ec *executionContext) unmarshalInputAddTensionTemplateInput(ctx context.Co
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
-				if err != nil {
-					return nil, err
-				}
-				f, err := ec.unmarshalOString2ᚖstring(ctx, "rootnameid")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
@@ -70115,10 +70235,10 @@ func (ec *executionContext) unmarshalInputAddTensionTemplateInput(ctx context.Co
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
 			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -70126,6 +70246,36 @@ func (ec *executionContext) unmarshalInputAddTensionTemplateInput(ctx context.Co
 				it.Name = data
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 3)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Description = data
+			} else if tmp == nil {
+				it.Description = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "nodes":
@@ -83710,7 +83860,7 @@ func (ec *executionContext) unmarshalInputTensionTemplateFilter(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "name", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "rootnameid", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -83731,13 +83881,6 @@ func (ec *executionContext) unmarshalInputTensionTemplateFilter(ctx context.Cont
 				return it, err
 			}
 			it.Rootnameid = data
-		case "name":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalOStringHashFilter_StringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringTermFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
 		case "has":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
 			data, err := ec.unmarshalOTensionTemplateHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx, v)
@@ -83820,7 +83963,7 @@ func (ec *executionContext) unmarshalInputTensionTemplatePatch(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"rootnameid", "name", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
+	fieldsInOrder := [...]string{"rootnameid", "name", "description", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -83853,20 +83996,6 @@ func (ec *executionContext) unmarshalInputTensionTemplatePatch(ctx context.Conte
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
-				if err != nil {
-					return nil, err
-				}
-				f, err := ec.unmarshalOString2ᚖstring(ctx, "rootnameid")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
@@ -83878,10 +84007,10 @@ func (ec *executionContext) unmarshalInputTensionTemplatePatch(ctx context.Conte
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
 			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -83889,6 +84018,36 @@ func (ec *executionContext) unmarshalInputTensionTemplatePatch(ctx context.Conte
 				it.Name = data
 			} else if tmp == nil {
 				it.Name = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 3)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Description = data
+			} else if tmp == nil {
+				it.Description = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -84028,7 +84187,7 @@ func (ec *executionContext) unmarshalInputTensionTemplateRef(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "name", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "description", "nodes", "is_recursive", "title", "comment", "type_", "labels", "assignees"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -84053,20 +84212,6 @@ func (ec *executionContext) unmarshalInputTensionTemplateRef(ctx context.Context
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				r, err := ec.unmarshalOString2ᚖstring(ctx, "unique")
-				if err != nil {
-					return nil, err
-				}
-				f, err := ec.unmarshalOString2ᚖstring(ctx, "rootnameid")
-				if err != nil {
-					return nil, err
-				}
-				if ec.directives.X_alter == nil {
-					return nil, errors.New("directive x_alter is not implemented")
-				}
-				return ec.directives.X_alter(ctx, obj, directive0, r, f, nil, nil)
-			}
-			directive2 := func(ctx context.Context) (interface{}, error) {
 				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
 				if err != nil {
 					return nil, err
@@ -84078,10 +84223,10 @@ func (ec *executionContext) unmarshalInputTensionTemplateRef(ctx context.Context
 				if ec.directives.X_alter == nil {
 					return nil, errors.New("directive x_alter is not implemented")
 				}
-				return ec.directives.X_alter(ctx, obj, directive1, r, nil, nil, n)
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
 			}
 
-			tmp, err := directive2(ctx)
+			tmp, err := directive1(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -84089,6 +84234,36 @@ func (ec *executionContext) unmarshalInputTensionTemplateRef(ctx context.Context
 				it.Name = data
 			} else if tmp == nil {
 				it.Name = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				r, err := ec.unmarshalOString2ᚖstring(ctx, "minLen")
+				if err != nil {
+					return nil, err
+				}
+				n, err := ec.unmarshalOInt2ᚖint(ctx, 3)
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.X_alter == nil {
+					return nil, errors.New("directive x_alter is not implemented")
+				}
+				return ec.directives.X_alter(ctx, obj, directive0, r, nil, nil, n)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.Description = data
+			} else if tmp == nil {
+				it.Description = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -95156,6 +95331,8 @@ func (ec *executionContext) _TensionTemplate(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "description":
+			out.Values[i] = ec._TensionTemplate_description(ctx, field, obj)
 		case "nodes":
 			out.Values[i] = ec._TensionTemplate_nodes(ctx, field, obj)
 		case "is_recursive":
@@ -95232,6 +95409,10 @@ func (ec *executionContext) _TensionTemplateAggregateResult(ctx context.Context,
 			out.Values[i] = ec._TensionTemplateAggregateResult_nameMin(ctx, field, obj)
 		case "nameMax":
 			out.Values[i] = ec._TensionTemplateAggregateResult_nameMax(ctx, field, obj)
+		case "descriptionMin":
+			out.Values[i] = ec._TensionTemplateAggregateResult_descriptionMin(ctx, field, obj)
+		case "descriptionMax":
+			out.Values[i] = ec._TensionTemplateAggregateResult_descriptionMax(ctx, field, obj)
 		case "titleMin":
 			out.Values[i] = ec._TensionTemplateAggregateResult_titleMin(ctx, field, obj)
 		case "titleMax":
