@@ -83860,7 +83860,7 @@ func (ec *executionContext) unmarshalInputTensionTemplateFilter(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "rootnameid", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "rootnameid", "name", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -83881,6 +83881,13 @@ func (ec *executionContext) unmarshalInputTensionTemplateFilter(ctx context.Cont
 				return it, err
 			}
 			it.Rootnameid = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOStringHashFilter_StringTermFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐStringHashFilterStringTermFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		case "has":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
 			data, err := ec.unmarshalOTensionTemplateHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionTemplateHasFilter(ctx, v)

@@ -41,7 +41,7 @@ type nodeQuery struct {
 
 // nodeHolder is satisfied by types that have a Nodes []*model.Node field.
 type nodeHolder interface {
-	model.Label | model.RoleExt | db.ProjectFull
+	model.Label | model.RoleExt | model.TensionTemplate | db.ProjectFull
 }
 
 // getNodes returns the Nodes field for items implementing nodeHolder.
@@ -50,6 +50,8 @@ func getNodes[T nodeHolder](item *T) []*model.Node {
 	case *model.Label:
 		return v.Nodes
 	case *model.RoleExt:
+		return v.Nodes
+	case *model.TensionTemplate:
 		return v.Nodes
 	case *db.ProjectFull:
 		return v.Nodes
@@ -63,6 +65,8 @@ func setNodes[T nodeHolder](item *T, nodes []*model.Node) {
 	case *model.Label:
 		v.Nodes = nodes
 	case *model.RoleExt:
+		v.Nodes = nodes
+	case *model.TensionTemplate:
 		v.Nodes = nodes
 	case *db.ProjectFull:
 		v.Nodes = nodes

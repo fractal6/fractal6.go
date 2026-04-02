@@ -224,7 +224,7 @@ type TensionTemplate @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }) {
   id: ID!
   rootnameid: String! @search(by:[hash])
-  name: String!
+  name: String! @search(by:[hash, term])
   description: String
   nodes: [Node!] @hasInverse(field: tension_templates)
   is_recursive: Boolean!

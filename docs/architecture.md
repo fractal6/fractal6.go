@@ -115,6 +115,8 @@ POST /q/labels/top                     - Query top labels
 POST /q/labels/sub                     - Query sub labels
 POST /q/roles/top                      - Query top roles
 POST /q/roles/sub                      - Query sub roles
+POST /q/tension_templates/top           - Query top tension templates
+POST /q/tension_templates/sub           - Query sub tension templates
 POST /q/projects/sub                   - Query sub-projects
 POST /q/tensions/{mode}                - Filtered tension queries (light, int, ext, all)
 POST /q/tensions/count                 - Tension count query

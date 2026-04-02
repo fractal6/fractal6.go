@@ -554,6 +554,42 @@ func (dg Dgraph) GetSubRoles(fieldid string, objid string, includeSelf bool) ([]
 	return Dedupe(data, func(r model.RoleExt) string { return r.Name }), nil
 }
 
+// Get all top tension templates
+func (dg Dgraph) GetTopTensionTemplates(fieldid string, objid string, includeSelf bool) ([]model.TensionTemplate, error) {
+	results, err := dg.Meta("getTopTensionTemplates", map[string]string{
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := DecodeDql[[]model.TensionTemplate](results)
+	if err != nil {
+		return nil, err
+	}
+	return Dedupe(data, func(t model.TensionTemplate) string { return t.ID }), nil
+}
+
+// Get all sub tension templates
+func (dg Dgraph) GetSubTensionTemplates(fieldid string, objid string, includeSelf bool) ([]model.TensionTemplate, error) {
+	results, err := dg.Meta("getSubTensionTemplates", map[string]string{
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := DecodeDql[[]model.TensionTemplate](results)
+	if err != nil {
+		return nil, err
+	}
+	return Dedupe(data, func(t model.TensionTemplate) string { return t.ID }), nil
+}
+
 // ProjectFull is a lightweight project representation for the sub_projects endpoint.
 type ProjectFull struct {
 	ID            string        `json:"id"`

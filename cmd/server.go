@@ -178,6 +178,10 @@ func RunServer() {
 				r.Post("/top", handle6.NodeHolderHandler(db.GetDB().GetTopRoles))
 				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubRoles))
 			})
+			r.Route("/tension_templates", func(r chi.Router) {
+				r.Post("/top", handle6.NodeHolderHandler(db.GetDB().GetTopTensionTemplates))
+				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubTensionTemplates))
+			})
 			r.Route("/projects", func(r chi.Router) {
 				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubProjects))
 			})

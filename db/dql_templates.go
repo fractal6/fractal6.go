@@ -414,6 +414,48 @@ var dqlQueries map[string]string = map[string]string{
             RoleExt.nodes { Node.nameid }
         }
     }`,
+	"getTopTensionTemplates": `{
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+            o as uid
+            Node.parent @normalize
+        }
+
+        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
+            l as Node.tension_templates @filter(eq(TensionTemplate.is_recursive, true))
+        }
+
+        all(func: uid(l)){
+            uid
+            TensionTemplate.name
+            TensionTemplate.description
+            TensionTemplate.is_recursive
+            TensionTemplate.title
+            TensionTemplate.comment
+            TensionTemplate.type_
+            TensionTemplate.nodes { Node.nameid }
+        }
+    }`,
+	"getSubTensionTemplates": `{
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+            o as uid
+            Node.children
+        }
+
+        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
+            l as Node.tension_templates
+        }
+
+        all(func: uid(l)){
+            uid
+            TensionTemplate.name
+            TensionTemplate.description
+            TensionTemplate.is_recursive
+            TensionTemplate.title
+            TensionTemplate.comment
+            TensionTemplate.type_
+            TensionTemplate.nodes { Node.nameid }
+        }
+    }`,
 	"getSubProjects": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
             o as uid

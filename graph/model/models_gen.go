@@ -2578,12 +2578,13 @@ type TensionTemplateAggregateResult struct {
 }
 
 type TensionTemplateFilter struct {
-	ID         []string                    `json:"id,omitempty"`
-	Rootnameid *StringHashFilter           `json:"rootnameid,omitempty"`
-	Has        []*TensionTemplateHasFilter `json:"has,omitempty"`
-	And        []*TensionTemplateFilter    `json:"and,omitempty"`
-	Or         []*TensionTemplateFilter    `json:"or,omitempty"`
-	Not        *TensionTemplateFilter      `json:"not,omitempty"`
+	ID         []string                          `json:"id,omitempty"`
+	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
+	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
+	Has        []*TensionTemplateHasFilter       `json:"has,omitempty"`
+	And        []*TensionTemplateFilter          `json:"and,omitempty"`
+	Or         []*TensionTemplateFilter          `json:"or,omitempty"`
+	Not        *TensionTemplateFilter            `json:"not,omitempty"`
 }
 
 type TensionTemplateOrder struct {

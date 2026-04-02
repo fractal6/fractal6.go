@@ -306,6 +306,30 @@ func seedTestData() error {
 		_:comment <Post.message> "This is the first comment on the test tension" .
 		_:tension <Tension.comments> _:comment .
 
+		# TensionTemplate on test-org
+		_:ttempl <dgraph.type> "TensionTemplate" .
+		_:ttempl <TensionTemplate.rootnameid> "test-org" .
+		_:ttempl <TensionTemplate.name> "bug-report" .
+		_:ttempl <TensionTemplate.description> "Template for bug reports" .
+		_:ttempl <TensionTemplate.is_recursive> "true" .
+		_:ttempl <TensionTemplate.title> "Bug: " .
+		_:ttempl <TensionTemplate.comment> "Describe the bug here" .
+		_:ttempl <TensionTemplate.type_> "Operational" .
+		_:ttempl <TensionTemplate.nodes> _:org .
+		_:org <Node.tension_templates> _:ttempl .
+
+		# Non-recursive TensionTemplate on test-org (should NOT appear in top queries from children)
+		_:ttempl_local <dgraph.type> "TensionTemplate" .
+		_:ttempl_local <TensionTemplate.rootnameid> "test-org" .
+		_:ttempl_local <TensionTemplate.name> "local-only" .
+		_:ttempl_local <TensionTemplate.description> "Non-recursive template" .
+		_:ttempl_local <TensionTemplate.is_recursive> "false" .
+		_:ttempl_local <TensionTemplate.title> "Local: " .
+		_:ttempl_local <TensionTemplate.comment> "Local scope only" .
+		_:ttempl_local <TensionTemplate.type_> "Operational" .
+		_:ttempl_local <TensionTemplate.nodes> _:org .
+		_:org <Node.tension_templates> _:ttempl_local .
+
 		# --- sec-org: Private organisation for security/visibility tests ---
 		_:secorg <dgraph.type> "Node" .
 		_:secorg <Node.nameid> "sec-org" .

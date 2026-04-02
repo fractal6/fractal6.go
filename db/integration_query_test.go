@@ -590,6 +590,113 @@ func TestGetTopLabels_Integration(t *testing.T) {
 	}
 }
 
+func TestGetTopTensionTemplates_Integration(t *testing.T) {
+	t.Parallel()
+	// test-org has tension template "bug-report" directly attached.
+	templates, err := GetDB().GetTopTensionTemplates("nameid", "test-org", true)
+	if err != nil {
+		t.Fatalf("GetTopTensionTemplates returned error: %v", err)
+	}
+	if len(templates) == 0 {
+		t.Fatal("GetTopTensionTemplates returned empty, expected at least 'bug-report'")
+	}
+	found := false
+	for _, tt := range templates {
+		if tt.Name == "bug-report" {
+			found = true
+			if tt.Title != "Bug: " {
+				t.Errorf("bug-report title = %q, want %q", tt.Title, "Bug: ")
+			}
+			if !tt.IsRecursive {
+				t.Error("bug-report is_recursive = false, want true")
+			}
+		}
+	}
+	if !found {
+		names := make([]string, len(templates))
+		for i, tt := range templates {
+			names[i] = tt.Name
+		}
+		t.Errorf("tension_templates = %v, expected to contain %q", names, "bug-report")
+	}
+}
+
+func TestGetSubTensionTemplates_Integration(t *testing.T) {
+	t.Parallel()
+	// test-org has tension template "bug-report" attached — sub query from root should find it.
+	templates, err := GetDB().GetSubTensionTemplates("nameid", "test-org", true)
+	if err != nil {
+		t.Fatalf("GetSubTensionTemplates returned error: %v", err)
+	}
+	if len(templates) == 0 {
+		t.Fatal("GetSubTensionTemplates returned empty, expected at least 'bug-report'")
+	}
+	found := false
+	for _, tt := range templates {
+		if tt.Name == "bug-report" {
+			found = true
+		}
+	}
+	if !found {
+		names := make([]string, len(templates))
+		for i, tt := range templates {
+			names[i] = tt.Name
+		}
+		t.Errorf("tension_templates = %v, expected to contain %q", names, "bug-report")
+	}
+}
+
+// TestGetTopTensionTemplates_FromChild queries from a child role node (test-org##:coordo)
+// and verifies the recursive parent traversal finds "bug-report" (is_recursive=true)
+// but excludes "local-only" (is_recursive=false).
+func TestGetTopTensionTemplates_FromChild(t *testing.T) {
+	t.Parallel()
+	templates, err := GetDB().GetTopTensionTemplates("nameid", "test-org##:coordo", false)
+	if err != nil {
+		t.Fatalf("GetTopTensionTemplates from child: %v", err)
+	}
+
+	foundRecursive := false
+	foundLocal := false
+	for _, tt := range templates {
+		switch tt.Name {
+		case "bug-report":
+			foundRecursive = true
+		case "local-only":
+			foundLocal = true
+		}
+	}
+
+	if !foundRecursive {
+		names := make([]string, len(templates))
+		for i, tt := range templates {
+			names[i] = tt.Name
+		}
+		t.Errorf("top templates from child = %v, expected recursive template %q to be present", names, "bug-report")
+	}
+	if foundLocal {
+		t.Errorf("top templates from child should NOT contain non-recursive template %q, but it was returned", "local-only")
+	}
+}
+
+// TestGetTopTensionTemplates_ExcludesNonRecursive queries from test-org itself with includeSelf=false
+// and verifies that even from a direct parent perspective, the is_recursive filter applies.
+func TestGetTopTensionTemplates_ExcludesNonRecursive(t *testing.T) {
+	t.Parallel()
+	// Query from the coordo role, excludeSelf=true (i.e. include the coordo node itself,
+	// but it has no templates — only parent test-org does).
+	templates, err := GetDB().GetTopTensionTemplates("nameid", "test-org##:coordo", true)
+	if err != nil {
+		t.Fatalf("GetTopTensionTemplates (non-recursive check): %v", err)
+	}
+
+	for _, tt := range templates {
+		if !tt.IsRecursive {
+			t.Errorf("top query returned non-recursive template %q (is_recursive=false); only recursive templates should appear", tt.Name)
+		}
+	}
+}
+
 func TestFormatTensionIntExtMap_PatternFilter(t *testing.T) {
 	t.Parallel()
 	pattern := "search term"
