@@ -373,19 +373,21 @@ type AddProjectFieldValuePayload struct {
 }
 
 type AddProjectInput struct {
-	CreatedBy     *UserRef            `json:"createdBy"`
-	CreatedAt     string              `json:"createdAt"`
-	UpdatedAt     string              `json:"updatedAt"`
-	Rootnameid    string              `json:"rootnameid"`
-	Parentnameid  string              `json:"parentnameid"`
-	Nameid        string              `json:"nameid"`
-	Name          string              `json:"name"`
-	Description   *string             `json:"description,omitempty"`
-	Status        ProjectStatus       `json:"status"`
-	Columns       []*ProjectColumnRef `json:"columns,omitempty"`
-	Fields        []*ProjectFieldRef  `json:"fields,omitempty"`
-	Nodes         []*NodeRef          `json:"nodes,omitempty"`
-	Collaborators []*UserRef          `json:"collaborators,omitempty"`
+	CreatedBy           *UserRef            `json:"createdBy"`
+	CreatedAt           string              `json:"createdAt"`
+	UpdatedAt           string              `json:"updatedAt"`
+	Rootnameid          string              `json:"rootnameid"`
+	Parentnameid        string              `json:"parentnameid"`
+	Nameid              string              `json:"nameid"`
+	Name                string              `json:"name"`
+	Description         *string             `json:"description,omitempty"`
+	Status              ProjectStatus       `json:"status"`
+	Columns             []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields              []*ProjectFieldRef  `json:"fields,omitempty"`
+	Nodes               []*NodeRef          `json:"nodes,omitempty"`
+	Collaborators       []*UserRef          `json:"collaborators,omitempty"`
+	PeerCanEditProject  bool                `json:"peerCanEditProject"`
+	GuestCanEditProject bool                `json:"guestCanEditProject"`
 }
 
 type AddProjectPayload struct {
@@ -1907,6 +1909,8 @@ type Project struct {
 	Fields                 []*ProjectField               `json:"fields,omitempty"`
 	Nodes                  []*Node                       `json:"nodes,omitempty"`
 	Collaborators          []*User                       `json:"collaborators,omitempty"`
+	PeerCanEditProject     bool                          `json:"peerCanEditProject"`
+	GuestCanEditProject    bool                          `json:"guestCanEditProject"`
 	ColumnsAggregate       *ProjectColumnAggregateResult `json:"columnsAggregate,omitempty"`
 	FieldsAggregate        *ProjectFieldAggregateResult  `json:"fieldsAggregate,omitempty"`
 	NodesAggregate         *NodeAggregateResult          `json:"nodesAggregate,omitempty"`
@@ -2203,36 +2207,40 @@ type ProjectOrder struct {
 }
 
 type ProjectPatch struct {
-	CreatedBy     *UserRef            `json:"createdBy,omitempty"`
-	CreatedAt     *string             `json:"createdAt,omitempty"`
-	UpdatedAt     *string             `json:"updatedAt,omitempty"`
-	Rootnameid    *string             `json:"rootnameid,omitempty"`
-	Parentnameid  *string             `json:"parentnameid,omitempty"`
-	Nameid        *string             `json:"nameid,omitempty"`
-	Name          *string             `json:"name,omitempty"`
-	Description   *string             `json:"description,omitempty"`
-	Status        *ProjectStatus      `json:"status,omitempty"`
-	Columns       []*ProjectColumnRef `json:"columns,omitempty"`
-	Fields        []*ProjectFieldRef  `json:"fields,omitempty"`
-	Nodes         []*NodeRef          `json:"nodes,omitempty"`
-	Collaborators []*UserRef          `json:"collaborators,omitempty"`
+	CreatedBy           *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt           *string             `json:"createdAt,omitempty"`
+	UpdatedAt           *string             `json:"updatedAt,omitempty"`
+	Rootnameid          *string             `json:"rootnameid,omitempty"`
+	Parentnameid        *string             `json:"parentnameid,omitempty"`
+	Nameid              *string             `json:"nameid,omitempty"`
+	Name                *string             `json:"name,omitempty"`
+	Description         *string             `json:"description,omitempty"`
+	Status              *ProjectStatus      `json:"status,omitempty"`
+	Columns             []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields              []*ProjectFieldRef  `json:"fields,omitempty"`
+	Nodes               []*NodeRef          `json:"nodes,omitempty"`
+	Collaborators       []*UserRef          `json:"collaborators,omitempty"`
+	PeerCanEditProject  *bool               `json:"peerCanEditProject,omitempty"`
+	GuestCanEditProject *bool               `json:"guestCanEditProject,omitempty"`
 }
 
 type ProjectRef struct {
-	ID            *string             `json:"id,omitempty"`
-	CreatedBy     *UserRef            `json:"createdBy,omitempty"`
-	CreatedAt     *string             `json:"createdAt,omitempty"`
-	UpdatedAt     *string             `json:"updatedAt,omitempty"`
-	Rootnameid    *string             `json:"rootnameid,omitempty"`
-	Parentnameid  *string             `json:"parentnameid,omitempty"`
-	Nameid        *string             `json:"nameid,omitempty"`
-	Name          *string             `json:"name,omitempty"`
-	Description   *string             `json:"description,omitempty"`
-	Status        *ProjectStatus      `json:"status,omitempty"`
-	Columns       []*ProjectColumnRef `json:"columns,omitempty"`
-	Fields        []*ProjectFieldRef  `json:"fields,omitempty"`
-	Nodes         []*NodeRef          `json:"nodes,omitempty"`
-	Collaborators []*UserRef          `json:"collaborators,omitempty"`
+	ID                  *string             `json:"id,omitempty"`
+	CreatedBy           *UserRef            `json:"createdBy,omitempty"`
+	CreatedAt           *string             `json:"createdAt,omitempty"`
+	UpdatedAt           *string             `json:"updatedAt,omitempty"`
+	Rootnameid          *string             `json:"rootnameid,omitempty"`
+	Parentnameid        *string             `json:"parentnameid,omitempty"`
+	Nameid              *string             `json:"nameid,omitempty"`
+	Name                *string             `json:"name,omitempty"`
+	Description         *string             `json:"description,omitempty"`
+	Status              *ProjectStatus      `json:"status,omitempty"`
+	Columns             []*ProjectColumnRef `json:"columns,omitempty"`
+	Fields              []*ProjectFieldRef  `json:"fields,omitempty"`
+	Nodes               []*NodeRef          `json:"nodes,omitempty"`
+	Collaborators       []*UserRef          `json:"collaborators,omitempty"`
+	PeerCanEditProject  *bool               `json:"peerCanEditProject,omitempty"`
+	GuestCanEditProject *bool               `json:"guestCanEditProject,omitempty"`
 }
 
 type ProjectStatusHash struct {
@@ -5823,19 +5831,21 @@ func (e ProjectFieldValueOrderable) MarshalGQL(w io.Writer) {
 type ProjectHasFilter string
 
 const (
-	ProjectHasFilterCreatedBy     ProjectHasFilter = "createdBy"
-	ProjectHasFilterCreatedAt     ProjectHasFilter = "createdAt"
-	ProjectHasFilterUpdatedAt     ProjectHasFilter = "updatedAt"
-	ProjectHasFilterRootnameid    ProjectHasFilter = "rootnameid"
-	ProjectHasFilterParentnameid  ProjectHasFilter = "parentnameid"
-	ProjectHasFilterNameid        ProjectHasFilter = "nameid"
-	ProjectHasFilterName          ProjectHasFilter = "name"
-	ProjectHasFilterDescription   ProjectHasFilter = "description"
-	ProjectHasFilterStatus        ProjectHasFilter = "status"
-	ProjectHasFilterColumns       ProjectHasFilter = "columns"
-	ProjectHasFilterFields        ProjectHasFilter = "fields"
-	ProjectHasFilterNodes         ProjectHasFilter = "nodes"
-	ProjectHasFilterCollaborators ProjectHasFilter = "collaborators"
+	ProjectHasFilterCreatedBy           ProjectHasFilter = "createdBy"
+	ProjectHasFilterCreatedAt           ProjectHasFilter = "createdAt"
+	ProjectHasFilterUpdatedAt           ProjectHasFilter = "updatedAt"
+	ProjectHasFilterRootnameid          ProjectHasFilter = "rootnameid"
+	ProjectHasFilterParentnameid        ProjectHasFilter = "parentnameid"
+	ProjectHasFilterNameid              ProjectHasFilter = "nameid"
+	ProjectHasFilterName                ProjectHasFilter = "name"
+	ProjectHasFilterDescription         ProjectHasFilter = "description"
+	ProjectHasFilterStatus              ProjectHasFilter = "status"
+	ProjectHasFilterColumns             ProjectHasFilter = "columns"
+	ProjectHasFilterFields              ProjectHasFilter = "fields"
+	ProjectHasFilterNodes               ProjectHasFilter = "nodes"
+	ProjectHasFilterCollaborators       ProjectHasFilter = "collaborators"
+	ProjectHasFilterPeerCanEditProject  ProjectHasFilter = "peerCanEditProject"
+	ProjectHasFilterGuestCanEditProject ProjectHasFilter = "guestCanEditProject"
 )
 
 var AllProjectHasFilter = []ProjectHasFilter{
@@ -5852,11 +5862,13 @@ var AllProjectHasFilter = []ProjectHasFilter{
 	ProjectHasFilterFields,
 	ProjectHasFilterNodes,
 	ProjectHasFilterCollaborators,
+	ProjectHasFilterPeerCanEditProject,
+	ProjectHasFilterGuestCanEditProject,
 }
 
 func (e ProjectHasFilter) IsValid() bool {
 	switch e {
-	case ProjectHasFilterCreatedBy, ProjectHasFilterCreatedAt, ProjectHasFilterUpdatedAt, ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterStatus, ProjectHasFilterColumns, ProjectHasFilterFields, ProjectHasFilterNodes, ProjectHasFilterCollaborators:
+	case ProjectHasFilterCreatedBy, ProjectHasFilterCreatedAt, ProjectHasFilterUpdatedAt, ProjectHasFilterRootnameid, ProjectHasFilterParentnameid, ProjectHasFilterNameid, ProjectHasFilterName, ProjectHasFilterDescription, ProjectHasFilterStatus, ProjectHasFilterColumns, ProjectHasFilterFields, ProjectHasFilterNodes, ProjectHasFilterCollaborators, ProjectHasFilterPeerCanEditProject, ProjectHasFilterGuestCanEditProject:
 		return true
 	}
 	return false

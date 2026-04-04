@@ -394,10 +394,25 @@ CheckProjectAuth(uctx, projectid)
     |
     ├── isProjectCollaborator? ──yes──> ALLOW
     |
+    ├── checkProjectFlagAuth? (peer/guest flags)
+    |       |
+    |       ├── peerCanEditProject=true + user is Member/Peer/Coordinator ──> ALLOW
+    |       ├── peerCanEditProject=true + guestCanEditProject=true + user is Guest ──> ALLOW
+    |       └── otherwise ──> continue
+    |
     └── checkProjectNodeAuth (coordinator check on linked nodes)
             |
             └── CheckNodesAuth -> HasCoordoAuth -> ...
 ```
+
+**Project Permission Flags** (`peerCanEditProject`, `guestCanEditProject`):
+
+Projects can optionally widen edit access beyond collaborators and coordinators via two boolean flags:
+
+- `peerCanEditProject`: when `true`, any organisation member (with a non-guest role) can edit project content (columns, cards, drafts).
+- `guestCanEditProject`: when `true` (and `peerCanEditProject` is also `true`), guests can also edit project content.
+
+Both flags default to `nil`/`false`, preserving the existing coordinator-only behaviour. Only coordinators can toggle these flags (enforced by `updateNodeArtefactHook`).
 
 This pattern can be extended to other resource types that need direct user invitations without requiring organisation membership.
 

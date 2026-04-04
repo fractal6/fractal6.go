@@ -22,7 +22,6 @@ package auth
 
 import (
 	"fmt"
-	"slices"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
@@ -94,46 +93,62 @@ func CheckNodesAuth(uctx *model.UserCtx, nodes []model.NodeRef, passAll bool) (b
 	return ok, nil
 }
 
+// projectAuthData holds the fields fetched by a single DQL call in CheckProjectAuth.
+type projectAuthData struct {
+	Collaborators       []struct{ Username string } `json:"collaborators"`
+	PeerCanEditProject  bool                        `json:"peerCanEditProject"`
+	GuestCanEditProject bool                        `json:"guestCanEditProject"`
+	Rootnameid          string                      `json:"rootnameid"`
+	Nodes               []struct{ Nameid string }   `json:"nodes"`
+}
+
+// projectAuthFields is the DQL predicate list fetched once for project authorization.
+const projectAuthFields = `Project.collaborators { User.username }
+            Project.peerCanEditProject
+            Project.guestCanEditProject
+            Project.rootnameid
+            Project.nodes { Node.nameid }`
+
 // CheckProjectAuth verifies the user has write access to a project.
-// Access is granted if the user is either:
-//   - a project collaborator, or
-//   - a coordinator of any node linked to the project
+// A single DB call fetches collaborators, permission flags, and linked nodes,
+// then checks access in order:
+//  1. Collaborator (username match)
+//  2. Permission flags (peerCanEditProject / guestCanEditProject)
+//  3. Coordinator on any linked node
 func CheckProjectAuth(uctx *model.UserCtx, projectid string) (bool, error) {
-	// Check collaborator access first (cheap username match)
-	if ok, err := isProjectCollaborator(uctx, projectid); err != nil {
-		return false, err
-	} else if ok {
-		return true, nil
-	}
-
-	// Fall back to node-based coordinator authorization
-	return checkProjectNodeAuth(uctx, projectid)
-}
-
-// isProjectCollaborator checks if the user is listed as a project collaborator.
-func isProjectCollaborator(uctx *model.UserCtx, projectid string) (bool, error) {
-	x, err := db.GetDB().GetSubFieldById(projectid, "Project.collaborators", "User.username")
+	r, err := db.GetDB().GetFieldById(projectid, projectAuthFields)
 	if err != nil {
 		return false, LogErr("Internal error", err)
 	}
-	return slices.Contains(InterfaceToSlice[string](x), uctx.Username), nil
-}
 
-// checkProjectNodeAuth verifies the user has coordinator authority on at least
-// one node linked to the project.
-func checkProjectNodeAuth(uctx *model.UserCtx, projectid string) (bool, error) {
-	x, err := db.GetDB().GetSubFieldById(projectid, "Project.nodes", "Node.nameid")
-	if err != nil {
-		return false, LogErr("Internal error", err)
+	p := StructMap[projectAuthData](r)
+
+	// 1. Collaborator (fast path)
+	for _, c := range p.Collaborators {
+		if c.Username == uctx.Username {
+			return true, nil
+		}
 	}
-	nameids := InterfaceToSlice[string](x)
-	if len(nameids) == 0 {
-		// Allow access when the project has no linked nodes
-		return true, nil
+
+	// 2. Permission flags
+	if p.PeerCanEditProject && p.Rootnameid != "" {
+		if UserIsGuest(uctx, p.Rootnameid) >= 0 {
+			if p.GuestCanEditProject {
+				return true, nil // guests need both flags
+			}
+		} else if UserIsMember(uctx, p.Rootnameid) >= 0 {
+			return true, nil // non-guest members pass with peerFlag alone
+		}
 	}
-	nodes := make([]model.NodeRef, len(nameids))
-	for i, n := range nameids {
-		nodes[i] = model.NodeRef{Nameid: &n}
+
+	// 3. Coordinator on linked nodes
+	if len(p.Nodes) == 0 {
+		return true, nil // no linked nodes — allow access
+	}
+	nodes := make([]model.NodeRef, len(p.Nodes))
+	for i, n := range p.Nodes {
+		nameid := n.Nameid
+		nodes[i] = model.NodeRef{Nameid: &nameid}
 	}
 	return CheckNodesAuth(uctx, nodes, false)
 }

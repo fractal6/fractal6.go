@@ -1014,12 +1014,14 @@ type ComplexityRoot struct {
 		Description            func(childComplexity int) int
 		Fields                 func(childComplexity int, filter *model.ProjectFieldFilter, first *int, offset *int) int
 		FieldsAggregate        func(childComplexity int, filter *model.ProjectFieldFilter) int
+		GuestCanEditProject    func(childComplexity int) int
 		ID                     func(childComplexity int) int
 		Name                   func(childComplexity int) int
 		Nameid                 func(childComplexity int) int
 		Nodes                  func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		NodesAggregate         func(childComplexity int, filter *model.NodeFilter) int
 		Parentnameid           func(childComplexity int) int
+		PeerCanEditProject     func(childComplexity int) int
 		Rootnameid             func(childComplexity int) int
 		Status                 func(childComplexity int) int
 		UpdatedAt              func(childComplexity int) int
@@ -6609,6 +6611,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.FieldsAggregate(childComplexity, args["filter"].(*model.ProjectFieldFilter)), true
 
+	case "Project.guestCanEditProject":
+		if e.complexity.Project.GuestCanEditProject == nil {
+			break
+		}
+
+		return e.complexity.Project.GuestCanEditProject(childComplexity), true
+
 	case "Project.id":
 		if e.complexity.Project.ID == nil {
 			break
@@ -6660,6 +6669,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Parentnameid(childComplexity), true
+
+	case "Project.peerCanEditProject":
+		if e.complexity.Project.PeerCanEditProject == nil {
+			break
+		}
+
+		return e.complexity.Project.PeerCanEditProject(childComplexity), true
 
 	case "Project.rootnameid":
 		if e.complexity.Project.Rootnameid == nil {
@@ -11178,6 +11194,8 @@ type Project {
   fields(filter: ProjectFieldFilter, first: Int, offset: Int): [ProjectField!]
   nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   collaborators(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
+  peerCanEditProject: Boolean!
+  guestCanEditProject: Boolean!
 
   columnsAggregate(filter: ProjectColumnFilter): ProjectColumnAggregateResult
   fieldsAggregate(filter: ProjectFieldFilter): ProjectFieldAggregateResult
@@ -11638,35 +11656,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 type ActivityAggregateResult {
   count: Int
@@ -12044,6 +12062,8 @@ input AddProjectInput {
   fields: [ProjectFieldRef!]
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   collaborators: [UserRef!] @x_alter(r:"ref")
+  peerCanEditProject: Boolean!
+  guestCanEditProject: Boolean!
 }
 
 type AddProjectPayload {
@@ -14066,6 +14086,8 @@ enum ProjectHasFilter {
   fields
   nodes
   collaborators
+  peerCanEditProject
+  guestCanEditProject
 }
 
 input ProjectOrder {
@@ -14098,6 +14120,8 @@ input ProjectPatch {
   fields: [ProjectFieldRef!] @x_patch_ro
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   collaborators: [UserRef!] @x_alter(r:"ref")
+  peerCanEditProject: Boolean
+  guestCanEditProject: Boolean
 }
 
 input ProjectRef {
@@ -14115,6 +14139,8 @@ input ProjectRef {
   fields: [ProjectFieldRef!]
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   collaborators: [UserRef!] @x_alter(r:"ref")
+  peerCanEditProject: Boolean
+  guestCanEditProject: Boolean
 }
 
 input ProjectStatus_hash {

@@ -245,6 +245,8 @@ type Project @auth(
   """ Extra auth """
   nodes: [Node!]       @hasInverse(field: projects) @x_alter(r:"oneByOne") @x_alter(r:"ref")
   collaborators: [User!]     @x_alter(r:"ref")
+  peerCanEditProject: Boolean!   @x_alter
+  guestCanEditProject: Boolean!  @x_alter
 }
 
 type ProjectColumn @hook_ {

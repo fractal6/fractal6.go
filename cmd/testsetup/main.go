@@ -452,6 +452,8 @@ func seedTestData() error {
 		_:proj_root <Project.status> "Open" .
 		_:proj_root <Project.createdAt> "2026-01-01T00:00:00Z" .
 		_:proj_root <Project.updatedAt> "2026-01-01T00:00:00Z" .
+		_:proj_root <Project.peerCanEditProject> "false" .
+		_:proj_root <Project.guestCanEditProject> "false" .
 		_:proj_root <Project.createdBy> _:user2 .
 		_:proj_root <Project.nodes> _:secorg .
 		_:secorg <Node.projects> _:proj_root .
@@ -466,6 +468,8 @@ func seedTestData() error {
 		_:proj_private <Project.status> "Open" .
 		_:proj_private <Project.createdAt> "2026-01-01T00:00:00Z" .
 		_:proj_private <Project.updatedAt> "2026-01-01T00:00:00Z" .
+		_:proj_private <Project.peerCanEditProject> "false" .
+		_:proj_private <Project.guestCanEditProject> "false" .
 		_:proj_private <Project.createdBy> _:user2 .
 		_:proj_private <Project.nodes> _:secorg_private .
 		_:secorg_private <Node.projects> _:proj_private .
@@ -480,6 +484,8 @@ func seedTestData() error {
 		_:proj_secret <Project.status> "Open" .
 		_:proj_secret <Project.createdAt> "2026-01-01T00:00:00Z" .
 		_:proj_secret <Project.updatedAt> "2026-01-01T00:00:00Z" .
+		_:proj_secret <Project.peerCanEditProject> "false" .
+		_:proj_secret <Project.guestCanEditProject> "false" .
 		_:proj_secret <Project.createdBy> _:user2 .
 		_:proj_secret <Project.nodes> _:secorg_secret .
 		_:secorg_secret <Node.projects> _:proj_secret .

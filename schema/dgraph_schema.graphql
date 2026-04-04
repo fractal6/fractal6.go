@@ -285,6 +285,8 @@ type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   fields: [ProjectField!]
   nodes: [Node!] @hasInverse(field: projects)
   collaborators: [User!]
+  peerCanEditProject: Boolean!
+  guestCanEditProject: Boolean!
 }
 
 type ProjectColumn {

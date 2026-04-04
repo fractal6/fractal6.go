@@ -14980,6 +14980,10 @@ func (ec *executionContext) fieldContext_AddProjectPayload_project(ctx context.C
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "collaborators":
 				return ec.fieldContext_Project_collaborators(ctx, field)
+			case "peerCanEditProject":
+				return ec.fieldContext_Project_peerCanEditProject(ctx, field)
+			case "guestCanEditProject":
+				return ec.fieldContext_Project_guestCanEditProject(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
 			case "fieldsAggregate":
@@ -22671,6 +22675,10 @@ func (ec *executionContext) fieldContext_DeleteProjectPayload_project(ctx contex
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "collaborators":
 				return ec.fieldContext_Project_collaborators(ctx, field)
+			case "peerCanEditProject":
+				return ec.fieldContext_Project_peerCanEditProject(ctx, field)
+			case "guestCanEditProject":
+				return ec.fieldContext_Project_guestCanEditProject(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
 			case "fieldsAggregate":
@@ -34796,6 +34804,10 @@ func (ec *executionContext) fieldContext_Node_projects(ctx context.Context, fiel
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "collaborators":
 				return ec.fieldContext_Project_collaborators(ctx, field)
+			case "peerCanEditProject":
+				return ec.fieldContext_Project_peerCanEditProject(ctx, field)
+			case "guestCanEditProject":
+				return ec.fieldContext_Project_guestCanEditProject(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
 			case "fieldsAggregate":
@@ -42062,6 +42074,88 @@ func (ec *executionContext) fieldContext_Project_collaborators(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Project_peerCanEditProject(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_peerCanEditProject(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PeerCanEditProject, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_peerCanEditProject(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Project_guestCanEditProject(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_guestCanEditProject(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GuestCanEditProject, nil
+	})
+
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_guestCanEditProject(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Project_columnsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Project_columnsAggregate(ctx, field)
 	if err != nil {
@@ -43837,6 +43931,10 @@ func (ec *executionContext) fieldContext_ProjectColumn_project(ctx context.Conte
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "collaborators":
 				return ec.fieldContext_Project_collaborators(ctx, field)
+			case "peerCanEditProject":
+				return ec.fieldContext_Project_peerCanEditProject(ctx, field)
+			case "guestCanEditProject":
+				return ec.fieldContext_Project_guestCanEditProject(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
 			case "fieldsAggregate":
@@ -47715,6 +47813,10 @@ func (ec *executionContext) fieldContext_Query_getProject(ctx context.Context, f
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "collaborators":
 				return ec.fieldContext_Project_collaborators(ctx, field)
+			case "peerCanEditProject":
+				return ec.fieldContext_Project_peerCanEditProject(ctx, field)
+			case "guestCanEditProject":
+				return ec.fieldContext_Project_guestCanEditProject(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
 			case "fieldsAggregate":
@@ -47802,6 +47904,10 @@ func (ec *executionContext) fieldContext_Query_queryProject(ctx context.Context,
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "collaborators":
 				return ec.fieldContext_Project_collaborators(ctx, field)
+			case "peerCanEditProject":
+				return ec.fieldContext_Project_peerCanEditProject(ctx, field)
+			case "guestCanEditProject":
+				return ec.fieldContext_Project_guestCanEditProject(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
 			case "fieldsAggregate":
@@ -60439,6 +60545,10 @@ func (ec *executionContext) fieldContext_UpdateProjectPayload_project(ctx contex
 				return ec.fieldContext_Project_nodes(ctx, field)
 			case "collaborators":
 				return ec.fieldContext_Project_collaborators(ctx, field)
+			case "peerCanEditProject":
+				return ec.fieldContext_Project_peerCanEditProject(ctx, field)
+			case "guestCanEditProject":
+				return ec.fieldContext_Project_guestCanEditProject(ctx, field)
 			case "columnsAggregate":
 				return ec.fieldContext_Project_columnsAggregate(ctx, field)
 			case "fieldsAggregate":
@@ -69237,7 +69347,7 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "nodes", "collaborators"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "nodes", "collaborators", "peerCanEditProject", "guestCanEditProject"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -69490,6 +69600,20 @@ func (ec *executionContext) unmarshalInputAddProjectInput(ctx context.Context, o
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "peerCanEditProject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("peerCanEditProject"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PeerCanEditProject = data
+		case "guestCanEditProject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanEditProject"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GuestCanEditProject = data
 		}
 	}
 
@@ -80728,7 +80852,7 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "nodes", "collaborators"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "nodes", "collaborators", "peerCanEditProject", "guestCanEditProject"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -81079,6 +81203,20 @@ func (ec *executionContext) unmarshalInputProjectPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "peerCanEditProject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("peerCanEditProject"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PeerCanEditProject = data
+		case "guestCanEditProject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanEditProject"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GuestCanEditProject = data
 		}
 	}
 
@@ -81092,7 +81230,7 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "nodes", "collaborators"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "rootnameid", "parentnameid", "nameid", "name", "description", "status", "columns", "fields", "nodes", "collaborators", "peerCanEditProject", "guestCanEditProject"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -81356,6 +81494,20 @@ func (ec *executionContext) unmarshalInputProjectRef(ctx context.Context, obj in
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.UserRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "peerCanEditProject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("peerCanEditProject"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PeerCanEditProject = data
+		case "guestCanEditProject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("guestCanEditProject"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GuestCanEditProject = data
 		}
 	}
 
@@ -92679,6 +92831,16 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Project_nodes(ctx, field, obj)
 		case "collaborators":
 			out.Values[i] = ec._Project_collaborators(ctx, field, obj)
+		case "peerCanEditProject":
+			out.Values[i] = ec._Project_peerCanEditProject(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "guestCanEditProject":
+			out.Values[i] = ec._Project_guestCanEditProject(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "columnsAggregate":
 			out.Values[i] = ec._Project_columnsAggregate(ctx, field, obj)
 		case "fieldsAggregate":

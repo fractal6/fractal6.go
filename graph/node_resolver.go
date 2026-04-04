@@ -45,10 +45,11 @@ import (
 ////////////////////////////////////////////////
 
 type AddArtefactInput struct {
-	Name       *string          `json:"name"`
-	Color      *string          `json:"color"`
-	Rootnameid string           `json:"rootnameid,omitempty"`
-	Nodes      []*model.NodeRef `json:"nodes,omitempty"`
+	Name          *string          `json:"name"`
+	Color         *string          `json:"color"`
+	Rootnameid    string           `json:"rootnameid,omitempty"`
+	Nodes         []*model.NodeRef `json:"nodes,omitempty"`
+	Collaborators []*model.UserRef `json:"collaborators,omitempty"`
 }
 
 type FilterArtefactInput struct {
@@ -162,11 +163,15 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 		nodesGiven = append(nodesGiven, DerefSlice(input.Set.Nodes)...)
 	}
 	if input.Remove != nil {
-		// @auth debug: Only allow nodes to be removed...
-		if len(input.Remove.Nodes) == 0 {
+		hasNodes := len(input.Remove.Nodes) > 0
+		hasCollaborators := len(input.Remove.Collaborators) > 0
+
+		if hasNodes {
+			nodesGiven = append(nodesGiven, DerefSlice(input.Remove.Nodes)...)
+		} else if !hasCollaborators {
+			// Remove must specify at least nodes or collaborators
 			return nil, LogErr("Access denied", fmt.Errorf("A node must be given."))
 		}
-		nodesGiven = append(nodesGiven, DerefSlice(input.Remove.Nodes)...)
 	}
 
 	// Authorization with regards to nodes attributes.
