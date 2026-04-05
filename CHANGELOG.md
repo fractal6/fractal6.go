@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.8.9] - 2026-04-06
+
+### Features
+
+- Tension Templates: new artefact type with full CRUD support, authorization rules, org-level settings, and dedicated REST API routes (`/q/tension_templates/sub` and `/q/tension_templates/top`)
+- Projects: add peer and guest edit permission flags, and safer handling when removing nodes (reparenting with orphan guard)
+- Email replies: improved handling with HTML body support, better Markdown conversion, and quote stripping
+
+### Bug Fixes
+
+- Fix nil dereferences on user-provided IDs in project resolvers
+- Fix email reply formatting that could break text width
+
 ## [0.8.7] - 2026-02-28
 
 ### Features
