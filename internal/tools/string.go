@@ -113,10 +113,27 @@ func FindTensions(msg string) []string {
 // header that email clients insert before the quoted original message.
 var reEmailQuoteHeader = re.MustCompile(`(?im)^(>?\s*)?(On\s.+wrote\s*:|Le\s.+a\s+[eé]crit\s*:)\s*$`)
 
-// StripEmailQuote removes the quoted reply portion from an email body.
+// reEmailSignature matches the standard email signature delimiter: a line
+// containing only "--" optionally followed by whitespace.
+var reEmailSignature = re.MustCompile(`^--\s*$`)
+
+// StripEmailQuote removes the quoted reply portion and trailing email
+// signature from an email body. The signature can appear before or after
+// the quoted block.
+func StripEmailQuote(msg string) string {
+	// 1. Strip signature first (handles signature sitting after the quote).
+	result := stripTrailingSignature(msg)
+	// 2. Strip the quoted reply.
+	result = stripEmailQuote(result)
+	// 3. Strip signature again (handles signature sitting before the quote).
+	result = stripTrailingSignature(result)
+	return result
+}
+
+// stripEmailQuote removes the quoted reply portion from an email body.
 // It only strips when the quoted block (header + ">" lines) sits at
 // the very start or very end of the message.
-func StripEmailQuote(msg string) string {
+func stripEmailQuote(msg string) string {
 	lines := strings.Split(msg, "\n")
 
 	// Collect all header line indices.
@@ -175,6 +192,52 @@ func StripEmailQuote(msg string) string {
 	}
 
 	// Quote is in the middle or stripping would leave nothing — keep as-is.
+	return msg
+}
+
+// stripTrailingSignature removes an email signature block from the end of
+// a message. It looks for the last line matching "-- " (the standard
+// delimiter) and strips it along with everything after it, provided the
+// result is non-empty.
+func stripTrailingSignature(msg string) string {
+	lines := strings.Split(msg, "\n")
+	// Scan backwards for the last signature delimiter.
+	for i := len(lines) - 1; i >= 0; i-- {
+		if !reEmailSignature.MatchString(lines[i]) {
+			continue
+		}
+		// Must be preceded by at least one empty line.
+		if i == 0 || strings.TrimSpace(lines[i-1]) != "" {
+			continue
+		}
+		// The signature body must be a contiguous block of non-empty lines
+		// (at least one), optionally followed by trailing blank lines until EOF.
+		// If a blank line appears followed by more non-empty content, this is
+		// not a real signature — skip it to avoid false positives.
+		j := i + 1
+		for j < len(lines) && strings.TrimSpace(lines[j]) != "" {
+			j++
+		}
+		if j == i+1 {
+			// No non-empty line right after "--": not a signature.
+			break
+		}
+		// Everything from j onward must be blank.
+		trailingOk := true
+		for _, l := range lines[j:] {
+			if strings.TrimSpace(l) != "" {
+				trailingOk = false
+				break
+			}
+		}
+		if !trailingOk {
+			break
+		}
+		if result := strings.TrimSpace(strings.Join(lines[:i], "\n")); result != "" {
+			return result
+		}
+		break
+	}
 	return msg
 }
 

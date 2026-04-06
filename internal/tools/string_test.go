@@ -123,6 +123,76 @@ func TestStripEmailQuote(t *testing.T) {
 			input:    "On Mon, 27 Mar 2026, Alice wrote:\n> everything is quoted",
 			expected: "On Mon, 27 Mar 2026, Alice wrote:\n> everything is quoted",
 		},
+		{
+			name:     "signature at end",
+			input:    "Hello, this is my reply.\n\n--\nJohn Doe\ntel: 02020",
+			expected: "Hello, this is my reply.",
+		},
+		{
+			name:     "signature at end with trailing blank lines",
+			input:    "Hello, this is my reply.\n\n--\nJohn Doe\ntel: 02020\n\n",
+			expected: "Hello, this is my reply.",
+		},
+		{
+			name:     "signature without preceding blank line not stripped",
+			input:    "Hello, this is my reply.\n--\nJohn Doe",
+			expected: "Hello, this is my reply.\n--\nJohn Doe",
+		},
+		{
+			name:     "bare -- with no content after not stripped",
+			input:    "Hello, this is my reply.\n\n--\n\n",
+			expected: "Hello, this is my reply.\n\n--\n\n",
+		},
+		{
+			name:     "signature after quote stripped",
+			input:    "My reply.\n\n--\nJohn Doe\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> quoted",
+			expected: "My reply.",
+		},
+		{
+			name:     "only signature returns original",
+			input:    "\n--\nJohn Doe",
+			expected: "\n--\nJohn Doe",
+		},
+		{
+			name:     "text after signature block not stripped",
+			input:    "Hello.\n\n--\nJohn Doe\n\nSome extra text here.",
+			expected: "Hello.\n\n--\nJohn Doe\n\nSome extra text here.",
+		},
+		{
+			name:     "text between signature and quote not stripped",
+			input:    "Reply.\n\n--\nJohn Doe\n\nPS: forgot to mention this.\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> quoted",
+			expected: "Reply.\n\n--\nJohn Doe\n\nPS: forgot to mention this.",
+		},
+		{
+			name:     "signature after quote both stripped",
+			input:    "My reply.\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> quoted\n\n--\nJohn Doe\ntel: 02020",
+			expected: "My reply.",
+		},
+		{
+			name:     "signature before quote both stripped",
+			input:    "My reply.\n\n--\nJohn Doe\ntel: 02020\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> quoted",
+			expected: "My reply.",
+		},
+		{
+			name:     "text between signature and EOF not stripped",
+			input:    "Reply.\n\n--\nJohn Doe\n\nActually one more thing.",
+			expected: "Reply.\n\n--\nJohn Doe\n\nActually one more thing.",
+		},
+		{
+			name:     "signature delimiter with trailing space (RFC 3676)",
+			input:    "Hello.\n\n-- \nJohn Doe\ntel: 02020",
+			expected: "Hello.",
+		},
+		{
+			name:     "quote at start and signature at end",
+			input:    "On Mon, 27 Mar 2026, Alice wrote:\n> quoted\n\nMy reply.\n\n--\nJohn Doe",
+			expected: "My reply.",
+		},
+		{
+			name:     "two -- blocks only last one is signature",
+			input:    "First part.\n\n--\nSeparator text\n\nSecond part.\n\n--\nJohn Doe",
+			expected: "First part.\n\n--\nSeparator text\n\nSecond part.",
+		},
 	}
 
 	for _, tt := range tests {
