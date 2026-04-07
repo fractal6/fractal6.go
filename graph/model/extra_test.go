@@ -29,6 +29,50 @@ import (
 	. "fractale/fractal6.go/graph/model"
 )
 
+// TestMentionedUserIsNotifiableOnCreated verifies that a user mentioned via "@"
+// triggers both internal (IsNotifiable) and external (IsEmailable) notifications
+// when the tension event is Created (not just CommentPushed).
+func TestMentionedUserIsNotifiableOnCreated(t *testing.T) {
+	created := TensionEventCreated
+	commentPushed := TensionEventCommentPushed
+	createdAt := "2026-01-01T00:00:00Z"
+
+	tests := []struct {
+		name         string
+		event        TensionEvent
+		reason       NotifReason
+		wantNotif    bool
+		wantEmail    bool
+	}{
+		{"mention+Created", TensionEventCreated, ReasonIsMentionned, true, true},
+		{"mention+CommentPushed", TensionEventCommentPushed, ReasonIsMentionned, true, true},
+		{"peer+Created", TensionEventCreated, ReasonIsPeer, true, true},
+		{"peer+CommentPushed", TensionEventCommentPushed, ReasonIsPeer, false, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var ev *TensionEvent
+			if tt.event == TensionEventCreated {
+				ev = &created
+			} else {
+				ev = &commentPushed
+			}
+			notif := EventNotif{
+				History: []*EventRef{{EventType: ev, CreatedAt: &createdAt}},
+			}
+			ui := UserNotifInfo{Reason: tt.reason}
+
+			if got := notif.IsNotifiable(ui); got != tt.wantNotif {
+				t.Errorf("IsNotifiable() = %v, want %v", got, tt.wantNotif)
+			}
+			if got := notif.IsEmailable(ui); got != tt.wantEmail {
+				t.Errorf("IsEmailable() = %v, want %v", got, tt.wantEmail)
+			}
+		})
+	}
+}
+
 func TestUserCreds(t *testing.T) {
 	testcases := []struct {
 		input string

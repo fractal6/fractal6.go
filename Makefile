@@ -75,7 +75,7 @@ test-integration: test-integration-setup
 	REDIS_ADDR=localhost:6479 \
 	DGRAPH_PUBLIC_KEY="$$(cat public.pem)" \
 	DGRAPH_PRIVATE_KEY="$$(cat private.pem)" \
-	go test -tags integration -count=1 -timeout 120s ./db/... ./web/auth/... ./web/handlers/...
+	go test -tags integration -count=1 -timeout 120s ./db/... ./graph/... ./web/auth/... ./web/handlers/...
 
 test-integration-down:
 	docker compose -f docker-compose.test.yml down -v --remove-orphans

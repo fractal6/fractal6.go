@@ -181,7 +181,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 		notif.Title = m[0]["title"].(string)
 		notif.Msg, _ = m[0]["message"].(string)
 
-		if notif.Msg != "" && notif.HasEvent(model.TensionEventCommentPushed) {
+		if notif.Msg != "" && (notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated)) {
 			// Mentioned users
 			err = UpdateWithMentionnedUser(notif.Msg, notif.Receiverid, users)
 			if err != nil {
@@ -633,7 +633,6 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 
 // Update the users map with notified users.
 // Note: only add user that are member of the given rootnameid
-// @FIX: user inside block code will be notified here...
 func UpdateWithMentionnedUser(msg string, receiverid string, users map[string]model.UserNotifInfo) error {
 	// Remove code block
 	msg = RemoveCodeBlocks(msg)
