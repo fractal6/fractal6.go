@@ -420,11 +420,17 @@ var dqlQueries map[string]string = map[string]string{
             Node.parent @normalize
         }
 
-        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
-            l as Node.tension_templates @filter(eq(TensionTemplate.is_recursive, true))
+        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
+            la as Node.tension_templates @filter(eq(TensionTemplate.is_recursive, true))
         }
 
-        all(func: uid(l)){
+        {{if not .excludeSelf}}
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @filter(eq(Node.isArchived, false)) {
+            ls as Node.tension_templates
+        }
+        {{end}}
+
+        all(func: uid(la{{if not .excludeSelf}}, ls{{end}})){
             uid
             TensionTemplate.name
             TensionTemplate.description
