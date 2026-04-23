@@ -109,96 +109,159 @@ func FindTensions(msg string) []string {
 	return match
 }
 
-// reEmailQuoteHeader matches the "On ... wrote:" (EN) or "Le ... a écrit :" (FR)
-// header that email clients insert before the quoted original message.
-var reEmailQuoteHeader = re.MustCompile(`(?im)^(>?\s*)?(On\s.+wrote\s*:|Le\s.+a\s+[eé]crit\s*:)\s*$`)
+// reEmailQuoteHeader matches quote headers from common clients across
+// languages: EN (Gmail/Apple Mail), FR, DE, ES. Group 1 captures anything
+// before the header on the same line — usually blank or ">"-quoted, but can
+// be real reply text when the client didn't break the line. The line must
+// end with ":" (typical header terminator), with optional content between
+// the keyword and the colon (e.g. DE "schrieb Alice <a@b>:").
+var reEmailQuoteHeader = re.MustCompile(`(?im)^(.*?)(?:` +
+	`On\s[^\n]{1,300}?wrote` + // EN: "On Mon, 27 Mar 2026, Alice wrote:"
+	`|Le\s[^\n]{1,300}?a\s+[eé]crit` + // FR: "Le lun. ... a écrit :"
+	`|Am\s[^\n]{1,300}?schrieb` + // DE: "Am 27.03.2026 schrieb Alice:"
+	`|El\s[^\n]{1,300}?escribi[oó]` + // ES: "El lun., 27 mar. ... escribió:"
+	`)[^\n]*:\s*$`)
 
-// reEmailSignature matches the standard email signature delimiter: a line
-// containing only "--" optionally followed by whitespace.
+// reEmailSignature matches the standard "-- " signature delimiter.
 var reEmailSignature = re.MustCompile(`^--\s*$`)
 
-// StripEmailQuote removes the quoted reply portion and trailing email
-// signature from an email body. The signature can appear before or after
-// the quoted block.
+// reFractaleFooter matches our own notification footer: stable anchors we
+// control, reliable even when the surrounding quote structure is mangled.
+// Either of the two footer lines is accepted — clients sometimes strip one.
+var reFractaleFooter = re.MustCompile(`(?im)^\s*>?\s*(?:—\s*)?(?:You are receiving this because\b|\[?View it on Fractale\b)`)
+
+// StripEmailQuote removes the quoted reply and trailing signature from an
+// email body. Signature can appear before or after the quoted block.
 func StripEmailQuote(msg string) string {
-	// 1. Strip signature first (handles signature sitting after the quote).
-	result := stripTrailingSignature(msg)
-	// 2. Strip the quoted reply.
+	result := stripFractaleFooter(msg)
+	result = stripTrailingSignature(result)
 	result = stripEmailQuote(result)
-	// 3. Strip signature again (handles signature sitting before the quote).
 	result = stripTrailingSignature(result)
 	return result
 }
 
-// stripEmailQuote removes the quoted reply portion from an email body.
-// It only strips when the quoted block (header + ">" lines) sits at
-// the very start or very end of the message.
+// headerPrefixIsQuoteOnly: the text before a quote header is pure quoting/whitespace.
+func headerPrefixIsQuoteOnly(prefix string) bool {
+	return strings.TrimLeft(prefix, "> \t") == ""
+}
+
+func isQuoteOrBlank(line string) bool {
+	t := strings.TrimSpace(line)
+	return t == "" || strings.HasPrefix(t, ">")
+}
+
+// truncateAtQuoteHeader drops the quote-header line at index i and everything
+// below. When the header is inline (real reply text before it on the same
+// line), that reply text is preserved as the last kept line.
+func truncateAtQuoteHeader(lines []string, i int, prefix string) []string {
+	if headerPrefixIsQuoteOnly(prefix) {
+		return lines[:i]
+	}
+	kept := append([]string{}, lines[:i]...)
+	if reply := strings.TrimRight(prefix, " \t"); reply != "" {
+		kept = append(kept, reply)
+	}
+	return kept
+}
+
+// keepOrFallback returns a trimmed candidate, or fallback if empty (refuses
+// to strip everything).
+func keepOrFallback(candidate, fallback string) string {
+	if r := strings.TrimSpace(candidate); r != "" {
+		return r
+	}
+	return fallback
+}
+
+// stripFractaleFooter cuts from the nearest preceding quote header when the
+// Fractale footer marker is found. Handles inline headers that stripEmailQuote
+// can't see (e.g. Gmail inlines "Le ... a écrit :" with the user's reply).
+func stripFractaleFooter(msg string) string {
+	loc := reFractaleFooter.FindStringIndex(msg)
+	if loc == nil {
+		return msg
+	}
+	footerLineStart := 0
+	if nl := strings.LastIndexByte(msg[:loc[0]], '\n'); nl >= 0 {
+		footerLineStart = nl + 1
+	}
+	prefix := strings.TrimRight(msg[:footerLineStart], "\n")
+	preLines := []string{}
+	if prefix != "" {
+		preLines = strings.Split(prefix, "\n")
+	}
+
+	for i := len(preLines) - 1; i >= 0; i-- {
+		m := reEmailQuoteHeader.FindStringSubmatch(preLines[i])
+		if m == nil {
+			continue
+		}
+		return keepOrFallback(strings.Join(truncateAtQuoteHeader(preLines, i, m[1]), "\n"), msg)
+	}
+
+	// No quote header: drop the footer block (and a preceding "—" line if any).
+	if n := len(preLines); n > 0 {
+		last := strings.TrimSpace(strings.TrimLeft(preLines[n-1], "> \t"))
+		if last == "—" {
+			preLines = preLines[:n-1]
+		}
+	}
+	return keepOrFallback(strings.Join(preLines, "\n"), msg)
+}
+
+// stripEmailQuote strips the quoted block when it sits at the very start or
+// very end of the message. Also handles an inline header on the last line.
 func stripEmailQuote(msg string) string {
 	lines := strings.Split(msg, "\n")
 
-	// Collect all header line indices.
-	var headerIndices []int
-	for i, line := range lines {
-		if reEmailQuoteHeader.MatchString(line) {
-			headerIndices = append(headerIndices, i)
-		}
+	type hit struct {
+		line   int
+		prefix string
 	}
-	if len(headerIndices) == 0 {
+	var hits []hit
+	for i, line := range lines {
+		m := reEmailQuoteHeader.FindStringSubmatch(line)
+		if m == nil {
+			continue
+		}
+		hits = append(hits, hit{line: i, prefix: m[1]})
+	}
+	if len(hits) == 0 {
 		return msg
 	}
 
-	// Case 1: quote at the start — header on first non-blank line,
-	// followed by ">" lines / blank lines, then the user's reply.
-	first := headerIndices[0]
-	atStart := true
-	for i := 0; i < first; i++ {
+	// Case 1: quote at the start — header on first non-blank line, followed by
+	// ">" / blank lines, then the reply.
+	first := hits[0]
+	atStart := headerPrefixIsQuoteOnly(first.prefix)
+	for i := 0; atStart && i < first.line; i++ {
 		if strings.TrimSpace(lines[i]) != "" {
 			atStart = false
-			break
 		}
 	}
 	if atStart {
-		// Walk past the quoted block (blank lines + ">" prefixed lines).
-		end := first + 1
-		for end < len(lines) {
-			t := strings.TrimSpace(lines[end])
-			if t == "" || strings.HasPrefix(t, ">") {
-				end++
-				continue
-			}
-			break
+		end := first.line + 1
+		for end < len(lines) && isQuoteOrBlank(lines[end]) {
+			end++
 		}
 		if result := strings.TrimSpace(strings.Join(lines[end:], "\n")); result != "" {
 			return result
 		}
 	}
 
-	// Case 2: quote at the end — use the last header.
-	// Everything after it until EOF must be blank or ">" prefixed.
-	last := headerIndices[len(headerIndices)-1]
-	allQuote := true
-	for i := last + 1; i < len(lines); i++ {
-		t := strings.TrimSpace(lines[i])
-		if t == "" || strings.HasPrefix(t, ">") {
-			continue
-		}
-		allQuote = false
-		break
-	}
-	if allQuote {
-		if result := strings.TrimSpace(strings.Join(lines[:last], "\n")); result != "" {
-			return result
+	// Case 2: quote at the end — everything after the last header is blank/">".
+	last := hits[len(hits)-1]
+	for i := last.line + 1; i < len(lines); i++ {
+		if !isQuoteOrBlank(lines[i]) {
+			return msg
 		}
 	}
-
-	// Quote is in the middle or stripping would leave nothing — keep as-is.
-	return msg
+	kept := truncateAtQuoteHeader(lines, last.line, last.prefix)
+	return keepOrFallback(strings.Join(kept, "\n"), msg)
 }
 
-// stripTrailingSignature removes an email signature block from the end of
-// a message. It looks for the last line matching "-- " (the standard
-// delimiter) and strips it along with everything after it, provided the
-// result is non-empty.
+// stripTrailingSignature strips the last "-- " delimited signature block at
+// EOF (preceded by a blank line, followed by non-empty body then only blanks).
 func stripTrailingSignature(msg string) string {
 	lines := strings.Split(msg, "\n")
 	// Scan backwards for the last signature delimiter.
@@ -210,16 +273,13 @@ func stripTrailingSignature(msg string) string {
 		if i == 0 || strings.TrimSpace(lines[i-1]) != "" {
 			continue
 		}
-		// The signature body must be a contiguous block of non-empty lines
-		// (at least one), optionally followed by trailing blank lines until EOF.
-		// If a blank line appears followed by more non-empty content, this is
-		// not a real signature — skip it to avoid false positives.
+		// Signature body: contiguous non-empty lines, then only blanks to EOF.
 		j := i + 1
 		for j < len(lines) && strings.TrimSpace(lines[j]) != "" {
 			j++
 		}
 		if j == i+1 {
-			// No non-empty line right after "--": not a signature.
+			// No content right after "--": not a signature.
 			break
 		}
 		// Everything from j onward must be blank.

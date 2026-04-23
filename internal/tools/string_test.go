@@ -193,6 +193,46 @@ func TestStripEmailQuote(t *testing.T) {
 			input:    "First part.\n\n--\nSeparator text\n\nSecond part.\n\n--\nJohn Doe",
 			expected: "First part.\n\n--\nSeparator text\n\nSecond part.",
 		},
+		{
+			name:     "inline french header on same line as reply",
+			input:    "Yes, it's fine. Le jeu. 23 avr. 2026 à 05:49, Adrien D. <notifications@fractale.co> a écrit :\n> Hi @maud.srd, message content.",
+			expected: "Yes, it's fine.",
+		},
+		{
+			name:     "inline english header on same line as reply",
+			input:    "Yes, it's fine. On Mon, 27 Mar 2026 at 10:00, Alice <alice@example.com> wrote:\n> Hi, message content.",
+			expected: "Yes, it's fine.",
+		},
+		{
+			name:     "fractale footer anchors inline header strip",
+			input:    "Yes, it's fine. Le jeu. 23 avr. 2026 à 05:49, Adrien D. <notifications@fractale.co> a écrit :\n> Hi @maud.srd, message content.\n> —\n> You are receiving this because you have been mentionned.\n> View it on Fractale or reply to this email directly.",
+			expected: "Yes, it's fine.",
+		},
+		{
+			name:     "fractale footer strips quoted block without > prefix",
+			input:    "My reply.\nLe jeu. 23 avr. 2026 à 05:49, Adrien D. <notifications@fractale.co> a écrit :\n\nHi @maud.srd, message content.\n—\nYou are receiving this because you have been mentionned.\nView it on Fractale or reply to this email directly.",
+			expected: "My reply.",
+		},
+		{
+			name:     "fractale footer alone without quote header",
+			input:    "My reply.\n—\nYou are receiving this because you have been mentionned.\nView it on Fractale or reply to this email directly.",
+			expected: "My reply.",
+		},
+		{
+			name:     "german quote at end",
+			input:    "Meine Antwort.\n\nAm 27.03.2026 um 10:00 schrieb Alice <alice@example.com>:\n> Original Nachricht\n> zweite Zeile",
+			expected: "Meine Antwort.",
+		},
+		{
+			name:     "spanish quote at end",
+			input:    "Mi respuesta.\n\nEl lun., 27 mar. 2026 a las 10:00, Alice <alice@example.com> escribió:\n> Mensaje original\n> segunda línea",
+			expected: "Mi respuesta.",
+		},
+		{
+			name:     "only View it on Fractale anchor (first line stripped)",
+			input:    "My reply.\n> [View it on Fractale](https://fractale.co/tension/x/y), reply to this email directly.",
+			expected: "My reply.",
+		},
 	}
 
 	for _, tt := range tests {
@@ -200,6 +240,50 @@ func TestStripEmailQuote(t *testing.T) {
 			got := StripEmailQuote(tt.input)
 			if got != tt.expected {
 				t.Errorf("StripEmailQuote():\n  got:  %q\n  want: %q", got, tt.expected)
+			}
+		})
+	}
+}
+
+// TestStripEmailQuote_GmailHTML exercises the real notifier path:
+// raw Gmail reply HTML -> HTMLToMarkdown -> StripEmailQuote.
+func TestStripEmailQuote_GmailHTML(t *testing.T) {
+	tests := []struct {
+		name     string
+		html     string
+		expected string
+	}{
+		{
+			// No <br> separator: <div> emits no newline, so the reply and
+			// the gmail_attr quote-header collapse onto one line.
+			name: "gmail reply without br between reply and quote",
+			html: `<div dir="ltr">Yes, it's fine.</div>` +
+				`<div class="gmail_quote gmail_quote_container">` +
+				`<div dir="ltr" class="gmail_attr">Le jeu. 23 avr. 2026 à 05:49, Adrien D. &lt;<a href="mailto:notifications@fractale.co">notifications@fractale.co</a>&gt; a écrit :<br></div>` +
+				`<blockquote class="gmail_quote">Hi @maud.srd, is it ok for you?<br>— <br>You are receiving this because you have been mentionned.<br><a href="https://fractale.co/tension/x/y">View it on Fractale</a> or reply to this email directly.</blockquote>` +
+				`</div>`,
+			expected: "Yes, it's fine.",
+		},
+		{
+			name: "gmail reply with br between reply and quote",
+			html: `<div dir="ltr">Yes, it's fine.</div><br>` +
+				`<div class="gmail_quote">` +
+				`<div dir="ltr" class="gmail_attr">Le jeu. 23 avr. 2026 à 05:49, Adrien D. &lt;notifications@fractale.co&gt; a écrit :<br></div>` +
+				`<blockquote class="gmail_quote">Hi @maud.srd, short message.<br>— <br>You are receiving this because you have been mentionned.</blockquote>` +
+				`</div>`,
+			expected: "Yes, it's fine.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			md, err := HTMLToMarkdown(tt.html)
+			if err != nil {
+				t.Fatalf("HTMLToMarkdown error: %v", err)
+			}
+			got := StripEmailQuote(md)
+			if got != tt.expected {
+				t.Errorf("StripEmailQuote(HTMLToMarkdown(html)):\n  got:  %q\n  want: %q\n  intermediate md: %q", got, tt.expected, md)
 			}
 		})
 	}
