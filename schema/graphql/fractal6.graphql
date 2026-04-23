@@ -317,6 +317,8 @@ interface Post @auth(
 type ProjectDraft implements Post @hook_ {
   title: String! @x_alter
   message: String @x_alter
+  labels: [Label!] @x_alter(r:"ref")
+  assignees: [User!] @x_alter(r:"ref")
   # @auto-in-hook
   project_status: ProjectColumn!
 }

@@ -353,6 +353,8 @@ interface Post @auth(add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 
 type ProjectDraft implements Post {
   title: String!
+  labels: [Label!]
+  assignees: [User!]
   project_status: ProjectColumn!
 }
 
