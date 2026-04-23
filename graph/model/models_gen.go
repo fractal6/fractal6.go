@@ -342,6 +342,8 @@ type AddProjectDraftInput struct {
 	UpdatedAt     *string           `json:"updatedAt,omitempty"`
 	Message       *string           `json:"message,omitempty"`
 	Title         string            `json:"title"`
+	Labels        []*LabelRef       `json:"labels,omitempty"`
+	Assignees     []*UserRef        `json:"assignees,omitempty"`
 	ProjectStatus *ProjectColumnRef `json:"project_status"`
 }
 
@@ -2057,13 +2059,17 @@ type ProjectColumnTypeHash struct {
 }
 
 type ProjectDraft struct {
-	Title         string         `json:"title"`
-	Message       *string        `json:"message,omitempty"`
-	ProjectStatus *ProjectColumn `json:"project_status"`
-	ID            string         `json:"id"`
-	CreatedBy     *User          `json:"createdBy"`
-	CreatedAt     string         `json:"createdAt"`
-	UpdatedAt     *string        `json:"updatedAt,omitempty"`
+	Title              string                `json:"title"`
+	Message            *string               `json:"message,omitempty"`
+	Labels             []*Label              `json:"labels,omitempty"`
+	Assignees          []*User               `json:"assignees,omitempty"`
+	ProjectStatus      *ProjectColumn        `json:"project_status"`
+	ID                 string                `json:"id"`
+	CreatedBy          *User                 `json:"createdBy"`
+	CreatedAt          string                `json:"createdAt"`
+	UpdatedAt          *string               `json:"updatedAt,omitempty"`
+	LabelsAggregate    *LabelAggregateResult `json:"labelsAggregate,omitempty"`
+	AssigneesAggregate *UserAggregateResult  `json:"assigneesAggregate,omitempty"`
 }
 
 func (ProjectDraft) IsCardKind() {}
@@ -2102,6 +2108,8 @@ type ProjectDraftPatch struct {
 	UpdatedAt     *string           `json:"updatedAt,omitempty"`
 	Message       *string           `json:"message,omitempty"`
 	Title         *string           `json:"title,omitempty"`
+	Labels        []*LabelRef       `json:"labels,omitempty"`
+	Assignees     []*UserRef        `json:"assignees,omitempty"`
 	ProjectStatus *ProjectColumnRef `json:"project_status,omitempty"`
 }
 
@@ -2112,6 +2120,8 @@ type ProjectDraftRef struct {
 	UpdatedAt     *string           `json:"updatedAt,omitempty"`
 	Message       *string           `json:"message,omitempty"`
 	Title         *string           `json:"title,omitempty"`
+	Labels        []*LabelRef       `json:"labels,omitempty"`
+	Assignees     []*UserRef        `json:"assignees,omitempty"`
 	ProjectStatus *ProjectColumnRef `json:"project_status,omitempty"`
 }
 
@@ -5570,6 +5580,8 @@ const (
 	ProjectDraftHasFilterUpdatedAt     ProjectDraftHasFilter = "updatedAt"
 	ProjectDraftHasFilterMessage       ProjectDraftHasFilter = "message"
 	ProjectDraftHasFilterTitle         ProjectDraftHasFilter = "title"
+	ProjectDraftHasFilterLabels        ProjectDraftHasFilter = "labels"
+	ProjectDraftHasFilterAssignees     ProjectDraftHasFilter = "assignees"
 	ProjectDraftHasFilterProjectStatus ProjectDraftHasFilter = "project_status"
 )
 
@@ -5579,12 +5591,14 @@ var AllProjectDraftHasFilter = []ProjectDraftHasFilter{
 	ProjectDraftHasFilterUpdatedAt,
 	ProjectDraftHasFilterMessage,
 	ProjectDraftHasFilterTitle,
+	ProjectDraftHasFilterLabels,
+	ProjectDraftHasFilterAssignees,
 	ProjectDraftHasFilterProjectStatus,
 }
 
 func (e ProjectDraftHasFilter) IsValid() bool {
 	switch e {
-	case ProjectDraftHasFilterCreatedBy, ProjectDraftHasFilterCreatedAt, ProjectDraftHasFilterUpdatedAt, ProjectDraftHasFilterMessage, ProjectDraftHasFilterTitle, ProjectDraftHasFilterProjectStatus:
+	case ProjectDraftHasFilterCreatedBy, ProjectDraftHasFilterCreatedAt, ProjectDraftHasFilterUpdatedAt, ProjectDraftHasFilterMessage, ProjectDraftHasFilterTitle, ProjectDraftHasFilterLabels, ProjectDraftHasFilterAssignees, ProjectDraftHasFilterProjectStatus:
 		return true
 	}
 	return false

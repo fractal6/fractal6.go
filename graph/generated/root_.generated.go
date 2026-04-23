@@ -1093,13 +1093,17 @@ type ComplexityRoot struct {
 	}
 
 	ProjectDraft struct {
-		CreatedAt     func(childComplexity int) int
-		CreatedBy     func(childComplexity int, filter *model.UserFilter) int
-		ID            func(childComplexity int) int
-		Message       func(childComplexity int) int
-		ProjectStatus func(childComplexity int, filter *model.ProjectColumnFilter) int
-		Title         func(childComplexity int) int
-		UpdatedAt     func(childComplexity int) int
+		Assignees          func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		AssigneesAggregate func(childComplexity int, filter *model.UserFilter) int
+		CreatedAt          func(childComplexity int) int
+		CreatedBy          func(childComplexity int, filter *model.UserFilter) int
+		ID                 func(childComplexity int) int
+		Labels             func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate    func(childComplexity int, filter *model.LabelFilter) int
+		Message            func(childComplexity int) int
+		ProjectStatus      func(childComplexity int, filter *model.ProjectColumnFilter) int
+		Title              func(childComplexity int) int
+		UpdatedAt          func(childComplexity int) int
 	}
 
 	ProjectDraftAggregateResult struct {
@@ -7103,6 +7107,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectColumnAggregateResult.PosSum(childComplexity), true
 
+	case "ProjectDraft.assignees":
+		if e.complexity.ProjectDraft.Assignees == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_assignees_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.Assignees(childComplexity, args["filter"].(*model.UserFilter), args["order"].(*model.UserOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "ProjectDraft.assigneesAggregate":
+		if e.complexity.ProjectDraft.AssigneesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_assigneesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.AssigneesAggregate(childComplexity, args["filter"].(*model.UserFilter)), true
+
 	case "ProjectDraft.createdAt":
 		if e.complexity.ProjectDraft.CreatedAt == nil {
 			break
@@ -7128,6 +7156,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectDraft.ID(childComplexity), true
+
+	case "ProjectDraft.labels":
+		if e.complexity.ProjectDraft.Labels == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_labels_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.Labels(childComplexity, args["filter"].(*model.LabelFilter), args["order"].(*model.LabelOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "ProjectDraft.labelsAggregate":
+		if e.complexity.ProjectDraft.LabelsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectDraft_labelsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectDraft.LabelsAggregate(childComplexity, args["filter"].(*model.LabelFilter)), true
 
 	case "ProjectDraft.message":
 		if e.complexity.ProjectDraft.Message == nil {
@@ -11269,11 +11321,16 @@ type Post {
 type ProjectDraft {
   title: String!
   message: String
+  labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
+  assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   project_status(filter: ProjectColumnFilter): ProjectColumn!
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
   updatedAt: DateTime
+
+  labelsAggregate(filter: LabelFilter): LabelAggregateResult
+  assigneesAggregate(filter: UserFilter): UserAggregateResult
 }
 
 type Tension {
@@ -11656,35 +11713,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
 directive @id on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 type ActivityAggregateResult {
   count: Int
@@ -12018,6 +12075,8 @@ input AddProjectDraftInput {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   title: String!
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
   project_status: ProjectColumnRef!
 }
 
@@ -13948,6 +14007,8 @@ enum ProjectDraftHasFilter {
   updatedAt
   message
   title
+  labels
+  assignees
   project_status
 }
 
@@ -13970,6 +14031,8 @@ input ProjectDraftPatch {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   title: String
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
   project_status: ProjectColumnRef @x_patch_ro
 }
 
@@ -13980,6 +14043,8 @@ input ProjectDraftRef {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   title: String
+  labels: [LabelRef!] @x_alter(r:"ref")
+  assignees: [UserRef!] @x_alter(r:"ref")
   project_status: ProjectColumnRef
 }
 

@@ -1,8 +1,6 @@
 module fractale/fractal6.go
 
-go 1.21
-
-toolchain go1.22.0
+go 1.26
 
 require (
 	github.com/99designs/gqlgen v0.17.49
@@ -21,9 +19,9 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.16
 	github.com/xuri/excelize/v2 v2.8.1
 	github.com/yuin/goldmark v1.7.2
-	golang.org/x/crypto v0.24.0
-	golang.org/x/net v0.26.0
-	golang.org/x/text v0.16.0
+	golang.org/x/crypto v0.50.0
+	golang.org/x/net v0.53.0
+	golang.org/x/text v0.36.0
 	google.golang.org/grpc v1.64.0
 )
 
@@ -77,10 +75,10 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
 	golang.org/x/image v0.17.0 // indirect
-	golang.org/x/mod v0.18.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/tools v0.22.0 // indirect
+	golang.org/x/mod v0.35.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/tools v0.44.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240610135401-a8a62080eff3 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

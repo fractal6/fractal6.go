@@ -74,7 +74,7 @@ func (TensionCharac) New(action model.TensionAction) (*TensionCharac, error) {
 	case model.TensionActionArchivedMd:
 		l = append(l, "archive", "md")
 	default:
-		err = fmt.Errorf("Tension Action type unknown: " + string(action))
+		err = fmt.Errorf("Tension Action type unknown: %s", string(action))
 	}
 
 	tc := &TensionCharac{
