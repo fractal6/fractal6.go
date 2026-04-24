@@ -654,7 +654,8 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
             Tension.title
             Tension.status
             Tension.type_
-            Tension.labels { uid Label.name Label.color }`
+            Tension.labels { uid Label.name Label.color }
+			Tension.receiver { Node.nameid Node.name Node.role_type }`
 	}
 
 	if type_ == "all" {
