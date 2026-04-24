@@ -624,7 +624,7 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 	var isLight bool = false
 	var payload string
 	switch type_ {
-case "light":
+	case "light":
 		op = "getTensionInt"
 		isLight = true
 	case "int":

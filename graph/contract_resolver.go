@@ -382,7 +382,7 @@ func addVoteHook(ctx context.Context, obj any, next graphql.Resolver) (any, erro
 	}
 
 	switch contract.Status {
-case model.ContractStatusCanceled:
+	case model.ContractStatusCanceled:
 		// Eventually reset the pending node state
 		if contract.Event.EventType == model.TensionEventMemberLinked || contract.Event.EventType == model.TensionEventUserJoined {
 			for _, c := range contract.Candidates {

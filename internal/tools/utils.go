@@ -107,4 +107,3 @@ func InterfaceSlice(arg any) (out []any, ok bool) {
 	}
 	return out, true
 }
-

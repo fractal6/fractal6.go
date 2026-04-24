@@ -433,7 +433,7 @@ func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model
 	}
 	if ok { // Update blob archived flag
 		switch *event.EventType {
-case model.TensionEventBlobArchived:
+		case model.TensionEventBlobArchived:
 			_, err = db.GetDB().Meta("setArchivedFlagBlob", map[string]string{
 				"bid": blob.ID, "flag": Now(), "tid": tension.ID, "action": string(tensionCharac.ArchiveAction(blob.Node.Type)),
 			})

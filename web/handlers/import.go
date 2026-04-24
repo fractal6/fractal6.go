@@ -40,14 +40,14 @@ import (
 // ImportNode represents a node in the imported organisation tree.
 type ImportNode struct {
 	Name             string
-	Purpose          string          // maps to Mandate.purpose
-	Domains          string          // maps to Mandate.domains
-	Policies         string          // maps to Mandate.policies
-	Responsabilities string          // maps to Mandate.responsabilities
-	Type             model.NodeType  // Circle or Role
-	RoleType         *model.RoleType // Coordinator, Peer, etc. (roles only)
-	Children         []*ImportNode   // sub-circles and roles
-	RoleExtRef       string          // name of RoleExt template (if deduplicated)
+	Purpose          string           // maps to Mandate.purpose
+	Domains          string           // maps to Mandate.domains
+	Policies         string           // maps to Mandate.policies
+	Responsabilities string           // maps to Mandate.responsabilities
+	Type             model.NodeType   // Circle or Role
+	RoleType         *model.RoleType  // Coordinator, Peer, etc. (roles only)
+	Children         []*ImportNode    // sub-circles and roles
+	RoleExtRef       string           // name of RoleExt template (if deduplicated)
 	RoleExtTemplates []*ImportRoleExt // role templates (root node only)
 }
 

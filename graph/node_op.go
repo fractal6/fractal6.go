@@ -97,7 +97,7 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 	var archiveFlag string
 
 	switch eventType {
-case model.TensionEventBlobArchived:
+	case model.TensionEventBlobArchived:
 		// Archive
 		// --
 		// Check that circle has no children
@@ -257,7 +257,7 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 	}
 
 	switch *event.EventType {
-case model.TensionEventMemberLinked:
+	case model.TensionEventMemberLinked:
 		// Link user
 		// --
 		if firstLink != nil {
@@ -313,7 +313,7 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
 		nodeType := *node.Type
 		roleType := node.RoleType
 		switch nodeType {
-case model.NodeTypeRole:
+		case model.NodeTypeRole:
 			// Validate input
 			if roleType == nil {
 				err = fmt.Errorf("role must have a RoleType.")

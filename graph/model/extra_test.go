@@ -25,8 +25,8 @@ import (
 	"reflect"
 	"testing"
 
-	. "fractale/fractal6.go/internal/tools"
 	. "fractale/fractal6.go/graph/model"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 // TestMentionedUserIsNotifiableOnCreated verifies that a user mentioned via "@"
@@ -38,11 +38,11 @@ func TestMentionedUserIsNotifiableOnCreated(t *testing.T) {
 	createdAt := "2026-01-01T00:00:00Z"
 
 	tests := []struct {
-		name         string
-		event        TensionEvent
-		reason       NotifReason
-		wantNotif    bool
-		wantEmail    bool
+		name      string
+		event     TensionEvent
+		reason    NotifReason
+		wantNotif bool
+		wantEmail bool
 	}{
 		{"mention+Created", TensionEventCreated, ReasonIsMentionned, true, true},
 		{"mention+CommentPushed", TensionEventCommentPushed, ReasonIsMentionned, true, true},

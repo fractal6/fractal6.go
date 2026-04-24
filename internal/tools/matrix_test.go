@@ -26,8 +26,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/spf13/viper"
 	. "fractale/fractal6.go/internal/tools"
+	"github.com/spf13/viper"
 )
 
 var (

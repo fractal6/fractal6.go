@@ -701,9 +701,9 @@ func TestFormatTensionIntExtMap_PatternFilter(t *testing.T) {
 	t.Parallel()
 	pattern := "search term"
 	q := TensionQuery{
-		Nameids: []string{"test-org"},
-		First:   10,
-		Pattern: &pattern,
+		Nameids:  []string{"test-org"},
+		First:    10,
+		Pattern:  &pattern,
 		Username: "testuser",
 	}
 	maps, err := FormatTensionIntExtMap(q)

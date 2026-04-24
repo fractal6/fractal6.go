@@ -231,7 +231,7 @@ func tensionTypeCheck(ctx context.Context, obj any, next graphql.Resolver, f *st
 
 		// Check auth
 		switch x {
-case model.TensionTypeAlert:
+		case model.TensionTypeAlert:
 			// User need circle authority
 			ok, err := auth.HasCoordoAuth(uctx, receiverid, nil)
 			if err != nil {

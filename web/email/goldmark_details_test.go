@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/yuin/goldmark"
 	. "fractale/fractal6.go/web/email"
+	"github.com/yuin/goldmark"
 )
 
 func newTestMD() goldmark.Markdown {

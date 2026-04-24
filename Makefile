@@ -23,6 +23,8 @@ LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr 
 	test-all
 default: build
 
+format:
+	gofmt -w ./
 
 #
 # Build commands

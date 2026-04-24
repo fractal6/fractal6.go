@@ -86,4 +86,3 @@ func readSpreadsheet(file io.Reader, filename string) (map[string][][]string, er
 		return nil, fmt.Errorf("unsupported file format %q: only .xlsx and .csv are supported", ext)
 	}
 }
-

@@ -30,13 +30,13 @@ import (
 
 func TestDecodeDql_SingleRecord(t *testing.T) {
 	raw := map[string]any{
-		"uid":           "0x1",
-		"Node.nameid":   "org#circle",
-		"Node.name":     "Circle",
-		"Node.type_":    "Circle",
-		"Node.isRoot":   false,
-		"Node.mode":     "Coordinated",
-		"Node.rights":   float64(0),
+		"uid":             "0x1",
+		"Node.nameid":     "org#circle",
+		"Node.name":       "Circle",
+		"Node.type_":      "Circle",
+		"Node.isRoot":     false,
+		"Node.mode":       "Coordinated",
+		"Node.rights":     float64(0),
 		"Node.visibility": "Public",
 	}
 	node, err := DecodeDql[model.Node](raw)
@@ -115,8 +115,8 @@ func TestDecodeDql_NestedStruct(t *testing.T) {
 			"Node.nameid": "org",
 		},
 		"Tension.receiver": map[string]any{
-			"Node.nameid":    "org#circle",
-			"Node.mode":      "Coordinated",
+			"Node.nameid":     "org#circle",
+			"Node.mode":       "Coordinated",
 			"Node.visibility": "Public",
 		},
 	}
@@ -280,8 +280,12 @@ func TestDecodeDql_TensionSearchData(t *testing.T) {
 	//   Tension.labels { Label.name }
 	//   Tension.comments(first:1) { message: Post.message }
 	type tensionSearchData struct {
-		Labels   []struct{ Name string `json:"name"` } `json:"labels"`
-		Comments []struct{ Message string `json:"message"` } `json:"comments"`
+		Labels []struct {
+			Name string `json:"name"`
+		} `json:"labels"`
+		Comments []struct {
+			Message string `json:"message"`
+		} `json:"comments"`
 	}
 
 	t.Run("with_data", func(t *testing.T) {
@@ -349,7 +353,9 @@ func TestDecodeDql_TensionBlobRef(t *testing.T) {
 	// Simulates the DQL response shape from getLastBlobId template:
 	//   Tension.blobs(orderdesc: Post.createdAt, first: 1) { uid }
 	type tensionBlobRef struct {
-		Blobs []struct{ ID string `json:"id"` } `json:"blobs"`
+		Blobs []struct {
+			ID string `json:"id"`
+		} `json:"blobs"`
 	}
 
 	t.Run("with_blob", func(t *testing.T) {
@@ -385,7 +391,9 @@ func TestDecodeDql_NodeChildRefs(t *testing.T) {
 	// Simulates the DQL response shape from getCoordos template:
 	//   Node.children @filter(...) { uid }
 	type nodeChildRefs struct {
-		Children []struct{ ID string `json:"id"` } `json:"children"`
+		Children []struct {
+			ID string `json:"id"`
+		} `json:"children"`
 	}
 
 	t.Run("has_children", func(t *testing.T) {
@@ -423,7 +431,9 @@ func TestDecodeDql_NodeChildNameids(t *testing.T) {
 	// Simulates the DQL response shape from getChildren template:
 	//   Node.children @filter(...) { Node.nameid }
 	type nodeChildNameids struct {
-		Children []struct{ Nameid string `json:"nameid"` } `json:"children"`
+		Children []struct {
+			Nameid string `json:"nameid"`
+		} `json:"children"`
 	}
 
 	t.Run("with_children", func(t *testing.T) {
