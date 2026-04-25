@@ -648,6 +648,9 @@ enum TensionEvent {
   Mentioned
   Pinned
   Unpinned
+  ProjectAdded
+  ProjectRemoved
+  ProjectColumnMoved
   # --- Trigger Action ---
   BlobPushed
   BlobArchived

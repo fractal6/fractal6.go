@@ -6302,32 +6302,35 @@ func (e TensionAction) MarshalGQL(w io.Writer) {
 type TensionEvent string
 
 const (
-	TensionEventCreated         TensionEvent = "Created"
-	TensionEventReopened        TensionEvent = "Reopened"
-	TensionEventClosed          TensionEvent = "Closed"
-	TensionEventTitleUpdated    TensionEvent = "TitleUpdated"
-	TensionEventTypeUpdated     TensionEvent = "TypeUpdated"
-	TensionEventCommentPushed   TensionEvent = "CommentPushed"
-	TensionEventCommentDeleted  TensionEvent = "CommentDeleted"
-	TensionEventAssigneeAdded   TensionEvent = "AssigneeAdded"
-	TensionEventAssigneeRemoved TensionEvent = "AssigneeRemoved"
-	TensionEventLabelAdded      TensionEvent = "LabelAdded"
-	TensionEventLabelRemoved    TensionEvent = "LabelRemoved"
-	TensionEventBlobCreated     TensionEvent = "BlobCreated"
-	TensionEventBlobCommitted   TensionEvent = "BlobCommitted"
-	TensionEventMentioned       TensionEvent = "Mentioned"
-	TensionEventPinned          TensionEvent = "Pinned"
-	TensionEventUnpinned        TensionEvent = "Unpinned"
-	TensionEventBlobPushed      TensionEvent = "BlobPushed"
-	TensionEventBlobArchived    TensionEvent = "BlobArchived"
-	TensionEventBlobUnarchived  TensionEvent = "BlobUnarchived"
-	TensionEventUserJoined      TensionEvent = "UserJoined"
-	TensionEventUserLeft        TensionEvent = "UserLeft"
-	TensionEventMemberLinked    TensionEvent = "MemberLinked"
-	TensionEventMemberUnlinked  TensionEvent = "MemberUnlinked"
-	TensionEventAuthority       TensionEvent = "Authority"
-	TensionEventVisibility      TensionEvent = "Visibility"
-	TensionEventMoved           TensionEvent = "Moved"
+	TensionEventCreated            TensionEvent = "Created"
+	TensionEventReopened           TensionEvent = "Reopened"
+	TensionEventClosed             TensionEvent = "Closed"
+	TensionEventTitleUpdated       TensionEvent = "TitleUpdated"
+	TensionEventTypeUpdated        TensionEvent = "TypeUpdated"
+	TensionEventCommentPushed      TensionEvent = "CommentPushed"
+	TensionEventCommentDeleted     TensionEvent = "CommentDeleted"
+	TensionEventAssigneeAdded      TensionEvent = "AssigneeAdded"
+	TensionEventAssigneeRemoved    TensionEvent = "AssigneeRemoved"
+	TensionEventLabelAdded         TensionEvent = "LabelAdded"
+	TensionEventLabelRemoved       TensionEvent = "LabelRemoved"
+	TensionEventBlobCreated        TensionEvent = "BlobCreated"
+	TensionEventBlobCommitted      TensionEvent = "BlobCommitted"
+	TensionEventMentioned          TensionEvent = "Mentioned"
+	TensionEventPinned             TensionEvent = "Pinned"
+	TensionEventUnpinned           TensionEvent = "Unpinned"
+	TensionEventProjectAdded       TensionEvent = "ProjectAdded"
+	TensionEventProjectRemoved     TensionEvent = "ProjectRemoved"
+	TensionEventProjectColumnMoved TensionEvent = "ProjectColumnMoved"
+	TensionEventBlobPushed         TensionEvent = "BlobPushed"
+	TensionEventBlobArchived       TensionEvent = "BlobArchived"
+	TensionEventBlobUnarchived     TensionEvent = "BlobUnarchived"
+	TensionEventUserJoined         TensionEvent = "UserJoined"
+	TensionEventUserLeft           TensionEvent = "UserLeft"
+	TensionEventMemberLinked       TensionEvent = "MemberLinked"
+	TensionEventMemberUnlinked     TensionEvent = "MemberUnlinked"
+	TensionEventAuthority          TensionEvent = "Authority"
+	TensionEventVisibility         TensionEvent = "Visibility"
+	TensionEventMoved              TensionEvent = "Moved"
 )
 
 var AllTensionEvent = []TensionEvent{
@@ -6347,6 +6350,9 @@ var AllTensionEvent = []TensionEvent{
 	TensionEventMentioned,
 	TensionEventPinned,
 	TensionEventUnpinned,
+	TensionEventProjectAdded,
+	TensionEventProjectRemoved,
+	TensionEventProjectColumnMoved,
 	TensionEventBlobPushed,
 	TensionEventBlobArchived,
 	TensionEventBlobUnarchived,
@@ -6361,7 +6367,7 @@ var AllTensionEvent = []TensionEvent{
 
 func (e TensionEvent) IsValid() bool {
 	switch e {
-	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventCommentDeleted, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMentioned, TensionEventPinned, TensionEventUnpinned, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
+	case TensionEventCreated, TensionEventReopened, TensionEventClosed, TensionEventTitleUpdated, TensionEventTypeUpdated, TensionEventCommentPushed, TensionEventCommentDeleted, TensionEventAssigneeAdded, TensionEventAssigneeRemoved, TensionEventLabelAdded, TensionEventLabelRemoved, TensionEventBlobCreated, TensionEventBlobCommitted, TensionEventMentioned, TensionEventPinned, TensionEventUnpinned, TensionEventProjectAdded, TensionEventProjectRemoved, TensionEventProjectColumnMoved, TensionEventBlobPushed, TensionEventBlobArchived, TensionEventBlobUnarchived, TensionEventUserJoined, TensionEventUserLeft, TensionEventMemberLinked, TensionEventMemberUnlinked, TensionEventAuthority, TensionEventVisibility, TensionEventMoved:
 		return true
 	}
 	return false
