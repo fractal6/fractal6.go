@@ -811,57 +811,58 @@ type ComplexityRoot struct {
 	}
 
 	Node struct {
-		About                     func(childComplexity int) int
-		Activity                  func(childComplexity int, from *string, to *string) int
-		ActivityAggregate         func(childComplexity int, filter *model.ActivityFilter) int
-		CascadeDirective          func(childComplexity int) int
-		Children                  func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
-		ChildrenAggregate         func(childComplexity int, filter *model.NodeFilter) int
-		Color                     func(childComplexity int) int
-		Contracts                 func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
-		ContractsAggregate        func(childComplexity int, filter *model.VoteFilter) int
-		CreatedAt                 func(childComplexity int) int
-		CreatedBy                 func(childComplexity int, filter *model.UserFilter) int
-		EventsHistory             func(childComplexity int, query *string) int
-		EventsHistoryAggregate    func(childComplexity int, filter *model.EventFilter) int
-		FirstLink                 func(childComplexity int, filter *model.UserFilter) int
-		GuestCanCreateTension     func(childComplexity int) int
-		ID                        func(childComplexity int) int
-		IsArchived                func(childComplexity int) int
-		IsPersonal                func(childComplexity int) int
-		IsRoot                    func(childComplexity int) int
-		IsTemplateTensionOnly     func(childComplexity int) int
-		Labels                    func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
-		LabelsAggregate           func(childComplexity int, filter *model.LabelFilter) int
-		Lexicon                   func(childComplexity int) int
-		Mode                      func(childComplexity int) int
-		Name                      func(childComplexity int) int
-		Nameid                    func(childComplexity int) int
-		Parent                    func(childComplexity int, filter *model.NodeFilter) int
-		Pinned                    func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		PinnedAggregate           func(childComplexity int, filter *model.TensionFilter) int
-		Projects                  func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
-		ProjectsAggregate         func(childComplexity int, filter *model.ProjectFilter) int
-		Rights                    func(childComplexity int) int
-		RoleExt                   func(childComplexity int, filter *model.RoleExtFilter) int
-		RoleType                  func(childComplexity int) int
-		Roles                     func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
-		RolesAggregate            func(childComplexity int, filter *model.RoleExtFilter) int
-		Rootnameid                func(childComplexity int) int
-		Skills                    func(childComplexity int) int
-		Source                    func(childComplexity int, filter *model.BlobFilter) int
-		TensionTemplates          func(childComplexity int, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) int
-		TensionTemplatesAggregate func(childComplexity int, filter *model.TensionTemplateFilter) int
-		TensionsIn                func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsInAggregate       func(childComplexity int, filter *model.TensionFilter) int
-		TensionsOut               func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsOutAggregate      func(childComplexity int, filter *model.TensionFilter) int
-		Type                      func(childComplexity int) int
-		UpdatedAt                 func(childComplexity int) int
-		UserCanJoin               func(childComplexity int) int
-		Visibility                func(childComplexity int) int
-		Watchers                  func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
-		WatchersAggregate         func(childComplexity int, filter *model.UserFilter) int
+		About                           func(childComplexity int) int
+		Activity                        func(childComplexity int, from *string, to *string) int
+		ActivityAggregate               func(childComplexity int, filter *model.ActivityFilter) int
+		CascadeDirective                func(childComplexity int) int
+		Children                        func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		ChildrenAggregate               func(childComplexity int, filter *model.NodeFilter) int
+		Color                           func(childComplexity int) int
+		Contracts                       func(childComplexity int, filter *model.VoteFilter, order *model.VoteOrder, first *int, offset *int) int
+		ContractsAggregate              func(childComplexity int, filter *model.VoteFilter) int
+		CreatedAt                       func(childComplexity int) int
+		CreatedBy                       func(childComplexity int, filter *model.UserFilter) int
+		EventsHistory                   func(childComplexity int, query *string) int
+		EventsHistoryAggregate          func(childComplexity int, filter *model.EventFilter) int
+		FirstLink                       func(childComplexity int, filter *model.UserFilter) int
+		GuestCanCreateTension           func(childComplexity int) int
+		ID                              func(childComplexity int) int
+		IsArchived                      func(childComplexity int) int
+		IsPersonal                      func(childComplexity int) int
+		IsPinnedTensionfetchRecursively func(childComplexity int) int
+		IsRoot                          func(childComplexity int) int
+		IsTemplateTensionOnly           func(childComplexity int) int
+		Labels                          func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
+		LabelsAggregate                 func(childComplexity int, filter *model.LabelFilter) int
+		Lexicon                         func(childComplexity int) int
+		Mode                            func(childComplexity int) int
+		Name                            func(childComplexity int) int
+		Nameid                          func(childComplexity int) int
+		Parent                          func(childComplexity int, filter *model.NodeFilter) int
+		Pinned                          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		PinnedAggregate                 func(childComplexity int, filter *model.TensionFilter) int
+		Projects                        func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
+		ProjectsAggregate               func(childComplexity int, filter *model.ProjectFilter) int
+		Rights                          func(childComplexity int) int
+		RoleExt                         func(childComplexity int, filter *model.RoleExtFilter) int
+		RoleType                        func(childComplexity int) int
+		Roles                           func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
+		RolesAggregate                  func(childComplexity int, filter *model.RoleExtFilter) int
+		Rootnameid                      func(childComplexity int) int
+		Skills                          func(childComplexity int) int
+		Source                          func(childComplexity int, filter *model.BlobFilter) int
+		TensionTemplates                func(childComplexity int, filter *model.TensionTemplateFilter, order *model.TensionTemplateOrder, first *int, offset *int) int
+		TensionTemplatesAggregate       func(childComplexity int, filter *model.TensionTemplateFilter) int
+		TensionsIn                      func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsInAggregate             func(childComplexity int, filter *model.TensionFilter) int
+		TensionsOut                     func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsOutAggregate            func(childComplexity int, filter *model.TensionFilter) int
+		Type                            func(childComplexity int) int
+		UpdatedAt                       func(childComplexity int) int
+		UserCanJoin                     func(childComplexity int) int
+		Visibility                      func(childComplexity int) int
+		Watchers                        func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
+		WatchersAggregate               func(childComplexity int, filter *model.UserFilter) int
 	}
 
 	NodeAggregateResult struct {
@@ -5427,6 +5428,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.IsPersonal(childComplexity), true
+
+	case "Node.isPinnedTensionfetchRecursively":
+		if e.complexity.Node.IsPinnedTensionfetchRecursively == nil {
+			break
+		}
+
+		return e.complexity.Node.IsPinnedTensionfetchRecursively(childComplexity), true
 
 	case "Node.isRoot":
 		if e.complexity.Node.IsRoot == nil {
@@ -11131,6 +11139,7 @@ type Node {
   guestCanCreateTension: Boolean
   lexicon: String
   isTemplateTensionOnly: Boolean
+  isPinnedTensionfetchRecursively: Boolean
   watchers(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   children(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
   projects(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project!]
@@ -11713,35 +11722,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @id on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @id on FIELD_DEFINITION
 
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 type ActivityAggregateResult {
   count: Int
@@ -11986,6 +11995,7 @@ input AddNodeInput {
   guestCanCreateTension: Boolean
   lexicon: String
   isTemplateTensionOnly: Boolean
+  isPinnedTensionfetchRecursively: Boolean
   watchers: [UserRef!]
   children: [NodeRef!]
   projects: [ProjectRef!]
@@ -13471,6 +13481,7 @@ enum NodeHasFilter {
   guestCanCreateTension
   lexicon
   isTemplateTensionOnly
+  isPinnedTensionfetchRecursively
   watchers
   children
   projects
@@ -13534,6 +13545,7 @@ input NodePatch {
   guestCanCreateTension: Boolean @x_patch_ro
   lexicon: String @x_patch_ro
   isTemplateTensionOnly: Boolean @x_patch_ro
+  isPinnedTensionfetchRecursively: Boolean @x_patch_ro
   watchers: [UserRef!] @x_patch_ro
   children: [NodeRef!] @x_patch_ro
   projects: [ProjectRef!] @x_patch_ro
@@ -13576,6 +13588,7 @@ input NodeRef {
   guestCanCreateTension: Boolean
   lexicon: String
   isTemplateTensionOnly: Boolean
+  isPinnedTensionfetchRecursively: Boolean
   watchers: [UserRef!]
   children: [NodeRef!]
   projects: [ProjectRef!]

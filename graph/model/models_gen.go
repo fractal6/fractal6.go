@@ -230,44 +230,45 @@ type AddNodeFragmentPayload struct {
 }
 
 type AddNodeInput struct {
-	CreatedBy             *UserRef              `json:"createdBy"`
-	CreatedAt             string                `json:"createdAt"`
-	UpdatedAt             *string               `json:"updatedAt,omitempty"`
-	Nameid                string                `json:"nameid"`
-	Rootnameid            string                `json:"rootnameid"`
-	Source                *BlobRef              `json:"source,omitempty"`
-	Name                  string                `json:"name"`
-	About                 *string               `json:"about,omitempty"`
-	Skills                []string              `json:"skills,omitempty"`
-	IsRoot                bool                  `json:"isRoot"`
-	Parent                *NodeRef              `json:"parent,omitempty"`
-	Type                  NodeType              `json:"type_"`
-	TensionsOut           []*TensionRef         `json:"tensions_out,omitempty"`
-	TensionsIn            []*TensionRef         `json:"tensions_in,omitempty"`
-	Visibility            NodeVisibility        `json:"visibility"`
-	Mode                  NodeMode              `json:"mode"`
-	Rights                int                   `json:"rights"`
-	IsArchived            bool                  `json:"isArchived"`
-	IsPersonal            *bool                 `json:"isPersonal,omitempty"`
-	UserCanJoin           *bool                 `json:"userCanJoin,omitempty"`
-	GuestCanCreateTension *bool                 `json:"guestCanCreateTension,omitempty"`
-	Lexicon               *string               `json:"lexicon,omitempty"`
-	IsTemplateTensionOnly *bool                 `json:"isTemplateTensionOnly,omitempty"`
-	Watchers              []*UserRef            `json:"watchers,omitempty"`
-	Children              []*NodeRef            `json:"children,omitempty"`
-	Projects              []*ProjectRef         `json:"projects,omitempty"`
-	Pinned                []*TensionRef         `json:"pinned,omitempty"`
-	Labels                []*LabelRef           `json:"labels,omitempty"`
-	Roles                 []*RoleExtRef         `json:"roles,omitempty"`
-	TensionTemplates      []*TensionTemplateRef `json:"tension_templates,omitempty"`
-	RoleExt               *RoleExtRef           `json:"role_ext,omitempty"`
-	RoleType              *RoleType             `json:"role_type,omitempty"`
-	Color                 *string               `json:"color,omitempty"`
-	FirstLink             *UserRef              `json:"first_link,omitempty"`
-	Contracts             []*VoteRef            `json:"contracts,omitempty"`
-	EventsHistory         []*EventRef           `json:"events_history,omitempty"`
-	Activity              []*ActivityRef        `json:"activity,omitempty"`
-	CascadeDirective      *bool                 `json:"cascade_directive,omitempty"`
+	CreatedBy                       *UserRef              `json:"createdBy"`
+	CreatedAt                       string                `json:"createdAt"`
+	UpdatedAt                       *string               `json:"updatedAt,omitempty"`
+	Nameid                          string                `json:"nameid"`
+	Rootnameid                      string                `json:"rootnameid"`
+	Source                          *BlobRef              `json:"source,omitempty"`
+	Name                            string                `json:"name"`
+	About                           *string               `json:"about,omitempty"`
+	Skills                          []string              `json:"skills,omitempty"`
+	IsRoot                          bool                  `json:"isRoot"`
+	Parent                          *NodeRef              `json:"parent,omitempty"`
+	Type                            NodeType              `json:"type_"`
+	TensionsOut                     []*TensionRef         `json:"tensions_out,omitempty"`
+	TensionsIn                      []*TensionRef         `json:"tensions_in,omitempty"`
+	Visibility                      NodeVisibility        `json:"visibility"`
+	Mode                            NodeMode              `json:"mode"`
+	Rights                          int                   `json:"rights"`
+	IsArchived                      bool                  `json:"isArchived"`
+	IsPersonal                      *bool                 `json:"isPersonal,omitempty"`
+	UserCanJoin                     *bool                 `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension           *bool                 `json:"guestCanCreateTension,omitempty"`
+	Lexicon                         *string               `json:"lexicon,omitempty"`
+	IsTemplateTensionOnly           *bool                 `json:"isTemplateTensionOnly,omitempty"`
+	IsPinnedTensionfetchRecursively *bool                 `json:"isPinnedTensionfetchRecursively,omitempty"`
+	Watchers                        []*UserRef            `json:"watchers,omitempty"`
+	Children                        []*NodeRef            `json:"children,omitempty"`
+	Projects                        []*ProjectRef         `json:"projects,omitempty"`
+	Pinned                          []*TensionRef         `json:"pinned,omitempty"`
+	Labels                          []*LabelRef           `json:"labels,omitempty"`
+	Roles                           []*RoleExtRef         `json:"roles,omitempty"`
+	TensionTemplates                []*TensionTemplateRef `json:"tension_templates,omitempty"`
+	RoleExt                         *RoleExtRef           `json:"role_ext,omitempty"`
+	RoleType                        *RoleType             `json:"role_type,omitempty"`
+	Color                           *string               `json:"color,omitempty"`
+	FirstLink                       *UserRef              `json:"first_link,omitempty"`
+	Contracts                       []*VoteRef            `json:"contracts,omitempty"`
+	EventsHistory                   []*EventRef           `json:"events_history,omitempty"`
+	Activity                        []*ActivityRef        `json:"activity,omitempty"`
+	CascadeDirective                *bool                 `json:"cascade_directive,omitempty"`
 }
 
 type AddNodePayload struct {
@@ -1402,57 +1403,58 @@ type NearFilter struct {
 }
 
 type Node struct {
-	ID                        string                          `json:"id"`
-	CreatedBy                 *User                           `json:"createdBy"`
-	CreatedAt                 string                          `json:"createdAt"`
-	UpdatedAt                 *string                         `json:"updatedAt,omitempty"`
-	Nameid                    string                          `json:"nameid"`
-	Rootnameid                string                          `json:"rootnameid"`
-	Source                    *Blob                           `json:"source,omitempty"`
-	Name                      string                          `json:"name"`
-	About                     *string                         `json:"about,omitempty"`
-	Skills                    []string                        `json:"skills,omitempty"`
-	IsRoot                    bool                            `json:"isRoot"`
-	Parent                    *Node                           `json:"parent,omitempty"`
-	Type                      NodeType                        `json:"type_"`
-	TensionsOut               []*Tension                      `json:"tensions_out,omitempty"`
-	TensionsIn                []*Tension                      `json:"tensions_in,omitempty"`
-	Visibility                NodeVisibility                  `json:"visibility"`
-	Mode                      NodeMode                        `json:"mode"`
-	Rights                    int                             `json:"rights"`
-	IsArchived                bool                            `json:"isArchived"`
-	IsPersonal                *bool                           `json:"isPersonal,omitempty"`
-	UserCanJoin               *bool                           `json:"userCanJoin,omitempty"`
-	GuestCanCreateTension     *bool                           `json:"guestCanCreateTension,omitempty"`
-	Lexicon                   *string                         `json:"lexicon,omitempty"`
-	IsTemplateTensionOnly     *bool                           `json:"isTemplateTensionOnly,omitempty"`
-	Watchers                  []*User                         `json:"watchers,omitempty"`
-	Children                  []*Node                         `json:"children,omitempty"`
-	Projects                  []*Project                      `json:"projects,omitempty"`
-	Pinned                    []*Tension                      `json:"pinned,omitempty"`
-	Labels                    []*Label                        `json:"labels,omitempty"`
-	Roles                     []*RoleExt                      `json:"roles,omitempty"`
-	TensionTemplates          []*TensionTemplate              `json:"tension_templates,omitempty"`
-	RoleExt                   *RoleExt                        `json:"role_ext,omitempty"`
-	RoleType                  *RoleType                       `json:"role_type,omitempty"`
-	Color                     *string                         `json:"color,omitempty"`
-	FirstLink                 *User                           `json:"first_link,omitempty"`
-	Contracts                 []*Vote                         `json:"contracts,omitempty"`
-	EventsHistory             []*Event                        `json:"events_history,omitempty"`
-	Activity                  []*Activity                     `json:"activity,omitempty"`
-	CascadeDirective          *bool                           `json:"cascade_directive,omitempty"`
-	TensionsOutAggregate      *TensionAggregateResult         `json:"tensions_outAggregate,omitempty"`
-	TensionsInAggregate       *TensionAggregateResult         `json:"tensions_inAggregate,omitempty"`
-	WatchersAggregate         *UserAggregateResult            `json:"watchersAggregate,omitempty"`
-	ChildrenAggregate         *NodeAggregateResult            `json:"childrenAggregate,omitempty"`
-	ProjectsAggregate         *ProjectAggregateResult         `json:"projectsAggregate,omitempty"`
-	PinnedAggregate           *TensionAggregateResult         `json:"pinnedAggregate,omitempty"`
-	LabelsAggregate           *LabelAggregateResult           `json:"labelsAggregate,omitempty"`
-	RolesAggregate            *RoleExtAggregateResult         `json:"rolesAggregate,omitempty"`
-	TensionTemplatesAggregate *TensionTemplateAggregateResult `json:"tension_templatesAggregate,omitempty"`
-	ContractsAggregate        *VoteAggregateResult            `json:"contractsAggregate,omitempty"`
-	EventsHistoryAggregate    *EventAggregateResult           `json:"events_historyAggregate,omitempty"`
-	ActivityAggregate         *ActivityAggregateResult        `json:"activityAggregate,omitempty"`
+	ID                              string                          `json:"id"`
+	CreatedBy                       *User                           `json:"createdBy"`
+	CreatedAt                       string                          `json:"createdAt"`
+	UpdatedAt                       *string                         `json:"updatedAt,omitempty"`
+	Nameid                          string                          `json:"nameid"`
+	Rootnameid                      string                          `json:"rootnameid"`
+	Source                          *Blob                           `json:"source,omitempty"`
+	Name                            string                          `json:"name"`
+	About                           *string                         `json:"about,omitempty"`
+	Skills                          []string                        `json:"skills,omitempty"`
+	IsRoot                          bool                            `json:"isRoot"`
+	Parent                          *Node                           `json:"parent,omitempty"`
+	Type                            NodeType                        `json:"type_"`
+	TensionsOut                     []*Tension                      `json:"tensions_out,omitempty"`
+	TensionsIn                      []*Tension                      `json:"tensions_in,omitempty"`
+	Visibility                      NodeVisibility                  `json:"visibility"`
+	Mode                            NodeMode                        `json:"mode"`
+	Rights                          int                             `json:"rights"`
+	IsArchived                      bool                            `json:"isArchived"`
+	IsPersonal                      *bool                           `json:"isPersonal,omitempty"`
+	UserCanJoin                     *bool                           `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension           *bool                           `json:"guestCanCreateTension,omitempty"`
+	Lexicon                         *string                         `json:"lexicon,omitempty"`
+	IsTemplateTensionOnly           *bool                           `json:"isTemplateTensionOnly,omitempty"`
+	IsPinnedTensionfetchRecursively *bool                           `json:"isPinnedTensionfetchRecursively,omitempty"`
+	Watchers                        []*User                         `json:"watchers,omitempty"`
+	Children                        []*Node                         `json:"children,omitempty"`
+	Projects                        []*Project                      `json:"projects,omitempty"`
+	Pinned                          []*Tension                      `json:"pinned,omitempty"`
+	Labels                          []*Label                        `json:"labels,omitempty"`
+	Roles                           []*RoleExt                      `json:"roles,omitempty"`
+	TensionTemplates                []*TensionTemplate              `json:"tension_templates,omitempty"`
+	RoleExt                         *RoleExt                        `json:"role_ext,omitempty"`
+	RoleType                        *RoleType                       `json:"role_type,omitempty"`
+	Color                           *string                         `json:"color,omitempty"`
+	FirstLink                       *User                           `json:"first_link,omitempty"`
+	Contracts                       []*Vote                         `json:"contracts,omitempty"`
+	EventsHistory                   []*Event                        `json:"events_history,omitempty"`
+	Activity                        []*Activity                     `json:"activity,omitempty"`
+	CascadeDirective                *bool                           `json:"cascade_directive,omitempty"`
+	TensionsOutAggregate            *TensionAggregateResult         `json:"tensions_outAggregate,omitempty"`
+	TensionsInAggregate             *TensionAggregateResult         `json:"tensions_inAggregate,omitempty"`
+	WatchersAggregate               *UserAggregateResult            `json:"watchersAggregate,omitempty"`
+	ChildrenAggregate               *NodeAggregateResult            `json:"childrenAggregate,omitempty"`
+	ProjectsAggregate               *ProjectAggregateResult         `json:"projectsAggregate,omitempty"`
+	PinnedAggregate                 *TensionAggregateResult         `json:"pinnedAggregate,omitempty"`
+	LabelsAggregate                 *LabelAggregateResult           `json:"labelsAggregate,omitempty"`
+	RolesAggregate                  *RoleExtAggregateResult         `json:"rolesAggregate,omitempty"`
+	TensionTemplatesAggregate       *TensionTemplateAggregateResult `json:"tension_templatesAggregate,omitempty"`
+	ContractsAggregate              *VoteAggregateResult            `json:"contractsAggregate,omitempty"`
+	EventsHistoryAggregate          *EventAggregateResult           `json:"events_historyAggregate,omitempty"`
+	ActivityAggregate               *ActivityAggregateResult        `json:"activityAggregate,omitempty"`
 }
 
 type NodeAggregateResult struct {
@@ -1589,85 +1591,87 @@ type NodeOrder struct {
 }
 
 type NodePatch struct {
-	CreatedBy             *UserRef              `json:"createdBy,omitempty"`
-	CreatedAt             *string               `json:"createdAt,omitempty"`
-	UpdatedAt             *string               `json:"updatedAt,omitempty"`
-	Rootnameid            *string               `json:"rootnameid,omitempty"`
-	Source                *BlobRef              `json:"source,omitempty"`
-	Name                  *string               `json:"name,omitempty"`
-	About                 *string               `json:"about,omitempty"`
-	Skills                []string              `json:"skills,omitempty"`
-	IsRoot                *bool                 `json:"isRoot,omitempty"`
-	Parent                *NodeRef              `json:"parent,omitempty"`
-	Type                  *NodeType             `json:"type_,omitempty"`
-	TensionsOut           []*TensionRef         `json:"tensions_out,omitempty"`
-	TensionsIn            []*TensionRef         `json:"tensions_in,omitempty"`
-	Visibility            *NodeVisibility       `json:"visibility,omitempty"`
-	Mode                  *NodeMode             `json:"mode,omitempty"`
-	Rights                *int                  `json:"rights,omitempty"`
-	IsArchived            *bool                 `json:"isArchived,omitempty"`
-	IsPersonal            *bool                 `json:"isPersonal,omitempty"`
-	UserCanJoin           *bool                 `json:"userCanJoin,omitempty"`
-	GuestCanCreateTension *bool                 `json:"guestCanCreateTension,omitempty"`
-	Lexicon               *string               `json:"lexicon,omitempty"`
-	IsTemplateTensionOnly *bool                 `json:"isTemplateTensionOnly,omitempty"`
-	Watchers              []*UserRef            `json:"watchers,omitempty"`
-	Children              []*NodeRef            `json:"children,omitempty"`
-	Projects              []*ProjectRef         `json:"projects,omitempty"`
-	Pinned                []*TensionRef         `json:"pinned,omitempty"`
-	Labels                []*LabelRef           `json:"labels,omitempty"`
-	Roles                 []*RoleExtRef         `json:"roles,omitempty"`
-	TensionTemplates      []*TensionTemplateRef `json:"tension_templates,omitempty"`
-	RoleExt               *RoleExtRef           `json:"role_ext,omitempty"`
-	RoleType              *RoleType             `json:"role_type,omitempty"`
-	Color                 *string               `json:"color,omitempty"`
-	FirstLink             *UserRef              `json:"first_link,omitempty"`
-	Contracts             []*VoteRef            `json:"contracts,omitempty"`
-	EventsHistory         []*EventRef           `json:"events_history,omitempty"`
-	Activity              []*ActivityRef        `json:"activity,omitempty"`
-	CascadeDirective      *bool                 `json:"cascade_directive,omitempty"`
+	CreatedBy                       *UserRef              `json:"createdBy,omitempty"`
+	CreatedAt                       *string               `json:"createdAt,omitempty"`
+	UpdatedAt                       *string               `json:"updatedAt,omitempty"`
+	Rootnameid                      *string               `json:"rootnameid,omitempty"`
+	Source                          *BlobRef              `json:"source,omitempty"`
+	Name                            *string               `json:"name,omitempty"`
+	About                           *string               `json:"about,omitempty"`
+	Skills                          []string              `json:"skills,omitempty"`
+	IsRoot                          *bool                 `json:"isRoot,omitempty"`
+	Parent                          *NodeRef              `json:"parent,omitempty"`
+	Type                            *NodeType             `json:"type_,omitempty"`
+	TensionsOut                     []*TensionRef         `json:"tensions_out,omitempty"`
+	TensionsIn                      []*TensionRef         `json:"tensions_in,omitempty"`
+	Visibility                      *NodeVisibility       `json:"visibility,omitempty"`
+	Mode                            *NodeMode             `json:"mode,omitempty"`
+	Rights                          *int                  `json:"rights,omitempty"`
+	IsArchived                      *bool                 `json:"isArchived,omitempty"`
+	IsPersonal                      *bool                 `json:"isPersonal,omitempty"`
+	UserCanJoin                     *bool                 `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension           *bool                 `json:"guestCanCreateTension,omitempty"`
+	Lexicon                         *string               `json:"lexicon,omitempty"`
+	IsTemplateTensionOnly           *bool                 `json:"isTemplateTensionOnly,omitempty"`
+	IsPinnedTensionfetchRecursively *bool                 `json:"isPinnedTensionfetchRecursively,omitempty"`
+	Watchers                        []*UserRef            `json:"watchers,omitempty"`
+	Children                        []*NodeRef            `json:"children,omitempty"`
+	Projects                        []*ProjectRef         `json:"projects,omitempty"`
+	Pinned                          []*TensionRef         `json:"pinned,omitempty"`
+	Labels                          []*LabelRef           `json:"labels,omitempty"`
+	Roles                           []*RoleExtRef         `json:"roles,omitempty"`
+	TensionTemplates                []*TensionTemplateRef `json:"tension_templates,omitempty"`
+	RoleExt                         *RoleExtRef           `json:"role_ext,omitempty"`
+	RoleType                        *RoleType             `json:"role_type,omitempty"`
+	Color                           *string               `json:"color,omitempty"`
+	FirstLink                       *UserRef              `json:"first_link,omitempty"`
+	Contracts                       []*VoteRef            `json:"contracts,omitempty"`
+	EventsHistory                   []*EventRef           `json:"events_history,omitempty"`
+	Activity                        []*ActivityRef        `json:"activity,omitempty"`
+	CascadeDirective                *bool                 `json:"cascade_directive,omitempty"`
 }
 
 type NodeRef struct {
-	ID                    *string               `json:"id,omitempty"`
-	CreatedBy             *UserRef              `json:"createdBy,omitempty"`
-	CreatedAt             *string               `json:"createdAt,omitempty"`
-	UpdatedAt             *string               `json:"updatedAt,omitempty"`
-	Nameid                *string               `json:"nameid,omitempty"`
-	Rootnameid            *string               `json:"rootnameid,omitempty"`
-	Source                *BlobRef              `json:"source,omitempty"`
-	Name                  *string               `json:"name,omitempty"`
-	About                 *string               `json:"about,omitempty"`
-	Skills                []string              `json:"skills,omitempty"`
-	IsRoot                *bool                 `json:"isRoot,omitempty"`
-	Parent                *NodeRef              `json:"parent,omitempty"`
-	Type                  *NodeType             `json:"type_,omitempty"`
-	TensionsOut           []*TensionRef         `json:"tensions_out,omitempty"`
-	TensionsIn            []*TensionRef         `json:"tensions_in,omitempty"`
-	Visibility            *NodeVisibility       `json:"visibility,omitempty"`
-	Mode                  *NodeMode             `json:"mode,omitempty"`
-	Rights                *int                  `json:"rights,omitempty"`
-	IsArchived            *bool                 `json:"isArchived,omitempty"`
-	IsPersonal            *bool                 `json:"isPersonal,omitempty"`
-	UserCanJoin           *bool                 `json:"userCanJoin,omitempty"`
-	GuestCanCreateTension *bool                 `json:"guestCanCreateTension,omitempty"`
-	Lexicon               *string               `json:"lexicon,omitempty"`
-	IsTemplateTensionOnly *bool                 `json:"isTemplateTensionOnly,omitempty"`
-	Watchers              []*UserRef            `json:"watchers,omitempty"`
-	Children              []*NodeRef            `json:"children,omitempty"`
-	Projects              []*ProjectRef         `json:"projects,omitempty"`
-	Pinned                []*TensionRef         `json:"pinned,omitempty"`
-	Labels                []*LabelRef           `json:"labels,omitempty"`
-	Roles                 []*RoleExtRef         `json:"roles,omitempty"`
-	TensionTemplates      []*TensionTemplateRef `json:"tension_templates,omitempty"`
-	RoleExt               *RoleExtRef           `json:"role_ext,omitempty"`
-	RoleType              *RoleType             `json:"role_type,omitempty"`
-	Color                 *string               `json:"color,omitempty"`
-	FirstLink             *UserRef              `json:"first_link,omitempty"`
-	Contracts             []*VoteRef            `json:"contracts,omitempty"`
-	EventsHistory         []*EventRef           `json:"events_history,omitempty"`
-	Activity              []*ActivityRef        `json:"activity,omitempty"`
-	CascadeDirective      *bool                 `json:"cascade_directive,omitempty"`
+	ID                              *string               `json:"id,omitempty"`
+	CreatedBy                       *UserRef              `json:"createdBy,omitempty"`
+	CreatedAt                       *string               `json:"createdAt,omitempty"`
+	UpdatedAt                       *string               `json:"updatedAt,omitempty"`
+	Nameid                          *string               `json:"nameid,omitempty"`
+	Rootnameid                      *string               `json:"rootnameid,omitempty"`
+	Source                          *BlobRef              `json:"source,omitempty"`
+	Name                            *string               `json:"name,omitempty"`
+	About                           *string               `json:"about,omitempty"`
+	Skills                          []string              `json:"skills,omitempty"`
+	IsRoot                          *bool                 `json:"isRoot,omitempty"`
+	Parent                          *NodeRef              `json:"parent,omitempty"`
+	Type                            *NodeType             `json:"type_,omitempty"`
+	TensionsOut                     []*TensionRef         `json:"tensions_out,omitempty"`
+	TensionsIn                      []*TensionRef         `json:"tensions_in,omitempty"`
+	Visibility                      *NodeVisibility       `json:"visibility,omitempty"`
+	Mode                            *NodeMode             `json:"mode,omitempty"`
+	Rights                          *int                  `json:"rights,omitempty"`
+	IsArchived                      *bool                 `json:"isArchived,omitempty"`
+	IsPersonal                      *bool                 `json:"isPersonal,omitempty"`
+	UserCanJoin                     *bool                 `json:"userCanJoin,omitempty"`
+	GuestCanCreateTension           *bool                 `json:"guestCanCreateTension,omitempty"`
+	Lexicon                         *string               `json:"lexicon,omitempty"`
+	IsTemplateTensionOnly           *bool                 `json:"isTemplateTensionOnly,omitempty"`
+	IsPinnedTensionfetchRecursively *bool                 `json:"isPinnedTensionfetchRecursively,omitempty"`
+	Watchers                        []*UserRef            `json:"watchers,omitempty"`
+	Children                        []*NodeRef            `json:"children,omitempty"`
+	Projects                        []*ProjectRef         `json:"projects,omitempty"`
+	Pinned                          []*TensionRef         `json:"pinned,omitempty"`
+	Labels                          []*LabelRef           `json:"labels,omitempty"`
+	Roles                           []*RoleExtRef         `json:"roles,omitempty"`
+	TensionTemplates                []*TensionTemplateRef `json:"tension_templates,omitempty"`
+	RoleExt                         *RoleExtRef           `json:"role_ext,omitempty"`
+	RoleType                        *RoleType             `json:"role_type,omitempty"`
+	Color                           *string               `json:"color,omitempty"`
+	FirstLink                       *UserRef              `json:"first_link,omitempty"`
+	Contracts                       []*VoteRef            `json:"contracts,omitempty"`
+	EventsHistory                   []*EventRef           `json:"events_history,omitempty"`
+	Activity                        []*ActivityRef        `json:"activity,omitempty"`
+	CascadeDirective                *bool                 `json:"cascade_directive,omitempty"`
 }
 
 type NodeTypeHash struct {
@@ -4769,44 +4773,45 @@ func (e NodeFragmentOrderable) MarshalGQL(w io.Writer) {
 type NodeHasFilter string
 
 const (
-	NodeHasFilterCreatedBy             NodeHasFilter = "createdBy"
-	NodeHasFilterCreatedAt             NodeHasFilter = "createdAt"
-	NodeHasFilterUpdatedAt             NodeHasFilter = "updatedAt"
-	NodeHasFilterNameid                NodeHasFilter = "nameid"
-	NodeHasFilterRootnameid            NodeHasFilter = "rootnameid"
-	NodeHasFilterSource                NodeHasFilter = "source"
-	NodeHasFilterName                  NodeHasFilter = "name"
-	NodeHasFilterAbout                 NodeHasFilter = "about"
-	NodeHasFilterSkills                NodeHasFilter = "skills"
-	NodeHasFilterIsRoot                NodeHasFilter = "isRoot"
-	NodeHasFilterParent                NodeHasFilter = "parent"
-	NodeHasFilterType                  NodeHasFilter = "type_"
-	NodeHasFilterTensionsOut           NodeHasFilter = "tensions_out"
-	NodeHasFilterTensionsIn            NodeHasFilter = "tensions_in"
-	NodeHasFilterVisibility            NodeHasFilter = "visibility"
-	NodeHasFilterMode                  NodeHasFilter = "mode"
-	NodeHasFilterRights                NodeHasFilter = "rights"
-	NodeHasFilterIsArchived            NodeHasFilter = "isArchived"
-	NodeHasFilterIsPersonal            NodeHasFilter = "isPersonal"
-	NodeHasFilterUserCanJoin           NodeHasFilter = "userCanJoin"
-	NodeHasFilterGuestCanCreateTension NodeHasFilter = "guestCanCreateTension"
-	NodeHasFilterLexicon               NodeHasFilter = "lexicon"
-	NodeHasFilterIsTemplateTensionOnly NodeHasFilter = "isTemplateTensionOnly"
-	NodeHasFilterWatchers              NodeHasFilter = "watchers"
-	NodeHasFilterChildren              NodeHasFilter = "children"
-	NodeHasFilterProjects              NodeHasFilter = "projects"
-	NodeHasFilterPinned                NodeHasFilter = "pinned"
-	NodeHasFilterLabels                NodeHasFilter = "labels"
-	NodeHasFilterRoles                 NodeHasFilter = "roles"
-	NodeHasFilterTensionTemplates      NodeHasFilter = "tension_templates"
-	NodeHasFilterRoleExt               NodeHasFilter = "role_ext"
-	NodeHasFilterRoleType              NodeHasFilter = "role_type"
-	NodeHasFilterColor                 NodeHasFilter = "color"
-	NodeHasFilterFirstLink             NodeHasFilter = "first_link"
-	NodeHasFilterContracts             NodeHasFilter = "contracts"
-	NodeHasFilterEventsHistory         NodeHasFilter = "events_history"
-	NodeHasFilterActivity              NodeHasFilter = "activity"
-	NodeHasFilterCascadeDirective      NodeHasFilter = "cascade_directive"
+	NodeHasFilterCreatedBy                       NodeHasFilter = "createdBy"
+	NodeHasFilterCreatedAt                       NodeHasFilter = "createdAt"
+	NodeHasFilterUpdatedAt                       NodeHasFilter = "updatedAt"
+	NodeHasFilterNameid                          NodeHasFilter = "nameid"
+	NodeHasFilterRootnameid                      NodeHasFilter = "rootnameid"
+	NodeHasFilterSource                          NodeHasFilter = "source"
+	NodeHasFilterName                            NodeHasFilter = "name"
+	NodeHasFilterAbout                           NodeHasFilter = "about"
+	NodeHasFilterSkills                          NodeHasFilter = "skills"
+	NodeHasFilterIsRoot                          NodeHasFilter = "isRoot"
+	NodeHasFilterParent                          NodeHasFilter = "parent"
+	NodeHasFilterType                            NodeHasFilter = "type_"
+	NodeHasFilterTensionsOut                     NodeHasFilter = "tensions_out"
+	NodeHasFilterTensionsIn                      NodeHasFilter = "tensions_in"
+	NodeHasFilterVisibility                      NodeHasFilter = "visibility"
+	NodeHasFilterMode                            NodeHasFilter = "mode"
+	NodeHasFilterRights                          NodeHasFilter = "rights"
+	NodeHasFilterIsArchived                      NodeHasFilter = "isArchived"
+	NodeHasFilterIsPersonal                      NodeHasFilter = "isPersonal"
+	NodeHasFilterUserCanJoin                     NodeHasFilter = "userCanJoin"
+	NodeHasFilterGuestCanCreateTension           NodeHasFilter = "guestCanCreateTension"
+	NodeHasFilterLexicon                         NodeHasFilter = "lexicon"
+	NodeHasFilterIsTemplateTensionOnly           NodeHasFilter = "isTemplateTensionOnly"
+	NodeHasFilterIsPinnedTensionfetchRecursively NodeHasFilter = "isPinnedTensionfetchRecursively"
+	NodeHasFilterWatchers                        NodeHasFilter = "watchers"
+	NodeHasFilterChildren                        NodeHasFilter = "children"
+	NodeHasFilterProjects                        NodeHasFilter = "projects"
+	NodeHasFilterPinned                          NodeHasFilter = "pinned"
+	NodeHasFilterLabels                          NodeHasFilter = "labels"
+	NodeHasFilterRoles                           NodeHasFilter = "roles"
+	NodeHasFilterTensionTemplates                NodeHasFilter = "tension_templates"
+	NodeHasFilterRoleExt                         NodeHasFilter = "role_ext"
+	NodeHasFilterRoleType                        NodeHasFilter = "role_type"
+	NodeHasFilterColor                           NodeHasFilter = "color"
+	NodeHasFilterFirstLink                       NodeHasFilter = "first_link"
+	NodeHasFilterContracts                       NodeHasFilter = "contracts"
+	NodeHasFilterEventsHistory                   NodeHasFilter = "events_history"
+	NodeHasFilterActivity                        NodeHasFilter = "activity"
+	NodeHasFilterCascadeDirective                NodeHasFilter = "cascade_directive"
 )
 
 var AllNodeHasFilter = []NodeHasFilter{
@@ -4833,6 +4838,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterGuestCanCreateTension,
 	NodeHasFilterLexicon,
 	NodeHasFilterIsTemplateTensionOnly,
+	NodeHasFilterIsPinnedTensionfetchRecursively,
 	NodeHasFilterWatchers,
 	NodeHasFilterChildren,
 	NodeHasFilterProjects,
@@ -4852,7 +4858,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterIsTemplateTensionOnly, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterTensionTemplates, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterCascadeDirective:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterIsTemplateTensionOnly, NodeHasFilterIsPinnedTensionfetchRecursively, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterTensionTemplates, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterCascadeDirective:
 		return true
 	}
 	return false

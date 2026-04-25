@@ -153,6 +153,7 @@ func RunServer() {
 			r.Post("/setguestcancreatetension", handle6.SetGuestCanCreateTension)
 			r.Post("/setlexicon", handle6.SetLexicon)
 			r.Post("/setistemplatetensiononly", handle6.SetIsTemplateTensionOnly)
+			r.Post("/setispinnedtensionfetchrecursively", handle6.SetisPinnedTensionfetchRecursively)
 
 			// Special
 			r.Post("/makeowner", handle6.MakeOwner)

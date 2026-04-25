@@ -81,6 +81,7 @@ type Node @auth(
   guestCanCreateTension: Boolean
   lexicon: String
   isTemplateTensionOnly: Boolean
+  isPinnedTensionfetchRecursively: Boolean
 
   # Watchers
   watchers: [User!] @hasInverse(field: watching)
