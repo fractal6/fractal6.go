@@ -163,6 +163,22 @@ func projectDescriptor(id, name string) string {
 	return id + "§" + name + "§"
 }
 
+// goTensionEvent runs a tension-history write in the background. Errors are
+// logged; panics are recovered. Used by the ProjectCard hooks so the API
+// response is not blocked on the secondary event write.
+func goTensionEvent(label string, fn func() error) {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("async %s panic: %v", label, r)
+			}
+		}()
+		if err := fn(); err != nil {
+			log.Printf("async %s failed: %v", label, err)
+		}
+	}()
+}
+
 // columnDescriptor returns "{colid}§{colname}§{colcolor}" for use in Event.old/new.
 func columnDescriptor(id, name, color string) string {
 	return id + "§" + name + "§" + color
@@ -264,7 +280,8 @@ func addProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (an
 	// Validate input
 	var inputs []model.AddProjectCardInput
 	ExtractInputs(ctx, &inputs)
-	for _, input := range inputs {
+	isDraft := make([]bool, len(inputs))
+	for i, input := range inputs {
 		x, err := db.GetDB().GetSubFieldById(*input.Pc.ID, "ProjectColumn.project", "uid")
 		if err != nil {
 			return nil, err
@@ -278,6 +295,8 @@ func addProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (an
 		if err = auth.Authorize(auth.CheckProjectAuth(uctx, projectid)); err != nil {
 			return nil, err
 		}
+
+		isDraft[i] = input.Card != nil && input.Card.ProjectDraftRef != nil
 	}
 
 	// Forward query
@@ -292,18 +311,22 @@ func addProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (an
 
 	// Post-processing:
 	// - Shift card position in columns list
-	// - Emit ProjectAdded for tension cards (drafts are skipped).
+	// - Emit ProjectAdded for tension cards (drafts have no tension to attach to).
 
-	for _, card := range d.ProjectCard {
+	for i, card := range d.ProjectCard {
 		if card.ID == "" {
 			return data, fmt.Errorf("id payload required for project card mutation")
 		}
 		if _, err := db.GetDB().Meta("incrementCardPos", map[string]string{"cardid": card.ID, "now": Now()}); err != nil {
 			return data, err
 		}
-		if err := PushProjectAdded(uctx, card.ID); err != nil {
-			return data, err
+		if i < len(isDraft) && isDraft[i] {
+			continue
 		}
+		cardID := card.ID
+		goTensionEvent("PushProjectAdded", func() error {
+			return PushProjectAdded(uctx, cardID)
+		})
 	}
 
 	return data, err
@@ -378,9 +401,10 @@ func deleteProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 			return data, err
 		}
 		// Push ProjectRemoved to tension history (skip drafts).
-		if err := PushProjectRemoved(uctx, cardLoc); err != nil {
-			return data, err
-		}
+		loc := cardLoc
+		goTensionEvent("PushProjectRemoved", func() error {
+			return PushProjectRemoved(uctx, loc)
+		})
 		if l := slices.Index(cardLoc.Typenames, "ProjectDraft"); l >= 0 {
 			// Delete draft
 			_, err := db.GetDB().Meta("deleteCardDraft", map[string]string{"cardid": card.ID})
@@ -476,13 +500,15 @@ func updateProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 
 		// Skip drafts and pure pos shuffles (same column).
 		if newColid != oldCard.Colid && isTensionCard(oldCard.Typenames) {
-			if err := pushTensionProjectEvent(
-				uctx, oldCard.Contentid, model.TensionEventProjectColumnMoved,
-				columnDescriptor(oldCard.Colid, oldCard.Colname, oldCard.Colcolor),
-				columnDescriptor(newCol.ID, newCol.Name, newCol.Color),
-			); err != nil {
-				return data, err
-			}
+			tid := oldCard.Contentid
+			oldDesc := columnDescriptor(oldCard.Colid, oldCard.Colname, oldCard.Colcolor)
+			newDesc := columnDescriptor(newCol.ID, newCol.Name, newCol.Color)
+			goTensionEvent("ProjectColumnMoved", func() error {
+				return pushTensionProjectEvent(
+					uctx, tid, model.TensionEventProjectColumnMoved,
+					oldDesc, newDesc,
+				)
+			})
 		}
 	}
 
