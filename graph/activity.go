@@ -37,12 +37,12 @@ var trackedEvents = map[model.TensionEvent]bool{
 	// model.TensionEventPinned:       true,
 	// model.TensionEventUnpinned:     true,
 
-	model.TensionEventCommentPushed:  true,
-	model.TensionEventCommentDeleted: true,
+	model.TensionEventCommentPushed: true,
+	// model.TensionEventCommentDeleted: true,
 
-	model.TensionEventBlobCommitted:  true,
-	model.TensionEventBlobPushed:     true,
-	model.TensionEventBlobArchived:   true,
+	model.TensionEventBlobCommitted: true,
+	model.TensionEventBlobPushed:    true,
+	// model.TensionEventBlobArchived:   true,
 	model.TensionEventBlobUnarchived: true,
 	model.TensionEventAuthority:      true,
 	model.TensionEventVisibility:     true,
@@ -52,14 +52,14 @@ var trackedEvents = map[model.TensionEvent]bool{
 	model.TensionEventProjectRemoved:     true,
 	model.TensionEventProjectColumnMoved: true,
 
-	model.TensionEventAssigneeAdded:   true,
-	model.TensionEventAssigneeRemoved: true,
-	model.TensionEventLabelAdded:      true,
-	model.TensionEventLabelRemoved:    true,
-	model.TensionEventUserJoined:      true,
-	model.TensionEventUserLeft:        true,
-	model.TensionEventMemberLinked:    true,
-	model.TensionEventMemberUnlinked:  true,
+	// model.TensionEventAssigneeAdded:   true,
+	// model.TensionEventAssigneeRemoved: true,
+	model.TensionEventLabelAdded:   true,
+	model.TensionEventLabelRemoved: true,
+	model.TensionEventUserJoined:   true,
+	// model.TensionEventUserLeft:        true,
+	model.TensionEventMemberLinked: true,
+	// model.TensionEventMemberUnlinked:  true,
 }
 
 // isTrackedEvent reports whether the given event should bump the daily

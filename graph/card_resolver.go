@@ -171,9 +171,9 @@ func goTensionEvent(label string, fn func() error) {
 	}()
 }
 
-// columnDescriptor returns "{colid}§{colname}§{colcolor}" for use in Event.old/new.
-func columnDescriptor(id, name, color string) string {
-	return id + "§" + name + "§" + color
+// columnDescriptor returns "{colid}§{colname}§{colcolor}§{projectid}" for use in Event.old/new.
+func columnDescriptor(id, name, color, projectid string) string {
+	return id + "§" + name + "§" + color + "§" + projectid
 }
 
 // isTensionCard reports whether a ProjectCard's referenced card is a Tension
@@ -256,8 +256,8 @@ func PushProjectColumnMoved(uctx *model.UserCtx, oldLoc ProjectCardLoc, newCol P
 	}
 	return pushTensionProjectEvent(
 		uctx, oldLoc.Contentid, oldLoc.Receiverid, model.TensionEventProjectColumnMoved,
-		columnDescriptor(oldLoc.Colid, oldLoc.Colname, oldLoc.Colcolor),
-		columnDescriptor(newCol.ID, newCol.Name, newCol.Color),
+		columnDescriptor(oldLoc.Colid, oldLoc.Colname, oldLoc.Colcolor, oldLoc.Projectid),
+		columnDescriptor(newCol.ID, newCol.Name, newCol.Color, oldLoc.Projectid),
 	)
 }
 

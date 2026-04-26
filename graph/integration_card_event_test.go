@@ -264,8 +264,8 @@ func TestPushProjectColumnMoved(t *testing.T) {
 	if len(got) != 1 {
 		t.Fatalf("expected 1 ProjectColumnMoved event, got %d", len(got))
 	}
-	wantOld := env.colAID + "§Evt Col A§#aaa111"
-	wantNew := env.colBID + "§Evt Col B§#bbb222"
+	wantOld := env.colAID + "§Evt Col A§#aaa111§" + env.projectID
+	wantNew := env.colBID + "§Evt Col B§#bbb222§" + env.projectID
 	if got[0].Old != wantOld {
 		t.Errorf("ProjectColumnMoved.old = %q, want %q", got[0].Old, wantOld)
 	}
