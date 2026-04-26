@@ -210,7 +210,7 @@ func pushTensionProjectEvent(uctx *model.UserCtx, tid, receiverNameid string, et
 		return err
 	}
 	if receiverNameid != "" {
-		trackActivity(uctx.Username, receiverNameid)
+		trackActivity(uctx.Username, receiverNameid, et)
 	}
 	return nil
 }

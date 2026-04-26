@@ -547,6 +547,7 @@ type EventCount	 {
 
 # Daily activity counter for users and organisations.
 # Accessed only via @meta fields; direct GraphQL access restricted.
+# Only tracked events are counted — see graph/activity.go::isTrackedEvent.
 type Activity @auth(
   query: <<is-root>>,
   add: <<is-root>>,

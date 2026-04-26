@@ -12,8 +12,8 @@ type Activity @auth(
   delete: <<is-root>>
 ) {
   id: ID!
-  activityid: String! @id          # Upsert key: "u#<username>#YYYY-MM-DD" or "o#<rootnameid>#YYYY-MM-DD"
-  ownerid: String! @search(by: [hash])  # Query key: "u#<username>" or "o#<rootnameid>"
+  activityid: String! @id          # "u#<username>#YYYY-MM-DD" or "o#<rootnameid>#YYYY-MM-DD"
+  ownerid: String! @search(by: [hash])  # "u#<username>" or "o#<rootnameid>"
   date: DateTime! @search(by: [day])
   count: Int!
 }
@@ -23,10 +23,16 @@ type Activity @auth(
 
 | Field | Description |
 |-------|-------------|
-| `activityid` | Composite unique key for DQL upsert. Encodes owner + date (e.g. `u#alice#2026-02-09`). |
+| `activityid` | Composite unique key for DQL upsert. Encodes owner + day (e.g. `u#alice#2026-02-09`). |
 | `ownerid` | Owner identifier for range queries. Encodes owner only (e.g. `u#alice` or `o#myorg`). |
 | `date` | Day of the activity (ISO 8601). Indexed by day for `between` filters. |
-| `count` | Number of events on this day. |
+| `count` | Number of tracked events on this day. |
+
+### Tracked events (noise filter)
+
+Not every `TensionEvent` bumps the counter. The set of events that *do* count
+lives in `graph/activity.go::trackedEvents` — that's the single source of truth.
+Events absent from the set are treated as noise and dropped at `trackActivity`.
 
 ### Access
 
@@ -56,12 +62,13 @@ Query activity nodes by `ownerid` with optional `from`/`to` date range filter. R
 
 Activity tracking hooks into the `ProcessEvent` pipeline in `graph/tension_op.go`:
 
-1. `ProcessEvent` calls `leaveTrace(uctx, tension)` as a **goroutine**
+1. `ProcessEvent` calls `leaveTrace(uctx, tension, eventType)` as a **goroutine**
 2. `leaveTrace` updates node timestamps then calls `trackActivity`
-3. `trackActivity` issues two `upsertActivity` DQL mutations: one for the user, one for the org
-4. A `recover()` in `leaveTrace` prevents goroutine panics from crashing the server
+3. `trackActivity` short-circuits if the event is not in `trackedEvents`
+4. Otherwise it issues two `upsertActivity` DQL mutations: one for the user, one for the org
+5. A `recover()` in `leaveTrace` prevents goroutine panics from crashing the server
 
-This means activity updates are fire-and-forget and do not block the GraphQL response.
+Activity updates are fire-and-forget and do not block the GraphQL response.
 
 ## Query Examples
 
@@ -98,3 +105,7 @@ See `db/integration_mutation_test.go` — `TestUpsertActivity_Integration` cover
 - Querying it back via `getUserActivity`
 - Incrementing via second upsert
 - Cleanup
+
+`graph/integration_card_event_test.go::TestPushProjectAdded_TracksActivity`
+covers the full pipeline: emitting a project event bumps both the user and the
+org daily counter.

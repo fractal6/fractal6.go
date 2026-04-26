@@ -271,7 +271,7 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 		}
 
 		// leave trace
-		go leaveTrace(uctx, tension)
+		go leaveTrace(uctx, tension, *event.EventType)
 	}
 
 	// Set contract status if any
@@ -299,7 +299,7 @@ func GetBlob(tension *model.Tension) *model.Blob {
 	return nil
 }
 
-func leaveTrace(uctx *model.UserCtx, tension *model.Tension) {
+func leaveTrace(uctx *model.UserCtx, tension *model.Tension, et model.TensionEvent) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("error: leaveTrace panic: %v\n", r)
@@ -330,12 +330,15 @@ func leaveTrace(uctx *model.UserCtx, tension *model.Tension) {
 	}
 
 	// Track activity
-	trackActivity(uctx.Username, tension.Receiver.Nameid)
+	trackActivity(uctx.Username, tension.Receiver.Nameid, et)
 }
 
 // trackActivity increments the daily activity counter for both the user
-// and the root organisation. Called from leaveTrace goroutine.
-func trackActivity(username, receiverNameid string) {
+// and the root organisation. Noise events (not in trackedEvents) are skipped.
+func trackActivity(username, receiverNameid string, et model.TensionEvent) {
+	if !isTrackedEvent(et) {
+		return
+	}
 	today := time.Now().UTC().Format("2006-01-02")
 	todayISO := today + "T00:00:00Z"
 
