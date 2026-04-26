@@ -83,21 +83,21 @@ The `REDIS_ADDR` environment variable controls which Redis the session cache con
 
 ### Test Data Setup
 
-Test data is seeded once by `cmd/testsetup` before any test packages run. This standalone program:
+Test data is seeded once by `cmd/testsetup` before any test packages run. The program is split into two files plus an embedded data file:
 
-1. Waits for Dgraph alpha to be healthy
-2. Drops all existing data
-3. Loads the schema from `schema/dgraph_schema.graphql`
-4. Seeds the shared test dataset via gRPC N-Quad mutations
+| File | Role |
+|------|------|
+| `cmd/testsetup/main.go` | Orchestration: wait for Dgraph, drop, load schema, poll until predicates are visible, then call seed |
+| `cmd/testsetup/seed.go` | Substitutes password placeholders into the embedded N-Quads and runs the gRPC mutation |
+| `cmd/testsetup/seed.nq` | Static N-Quads dataset (embedded via `//go:embed`) — edit this to change seed data |
+
+The setup is resilient to Dgraph startup races: schema upload retries on transient `Server not ready` errors, and a schema-predicate poll runs before seeding (so mutations don't race ahead of schema propagation).
 
 Each test package's `TestMain` only verifies that the data exists (no setup logic).
 
-**Shared seed data:**
-- 1 root Node (Circle): `test-org`
-- 2 Users: `testuser`, `testuser2` (with real bcrypt password hashes)
-- 1 Owner role node: `test-org##@testuser`
-- 1 Coordinator role node: `test-org##:coordo`
-- 1 Tension (Open, Operational) with blob and event
+**Shared seed data** (see `seed.nq` for the full picture):
+- `test-org` (Public): general-purpose org with users `testuser` / `testuser2`, Owner + Coordinator roles, one tension with blob/event/comment/label, and tension templates
+- `sec-org` (Private): security/visibility org with `private-circle` (Private) and `secret-circle` (Secret) sub-circles, plus three Projects scoped to each visibility level
 
 **Nameid convention:**
 - Root org: `"test-org"` (no trailing `#`)
@@ -142,7 +142,7 @@ Uses a real chi router with JWT middleware and tests handlers end-to-end.
 ### Adding New Tests
 
 1. Add test functions to existing `integration_*_test.go` files (or create new ones with `//go:build integration`)
-2. If new seed data is needed, update `cmd/testsetup/main.go`
+2. If new seed data is needed, edit `cmd/testsetup/seed.nq` (or `seed.go` if Go-side substitution is required)
 3. Mutation tests should restore original values to avoid interfering with other tests
 
 ## Pitfalls & Lessons Learned

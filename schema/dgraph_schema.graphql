@@ -142,7 +142,29 @@ type Label @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
         }
     }"""
 },{ rule:"""query ($ROOTIDS: [String]) {
-        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+        queryLabel(filter: {rootnameid: {in: $ROOTIDS}}) {
+          nodes(filter: {visibility: {eq: Private}}) { id }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryLabel {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryLabel {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            parent {
+              children {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
+        }
     }"""
 }]
 }, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -172,7 +194,29 @@ type RoleExt @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
         }
     }"""
 },{ rule:"""query ($ROOTIDS: [String]) {
-        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) {
+          nodes(filter: {visibility: {eq: Private}}) { id }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryRoleExt {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryRoleExt {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            parent {
+              children {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
+        }
     }"""
 }]
 }, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -204,7 +248,29 @@ type TensionTemplate @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
         }
     }"""
 },{ rule:"""query ($ROOTIDS: [String]) {
-        queryTensionTemplate(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+        queryTensionTemplate(filter: {rootnameid: {in: $ROOTIDS}}) {
+          nodes(filter: {visibility: {eq: Private}}) { id }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryTensionTemplate {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryTensionTemplate {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            parent {
+              children {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
+        }
     }"""
 }]
 }, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
@@ -237,13 +303,35 @@ type TensionTemplate @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
 }
 
 type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
-},{ rule:"""query {
+},{ rule:"""query ($OWNIDS: [String]) {
         queryProject {
-          nodes(filter: {visibility: {eq: Public}}) { id }
+          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
         }
     }"""
 },{ rule:"""query ($ROOTIDS: [String]) {
-        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) {
+          nodes(filter: {visibility: {eq: Private}}) { id }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryProject {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryProject {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            parent {
+              children {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
+        }
     }"""
 },{ rule:"""query ($USERNAME: String!) {
         queryProject {

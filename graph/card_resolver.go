@@ -41,12 +41,15 @@ import (
 // moved to respect the shifting.
 
 type ProjectCardLoc struct {
-	ID        string `json:"id"`
-	Colid     string
-	Projectid string
-	Pos       int
-	Contentid string
-	Typenames []string
+	ID          string `json:"id"`
+	Colid       string
+	Colname     string
+	Colcolor    string
+	Projectid   string
+	Projectname string
+	Pos         int
+	Contentid   string
+	Typenames   []string
 }
 
 var QueryCardLoc db.QueryMut = db.QueryMut{
@@ -55,7 +58,12 @@ var QueryCardLoc db.QueryMut = db.QueryMut{
                 uid
                 ProjectCard.pc {
                     colid: uid
-                    ProjectColumn.project { projectid: uid }
+                    colname: ProjectColumn.name
+                    colcolor: ProjectColumn.color
+                    ProjectColumn.project {
+                        projectid: uid
+                        projectname: Project.name
+                    }
                 }
                 pos: ProjectCard.pos
                 ProjectCard.card {
@@ -64,6 +72,182 @@ var QueryCardLoc db.QueryMut = db.QueryMut{
                 }
             }
         }`,
+}
+
+type ProjectColumnDesc struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
+var QueryColumnDesc db.QueryMut = db.QueryMut{
+	Q: `query {
+            all(func: uid({{.colid}})) @normalize {
+                id: uid
+                name: ProjectColumn.name
+                color: ProjectColumn.color
+            }
+        }`,
+}
+
+// projectCardMoveLoc is the decoded record of QueryCardLocAndNewCol. The query
+// returns two normalized rows over the same `all` block — one for the card uid
+// (with ProjectCard.* fields populated, NewColname/NewColcolor empty) and one
+// for the new column uid (only NewColname/NewColcolor populated). They are
+// split apart by isCardRow.
+type projectCardMoveLoc struct {
+	ProjectCardLoc
+	NewColname  string `json:"new_colname,omitempty"`
+	NewColcolor string `json:"new_colcolor,omitempty"`
+}
+
+// isCardRow reports whether a decoded row corresponds to the ProjectCard uid
+// (vs. the new column uid). Cards always have a ProjectCard.card link, so
+// Contentid is set; columns have no such field.
+func (l projectCardMoveLoc) isCardRow() bool { return l.Contentid != "" }
+
+// QueryCardLocAndNewCol fetches both the old ProjectCardLoc and the new column
+// descriptor in a single DQL request. Used by updateProjectCardHook when the
+// card is being moved between columns, saving a roundtrip vs. running
+// QueryCardLoc + QueryColumnDesc separately.
+var QueryCardLocAndNewCol db.QueryMut = db.QueryMut{
+	Q: `query {
+            all(func: uid({{.cardid}}, {{.new_colid}})) @normalize {
+                uid
+                ProjectCard.pc {
+                    colid: uid
+                    colname: ProjectColumn.name
+                    colcolor: ProjectColumn.color
+                    ProjectColumn.project {
+                        projectid: uid
+                        projectname: Project.name
+                    }
+                }
+                pos: ProjectCard.pos
+                ProjectCard.card {
+                    contentid: uid
+                    typenames: dgraph.type
+                }
+                new_colname: ProjectColumn.name
+                new_colcolor: ProjectColumn.color
+            }
+        }`,
+}
+
+// fetchCardAndNewCol runs QueryCardLocAndNewCol and splits the two normalized
+// rows into the card loc and the new column descriptor.
+func fetchCardAndNewCol(cardid, newColid string) (ProjectCardLoc, ProjectColumnDesc, error) {
+	rows, err := db.Gamma[projectCardMoveLoc](QueryCardLocAndNewCol, map[string]string{
+		"cardid":     cardid,
+		"new_colid":  newColid,
+	})
+	if err != nil {
+		return ProjectCardLoc{}, ProjectColumnDesc{}, err
+	}
+	var card ProjectCardLoc
+	var newCol ProjectColumnDesc
+	newCol.ID = newColid
+	for _, r := range rows {
+		if r.isCardRow() {
+			card = r.ProjectCardLoc
+		} else {
+			newCol.Name = r.NewColname
+			newCol.Color = r.NewColcolor
+		}
+	}
+	return card, newCol, nil
+}
+
+// projectDescriptor returns "{projectid}§{projectname}§" for use in Event.old/new.
+func projectDescriptor(id, name string) string {
+	return id + "§" + name + "§"
+}
+
+// columnDescriptor returns "{colid}§{colname}§{colcolor}" for use in Event.old/new.
+func columnDescriptor(id, name, color string) string {
+	return id + "§" + name + "§" + color
+}
+
+// isTensionCard reports whether a ProjectCard's referenced card is a Tension
+// (not a ProjectDraft). Project events are only emitted for tension cards.
+func isTensionCard(typenames []string) bool {
+	return slices.Contains(typenames, "Tension")
+}
+
+// pushTensionProjectEvent appends a project-related Event to tension.history and
+// bumps Tension.updatedAt in a single updateTension mutation. Post.updatedAt is
+// the order key for sort=activity in db/tensionQuery.go.
+// Auth is already enforced upstream (CheckProjectAuth in the ProjectCard hook),
+// so we skip EMAP and write directly with the root uctx.
+func pushTensionProjectEvent(uctx *model.UserCtx, tid string, et model.TensionEvent, oldVal, newVal string) error {
+	now := Now()
+	event := &model.EventRef{
+		CreatedAt: &now,
+		CreatedBy: &model.UserRef{Username: &uctx.Username},
+		EventType: &et,
+	}
+	if oldVal != "" {
+		event.Old = &oldVal
+	}
+	if newVal != "" {
+		event.New = &newVal
+	}
+	return db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", &model.UpdateTensionInput{
+		Filter: &model.TensionFilter{ID: []string{tid}},
+		Set: &model.TensionPatch{
+			UpdatedAt: &now,
+			History:   []*model.EventRef{event},
+		},
+	})
+}
+
+// PushProjectAdded writes a ProjectAdded event for a freshly-added ProjectCard.
+// No-op if the card is a ProjectDraft.
+func PushProjectAdded(uctx *model.UserCtx, cardID string) error {
+	loc, err := First(db.Gamma[ProjectCardLoc](QueryCardLoc, map[string]string{"cardid": cardID}))
+	if err != nil {
+		return err
+	}
+	if !isTensionCard(loc.Typenames) {
+		return nil
+	}
+	return pushTensionProjectEvent(
+		uctx, loc.Contentid, model.TensionEventProjectAdded,
+		"", projectDescriptor(loc.Projectid, loc.Projectname),
+	)
+}
+
+// PushProjectRemoved writes a ProjectRemoved event for a ProjectCard about to be deleted.
+// `loc` must be captured BEFORE the card is removed. No-op for drafts.
+func PushProjectRemoved(uctx *model.UserCtx, loc ProjectCardLoc) error {
+	if !isTensionCard(loc.Typenames) {
+		return nil
+	}
+	return pushTensionProjectEvent(
+		uctx, loc.Contentid, model.TensionEventProjectRemoved,
+		projectDescriptor(loc.Projectid, loc.Projectname), "",
+	)
+}
+
+// PushProjectColumnMoved writes a ProjectColumnMoved event for a card moved between columns.
+// `oldLoc` must reflect the card state BEFORE the move. No-op for drafts or pure
+// in-column position shuffles.
+func PushProjectColumnMoved(uctx *model.UserCtx, oldLoc ProjectCardLoc, newColid string) error {
+	if newColid == oldLoc.Colid {
+		return nil
+	}
+	if !isTensionCard(oldLoc.Typenames) {
+		return nil
+	}
+	newCol, err := First(db.Gamma[ProjectColumnDesc](QueryColumnDesc, map[string]string{"colid": newColid}))
+	if err != nil {
+		return err
+	}
+	return pushTensionProjectEvent(
+		uctx, oldLoc.Contentid, model.TensionEventProjectColumnMoved,
+		columnDescriptor(oldLoc.Colid, oldLoc.Colname, oldLoc.Colcolor),
+		columnDescriptor(newCol.ID, newCol.Name, newCol.Color),
+	)
 }
 
 // Add "ProjectCard"
@@ -108,13 +292,16 @@ func addProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (an
 
 	// Post-processing:
 	// - Shift card position in columns list
+	// - Emit ProjectAdded for tension cards (drafts are skipped).
 
 	for _, card := range d.ProjectCard {
 		if card.ID == "" {
 			return data, fmt.Errorf("id payload required for project card mutation")
 		}
-		_, err := db.GetDB().Meta("incrementCardPos", map[string]string{"cardid": card.ID, "now": Now()})
-		if err != nil {
+		if _, err := db.GetDB().Meta("incrementCardPos", map[string]string{"cardid": card.ID, "now": Now()}); err != nil {
+			return data, err
+		}
+		if err := PushProjectAdded(uctx, card.ID); err != nil {
 			return data, err
 		}
 	}
@@ -190,6 +377,10 @@ func deleteProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 		if err != nil {
 			return data, err
 		}
+		// Push ProjectRemoved to tension history (skip drafts).
+		if err := PushProjectRemoved(uctx, cardLoc); err != nil {
+			return data, err
+		}
 		if l := slices.Index(cardLoc.Typenames, "ProjectDraft"); l >= 0 {
 			// Delete draft
 			_, err := db.GetDB().Meta("deleteCardDraft", map[string]string{"cardid": card.ID})
@@ -219,22 +410,25 @@ func updateProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 	ExtractInput(ctx, &input)
 	isMoved := false
 	oldCard := ProjectCardLoc{}
+	newCol := ProjectColumnDesc{}
 	if input.Set != nil && len(input.Filter.ID) == 1 {
 		id := input.Filter.ID[0]
-		oldCard, err = First(db.Gamma[ProjectCardLoc](QueryCardLoc, map[string]string{"cardid": id}))
+		isMoved = input.Set.Pos != nil && input.Set.Pc != nil
+		if isMoved {
+			// Single DQL request returns both old card loc and new col descriptor.
+			oldCard, newCol, err = fetchCardAndNewCol(id, *input.Set.Pc.ID)
+		} else {
+			oldCard, err = First(db.Gamma[ProjectCardLoc](QueryCardLoc, map[string]string{"cardid": id}))
+		}
 		if err != nil {
 			return nil, err
 		}
 		if oldCard.Projectid == "" {
 			return nil, fmt.Errorf("project not found for card %s", id)
 		}
-		if input.Set.Pos != nil && input.Set.Pc != nil {
-			isMoved = true
-		}
-		projectid := oldCard.Projectid
 
 		// Check project auth
-		if err = auth.Authorize(auth.CheckProjectAuth(uctx, projectid)); err != nil {
+		if err = auth.Authorize(auth.CheckProjectAuth(uctx, oldCard.Projectid)); err != nil {
 			return nil, err
 		}
 	} else {
@@ -253,13 +447,14 @@ func updateProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 	}
 
 	// Post-processing:
-	// - shift card positiun in columns list
+	// - shift card position in columns list
+	// - emit ProjectColumnMoved when the column actually changed
 
 	// Auto increment card position only when updating a single card,
 	// otherwise, assume that user know what they are doing.
 	if isMoved {
 		newPos := *input.Set.Pos
-		newColid := *input.Set.Pc.ID
+		newColid := newCol.ID
 		q := "moveCardPos"
 		if newColid == oldCard.Colid {
 			if oldCard.Pos > newPos {
@@ -277,6 +472,17 @@ func updateProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 		})
 		if err != nil {
 			return data, err
+		}
+
+		// Skip drafts and pure pos shuffles (same column).
+		if newColid != oldCard.Colid && isTensionCard(oldCard.Typenames) {
+			if err := pushTensionProjectEvent(
+				uctx, oldCard.Contentid, model.TensionEventProjectColumnMoved,
+				columnDescriptor(oldCard.Colid, oldCard.Colname, oldCard.Colcolor),
+				columnDescriptor(newCol.ID, newCol.Name, newCol.Color),
+			); err != nil {
+				return data, err
+			}
 		}
 	}
 

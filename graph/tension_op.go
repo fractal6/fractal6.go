@@ -148,6 +148,22 @@ func init() {
 			Auth:   PassingHook,
 			Action: UserLeave,
 		},
+		// Project-related events are emitted internally by the ProjectCard hooks
+		// (graph/card_resolver.go), never via updateTension(history:...).
+		// PassingHook lets Check() succeed so the rejecting Action runs and
+		// returns a clear error.
+		model.TensionEventProjectAdded: EventMap{
+			Auth:   PassingHook,
+			Action: RejectInternalEvent,
+		},
+		model.TensionEventProjectRemoved: EventMap{
+			Auth:   PassingHook,
+			Action: RejectInternalEvent,
+		},
+		model.TensionEventProjectColumnMoved: EventMap{
+			Auth:   PassingHook,
+			Action: RejectInternalEvent,
+		},
 	}
 
 	SubscribingEvents = map[model.TensionEvent]bool{
@@ -703,6 +719,15 @@ func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 	// update node
 	err := db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput)
 	return true, err
+}
+
+// RejectInternalEvent is the Action used by EMAP entries for events that must
+// only be emitted from internal hooks (e.g. ProjectAdded/Removed/ColumnMoved
+// from the ProjectCard mutations in graph/card_resolver.go). Any caller that
+// reaches this through TensionEventHook gets a clear error instead of the
+// generic "Event not implemented" fallback.
+func RejectInternalEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+	return false, fmt.Errorf("%s is emitted internally and cannot be set via updateTension.", *event.EventType)
 }
 
 // SyncTensionSearchMessage rebuilds the denormalized Post.message field on a

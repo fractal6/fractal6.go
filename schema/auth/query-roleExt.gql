@@ -7,9 +7,34 @@
           nodes(filter: {visibility: {eq: Public}}) { id }
         }
     }""" },
-    # Authorize members
+    # Authorize private data (members only)
     { rule: """query ($ROOTIDS: [String]) {
-        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+        queryRoleExt(filter: {rootnameid: {in: $ROOTIDS}}) {
+          nodes(filter: {visibility: {eq: Private}}) { id }
+        }
+    }""" },
+    # Authorize secret data (explicit member only)
+    # -- parent
+    { rule: """query ($USERNAME: String!) {
+        queryRoleExt {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }""" },
+    # -- children (including secret circle!)
+    { rule: """query ($USERNAME: String!) {
+        queryRoleExt {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            parent {
+              children {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
+        }
     }""" }
   ]
 }

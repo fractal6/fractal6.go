@@ -1,15 +1,40 @@
 { or: [
     # Authorize root
     { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
-    # Authorize public data
-    { rule: """query {
+    # Authorize public data OR Owner
+    { rule: """query ($OWNIDS: [String]) {
         queryProject {
-          nodes(filter: {visibility: {eq: Public}}) { id }
+          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
         }
     }""" },
-    # Authorize members
+    # Authorize private data (members only)
     { rule: """query ($ROOTIDS: [String]) {
-        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+        queryProject(filter: {rootnameid: {in: $ROOTIDS}}) {
+          nodes(filter: {visibility: {eq: Private}}) { id }
+        }
+    }""" },
+    # Authorize secret data (explicit member only)
+    # -- parent
+    { rule: """query ($USERNAME: String!) {
+        queryProject {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }""" },
+    # -- children (including secret circle!)
+    { rule: """query ($USERNAME: String!) {
+        queryProject {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            parent {
+              children {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
+        }
     }""" },
     # Authorize collaborators
     { rule: """query ($USERNAME: String!) {

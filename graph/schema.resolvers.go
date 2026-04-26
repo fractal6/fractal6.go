@@ -581,8 +581,9 @@ func (r *queryResolver) GetProject(ctx context.Context, id string) (data *model.
 }
 
 // QueryProject is the resolver for the queryProject field.
-func (r *queryResolver) QueryProject(ctx context.Context, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) ([]*model.Project, error) {
-	panic(fmt.Errorf("not implemented: QueryProject - queryProject"))
+func (r *queryResolver) QueryProject(ctx context.Context, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) (data []*model.Project, errors error) {
+	errors = r.DgraphQueryBridge(ctx, filter, order, first, offset, &data)
+	return data, errors
 }
 
 // AggregateProject is the resolver for the aggregateProject field.

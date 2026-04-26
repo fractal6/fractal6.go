@@ -28,6 +28,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -41,40 +42,47 @@ import (
 	"google.golang.org/grpc"
 
 	"fractale/fractal6.go/internal/testutil"
-	. "fractale/fractal6.go/internal/tools"
 )
 
-const (
-	schemaPath = "schema/dgraph_schema.graphql"
-)
+const schemaPath = "schema/dgraph_schema.graphql"
 
 func main() {
 	log.SetFlags(log.Ltime)
 
-	// 1. Wait for Dgraph alpha to be healthy
 	if err := waitForDgraph(60 * time.Second); err != nil {
 		log.Fatalf("Dgraph not ready: %v", err)
 	}
 
-	// 2. Drop all data
-	if err := dropAllData(); err != nil {
+	dgc, closeConn, err := newDgraphClient()
+	if err != nil {
+		log.Fatalf("Dial Dgraph: %v", err)
+	}
+	defer closeConn()
+
+	if err := dropAllData(dgc); err != nil {
 		log.Fatalf("Failed to drop data: %v", err)
 	}
-
-	// 3. Load schema
 	if err := loadSchema(); err != nil {
 		log.Fatalf("Failed to load schema: %v", err)
 	}
-
-	// Wait for schema to be applied
-	time.Sleep(2 * time.Second)
-
-	// 4. Seed test data
-	if err := seedTestData(); err != nil {
+	// /admin/schema returns 200 as soon as the alpha accepts the schema, but
+	// predicates may not yet be visible to gRPC mutations — poll until ready.
+	if err := waitForPredicate(dgc, "Node.nameid", 30*time.Second); err != nil {
+		log.Fatalf("Schema predicate not ready: %v", err)
+	}
+	if err := seedTestData(dgc); err != nil {
 		log.Fatalf("Failed to seed test data: %v", err)
 	}
 
 	log.Println("Integration test setup complete.")
+}
+
+func newDgraphClient() (*dgo.Dgraph, func(), error) {
+	conn, err := grpc.Dial(testutil.TestGrpcAddr, grpc.WithInsecure()) //nolint:staticcheck
+	if err != nil {
+		return nil, nil, fmt.Errorf("dial gRPC: %w", err)
+	}
+	return dgo.NewDgraphClient(api.NewDgraphClient(conn)), func() { conn.Close() }, nil
 }
 
 func waitForDgraph(timeout time.Duration) error {
@@ -94,20 +102,8 @@ func waitForDgraph(timeout time.Duration) error {
 	return fmt.Errorf("dgraph alpha not healthy after %s", timeout)
 }
 
-func newDgraphClient() (*dgo.Dgraph, func()) {
-	conn, err := grpc.Dial(testutil.TestGrpcAddr, grpc.WithInsecure()) //nolint:staticcheck
-	if err != nil {
-		log.Fatal("While trying to dial gRPC: ", err)
-	}
-	dgClient := dgo.NewDgraphClient(api.NewDgraphClient(conn))
-	return dgClient, func() { conn.Close() }
-}
-
-func dropAllData() error {
-	dgc, cancel := newDgraphClient()
-	defer cancel()
-	err := dgc.Alter(context.Background(), &api.Operation{DropAll: true})
-	if err != nil {
+func dropAllData(dgc *dgo.Dgraph) error {
+	if err := dgc.Alter(context.Background(), &api.Operation{DropAll: true}); err != nil {
 		return err
 	}
 	log.Println("All data dropped")
@@ -120,6 +116,24 @@ func loadSchema() error {
 		return fmt.Errorf("read schema: %w", err)
 	}
 
+	// Retry on transient "Server not ready" responses — Dgraph alpha briefly
+	// reports as not ready right after DropAll while internal state resets.
+	deadline := time.Now().Add(30 * time.Second)
+	for attempt := 0; ; attempt++ {
+		err := postSchema(schemaBytes)
+		if err == nil {
+			log.Println("Schema loaded successfully")
+			return nil
+		}
+		if !isTransientErr(err) || time.Now().After(deadline) {
+			return err
+		}
+		log.Printf("Schema upload not ready yet (attempt %d): %v — retrying", attempt+1, err)
+		time.Sleep(500 * time.Millisecond)
+	}
+}
+
+func postSchema(schemaBytes []byte) error {
 	resp, err := http.Post(
 		testutil.TestHTTPAddr+"/admin/schema",
 		"application/octet-stream",
@@ -135,373 +149,57 @@ func loadSchema() error {
 		return fmt.Errorf("schema upload failed (HTTP %d): %s", resp.StatusCode, string(body))
 	}
 
-	log.Println("Schema loaded successfully")
+	// Dgraph returns HTTP 200 even when the schema is rejected — errors are
+	// reported in the JSON body as {"errors":[{"message":"..."}]}.
+	var parsed struct {
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+	if err := json.Unmarshal(body, &parsed); err == nil && len(parsed.Errors) > 0 {
+		return fmt.Errorf("schema upload rejected: %s", parsed.Errors[0].Message)
+	}
 	return nil
 }
 
-// seedTestData inserts the shared test dataset via gRPC N-Quads mutation.
-// This dataset is the superset used by all integration test packages:
-//   - 1 root Node (Circle): test-org (Public, with userCanJoin, guestCanCreateTension, source blob)
-//   - 2 Users: testuser, testuser2 (with real bcrypt password hashes and UserRights)
-//   - 1 Owner role node: test-org##@testuser (child of org, linked to testuser)
-//   - 1 Coordinator role node: test-org##:coordo (child of org, linked to testuser)
-//   - 1 Tension (Open, Operational) with blob and event
-//   - 1 root Node (Circle): sec-org (Private, for visibility/security tests)
-//   - 2 Sub-circles: sec-org#private-circle (Private), sec-org#secret-circle (Secret)
-//   - Roles: testuser=Member of sec-org, testuser2=Owner of sec-org + Coordinator of secret-circle
-//   - 3 Projects: root-project (on sec-org), private-project (on private-circle), secret-project (on secret-circle)
-func seedTestData() error {
-	dgc, cancel := newDgraphClient()
-	defer cancel()
-
-	hashedPw1 := HashPassword(testutil.TestPassword)
-	hashedPw2 := HashPassword(testutil.TestPassword2)
-
-	nquads := fmt.Sprintf(`
-		# --- test-org: Public organisation for general tests ---
-		_:org <dgraph.type> "Node" .
-		_:org <Node.nameid> "test-org" .
-		_:org <Node.rootnameid> "test-org" .
-		_:org <Node.name> "Test Org" .
-		_:org <Node.about> "A test organisation" .
-		_:org <Node.isRoot> "true" .
-		_:org <Node.type_> "Circle" .
-		_:org <Node.visibility> "Public" .
-		_:org <Node.mode> "Coordinated" .
-		_:org <Node.rights> "0" .
-		_:org <Node.isArchived> "false" .
-		_:org <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:org <Node.userCanJoin> "true" .
-		_:org <Node.guestCanCreateTension> "true" .
-
-		# --- User 1: testuser (Owner of test-org, Member of sec-org) ---
-		_:rights1 <dgraph.type> "UserRights" .
-		_:rights1 <UserRights.type_> "Regular" .
-		_:rights1 <UserRights.canLogin> "true" .
-		_:rights1 <UserRights.canCreateRoot> "true" .
-		_:rights1 <UserRights.maxPublicOrga> "5" .
-		_:rights1 <UserRights.maxPrivateOrga> "5" .
-		_:rights1 <UserRights.hasEmailNotifications> "false" .
-
-		_:user1 <dgraph.type> "User" .
-		_:user1 <User.username> "testuser" .
-		_:user1 <User.email> "testuser@test.co" .
-		_:user1 <User.password> "%s" .
-		_:user1 <User.name> "Test User" .
-		_:user1 <User.createdAt> "2026-01-01T00:00:00Z" .
-		_:user1 <User.lastAck> "2026-01-01T00:00:00Z" .
-		_:user1 <User.notifyByEmail> "false" .
-		_:user1 <User.lang> "EN" .
-		_:user1 <User.rights> _:rights1 .
-
-		_:org <Node.createdBy> _:user1 .
-
-		# --- User 2: testuser2 (Owner of sec-org, Coordinator of secret-circle) ---
-		_:rights2 <dgraph.type> "UserRights" .
-		_:rights2 <UserRights.type_> "Regular" .
-		_:rights2 <UserRights.canLogin> "true" .
-		_:rights2 <UserRights.canCreateRoot> "true" .
-		_:rights2 <UserRights.maxPublicOrga> "5" .
-		_:rights2 <UserRights.maxPrivateOrga> "5" .
-		_:rights2 <UserRights.hasEmailNotifications> "false" .
-
-		_:user2 <dgraph.type> "User" .
-		_:user2 <User.username> "testuser2" .
-		_:user2 <User.email> "testuser2@test.co" .
-		_:user2 <User.password> "%s" .
-		_:user2 <User.name> "Test User 2" .
-		_:user2 <User.createdAt> "2026-01-01T00:00:00Z" .
-		_:user2 <User.lastAck> "2026-01-01T00:00:00Z" .
-		_:user2 <User.notifyByEmail> "false" .
-		_:user2 <User.lang> "EN" .
-		_:user2 <User.rights> _:rights2 .
-
-		# --- test-org roles ---
-
-		# Owner role for testuser in test-org
-		_:member1 <dgraph.type> "Node" .
-		_:member1 <Node.nameid> "test-org##@testuser" .
-		_:member1 <Node.rootnameid> "test-org" .
-		_:member1 <Node.name> "testuser" .
-		_:member1 <Node.isRoot> "false" .
-		_:member1 <Node.type_> "Role" .
-		_:member1 <Node.role_type> "Owner" .
-		_:member1 <Node.visibility> "Public" .
-		_:member1 <Node.mode> "Coordinated" .
-		_:member1 <Node.rights> "0" .
-		_:member1 <Node.isArchived> "false" .
-		_:member1 <Node.parent> _:org .
-		_:member1 <Node.first_link> _:user1 .
-		_:member1 <Node.createdBy> _:user1 .
-		_:member1 <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:org <Node.children> _:member1 .
-		_:user1 <User.roles> _:member1 .
-
-		# Coordinator role for testuser in test-org
-		_:coordo <dgraph.type> "Node" .
-		_:coordo <Node.nameid> "test-org##:coordo" .
-		_:coordo <Node.rootnameid> "test-org" .
-		_:coordo <Node.name> "Coordinator" .
-		_:coordo <Node.isRoot> "false" .
-		_:coordo <Node.type_> "Role" .
-		_:coordo <Node.role_type> "Coordinator" .
-		_:coordo <Node.visibility> "Public" .
-		_:coordo <Node.mode> "Coordinated" .
-		_:coordo <Node.rights> "0" .
-		_:coordo <Node.isArchived> "false" .
-		_:coordo <Node.parent> _:org .
-		_:coordo <Node.first_link> _:user1 .
-		_:coordo <Node.createdBy> _:user1 .
-		_:coordo <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:org <Node.children> _:coordo .
-
-		# --- test-org tension with blob and event ---
-
-		# Tension (Open, Operational)
-		_:tension <dgraph.type> "Tension" .
-		_:tension <Tension.title> "Test tension" .
-		_:tension <Tension.status> "Open" .
-		_:tension <Tension.type_> "Operational" .
-		_:tension <Tension.emitter> _:org .
-		_:tension <Tension.emitterid> "test-org" .
-		_:tension <Tension.receiver> _:org .
-		_:tension <Tension.receiverid> "test-org" .
-		_:tension <Post.createdBy> _:user1 .
-		_:tension <Post.createdAt> "2026-01-01T00:00:00Z" .
-		_:tension <Post.message> "---\nbug\n---\n\nThis is the first comment on the test tension" .
-		_:org <Node.tensions_out> _:tension .
-		_:org <Node.tensions_in> _:tension .
-
-		# Blob (OnNode, source for org)
-		_:blob <dgraph.type> "Blob" .
-		_:blob <Blob.blob_type> "OnNode" .
-		_:blob <Blob.tension> _:tension .
-		_:blob <Post.createdBy> _:user1 .
-		_:blob <Post.createdAt> "2026-01-01T00:00:00Z" .
-		_:tension <Tension.blobs> _:blob .
-		_:org <Node.source> _:blob .
-
-		# Event (Created)
-		_:event <dgraph.type> "Event" .
-		_:event <Event.event_type> "Created" .
-		_:event <Event.tension> _:tension .
-		_:event <Post.createdBy> _:user1 .
-		_:event <Post.createdAt> "2026-01-01T00:00:00Z" .
-		_:tension <Tension.history> _:event .
-
-		# Label on test-org, linked to tension
-		_:label <dgraph.type> "Label" .
-		_:label <Label.rootnameid> "test-org" .
-		_:label <Label.name> "bug" .
-		_:label <Label.color> "#d73a4a" .
-		_:tension <Tension.labels> _:label .
-		_:label <Label.tensions> _:tension .
-		_:org <Node.labels> _:label .
-		_:label <Label.nodes> _:org .
-
-		# Comment on tension
-		_:comment <dgraph.type> "Comment" .
-		_:comment <Post.createdBy> _:user1 .
-		_:comment <Post.createdAt> "2026-01-01T00:01:00Z" .
-		_:comment <Post.message> "This is the first comment on the test tension" .
-		_:tension <Tension.comments> _:comment .
-
-		# TensionTemplate on test-org
-		_:ttempl <dgraph.type> "TensionTemplate" .
-		_:ttempl <TensionTemplate.rootnameid> "test-org" .
-		_:ttempl <TensionTemplate.name> "bug-report" .
-		_:ttempl <TensionTemplate.description> "Template for bug reports" .
-		_:ttempl <TensionTemplate.is_recursive> "true" .
-		_:ttempl <TensionTemplate.title> "Bug: " .
-		_:ttempl <TensionTemplate.comment> "Describe the bug here" .
-		_:ttempl <TensionTemplate.type_> "Operational" .
-		_:ttempl <TensionTemplate.nodes> _:org .
-		_:org <Node.tension_templates> _:ttempl .
-
-		# Non-recursive TensionTemplate on test-org (should NOT appear in top queries from children)
-		_:ttempl_local <dgraph.type> "TensionTemplate" .
-		_:ttempl_local <TensionTemplate.rootnameid> "test-org" .
-		_:ttempl_local <TensionTemplate.name> "local-only" .
-		_:ttempl_local <TensionTemplate.description> "Non-recursive template" .
-		_:ttempl_local <TensionTemplate.is_recursive> "false" .
-		_:ttempl_local <TensionTemplate.title> "Local: " .
-		_:ttempl_local <TensionTemplate.comment> "Local scope only" .
-		_:ttempl_local <TensionTemplate.type_> "Operational" .
-		_:ttempl_local <TensionTemplate.nodes> _:org .
-		_:org <Node.tension_templates> _:ttempl_local .
-
-		# --- sec-org: Private organisation for security/visibility tests ---
-		_:secorg <dgraph.type> "Node" .
-		_:secorg <Node.nameid> "sec-org" .
-		_:secorg <Node.rootnameid> "sec-org" .
-		_:secorg <Node.name> "Security Org" .
-		_:secorg <Node.about> "Organisation for security tests" .
-		_:secorg <Node.isRoot> "true" .
-		_:secorg <Node.type_> "Circle" .
-		_:secorg <Node.visibility> "Private" .
-		_:secorg <Node.mode> "Coordinated" .
-		_:secorg <Node.rights> "0" .
-		_:secorg <Node.isArchived> "false" .
-		_:secorg <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:secorg <Node.createdBy> _:user2 .
-		_:secorg <Node.userCanJoin> "false" .
-		_:secorg <Node.guestCanCreateTension> "false" .
-
-		# --- sec-org roles ---
-
-		# Owner role for testuser2 in sec-org
-		_:secorg_owner <dgraph.type> "Node" .
-		_:secorg_owner <Node.nameid> "sec-org##@testuser2" .
-		_:secorg_owner <Node.rootnameid> "sec-org" .
-		_:secorg_owner <Node.name> "testuser2" .
-		_:secorg_owner <Node.isRoot> "false" .
-		_:secorg_owner <Node.type_> "Role" .
-		_:secorg_owner <Node.role_type> "Owner" .
-		_:secorg_owner <Node.visibility> "Private" .
-		_:secorg_owner <Node.mode> "Coordinated" .
-		_:secorg_owner <Node.rights> "0" .
-		_:secorg_owner <Node.isArchived> "false" .
-		_:secorg_owner <Node.parent> _:secorg .
-		_:secorg_owner <Node.first_link> _:user2 .
-		_:secorg_owner <Node.createdBy> _:user2 .
-		_:secorg_owner <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:secorg <Node.children> _:secorg_owner .
-		_:user2 <User.roles> _:secorg_owner .
-
-		# Member role for testuser in sec-org (regular member, no coordo)
-		_:secorg_member <dgraph.type> "Node" .
-		_:secorg_member <Node.nameid> "sec-org##@testuser" .
-		_:secorg_member <Node.rootnameid> "sec-org" .
-		_:secorg_member <Node.name> "testuser" .
-		_:secorg_member <Node.isRoot> "false" .
-		_:secorg_member <Node.type_> "Role" .
-		_:secorg_member <Node.role_type> "Member" .
-		_:secorg_member <Node.visibility> "Private" .
-		_:secorg_member <Node.mode> "Coordinated" .
-		_:secorg_member <Node.rights> "0" .
-		_:secorg_member <Node.isArchived> "false" .
-		_:secorg_member <Node.parent> _:secorg .
-		_:secorg_member <Node.first_link> _:user1 .
-		_:secorg_member <Node.createdBy> _:user2 .
-		_:secorg_member <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:secorg <Node.children> _:secorg_member .
-		_:user1 <User.roles> _:secorg_member .
-
-		# --- sec-org sub-circles ---
-
-		# Private sub-circle (visible to org members)
-		_:secorg_private <dgraph.type> "Node" .
-		_:secorg_private <Node.nameid> "sec-org#private-circle" .
-		_:secorg_private <Node.rootnameid> "sec-org" .
-		_:secorg_private <Node.name> "Private Circle" .
-		_:secorg_private <Node.isRoot> "false" .
-		_:secorg_private <Node.type_> "Circle" .
-		_:secorg_private <Node.visibility> "Private" .
-		_:secorg_private <Node.mode> "Coordinated" .
-		_:secorg_private <Node.rights> "0" .
-		_:secorg_private <Node.isArchived> "false" .
-		_:secorg_private <Node.parent> _:secorg .
-		_:secorg_private <Node.createdBy> _:user2 .
-		_:secorg_private <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:secorg <Node.children> _:secorg_private .
-
-		# Secret sub-circle (visible only to role holders in this circle)
-		_:secorg_secret <dgraph.type> "Node" .
-		_:secorg_secret <Node.nameid> "sec-org#secret-circle" .
-		_:secorg_secret <Node.rootnameid> "sec-org" .
-		_:secorg_secret <Node.name> "Secret Circle" .
-		_:secorg_secret <Node.isRoot> "false" .
-		_:secorg_secret <Node.type_> "Circle" .
-		_:secorg_secret <Node.visibility> "Secret" .
-		_:secorg_secret <Node.mode> "Coordinated" .
-		_:secorg_secret <Node.rights> "0" .
-		_:secorg_secret <Node.isArchived> "false" .
-		_:secorg_secret <Node.parent> _:secorg .
-		_:secorg_secret <Node.createdBy> _:user2 .
-		_:secorg_secret <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:secorg <Node.children> _:secorg_secret .
-
-		# Coordinator role for testuser2 in secret circle (so they can see it)
-		_:secret_coordo <dgraph.type> "Node" .
-		_:secret_coordo <Node.nameid> "sec-org#secret-circle#:coordo" .
-		_:secret_coordo <Node.rootnameid> "sec-org" .
-		_:secret_coordo <Node.name> "Secret Coordinator" .
-		_:secret_coordo <Node.isRoot> "false" .
-		_:secret_coordo <Node.type_> "Role" .
-		_:secret_coordo <Node.role_type> "Coordinator" .
-		_:secret_coordo <Node.visibility> "Secret" .
-		_:secret_coordo <Node.mode> "Coordinated" .
-		_:secret_coordo <Node.rights> "0" .
-		_:secret_coordo <Node.isArchived> "false" .
-		_:secret_coordo <Node.parent> _:secorg_secret .
-		_:secret_coordo <Node.first_link> _:user2 .
-		_:secret_coordo <Node.createdBy> _:user2 .
-		_:secret_coordo <Node.createdAt> "2026-01-01T00:00:00Z" .
-		_:secorg_secret <Node.children> _:secret_coordo .
-		_:user2 <User.roles> _:secret_coordo .
-
-		# --- Projects linked to sec-org nodes ---
-
-		# Project on root circle (testuser can see, unauthenticated cannot)
-		_:proj_root <dgraph.type> "Project" .
-		_:proj_root <Project.nameid> "root-project" .
-		_:proj_root <Project.rootnameid> "sec-org" .
-		_:proj_root <Project.parentnameid> "sec-org" .
-		_:proj_root <Project.name> "Root Project" .
-		_:proj_root <Project.description> "Project on the root private circle" .
-		_:proj_root <Project.status> "Open" .
-		_:proj_root <Project.createdAt> "2026-01-01T00:00:00Z" .
-		_:proj_root <Project.updatedAt> "2026-01-01T00:00:00Z" .
-		_:proj_root <Project.peerCanEditProject> "false" .
-		_:proj_root <Project.guestCanEditProject> "false" .
-		_:proj_root <Project.createdBy> _:user2 .
-		_:proj_root <Project.nodes> _:secorg .
-		_:secorg <Node.projects> _:proj_root .
-
-		# Project on private sub-circle (testuser can see as org member)
-		_:proj_private <dgraph.type> "Project" .
-		_:proj_private <Project.nameid> "private-project" .
-		_:proj_private <Project.rootnameid> "sec-org" .
-		_:proj_private <Project.parentnameid> "sec-org#private-circle" .
-		_:proj_private <Project.name> "Private Project" .
-		_:proj_private <Project.description> "Project on the private sub-circle" .
-		_:proj_private <Project.status> "Open" .
-		_:proj_private <Project.createdAt> "2026-01-01T00:00:00Z" .
-		_:proj_private <Project.updatedAt> "2026-01-01T00:00:00Z" .
-		_:proj_private <Project.peerCanEditProject> "false" .
-		_:proj_private <Project.guestCanEditProject> "false" .
-		_:proj_private <Project.createdBy> _:user2 .
-		_:proj_private <Project.nodes> _:secorg_private .
-		_:secorg_private <Node.projects> _:proj_private .
-
-		# Project on secret sub-circle (only testuser2 can see)
-		_:proj_secret <dgraph.type> "Project" .
-		_:proj_secret <Project.nameid> "secret-project" .
-		_:proj_secret <Project.rootnameid> "sec-org" .
-		_:proj_secret <Project.parentnameid> "sec-org#secret-circle" .
-		_:proj_secret <Project.name> "Secret Project" .
-		_:proj_secret <Project.description> "Project on the secret sub-circle" .
-		_:proj_secret <Project.status> "Open" .
-		_:proj_secret <Project.createdAt> "2026-01-01T00:00:00Z" .
-		_:proj_secret <Project.updatedAt> "2026-01-01T00:00:00Z" .
-		_:proj_secret <Project.peerCanEditProject> "false" .
-		_:proj_secret <Project.guestCanEditProject> "false" .
-		_:proj_secret <Project.createdBy> _:user2 .
-		_:proj_secret <Project.nodes> _:secorg_secret .
-		_:secorg_secret <Node.projects> _:proj_secret .
-	`, hashedPw1, hashedPw2)
-
-	txn := dgc.NewTxn()
-	defer txn.Discard(context.Background())
-
-	_, err := txn.Mutate(context.Background(), &api.Mutation{
-		SetNquads: []byte(nquads),
-		CommitNow: true,
-	})
-	if err != nil {
-		return fmt.Errorf("seed mutation: %w", err)
+func isTransientErr(err error) bool {
+	if err == nil {
+		return false
 	}
+	msg := err.Error()
+	return strings.Contains(msg, "Server not ready") ||
+		strings.Contains(msg, "Unavailable") ||
+		strings.Contains(msg, "connection refused") ||
+		strings.Contains(msg, "EOF")
+}
 
-	log.Println("Test data seeded successfully")
-	return nil
+// waitForPredicate polls Dgraph (via gRPC) until the named predicate is
+// visible in the schema, or until the timeout elapses.
+func waitForPredicate(dgc *dgo.Dgraph, pred string, timeout time.Duration) error {
+	query := fmt.Sprintf(`schema(pred: [%s]) { type }`, pred)
+	deadline := time.Now().Add(timeout)
+	var lastErr error
+	for time.Now().Before(deadline) {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		resp, err := dgc.NewReadOnlyTxn().Query(ctx, query)
+		cancel()
+		if err == nil {
+			var parsed struct {
+				Schema []struct {
+					Type string `json:"type"`
+				} `json:"schema"`
+			}
+			if jerr := json.Unmarshal(resp.GetJson(), &parsed); jerr == nil && len(parsed.Schema) > 0 {
+				log.Printf("Schema predicate %q ready", pred)
+				return nil
+			}
+		} else {
+			lastErr = err
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+	if lastErr != nil {
+		return fmt.Errorf("predicate %q not visible after %s (last err: %v)", pred, timeout, lastErr)
+	}
+	return fmt.Errorf("predicate %q not visible after %s", pred, timeout)
 }

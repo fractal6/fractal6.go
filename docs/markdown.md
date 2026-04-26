@@ -54,12 +54,10 @@ All in `web/email/main.go`:
 
 ## Details/Summary Extension
 
-Custom goldmark extension (`web/email/goldmark_details.go`) that parses collapsible content blocks.
-
-### Markdown Syntax
+Custom goldmark extension (`web/email/goldmark_details.go`) — parses `<details>` / `<summary>` blocks where the body is regular markdown. The `open` attribute is supported. The sanitizer above is configured to let these elements through.
 
 ```markdown
-<details>
+<details open>
 <summary>Click to expand</summary>
 
 Body content with **markdown** support.
@@ -67,37 +65,5 @@ Body content with **markdown** support.
 - List items work
 - Code blocks work
 
-</details>
-```
-
-The `open` attribute is supported:
-
-```markdown
-<details open>
-<summary>Expanded by default</summary>
-
-This section starts expanded.
-
-</details>
-```
-
-### How It Works
-
-1. **Block parser** (priority 650, above HTMLBlock at 600) detects `<details>` opening tags
-2. `<summary>` lines are captured as metadata on a Summary AST node
-3. Body content between `</summary>` and `</details>` is parsed as regular markdown (paragraphs, lists, code, etc.)
-4. **Renderer** wraps the output in proper `<details>` and `<summary>` HTML elements
-5. The sanitizer allows these elements through
-
-### Rendered Output
-
-```html
-<details>
-<summary>Click to expand</summary>
-<p>Body content with <strong>markdown</strong> support.</p>
-<ul>
-<li>List items work</li>
-<li>Code blocks work</li>
-</ul>
 </details>
 ```
