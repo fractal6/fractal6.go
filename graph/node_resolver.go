@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/99designs/gqlgen/graphql"
 
@@ -33,6 +34,21 @@ import (
 	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
+
+// sepRune is the descriptor separator used in tension history events
+// (Label "{name}§{color}", Project "{id}§{name}§", ProjectColumn
+// "{id}§{name}§{color}"). User-controlled name/color fields must reject it,
+// otherwise the frontend descriptor parser breaks.
+const sepRune = '§'
+
+func checkNoSep(fields ...*string) error {
+	for _, f := range fields {
+		if f != nil && strings.ContainsRune(*f, sepRune) {
+			return fmt.Errorf("name/color must not contain '%c'", sepRune)
+		}
+	}
+	return nil
+}
 
 ////////////////////////////////////////////////
 // Node Resolver
@@ -85,6 +101,9 @@ func addNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver) (a
 	var inputs []AddArtefactInput
 	ExtractInputs(ctx, &inputs)
 	for _, input := range inputs {
+		if err := checkNoSep(input.Name, input.Color); err != nil {
+			return nil, LogErr("Invalid input", err)
+		}
 		if len(input.Nodes) == 0 {
 			return nil, LogErr("Access denied", fmt.Errorf("A node must be given."))
 		}
@@ -131,6 +150,11 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	// Validate input
 	var input UpdateArtefactInput
 	ExtractInput(ctx, &input)
+	if input.Set != nil {
+		if err := checkNoSep(input.Set.Name, input.Set.Color); err != nil {
+			return nil, LogErr("Invalid input", err)
+		}
+	}
 
 	// Get nodes in order to perform @auth rules against it
 	nodes := []model.NodeRef{}

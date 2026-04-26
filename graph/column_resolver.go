@@ -132,6 +132,9 @@ func addProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver) (
 	var inputs []model.AddProjectColumnInput
 	ExtractInputs(ctx, &inputs)
 	for _, input := range inputs {
+		if err := checkNoSep(&input.Name, input.Color); err != nil {
+			return nil, LogErr("Invalid input", err)
+		}
 		// Check project auth
 		if err = auth.Authorize(auth.CheckProjectAuth(uctx, *input.Project.ID)); err != nil {
 			return nil, err
@@ -242,6 +245,11 @@ func updateProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 	// Get input
 	var input model.UpdateProjectColumnInput
 	ExtractInput(ctx, &input)
+	if input.Set != nil {
+		if err := checkNoSep(input.Set.Name, input.Set.Color); err != nil {
+			return nil, LogErr("Invalid input", err)
+		}
+	}
 	isMoved := false
 	oldColumn := ProjectColumnLoc{}
 	if input.Set == nil || len(input.Filter.ID) != 1 {
