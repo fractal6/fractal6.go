@@ -24,6 +24,7 @@ package graph_test
 
 import (
 	"testing"
+	"time"
 
 	"fractale/fractal6.go/db"
 	. "fractale/fractal6.go/graph"
@@ -253,8 +254,9 @@ func TestPushProjectColumnMoved(t *testing.T) {
 		Typenames:   []string{"Tension"},
 	}
 
+	newCol := ProjectColumnDesc{ID: env.colBID, Name: "Evt Col B", Color: "#bbb222"}
 	uctx := &model.UserCtx{Username: testutil.TestUser}
-	if err := PushProjectColumnMoved(uctx, oldLoc, env.colBID); err != nil {
+	if err := PushProjectColumnMoved(uctx, oldLoc, newCol); err != nil {
 		t.Fatalf("PushProjectColumnMoved: %v", err)
 	}
 
@@ -284,8 +286,9 @@ func TestPushProjectColumnMoved_SameColumnSkipped(t *testing.T) {
 		Projectname: "Evt Test Project", Pos: 0,
 		Contentid: env.tensionID, Typenames: []string{"Tension"},
 	}
+	sameCol := ProjectColumnDesc{ID: env.colAID, Name: "Evt Col A", Color: "#aaa111"}
 	uctx := &model.UserCtx{Username: testutil.TestUser}
-	if err := PushProjectColumnMoved(uctx, oldLoc, env.colAID); err != nil {
+	if err := PushProjectColumnMoved(uctx, oldLoc, sameCol); err != nil {
 		t.Fatalf("PushProjectColumnMoved (same col): %v", err)
 	}
 	if got := fetchHistory(t, env.tensionID, model.TensionEventProjectColumnMoved); len(got) != 0 {
@@ -320,6 +323,56 @@ func TestPushProjectRemoved(t *testing.T) {
 	}
 	if got[0].New != "" {
 		t.Errorf("ProjectRemoved.new = %q, want empty", got[0].New)
+	}
+}
+
+// activityCount returns the current Activity.count for the given activityid,
+// or 0 if no Activity node exists yet.
+func activityCount(t *testing.T, activityid string) int {
+	t.Helper()
+	type row struct {
+		Count int `json:"count"`
+	}
+	q := db.QueryMut{
+		Q: `query {
+            all(func: eq(Activity.activityid, "` + activityid + `")) @normalize {
+                count: Activity.count
+            }
+        }`,
+	}
+	out, err := db.Gamma[row](q, map[string]string{})
+	if err != nil {
+		t.Fatalf("activityCount(%s): %v", activityid, err)
+	}
+	if len(out) == 0 {
+		return 0
+	}
+	return out[0].Count
+}
+
+// TestPushProjectAdded_TracksActivity verifies that emitting a project event
+// also bumps the daily Activity counters for the user and the root org.
+func TestPushProjectAdded_TracksActivity(t *testing.T) {
+	env := seedCardEnv(t)
+	defer cleanupCardEnv(t, env)
+
+	today := time.Now().UTC().Format("2006-01-02")
+	userKey := "u#" + testutil.TestUser + "#" + today
+	orgKey := "o#test-org#" + today
+
+	beforeUser := activityCount(t, userKey)
+	beforeOrg := activityCount(t, orgKey)
+
+	uctx := &model.UserCtx{Username: testutil.TestUser}
+	if err := PushProjectAdded(uctx, env.cardID); err != nil {
+		t.Fatalf("PushProjectAdded: %v", err)
+	}
+
+	if got := activityCount(t, userKey); got != beforeUser+1 {
+		t.Errorf("user activity count = %d, want %d", got, beforeUser+1)
+	}
+	if got := activityCount(t, orgKey); got != beforeOrg+1 {
+		t.Errorf("org activity count = %d, want %d", got, beforeOrg+1)
 	}
 }
 
