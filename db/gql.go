@@ -119,27 +119,20 @@ var gqlQueries map[string]string = map[string]string{
 //
 
 // Query data using GQL dgraph API. @auth rules will apply.
+// k must be "id" or a field that supports {in: […]} (i.e. @id or @search(by:[hash])).
 func (dg Dgraph) Query(uctx model.UserCtx, vertex string, k string, values []string, queryGraph string) ([]map[string]string, error) {
 	Vertex := strings.ToUpper(vertex[:1]) + vertex[1:]
 	queryName := "query" + Vertex
 
-	var i int
-	var n, args string
+	var args string
 	var res []map[string]string
 
 	// Build query arguments
+	formatted, _ := json.Marshal(values)
 	if k == "id" {
-		ids_formated, _ := json.Marshal(values)
-		args = fmt.Sprintf(`id: %s`, ids_formated)
+		args = fmt.Sprintf(`id: %s`, formatted)
 	} else {
-		for i, n = range values {
-			if i == 0 {
-				args += fmt.Sprintf(`%s: {eq:"%s"},`, k, n)
-			} else {
-				args += fmt.Sprintf(`or: {%s: {eq: "%s"},`, k, n)
-			}
-		}
-		args += strings.Repeat("},", i)
+		args = fmt.Sprintf(`%s: {in: %s}`, k, formatted)
 	}
 
 	// Build query

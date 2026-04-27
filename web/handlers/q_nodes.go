@@ -24,6 +24,7 @@ import (
 	"net/http"
 
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/web/auth"
 )
@@ -75,20 +76,13 @@ func setNodes[T nodeHolder](item *T, nodes []*model.Node) {
 
 // filterByNodeVisibility filters items (Labels, RoleExt, or Projects) by checking
 // visibility of their attached nodes. Items with no visible nodes are dropped.
+//
+// If every attached node already has Visibility populated (e.g. fetched in the
+// DQL select), the membership/role check runs in-memory and skips the
+// GraphQL @auth roundtrip — that auth pass is redundant since we re-check
+// manually below.
 func filterByNodeVisibility[T nodeHolder](uctx *model.UserCtx, data []T) ([]T, error) {
-	nodeSet := make(map[string]bool)
-	for i := range data {
-		for _, n := range getNodes(&data[i]) {
-			if n != nil {
-				nodeSet[n.Nameid] = true
-			}
-		}
-	}
-	var allNameids []string
-	for nid := range nodeSet {
-		allNameids = append(allNameids, nid)
-	}
-	visible, err := auth.NodeVisibilityFilter(uctx, allNameids)
+	visible, err := buildVisibilityMap(uctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +100,45 @@ func filterByNodeVisibility[T nodeHolder](uctx *model.UserCtx, data []T) ([]T, e
 		}
 	}
 	return filtered, nil
+}
+
+// buildVisibilityMap returns a {nameid: bool} map for all nodes attached to
+// data. Uses pre-fetched Node.Visibility when available; otherwise falls back
+// to auth.NodeVisibilityFilter (which queries Dgraph through @auth rules).
+func buildVisibilityMap[T nodeHolder](uctx *model.UserCtx, data []T) (map[string]bool, error) {
+	type pair struct {
+		nameid string
+		vis    model.NodeVisibility
+	}
+	var flat []pair
+	for i := range data {
+		for _, n := range getNodes(&data[i]) {
+			if n == nil {
+				continue
+			}
+			flat = append(flat, pair{n.Nameid, n.Visibility})
+		}
+	}
+	return visibilityMapFromNodes(uctx, flat, func(p pair) (string, model.NodeVisibility) {
+		return p.nameid, p.vis
+	})
+}
+
+// isNodeVisible mirrors the rules in auth.NodeVisibilityFilter but works from
+// an already-known visibility value, avoiding a Dgraph roundtrip.
+func isNodeVisible(uctx *model.UserCtx, nameid string, visibility model.NodeVisibility) (bool, error) {
+	nid, err := codec.Nid2pid(nameid)
+	if err != nil {
+		return false, err
+	}
+	switch visibility {
+	case model.NodeVisibilityPrivate:
+		return auth.UserIsMember(uctx, nid) >= 0, nil
+	case model.NodeVisibilitySecret:
+		return auth.UserHasRole(uctx, nid) >= 0, nil
+	default:
+		return true, nil
+	}
 }
 
 // NodeHolderHandler returns a handler that decodes a nodeQuery, fetches items
@@ -137,20 +170,16 @@ func SubNodes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get sub children
 	data, err := db.GetDB().GetSubNodes("nameid", form.Nameid, form.IncludeSelf)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	// Filter nodes by visibility
 	uctx := auth.GetUserContextOrEmpty(r.Context())
-	var nameids []string
-	for _, n := range data {
-		nameids = append(nameids, n.Nameid)
-	}
-	visible, err := auth.NodeVisibilityFilter(&uctx, nameids)
+	visible, err := visibilityMapFromNodes(&uctx, data, func(n model.Node) (string, model.NodeVisibility) {
+		return n.Nameid, n.Visibility
+	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -171,26 +200,19 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get sub members
 	data, err := db.GetDB().GetSubMembers("nameid", form.Nameid, "User.name User.username", form.IncludeSelf)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	// Filter members by parent circle visibility
 	uctx := auth.GetUserContextOrEmpty(r.Context())
-	parentSet := make(map[string]bool)
-	for _, n := range data {
-		if n.Parent != nil {
-			parentSet[n.Parent.Nameid] = true
+	visible, err := visibilityMapFromNodes(&uctx, data, func(n model.Node) (string, model.NodeVisibility) {
+		if n.Parent == nil {
+			return "", ""
 		}
-	}
-	var parentNameids []string
-	for nid := range parentSet {
-		parentNameids = append(parentNameids, nid)
-	}
-	visible, err := auth.NodeVisibilityFilter(&uctx, parentNameids)
+		return n.Parent.Nameid, n.Parent.Visibility
+	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -203,4 +225,45 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, filtered)
+}
+
+// visibilityMapFromNodes builds a {nameid: bool} visibility map for nodes
+// extracted via keyFn. If every key has a non-empty Visibility, the check runs
+// in-memory; otherwise it falls back to auth.NodeVisibilityFilter.
+func visibilityMapFromNodes[T any](uctx *model.UserCtx, items []T, keyFn func(T) (string, model.NodeVisibility)) (map[string]bool, error) {
+	known := make(map[string]model.NodeVisibility)
+	allKnown := true
+	for _, it := range items {
+		nameid, vis := keyFn(it)
+		if nameid == "" {
+			continue
+		}
+		if _, ok := known[nameid]; ok {
+			continue
+		}
+		known[nameid] = vis
+		if vis == "" {
+			allKnown = false
+		}
+	}
+
+	if !allKnown {
+		nameids := make([]string, 0, len(known))
+		for nid := range known {
+			nameids = append(nameids, nid)
+		}
+		return auth.NodeVisibilityFilter(uctx, nameids)
+	}
+
+	visible := make(map[string]bool, len(known))
+	for nameid, vis := range known {
+		v, err := isNodeVisible(uctx, nameid, vis)
+		if err != nil {
+			return nil, err
+		}
+		if v {
+			visible[nameid] = true
+		}
+	}
+	return visible, nil
 }

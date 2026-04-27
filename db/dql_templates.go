@@ -321,6 +321,7 @@ var dqlQueries map[string]string = map[string]string{
 
         all(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
             Node.{{.fieldid}}
+            Node.visibility
         }
     }`,
 	"getSubMembers": `{
@@ -341,6 +342,7 @@ var dqlQueries map[string]string = map[string]string{
             Node.first_link { {{.user_payload}} }
             Node.parent {
                 Node.nameid
+                Node.visibility
             }
         }
     }`,
@@ -358,7 +360,7 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Label.name
             Label.color
-            Label.nodes { Node.nameid }
+            Label.nodes { Node.nameid Node.visibility }
         }
     }`,
 	"getSubLabels": `{
@@ -375,7 +377,7 @@ var dqlQueries map[string]string = map[string]string{
             uid
             Label.name
             Label.color
-            Label.nodes { Node.nameid }
+            Label.nodes { Node.nameid Node.visibility }
         }
     }`,
 	"getTopRoles": `{
@@ -393,7 +395,7 @@ var dqlQueries map[string]string = map[string]string{
             RoleExt.name
             RoleExt.color
             RoleExt.role_type
-            RoleExt.nodes { Node.nameid }
+            RoleExt.nodes { Node.nameid Node.visibility }
         }
     }`,
 	"getSubRoles": `{
@@ -411,7 +413,7 @@ var dqlQueries map[string]string = map[string]string{
             RoleExt.name
             RoleExt.color
             RoleExt.role_type
-            RoleExt.nodes { Node.nameid }
+            RoleExt.nodes { Node.nameid Node.visibility }
         }
     }`,
 	"getTopTensionTemplates": `{
@@ -438,7 +440,7 @@ var dqlQueries map[string]string = map[string]string{
             TensionTemplate.title
             TensionTemplate.comment
             TensionTemplate.type_
-            TensionTemplate.nodes { Node.nameid }
+            TensionTemplate.nodes { Node.nameid Node.visibility }
         }
     }`,
 	"getSubTensionTemplates": `{
@@ -459,7 +461,7 @@ var dqlQueries map[string]string = map[string]string{
             TensionTemplate.title
             TensionTemplate.comment
             TensionTemplate.type_
-            TensionTemplate.nodes { Node.nameid }
+            TensionTemplate.nodes { Node.nameid Node.visibility }
         }
     }`,
 	"getSubProjects": `{
@@ -477,7 +479,7 @@ var dqlQueries map[string]string = map[string]string{
             Project.updatedAt
             Project.name
             Project.description
-            Project.nodes { Node.nameid Node.name }
+            Project.nodes { Node.nameid Node.name Node.visibility }
             Project.collaborators { User.username User.name }
         }
     }`,
