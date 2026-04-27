@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/dgraph-io/dgo/v200/protos/api"
@@ -139,6 +140,183 @@ func (dg Dgraph) Exists(fieldName string, value string, filter *string) (bool, e
 		return false, err
 	}
 	return len(r.All) > 0, nil
+}
+
+// GetNodeVisibilities returns a {nameid -> visibility} map for the given
+// nameids using a DQL query that bypasses @auth. Callers must perform their
+// own visibility / membership check.
+func (dg Dgraph) GetNodeVisibilities(nameids []string) (map[string]model.NodeVisibility, error) {
+	out := map[string]model.NodeVisibility{}
+	if len(nameids) == 0 {
+		return out, nil
+	}
+	res, err := dg.QueryDql("getNodeVisibilities", map[string]string{
+		"nameids": quoteNameids(nameids),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return decodeNodeVisibilities(res)
+}
+
+// GetSubNodeVisibilities returns a {nameid -> visibility} map for every Circle
+// in the subtree rooted at (fieldid, objid). Bypasses @auth — callers must
+// classify visibility themselves (see auth.ClassifyVisibleNameids).
+func (dg Dgraph) GetSubNodeVisibilities(fieldid, objid string, includeSelf bool) (map[string]model.NodeVisibility, error) {
+	return dg.queryNodeVisibilities("getSubNodeVisibilities", fieldid, objid, includeSelf)
+}
+
+// GetTopNodeVisibilities returns a {nameid -> visibility} map for every Circle
+// in the ancestor chain of (fieldid, objid). Bypasses @auth.
+func (dg Dgraph) GetTopNodeVisibilities(fieldid, objid string, includeSelf bool) (map[string]model.NodeVisibility, error) {
+	return dg.queryNodeVisibilities("getTopNodeVisibilities", fieldid, objid, includeSelf)
+}
+
+func (dg Dgraph) queryNodeVisibilities(query, fieldid, objid string, includeSelf bool) (map[string]model.NodeVisibility, error) {
+	res, err := dg.QueryDql(query, map[string]string{
+		"fieldid":     fieldid,
+		"objid":       objid,
+		"excludeSelf": excludeSelfFlag(includeSelf),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return decodeNodeVisibilities(res)
+}
+
+func decodeNodeVisibilities(res *api.Response) (map[string]model.NodeVisibility, error) {
+	out := map[string]model.NodeVisibility{}
+	r, err := unmarshalDqlResp(res)
+	if err != nil {
+		return nil, err
+	}
+	for _, m := range r.All {
+		nameid, _ := m["Node.nameid"].(string)
+		vis, _ := m["Node.visibility"].(string)
+		if nameid != "" {
+			out[nameid] = model.NodeVisibility(vis)
+		}
+	}
+	return out, nil
+}
+
+func quoteNameids(nameids []string) string {
+	quoted := make([]string, len(nameids))
+	for i, n := range nameids {
+		quoted[i] = strconv.Quote(n)
+	}
+	return strings.Join(quoted, ",")
+}
+
+// GetMembersIn returns members (Roles with first_link) attached to circles
+// in the given visible-nameids list.
+func (dg Dgraph) GetMembersIn(nameids []string, userPayload string) ([]model.Node, error) {
+	if len(nameids) == 0 {
+		return []model.Node{}, nil
+	}
+	results, err := dg.Meta("getMembersByNameids", map[string]string{
+		"nameids":      quoteNameids(nameids),
+		"user_payload": userPayload,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return DecodeDql[[]model.Node](results)
+}
+
+// GetLabelsIn returns labels attached to circles in the given visible-nameids list.
+// Labels deduplicated by name. objid is unused; present to match ArtefactFetcher.
+func (dg Dgraph) GetLabelsIn(nameids []string, objid string) ([]model.Label, error) {
+	if len(nameids) == 0 {
+		return []model.Label{}, nil
+	}
+	results, err := dg.Meta("getLabelsByNameids", map[string]string{
+		"nameids": quoteNameids(nameids),
+	})
+	if err != nil {
+		return nil, err
+	}
+	data, err := DecodeDql[[]model.Label](results)
+	if err != nil {
+		return nil, err
+	}
+	return Dedupe(data, func(l model.Label) string { return l.Name }), nil
+}
+
+// GetRolesIn returns role templates attached to circles in the given visible-nameids list.
+// Roles deduplicated by name. objid is unused; present to match ArtefactFetcher.
+func (dg Dgraph) GetRolesIn(nameids []string, objid string) ([]model.RoleExt, error) {
+	if len(nameids) == 0 {
+		return []model.RoleExt{}, nil
+	}
+	results, err := dg.Meta("getRolesByNameids", map[string]string{
+		"nameids": quoteNameids(nameids),
+	})
+	if err != nil {
+		return nil, err
+	}
+	data, err := DecodeDql[[]model.RoleExt](results)
+	if err != nil {
+		return nil, err
+	}
+	return Dedupe(data, func(r model.RoleExt) string { return r.Name }), nil
+}
+
+// GetTensionTemplatesIn returns all tension templates attached to circles in
+// the given visible-nameids list. Used by /q/tension_templates/sub. objid is
+// unused; present to match ArtefactFetcher.
+func (dg Dgraph) GetTensionTemplatesIn(nameids []string, objid string) ([]model.TensionTemplate, error) {
+	if len(nameids) == 0 {
+		return []model.TensionTemplate{}, nil
+	}
+	results, err := dg.Meta("getTensionTemplatesByNameids", map[string]string{
+		"nameids": quoteNameids(nameids),
+	})
+	if err != nil {
+		return nil, err
+	}
+	data, err := DecodeDql[[]model.TensionTemplate](results)
+	if err != nil {
+		return nil, err
+	}
+	return Dedupe(data, func(t model.TensionTemplate) string { return t.ID }), nil
+}
+
+// GetTopTensionTemplatesIn returns templates inherited from ancestors
+// (is_recursive=true only) plus all templates from self (when self is in
+// the visible set). Used by /q/tension_templates/top.
+func (dg Dgraph) GetTopTensionTemplatesIn(nameids []string, objid string) ([]model.TensionTemplate, error) {
+	if len(nameids) == 0 {
+		return []model.TensionTemplate{}, nil
+	}
+	results, err := dg.Meta("getTopTensionTemplatesByNameids", map[string]string{
+		"nameids": quoteNameids(nameids),
+		"fieldid": "nameid",
+		"objid":   objid,
+	})
+	if err != nil {
+		return nil, err
+	}
+	data, err := DecodeDql[[]model.TensionTemplate](results)
+	if err != nil {
+		return nil, err
+	}
+	return Dedupe(data, func(t model.TensionTemplate) string { return t.ID }), nil
+}
+
+// GetProjectsIn returns projects attached to circles in the given visible-nameids list.
+// objid is unused; present to match ArtefactFetcher.
+func (dg Dgraph) GetProjectsIn(nameids []string, objid string) ([]ProjectFull, error) {
+	if len(nameids) == 0 {
+		return []ProjectFull{}, nil
+	}
+	results, err := dg.Meta("getProjectsByNameids", map[string]string{
+		"nameids": quoteNameids(nameids),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return DecodeDql[[]ProjectFull](results)
 }
 
 // IsChild returns true is a node parent has the given child.
@@ -455,20 +633,9 @@ func excludeSelfFlag(includeSelf bool) string {
 	return ""
 }
 
-// Get all sub children
-func (dg Dgraph) GetSubNodes(fieldid string, objid string, includeSelf bool) ([]model.Node, error) {
-	results, err := dg.Meta("getSubNodes", map[string]string{
-		"fieldid":     fieldid,
-		"objid":       objid,
-		"excludeSelf": excludeSelfFlag(includeSelf),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return DecodeDql[[]model.Node](results)
-}
-
-// Get all sub members
+// GetSubMembers returns all members in the subtree of (fieldid, objid).
+// Used by graph/notifications.go for system-level dispatch (no auth check).
+// /q/members/sub uses the visibility-aware GetMembersIn instead.
 func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string, includeSelf bool) ([]model.Node, error) {
 	results, err := dg.Meta("getSubMembers", map[string]string{
 		"fieldid":      fieldid,
@@ -482,115 +649,7 @@ func (dg Dgraph) GetSubMembers(fieldid, objid, user_payload string, includeSelf 
 	return DecodeDql[[]model.Node](results)
 }
 
-// Get all top labels
-func (dg Dgraph) GetTopLabels(fieldid string, objid string, includeSelf bool) ([]model.Label, error) {
-	results, err := dg.Meta("getTopLabels", map[string]string{
-		"fieldid":     fieldid,
-		"objid":       objid,
-		"excludeSelf": excludeSelfFlag(includeSelf),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := DecodeDql[[]model.Label](results)
-	if err != nil {
-		return nil, err
-	}
-	return Dedupe(data, func(l model.Label) string { return l.Name }), nil
-}
-
-// Get all sub labels
-func (dg Dgraph) GetSubLabels(fieldid string, objid string, includeSelf bool) ([]model.Label, error) {
-	results, err := dg.Meta("getSubLabels", map[string]string{
-		"fieldid":     fieldid,
-		"objid":       objid,
-		"excludeSelf": excludeSelfFlag(includeSelf),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := DecodeDql[[]model.Label](results)
-	if err != nil {
-		return nil, err
-	}
-	return Dedupe(data, func(l model.Label) string { return l.Name }), nil
-}
-
-// Get all top roles
-func (dg Dgraph) GetTopRoles(fieldid string, objid string, includeSelf bool) ([]model.RoleExt, error) {
-	results, err := dg.Meta("getTopRoles", map[string]string{
-		"fieldid":     fieldid,
-		"objid":       objid,
-		"excludeSelf": excludeSelfFlag(includeSelf),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := DecodeDql[[]model.RoleExt](results)
-	if err != nil {
-		return nil, err
-	}
-	return Dedupe(data, func(r model.RoleExt) string { return r.Name }), nil
-}
-
-// Get all sub roles
-func (dg Dgraph) GetSubRoles(fieldid string, objid string, includeSelf bool) ([]model.RoleExt, error) {
-	results, err := dg.Meta("getSubRoles", map[string]string{
-		"fieldid":     fieldid,
-		"objid":       objid,
-		"excludeSelf": excludeSelfFlag(includeSelf),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := DecodeDql[[]model.RoleExt](results)
-	if err != nil {
-		return nil, err
-	}
-	return Dedupe(data, func(r model.RoleExt) string { return r.Name }), nil
-}
-
-// Get all top tension templates
-func (dg Dgraph) GetTopTensionTemplates(fieldid string, objid string, includeSelf bool) ([]model.TensionTemplate, error) {
-	results, err := dg.Meta("getTopTensionTemplates", map[string]string{
-		"fieldid":     fieldid,
-		"objid":       objid,
-		"excludeSelf": excludeSelfFlag(includeSelf),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := DecodeDql[[]model.TensionTemplate](results)
-	if err != nil {
-		return nil, err
-	}
-	return Dedupe(data, func(t model.TensionTemplate) string { return t.ID }), nil
-}
-
-// Get all sub tension templates
-func (dg Dgraph) GetSubTensionTemplates(fieldid string, objid string, includeSelf bool) ([]model.TensionTemplate, error) {
-	results, err := dg.Meta("getSubTensionTemplates", map[string]string{
-		"fieldid":     fieldid,
-		"objid":       objid,
-		"excludeSelf": excludeSelfFlag(includeSelf),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := DecodeDql[[]model.TensionTemplate](results)
-	if err != nil {
-		return nil, err
-	}
-	return Dedupe(data, func(t model.TensionTemplate) string { return t.ID }), nil
-}
-
-// ProjectFull is a lightweight project representation for the sub_projects endpoint.
+// ProjectFull is a lightweight project representation for the /q/projects/sub endpoint.
 type ProjectFull struct {
 	ID            string        `json:"id"`
 	UpdatedAt     string        `json:"updatedAt,omitempty"`
@@ -598,19 +657,6 @@ type ProjectFull struct {
 	Description   *string       `json:"description,omitempty"`
 	Nodes         []*model.Node `json:"nodes,omitempty"`
 	Collaborators []*model.User `json:"collaborators,omitempty"`
-}
-
-// Get all sub projects
-func (dg Dgraph) GetSubProjects(fieldid string, objid string, includeSelf bool) ([]ProjectFull, error) {
-	results, err := dg.Meta("getSubProjects", map[string]string{
-		"fieldid":     fieldid,
-		"objid":       objid,
-		"excludeSelf": excludeSelfFlag(includeSelf),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return DecodeDql[[]ProjectFull](results)
 }
 
 func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, error) {

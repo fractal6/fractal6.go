@@ -165,6 +165,128 @@ var dqlQueries map[string]string = map[string]string{
         all(func: regexp(Node.nameid, /{{.regex}}/)) @filter(eq(Node.isRoot, true))
         {{.payload}}
     }`,
+	"getNodeVisibilities": `{
+        all(func: eq(Node.nameid, [{{.nameids}}])) {
+            Node.nameid
+            Node.visibility
+        }
+    }`,
+	"getSubNodeVisibilities": `{
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+            o as uid
+            Node.children
+        }
+
+        all(func: uid(o)) @filter(eq(Node.isArchived, false) AND eq(Node.type_, "Circle"){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
+            Node.nameid
+            Node.visibility
+        }
+    }`,
+	"getTopNodeVisibilities": `{
+        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
+            o as uid
+            Node.parent @normalize
+        }
+
+        all(func: uid(o)) @filter(eq(Node.isArchived, false) AND eq(Node.type_, "Circle"){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
+            Node.nameid
+            Node.visibility
+        }
+    }`,
+	"getMembersByNameids": `{
+        var(func: eq(Node.nameid, [{{.nameids}}])) {
+            m as Node.children
+        }
+
+        all(func: uid(m)) @filter(has(Node.first_link) AND has(Node.role_type) AND eq(Node.isArchived, false)
+                           AND NOT eq(Node.role_type, "Pending") AND NOT eq(Node.role_type, "Retired")) {
+            Node.createdAt
+            Node.name
+            Node.nameid
+            Node.role_type
+            Node.color
+            Node.first_link { {{.user_payload}} }
+            Node.parent {
+                Node.nameid
+                Node.visibility
+            }
+        }
+    }`,
+	"getLabelsByNameids": `{
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false)) {
+            l as Node.labels
+        }
+
+        all(func: uid(l)) {
+            uid
+            Label.name
+            Label.color
+            Label.nodes { Node.nameid Node.visibility }
+        }
+    }`,
+	"getRolesByNameids": `{
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false)) {
+            l as Node.roles
+        }
+
+        all(func: uid(l)) {
+            uid
+            RoleExt.name
+            RoleExt.color
+            RoleExt.role_type
+            RoleExt.nodes { Node.nameid Node.visibility }
+        }
+    }`,
+	"getTensionTemplatesByNameids": `{
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false)) {
+            l as Node.tension_templates
+        }
+
+        all(func: uid(l)) {
+            uid
+            TensionTemplate.name
+            TensionTemplate.description
+            TensionTemplate.is_recursive
+            TensionTemplate.title
+            TensionTemplate.comment
+            TensionTemplate.type_
+            TensionTemplate.nodes { Node.nameid Node.visibility }
+        }
+    }`,
+	"getTopTensionTemplatesByNameids": `{
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
+            la as Node.tension_templates @filter(eq(TensionTemplate.is_recursive, true))
+        }
+
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false) AND eq(Node.{{.fieldid}}, "{{.objid}}")) {
+            ls as Node.tension_templates
+        }
+
+        all(func: uid(la, ls)) {
+            uid
+            TensionTemplate.name
+            TensionTemplate.description
+            TensionTemplate.is_recursive
+            TensionTemplate.title
+            TensionTemplate.comment
+            TensionTemplate.type_
+            TensionTemplate.nodes { Node.nameid Node.visibility }
+        }
+    }`,
+	"getProjectsByNameids": `{
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false)) {
+            p as Node.projects
+        }
+
+        all(func: uid(p)) @filter(eq(Project.status, "Open")) {
+            uid
+            Project.updatedAt
+            Project.name
+            Project.description
+            Project.nodes { Node.nameid Node.name Node.visibility }
+            Project.collaborators { User.username User.name }
+        }
+    }`,
 	"getTensionHook": `{
         all(func: uid("{{.id}}"))
         {{.payload}}
@@ -313,17 +435,6 @@ var dqlQueries map[string]string = map[string]string{
 
         }
     }`,
-	"getSubNodes": `{
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as uid
-            Node.children
-        }
-
-        all(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
-            Node.{{.fieldid}}
-            Node.visibility
-        }
-    }`,
 	"getSubMembers": `{
         var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
             o as uid
@@ -344,143 +455,6 @@ var dqlQueries map[string]string = map[string]string{
                 Node.nameid
                 Node.visibility
             }
-        }
-    }`,
-	"getTopLabels": `{
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as uid
-            Node.parent @normalize
-        }
-
-        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
-            l as Node.labels
-        }
-
-        all(func: uid(l)){
-            uid
-            Label.name
-            Label.color
-            Label.nodes { Node.nameid Node.visibility }
-        }
-    }`,
-	"getSubLabels": `{
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as uid
-            Node.children
-        }
-
-        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
-            l as Node.labels
-        }
-
-        all(func: uid(l)){
-            uid
-            Label.name
-            Label.color
-            Label.nodes { Node.nameid Node.visibility }
-        }
-    }`,
-	"getTopRoles": `{
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as uid
-            Node.parent @normalize
-        }
-
-        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
-            l as Node.roles
-        }
-
-        all(func: uid(l)){
-            uid
-            RoleExt.name
-            RoleExt.color
-            RoleExt.role_type
-            RoleExt.nodes { Node.nameid Node.visibility }
-        }
-    }`,
-	"getSubRoles": `{
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as uid
-            Node.children
-        }
-
-        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
-            l as Node.roles
-        }
-
-        all(func: uid(l)){
-            uid
-            RoleExt.name
-            RoleExt.color
-            RoleExt.role_type
-            RoleExt.nodes { Node.nameid Node.visibility }
-        }
-    }`,
-	"getTopTensionTemplates": `{
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as uid
-            Node.parent @normalize
-        }
-
-        var(func: uid(o)) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
-            la as Node.tension_templates @filter(eq(TensionTemplate.is_recursive, true))
-        }
-
-        {{if not .excludeSelf}}
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @filter(eq(Node.isArchived, false)) {
-            ls as Node.tension_templates
-        }
-        {{end}}
-
-        all(func: uid(la{{if not .excludeSelf}}, ls{{end}})){
-            uid
-            TensionTemplate.name
-            TensionTemplate.description
-            TensionTemplate.is_recursive
-            TensionTemplate.title
-            TensionTemplate.comment
-            TensionTemplate.type_
-            TensionTemplate.nodes { Node.nameid Node.visibility }
-        }
-    }`,
-	"getSubTensionTemplates": `{
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as uid
-            Node.children
-        }
-
-        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
-            l as Node.tension_templates
-        }
-
-        all(func: uid(l)){
-            uid
-            TensionTemplate.name
-            TensionTemplate.description
-            TensionTemplate.is_recursive
-            TensionTemplate.title
-            TensionTemplate.comment
-            TensionTemplate.type_
-            TensionTemplate.nodes { Node.nameid Node.visibility }
-        }
-    }`,
-	"getSubProjects": `{
-        var(func: eq(Node.{{.fieldid}}, "{{.objid}}")) @recurse {
-            o as uid
-            Node.children
-        }
-
-        var(func: uid(o)) @filter(eq(Node.isArchived, false){{if .excludeSelf}} AND NOT eq(Node.{{.fieldid}}, "{{.objid}}"){{end}}) {
-            p as Node.projects
-        }
-
-        all(func: uid(p)) @filter(eq(Project.status, "Open")) {
-            uid
-            Project.updatedAt
-            Project.name
-            Project.description
-            Project.nodes { Node.nameid Node.name Node.visibility }
-            Project.collaborators { User.username User.name }
         }
     }`,
 	"getTensionInt": `{

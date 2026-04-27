@@ -92,6 +92,8 @@ func buildTestRouter() chi.Router {
 
 	// Query routes
 	r.Route("/q", func(r chi.Router) {
+		top := db.GetDB().GetTopNodeVisibilities
+		sub := db.GetDB().GetSubNodeVisibilities
 		r.Route("/nodes", func(r chi.Router) {
 			r.Post("/sub", SubNodes)
 		})
@@ -99,15 +101,15 @@ func buildTestRouter() chi.Router {
 			r.Post("/sub", SubMembers)
 		})
 		r.Route("/labels", func(r chi.Router) {
-			r.Post("/top", NodeHolderHandler(db.GetDB().GetTopLabels))
-			r.Post("/sub", NodeHolderHandler(db.GetDB().GetSubLabels))
+			r.Post("/top", NodeHolderHandler(top, db.GetDB().GetLabelsIn))
+			r.Post("/sub", NodeHolderHandler(sub, db.GetDB().GetLabelsIn))
 		})
 		r.Route("/roles", func(r chi.Router) {
-			r.Post("/top", NodeHolderHandler(db.GetDB().GetTopRoles))
-			r.Post("/sub", NodeHolderHandler(db.GetDB().GetSubRoles))
+			r.Post("/top", NodeHolderHandler(top, db.GetDB().GetRolesIn))
+			r.Post("/sub", NodeHolderHandler(sub, db.GetDB().GetRolesIn))
 		})
 		r.Route("/projects", func(r chi.Router) {
-			r.Post("/sub", NodeHolderHandler(db.GetDB().GetSubProjects))
+			r.Post("/sub", NodeHolderHandler(sub, db.GetDB().GetProjectsIn))
 		})
 		r.Route("/tensions", func(r chi.Router) {
 			r.Post("/light", TensionsHandler("light"))

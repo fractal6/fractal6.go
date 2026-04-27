@@ -20,132 +20,19 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Tests for named-template queries: tension search/pattern, parents/history
+// traversal, and the two-phase /q/* visibility helpers (Get*Visibilities,
+// Get*In). Generic primitives are tested in integration_helpers_test.go.
+
 package db_test
 
 import (
-	"encoding/json"
 	"strings"
 	"testing"
 
 	. "fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 )
-
-func TestCountHas_Integration(t *testing.T) {
-	t.Parallel()
-	count := GetDB().CountHas("Node.nameid")
-	if count < 1 {
-		t.Errorf("CountHas(Node.nameid) = %d, want >= 1", count)
-	}
-	t.Logf("CountHas(Node.nameid) = %d", count)
-}
-
-func TestExists_Integration(t *testing.T) {
-	t.Parallel()
-
-	t.Run("found", func(t *testing.T) {
-		t.Parallel()
-		found, err := GetDB().Exists("Node.nameid", "test-org", nil)
-		if err != nil {
-			t.Fatalf("Exists returned error: %v", err)
-		}
-		if !found {
-			t.Error("Exists(Node.nameid, test-org) = false, want true")
-		}
-	})
-
-	t.Run("not_found", func(t *testing.T) {
-		t.Parallel()
-		found, err := GetDB().Exists("Node.nameid", "nonexistent-org#", nil)
-		if err != nil {
-			t.Fatalf("Exists returned error: %v", err)
-		}
-		if found {
-			t.Error("Exists(Node.nameid, nonexistent-org#) = true, want false")
-		}
-	})
-}
-
-func TestGetFieldByEq_Integration(t *testing.T) {
-	t.Parallel()
-	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.name")
-	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
-	}
-	name, ok := val.(string)
-	if !ok {
-		t.Fatalf("GetFieldByEq returned type %T, want string", val)
-	}
-	if name != "Test Org" {
-		t.Errorf("GetFieldByEq(Node.name) = %q, want %q", name, "Test Org")
-	}
-}
-
-func TestIsChild_Integration(t *testing.T) {
-	t.Parallel()
-
-	t.Run("is_child", func(t *testing.T) {
-		t.Parallel()
-		isChild, err := GetDB().IsChild("test-org", "test-org##@testuser")
-		if err != nil {
-			t.Fatalf("IsChild returned error: %v", err)
-		}
-		if !isChild {
-			t.Error("IsChild(test-org, test-org##@testuser) = false, want true")
-		}
-	})
-
-	t.Run("not_child", func(t *testing.T) {
-		t.Parallel()
-		isChild, err := GetDB().IsChild("test-org", "nonexistent#")
-		if err != nil {
-			t.Fatalf("IsChild returned error: %v", err)
-		}
-		if isChild {
-			t.Error("IsChild(test-org, nonexistent#) = true, want false")
-		}
-	})
-}
-
-func TestGetChildren_Integration(t *testing.T) {
-	t.Parallel()
-	children, err := GetDB().GetChildren("test-org")
-	if err != nil {
-		t.Fatalf("GetChildren returned error: %v", err)
-	}
-	if len(children) < 2 {
-		t.Errorf("GetChildren(test-org) returned %d children, want >= 2", len(children))
-	}
-	t.Logf("GetChildren(test-org) = %v", children)
-}
-
-func TestHasCoordos_Integration(t *testing.T) {
-	t.Parallel()
-	has := GetDB().HasCoordos("test-org")
-	if !has {
-		t.Error("HasCoordos(test-org) = false, want true")
-	}
-}
-
-func TestQueryDql_IntegrationRaw(t *testing.T) {
-	t.Parallel()
-	res, err := GetDB().QueryDql("exists", map[string]string{
-		"fieldName": "Node.nameid",
-		"value":     "test-org",
-		"filter":    "",
-	})
-	if err != nil {
-		t.Fatalf("QueryDql returned error: %v", err)
-	}
-
-	var resp DqlResp
-	if err := json.Unmarshal(res.Json, &resp); err != nil {
-		t.Fatalf("Failed to unmarshal response: %v", err)
-	}
-	if len(resp.All) == 0 {
-		t.Error("QueryDql(exists) returned empty result")
-	}
-}
 
 func TestGetUserRoles_Integration(t *testing.T) {
 	t.Parallel()
@@ -179,19 +66,6 @@ func TestMeta_IntegrationGetNodeHistory(t *testing.T) {
 		t.Errorf("Meta(getNodeHistory) returned %d results, want >= 1", len(results))
 	}
 	t.Logf("Meta(getNodeHistory) returned %d events", len(results))
-}
-
-// getTensionUID is a test helper that returns the UID of the seed "Test tension".
-func getTensionUID(t *testing.T) string {
-	t.Helper()
-	tids, err := GetDB().GetIDs("Tension.title", "Test tension", nil, nil)
-	if err != nil {
-		t.Fatalf("GetIDs(Tension.title) returned error: %v", err)
-	}
-	if len(tids) == 0 {
-		t.Fatal("No tension found with title 'Test tension'")
-	}
-	return tids[0]
 }
 
 func TestGetTensionSearchData_Integration(t *testing.T) {
@@ -291,226 +165,6 @@ func TestGetTensions_PatternMatchesMessage_Integration(t *testing.T) {
 	})
 }
 
-func TestGetFieldById_Integration(t *testing.T) {
-	t.Parallel()
-	tid := getTensionUID(t)
-
-	t.Run("single_field", func(t *testing.T) {
-		t.Parallel()
-		val, err := GetDB().GetFieldById(tid, "Tension.title")
-		if err != nil {
-			t.Fatalf("GetFieldById returned error: %v", err)
-		}
-		title, ok := val.(string)
-		if !ok {
-			t.Fatalf("expected string, got %T", val)
-		}
-		if title != "Test tension" {
-			t.Errorf("Tension.title = %q, want %q", title, "Test tension")
-		}
-	})
-
-	t.Run("multi_field", func(t *testing.T) {
-		t.Parallel()
-		val, err := GetDB().GetFieldById(tid, "Tension.title Tension.status")
-		if err != nil {
-			t.Fatalf("GetFieldById returned error: %v", err)
-		}
-		m, ok := val.(map[string]any)
-		if !ok {
-			t.Fatalf("expected map[string]any, got %T", val)
-		}
-		if m["title"] != "Test tension" {
-			t.Errorf("title = %v, want %q", m["title"], "Test tension")
-		}
-		if m["status"] != "Open" {
-			t.Errorf("status = %v, want %q", m["status"], "Open")
-		}
-	})
-
-	t.Run("not_found", func(t *testing.T) {
-		t.Parallel()
-		val, err := GetDB().GetFieldById("0xdeadbeef", "Tension.title")
-		if err != nil {
-			t.Fatalf("GetFieldById returned error: %v", err)
-		}
-		if val != nil {
-			t.Errorf("expected nil for nonexistent uid, got %v", val)
-		}
-	})
-}
-
-func TestGetFieldByEq_MultiField_Integration(t *testing.T) {
-	t.Parallel()
-	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.name Node.about")
-	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
-	}
-	m, ok := val.(map[string]any)
-	if !ok {
-		t.Fatalf("expected map[string]any, got %T", val)
-	}
-	if m["name"] != "Test Org" {
-		t.Errorf("name = %v, want %q", m["name"], "Test Org")
-	}
-	if m["about"] != "A test organisation" {
-		t.Errorf("about = %v, want %q", m["about"], "A test organisation")
-	}
-}
-
-func TestGetSubFieldById_Integration(t *testing.T) {
-	t.Parallel()
-	tid := getTensionUID(t)
-
-	t.Run("scalar_result", func(t *testing.T) {
-		t.Parallel()
-		val, err := GetDB().GetSubFieldById(tid, "Post.createdBy", "User.username")
-		if err != nil {
-			t.Fatalf("GetSubFieldById returned error: %v", err)
-		}
-		username, ok := val.(string)
-		if !ok {
-			t.Fatalf("expected string, got %T", val)
-		}
-		if username != "testuser" {
-			t.Errorf("createdBy username = %q, want %q", username, "testuser")
-		}
-	})
-
-	t.Run("not_found", func(t *testing.T) {
-		t.Parallel()
-		val, err := GetDB().GetSubFieldById("0xdeadbeef", "Post.createdBy", "User.username")
-		if err != nil {
-			t.Fatalf("GetSubFieldById returned error: %v", err)
-		}
-		if val != nil {
-			t.Errorf("expected nil for nonexistent uid, got %v", val)
-		}
-	})
-}
-
-func TestGetSubFieldByEq_Integration(t *testing.T) {
-	t.Parallel()
-
-	t.Run("scalar_result", func(t *testing.T) {
-		t.Parallel()
-		// test-org##@testuser has first_link -> testuser
-		val, err := GetDB().GetSubFieldByEq("Node.nameid", "test-org##@testuser", "Node.first_link", "User.username")
-		if err != nil {
-			t.Fatalf("GetSubFieldByEq returned error: %v", err)
-		}
-		username, ok := val.(string)
-		if !ok {
-			t.Fatalf("expected string, got %T", val)
-		}
-		if username != "testuser" {
-			t.Errorf("first_link username = %q, want %q", username, "testuser")
-		}
-	})
-
-	t.Run("list_result", func(t *testing.T) {
-		t.Parallel()
-		// test-org has children (roles + coordo), so children returns a list
-		val, err := GetDB().GetSubFieldByEq("Node.nameid", "test-org", "Node.children", "Node.nameid")
-		if err != nil {
-			t.Fatalf("GetSubFieldByEq returned error: %v", err)
-		}
-		list, ok := val.([]any)
-		if !ok {
-			t.Fatalf("expected []any, got %T", val)
-		}
-		if len(list) < 2 {
-			t.Errorf("expected >= 2 children, got %d", len(list))
-		}
-	})
-
-	t.Run("not_found", func(t *testing.T) {
-		t.Parallel()
-		val, err := GetDB().GetSubFieldByEq("Node.nameid", "nonexistent-org", "Node.first_link", "User.username")
-		if err != nil {
-			t.Fatalf("GetSubFieldByEq returned error: %v", err)
-		}
-		if val != nil {
-			t.Errorf("expected nil for nonexistent node, got %v", val)
-		}
-	})
-}
-
-func TestGetFieldByEqWithFilter_Integration(t *testing.T) {
-	t.Parallel()
-
-	t.Run("found", func(t *testing.T) {
-		t.Parallel()
-		// Query the "private-project" project by nameid + parentnameid filter
-		val, err := GetDB().GetFieldByEq(
-			"Project.nameid", "private-project",
-			"uid Project.rootnameid",
-			"Project.parentnameid", "sec-org#private-circle",
-		)
-		if err != nil {
-			t.Fatalf("GetFieldByEq with filter returned error: %v", err)
-		}
-		m, ok := val.(map[string]any)
-		if !ok {
-			t.Fatalf("expected map[string]any, got %T", val)
-		}
-		uid, _ := m["id"].(string)
-		if uid == "" {
-			t.Error("expected non-empty uid")
-		}
-		rootnameid, _ := m["rootnameid"].(string)
-		if rootnameid != "sec-org" {
-			t.Errorf("rootnameid = %q, want %q", rootnameid, "sec-org")
-		}
-	})
-
-	t.Run("not_found", func(t *testing.T) {
-		t.Parallel()
-		val, err := GetDB().GetFieldByEq(
-			"Project.nameid", "nonexistent-project",
-			"uid Project.rootnameid",
-			"Project.parentnameid", "sec-org",
-		)
-		if err != nil {
-			t.Fatalf("GetFieldByEq with filter returned error: %v", err)
-		}
-		if val != nil {
-			t.Errorf("expected nil for nonexistent project, got %v", val)
-		}
-	})
-}
-
-func TestGetSubSubFieldByEq_Integration(t *testing.T) {
-	t.Parallel()
-
-	t.Run("found", func(t *testing.T) {
-		t.Parallel()
-		// test-org has source (Blob) -> tension -> uid
-		val, err := GetDB().GetSubSubFieldByEq("Node.nameid", "test-org", "Node.source", "Blob.tension", "uid")
-		if err != nil {
-			t.Fatalf("GetSubSubFieldByEq returned error: %v", err)
-		}
-		uid, ok := val.(string)
-		if !ok {
-			t.Fatalf("expected string, got %T (%v)", val, val)
-		}
-		if uid == "" {
-			t.Error("expected non-empty uid for blob.tension")
-		}
-	})
-
-	t.Run("not_found", func(t *testing.T) {
-		t.Parallel()
-		val, err := GetDB().GetSubSubFieldByEq("Node.nameid", "nonexistent-org", "Node.source", "Blob.tension", "uid")
-		if err != nil {
-			t.Fatalf("GetSubSubFieldByEq returned error: %v", err)
-		}
-		if val != nil {
-			t.Errorf("expected nil for nonexistent node, got %v", val)
-		}
-	})
-}
-
 func TestGetParents_Integration(t *testing.T) {
 	t.Parallel()
 
@@ -561,16 +215,174 @@ func TestGetParents_Integration(t *testing.T) {
 	})
 }
 
-func TestGetTopLabels_Integration(t *testing.T) {
+//
+// Two-phase /q/* visibility helpers
+//
+
+// Phase 1, recurse-down: subtree of test-org should include test-org itself
+// (when includeSelf=true) plus its sub-circles. Members and roles are filtered
+// out (only Circle-type nodes are returned).
+func TestGetSubNodeVisibilities_Integration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("includes_self", func(t *testing.T) {
+		t.Parallel()
+		visMap, err := GetDB().GetSubNodeVisibilities("nameid", "test-org", true)
+		if err != nil {
+			t.Fatalf("GetSubNodeVisibilities returned error: %v", err)
+		}
+		if _, ok := visMap["test-org"]; !ok {
+			t.Errorf("expected 'test-org' in result with includeSelf=true, got %v", keys(visMap))
+		}
+		if len(visMap) < 1 {
+			t.Error("expected at least 1 circle in subtree")
+		}
+	})
+
+	t.Run("excludes_self", func(t *testing.T) {
+		t.Parallel()
+		visMap, err := GetDB().GetSubNodeVisibilities("nameid", "test-org", false)
+		if err != nil {
+			t.Fatalf("GetSubNodeVisibilities returned error: %v", err)
+		}
+		if _, ok := visMap["test-org"]; ok {
+			t.Errorf("'test-org' should not appear with includeSelf=false, got %v", keys(visMap))
+		}
+	})
+
+	t.Run("excludes_non_circles", func(t *testing.T) {
+		t.Parallel()
+		// Members (e.g. test-org##@testuser) are role-type nodes — should not appear.
+		visMap, err := GetDB().GetSubNodeVisibilities("nameid", "test-org", true)
+		if err != nil {
+			t.Fatalf("GetSubNodeVisibilities returned error: %v", err)
+		}
+		for nameid := range visMap {
+			if strings.Contains(nameid, "##@") || strings.Contains(nameid, "##:") || strings.Contains(nameid, "#:") {
+				t.Errorf("non-Circle node leaked into subtree visibility: %q", nameid)
+			}
+		}
+	})
+}
+
+// Phase 1, recurse-up: ancestor chain of a child role should reach its root org.
+func TestGetTopNodeVisibilities_Integration(t *testing.T) {
+	t.Parallel()
+
+	visMap, err := GetDB().GetTopNodeVisibilities("nameid", "sec-org#secret-circle#:coordo", false)
+	if err != nil {
+		t.Fatalf("GetTopNodeVisibilities returned error: %v", err)
+	}
+	// Ancestors should include sec-org#secret-circle and sec-org.
+	wantAncestor := "sec-org"
+	if _, ok := visMap[wantAncestor]; !ok {
+		t.Errorf("expected ancestor %q in result, got %v", wantAncestor, keys(visMap))
+	}
+	// Self (the role) is excluded by includeSelf=false; even with includeSelf=true
+	// it'd be filtered by Node.type_ = Circle.
+	if _, ok := visMap["sec-org#secret-circle#:coordo"]; ok {
+		t.Errorf("self role leaked despite includeSelf=false: %v", keys(visMap))
+	}
+}
+
+// Phase 3: members attached to circles in the visible-nameids list.
+func TestGetMembersIn_Integration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("returns_members", func(t *testing.T) {
+		t.Parallel()
+		members, err := GetDB().GetMembersIn([]string{"test-org"}, "User.username")
+		if err != nil {
+			t.Fatalf("GetMembersIn returned error: %v", err)
+		}
+		if len(members) == 0 {
+			t.Fatal("GetMembersIn returned empty, expected at least one member")
+		}
+		// Each result must be a role-typed node with first_link.
+		for _, m := range members {
+			if m.RoleType == nil {
+				t.Errorf("member %q missing role_type", m.Nameid)
+			}
+			if m.FirstLink == nil {
+				t.Errorf("member %q missing first_link", m.Nameid)
+			}
+		}
+	})
+
+	t.Run("empty_input", func(t *testing.T) {
+		t.Parallel()
+		members, err := GetDB().GetMembersIn(nil, "User.username")
+		if err != nil {
+			t.Fatalf("GetMembersIn(nil) returned error: %v", err)
+		}
+		if len(members) != 0 {
+			t.Errorf("empty input should return empty slice, got %d", len(members))
+		}
+	})
+}
+
+// Phase 3: roles attached to circles in the visible-nameids list.
+func TestGetRolesIn_Integration(t *testing.T) {
+	t.Parallel()
+
+	roles, err := GetDB().GetRolesIn([]string{"test-org"}, "")
+	if err != nil {
+		t.Fatalf("GetRolesIn returned error: %v", err)
+	}
+	// Seed data attaches at least one RoleExt template to test-org.
+	if len(roles) == 0 {
+		t.Skip("seed data has no RoleExt attached to test-org; skip")
+	}
+	for _, r := range roles {
+		if r.Name == "" {
+			t.Errorf("RoleExt with empty name: %+v", r)
+		}
+	}
+}
+
+// Phase 3: projects attached to circles in the visible-nameids list, filtered
+// to status=Open.
+func TestGetProjectsIn_Integration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("filters_open_only", func(t *testing.T) {
+		t.Parallel()
+		// sec-org#private-circle has "private-project" attached.
+		projects, err := GetDB().GetProjectsIn([]string{"sec-org#private-circle"}, "")
+		if err != nil {
+			t.Fatalf("GetProjectsIn returned error: %v", err)
+		}
+		if len(projects) == 0 {
+			t.Skip("seed data has no Open projects under sec-org#private-circle; skip")
+		}
+		for _, p := range projects {
+			if p.Name == "" {
+				t.Errorf("project with empty name: %+v", p)
+			}
+		}
+	})
+
+	t.Run("empty_input", func(t *testing.T) {
+		t.Parallel()
+		projects, err := GetDB().GetProjectsIn(nil, "")
+		if err != nil {
+			t.Fatalf("GetProjectsIn(nil) returned error: %v", err)
+		}
+		if len(projects) != 0 {
+			t.Errorf("empty input should return empty slice, got %d", len(projects))
+		}
+	})
+}
+
+func TestGetLabelsIn_Integration(t *testing.T) {
 	t.Parallel()
 	// test-org has label "bug" directly attached.
-	// Note: fieldid is "nameid" (not "Node.nameid") because the DQL template builds "Node.{{.fieldid}}".
-	labels, err := GetDB().GetTopLabels("nameid", "test-org", true)
+	labels, err := GetDB().GetLabelsIn([]string{"test-org"}, "")
 	if err != nil {
-		t.Fatalf("GetTopLabels returned error: %v", err)
+		t.Fatalf("GetLabelsIn returned error: %v", err)
 	}
 	if len(labels) == 0 {
-		t.Fatal("GetTopLabels returned empty, expected at least 'bug'")
+		t.Fatal("GetLabelsIn returned empty, expected at least 'bug'")
 	}
 	found := false
 	for _, l := range labels {
@@ -590,15 +402,16 @@ func TestGetTopLabels_Integration(t *testing.T) {
 	}
 }
 
-func TestGetTopTensionTemplates_Integration(t *testing.T) {
+// /q/tension_templates/top from test-org with includeSelf=true: visible
+// nameids = ["test-org"] (= self). Self pulls all templates → bug-report present.
+func TestGetTopTensionTemplatesIn_FromSelf(t *testing.T) {
 	t.Parallel()
-	// test-org has tension template "bug-report" directly attached.
-	templates, err := GetDB().GetTopTensionTemplates("nameid", "test-org", true)
+	templates, err := GetDB().GetTopTensionTemplatesIn([]string{"test-org"}, "test-org")
 	if err != nil {
-		t.Fatalf("GetTopTensionTemplates returned error: %v", err)
+		t.Fatalf("GetTopTensionTemplatesIn returned error: %v", err)
 	}
 	if len(templates) == 0 {
-		t.Fatal("GetTopTensionTemplates returned empty, expected at least 'bug-report'")
+		t.Fatal("GetTopTensionTemplatesIn returned empty, expected at least 'bug-report'")
 	}
 	found := false
 	for _, tt := range templates {
@@ -621,15 +434,16 @@ func TestGetTopTensionTemplates_Integration(t *testing.T) {
 	}
 }
 
-func TestGetSubTensionTemplates_Integration(t *testing.T) {
+// /q/tension_templates/sub from test-org: visible nameids include test-org —
+// pulls all templates attached, including bug-report.
+func TestGetTensionTemplatesIn_Integration(t *testing.T) {
 	t.Parallel()
-	// test-org has tension template "bug-report" attached — sub query from root should find it.
-	templates, err := GetDB().GetSubTensionTemplates("nameid", "test-org", true)
+	templates, err := GetDB().GetTensionTemplatesIn([]string{"test-org"}, "")
 	if err != nil {
-		t.Fatalf("GetSubTensionTemplates returned error: %v", err)
+		t.Fatalf("GetTensionTemplatesIn returned error: %v", err)
 	}
 	if len(templates) == 0 {
-		t.Fatal("GetSubTensionTemplates returned empty, expected at least 'bug-report'")
+		t.Fatal("GetTensionTemplatesIn returned empty, expected at least 'bug-report'")
 	}
 	found := false
 	for _, tt := range templates {
@@ -646,14 +460,14 @@ func TestGetSubTensionTemplates_Integration(t *testing.T) {
 	}
 }
 
-// TestGetTopTensionTemplates_FromChild queries from a child role node (test-org##:coordo)
-// and verifies the recursive parent traversal finds "bug-report" (is_recursive=true)
-// but excludes "local-only" (is_recursive=false).
-func TestGetTopTensionTemplates_FromChild(t *testing.T) {
+// /q/tension_templates/top from a child role with includeSelf=false. Visible
+// nameids only contain ancestor "test-org"; the is_recursive=true filter must
+// keep "bug-report" but drop "local-only".
+func TestGetTopTensionTemplatesIn_FromChild(t *testing.T) {
 	t.Parallel()
-	templates, err := GetDB().GetTopTensionTemplates("nameid", "test-org##:coordo", false)
+	templates, err := GetDB().GetTopTensionTemplatesIn([]string{"test-org"}, "test-org##:coordo")
 	if err != nil {
-		t.Fatalf("GetTopTensionTemplates from child: %v", err)
+		t.Fatalf("GetTopTensionTemplatesIn from child: %v", err)
 	}
 
 	foundRecursive := false
@@ -679,15 +493,14 @@ func TestGetTopTensionTemplates_FromChild(t *testing.T) {
 	}
 }
 
-// TestGetTopTensionTemplates_ExcludesNonRecursive queries from test-org itself with includeSelf=false
-// and verifies that even from a direct parent perspective, the is_recursive filter applies.
-func TestGetTopTensionTemplates_ExcludesNonRecursive(t *testing.T) {
+// /q/tension_templates/top from a child role with includeSelf=true. Visible
+// nameids = [child, ancestor]. Ancestors get is_recursive=true filter; self
+// (the coordo role) has no templates. Only recursive templates should appear.
+func TestGetTopTensionTemplatesIn_ExcludesNonRecursive(t *testing.T) {
 	t.Parallel()
-	// Query from the coordo role, excludeSelf=true (i.e. include the coordo node itself,
-	// but it has no templates — only parent test-org does).
-	templates, err := GetDB().GetTopTensionTemplates("nameid", "test-org##:coordo", true)
+	templates, err := GetDB().GetTopTensionTemplatesIn([]string{"test-org##:coordo", "test-org"}, "test-org##:coordo")
 	if err != nil {
-		t.Fatalf("GetTopTensionTemplates (non-recursive check): %v", err)
+		t.Fatalf("GetTopTensionTemplatesIn (non-recursive check): %v", err)
 	}
 
 	for _, tt := range templates {
@@ -720,4 +533,12 @@ func TestFormatTensionIntExtMap_PatternFilter(t *testing.T) {
 	if !strings.Contains(tf, " OR ") {
 		t.Errorf("tensionFilter missing OR between title and message: %s", tf)
 	}
+}
+
+func keys[K comparable, V any](m map[K]V) []K {
+	out := make([]K, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	return out
 }

@@ -24,14 +24,22 @@ import (
 	"net/http"
 
 	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/web/auth"
 )
 
 //
 // Query node data
-// @Todo: token and check private status
+//
+// All /q/* routes follow a two-phase pattern designed to be paginate-safe:
+//   1. fetch {nameid -> visibility} for the requested subtree (or ancestor
+//      chain) via DQL, bypassing @auth (cheap)
+//   2. classify visible nameids in Go via auth.ClassifyVisibleNameids
+//   3. fetch the artefacts (members, labels, roles, etc.) restricted to the
+//      visible nameids
+//
+// Phase 3 only sees authorized circles, so any future pagination/limit on
+// phase 3 will not under-fill due to post-fetch filtering.
 //
 
 // nodeQuery is the common request body for node query endpoints.
@@ -40,230 +48,102 @@ type nodeQuery struct {
 	IncludeSelf bool   `json:"include_self"`
 }
 
-// nodeHolder is satisfied by types that have a Nodes []*model.Node field.
+// nodeHolder is satisfied by types returned by /q/{labels,roles,tension_templates,projects}.
 type nodeHolder interface {
 	model.Label | model.RoleExt | model.TensionTemplate | db.ProjectFull
 }
 
-// getNodes returns the Nodes field for items implementing nodeHolder.
-func getNodes[T nodeHolder](item *T) []*model.Node {
-	switch v := any(item).(type) {
-	case *model.Label:
-		return v.Nodes
-	case *model.RoleExt:
-		return v.Nodes
-	case *model.TensionTemplate:
-		return v.Nodes
-	case *db.ProjectFull:
-		return v.Nodes
-	}
-	return nil
-}
+// VisFetcher fetches per-circle visibility for a recursion shape (sub-tree or ancestor chain).
+type VisFetcher func(fieldid, objid string, includeSelf bool) (map[string]model.NodeVisibility, error)
 
-// setNodes sets the Nodes field for items implementing nodeHolder.
-func setNodes[T nodeHolder](item *T, nodes []*model.Node) {
-	switch v := any(item).(type) {
-	case *model.Label:
-		v.Nodes = nodes
-	case *model.RoleExt:
-		v.Nodes = nodes
-	case *model.TensionTemplate:
-		v.Nodes = nodes
-	case *db.ProjectFull:
-		v.Nodes = nodes
-	}
-}
+// ArtefactFetcher fetches artefacts attached to the given visible nameids.
+// objid is passed through for fetchers that distinguish self vs ancestors
+// (e.g. GetTopTensionTemplatesIn); other fetchers ignore it.
+type ArtefactFetcher[T nodeHolder] func(visibleNameids []string, objid string) ([]T, error)
 
-// filterByNodeVisibility filters items (Labels, RoleExt, or Projects) by checking
-// visibility of their attached nodes. Items with no visible nodes are dropped.
-//
-// If every attached node already has Visibility populated (e.g. fetched in the
-// DQL select), the membership/role check runs in-memory and skips the
-// GraphQL @auth roundtrip — that auth pass is redundant since we re-check
-// manually below.
-func filterByNodeVisibility[T nodeHolder](uctx *model.UserCtx, data []T) ([]T, error) {
-	visible, err := buildVisibilityMap(uctx, data)
+// classifyVisible runs phase 1 + phase 2 for a request: fetch visibility
+// for the (visFn) recursion, classify in Go.
+func classifyVisible(r *http.Request, form nodeQuery, visFn VisFetcher) ([]string, error) {
+	visMap, err := visFn("nameid", form.Nameid, form.IncludeSelf)
 	if err != nil {
 		return nil, err
 	}
-	filtered := make([]T, 0)
-	for i := range data {
-		var visibleNodes []*model.Node
-		for _, n := range getNodes(&data[i]) {
-			if n != nil && visible[n.Nameid] {
-				visibleNodes = append(visibleNodes, n)
-			}
-		}
-		if len(visibleNodes) > 0 {
-			setNodes(&data[i], visibleNodes)
-			filtered = append(filtered, data[i])
-		}
-	}
-	return filtered, nil
+	uctx := auth.GetUserContextOrEmpty(r.Context())
+	return auth.ClassifyVisibleNameids(&uctx, visMap)
 }
 
-// buildVisibilityMap returns a {nameid: bool} map for all nodes attached to
-// data. Uses pre-fetched Node.Visibility when available; otherwise falls back
-// to auth.NodeVisibilityFilter (which queries Dgraph through @auth rules).
-func buildVisibilityMap[T nodeHolder](uctx *model.UserCtx, data []T) (map[string]bool, error) {
-	type pair struct {
-		nameid string
-		vis    model.NodeVisibility
-	}
-	var flat []pair
-	for i := range data {
-		for _, n := range getNodes(&data[i]) {
-			if n == nil {
-				continue
-			}
-			flat = append(flat, pair{n.Nameid, n.Visibility})
-		}
-	}
-	return visibilityMapFromNodes(uctx, flat, func(p pair) (string, model.NodeVisibility) {
-		return p.nameid, p.vis
-	})
-}
-
-// isNodeVisible mirrors the rules in auth.NodeVisibilityFilter but works from
-// an already-known visibility value, avoiding a Dgraph roundtrip.
-func isNodeVisible(uctx *model.UserCtx, nameid string, visibility model.NodeVisibility) (bool, error) {
-	nid, err := codec.Nid2pid(nameid)
-	if err != nil {
-		return false, err
-	}
-	switch visibility {
-	case model.NodeVisibilityPrivate:
-		return auth.UserIsMember(uctx, nid) >= 0, nil
-	case model.NodeVisibilitySecret:
-		return auth.UserHasRole(uctx, nid) >= 0, nil
-	default:
-		return true, nil
-	}
-}
-
-// NodeHolderHandler returns a handler that decodes a nodeQuery, fetches items
-// using the provided function, filters by node visibility, and writes JSON.
-func NodeHolderHandler[T nodeHolder](fetch func(fieldid, objid string, includeSelf bool) ([]T, error)) http.HandlerFunc {
+// NodeHolderHandler returns a generic /q/* handler that fetches visibility,
+// classifies, then fetches artefacts restricted to visible nameids.
+func NodeHolderHandler[T nodeHolder](visFn VisFetcher, fetchFn ArtefactFetcher[T]) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var form nodeQuery
 		if !decodeBody(w, r, &form) {
 			return
 		}
-		data, err := fetch("nameid", form.Nameid, form.IncludeSelf)
+		visible, err := classifyVisible(r, form, visFn)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-		uctx := auth.GetUserContextOrEmpty(r.Context())
-		filtered, err := filterByNodeVisibility(&uctx, data)
+		if len(visible) == 0 {
+			writeJSON(w, []T{})
+			return
+		}
+		data, err := fetchFn(visible, form.Nameid)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-		writeJSON(w, filtered)
+		writeJSON(w, data)
 	}
 }
 
+// SubNodes returns visible circles in the subtree of form.Nameid.
+// The visibility-fetch result already contains everything the response needs
+// (nameid + visibility), so no second DQL call is issued.
 func SubNodes(w http.ResponseWriter, r *http.Request) {
 	var form nodeQuery
 	if !decodeBody(w, r, &form) {
 		return
 	}
-
-	data, err := db.GetDB().GetSubNodes("nameid", form.Nameid, form.IncludeSelf)
+	visMap, err := db.GetDB().GetSubNodeVisibilities("nameid", form.Nameid, form.IncludeSelf)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 	uctx := auth.GetUserContextOrEmpty(r.Context())
-	visible, err := visibilityMapFromNodes(&uctx, data, func(n model.Node) (string, model.NodeVisibility) {
-		return n.Nameid, n.Visibility
-	})
+	visible, err := auth.ClassifyVisibleNameids(&uctx, visMap)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	filtered := []model.Node{}
-	for _, n := range data {
-		if visible[n.Nameid] {
-			filtered = append(filtered, n)
-		}
+	out := make([]model.Node, 0, len(visible))
+	for _, nameid := range visible {
+		out = append(out, model.Node{Nameid: nameid, Visibility: visMap[nameid]})
 	}
-
-	writeJSON(w, filtered)
+	writeJSON(w, out)
 }
 
+// SubMembers returns members attached to circles in the subtree of form.Nameid
+// that the user is authorized to see.
 func SubMembers(w http.ResponseWriter, r *http.Request) {
 	var form nodeQuery
 	if !decodeBody(w, r, &form) {
 		return
 	}
-
-	data, err := db.GetDB().GetSubMembers("nameid", form.Nameid, "User.name User.username", form.IncludeSelf)
+	visible, err := classifyVisible(r, form, db.GetDB().GetSubNodeVisibilities)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
-	uctx := auth.GetUserContextOrEmpty(r.Context())
-	visible, err := visibilityMapFromNodes(&uctx, data, func(n model.Node) (string, model.NodeVisibility) {
-		if n.Parent == nil {
-			return "", ""
-		}
-		return n.Parent.Nameid, n.Parent.Visibility
-	})
+	if len(visible) == 0 {
+		writeJSON(w, []model.Node{})
+		return
+	}
+	data, err := db.GetDB().GetMembersIn(visible, "User.name User.username")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	filtered := []model.Node{}
-	for _, n := range data {
-		if n.Parent != nil && visible[n.Parent.Nameid] {
-			filtered = append(filtered, n)
-		}
-	}
-
-	writeJSON(w, filtered)
-}
-
-// visibilityMapFromNodes builds a {nameid: bool} visibility map for nodes
-// extracted via keyFn. If every key has a non-empty Visibility, the check runs
-// in-memory; otherwise it falls back to auth.NodeVisibilityFilter.
-func visibilityMapFromNodes[T any](uctx *model.UserCtx, items []T, keyFn func(T) (string, model.NodeVisibility)) (map[string]bool, error) {
-	known := make(map[string]model.NodeVisibility)
-	allKnown := true
-	for _, it := range items {
-		nameid, vis := keyFn(it)
-		if nameid == "" {
-			continue
-		}
-		if _, ok := known[nameid]; ok {
-			continue
-		}
-		known[nameid] = vis
-		if vis == "" {
-			allKnown = false
-		}
-	}
-
-	if !allKnown {
-		nameids := make([]string, 0, len(known))
-		for nid := range known {
-			nameids = append(nameids, nid)
-		}
-		return auth.NodeVisibilityFilter(uctx, nameids)
-	}
-
-	visible := make(map[string]bool, len(known))
-	for nameid, vis := range known {
-		v, err := isNodeVisible(uctx, nameid, vis)
-		if err != nil {
-			return nil, err
-		}
-		if v {
-			visible[nameid] = true
-		}
-	}
-	return visible, nil
+	writeJSON(w, data)
 }

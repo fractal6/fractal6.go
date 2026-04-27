@@ -163,8 +163,9 @@ func RunServer() {
 	// Rest API
 	r.Group(func(r chi.Router) {
 		r.Route("/q", func(r chi.Router) {
-			// Special recursive query
-			// The visibility filtering is done through the filterByNodeVisibility
+			// Two-phase visibility filtering: see web/handlers/q_nodes.go.
+			top := db.GetDB().GetTopNodeVisibilities
+			sub := db.GetDB().GetSubNodeVisibilities
 			r.Route("/nodes", func(r chi.Router) {
 				r.Post("/sub", handle6.SubNodes)
 			})
@@ -172,19 +173,19 @@ func RunServer() {
 				r.Post("/sub", handle6.SubMembers)
 			})
 			r.Route("/labels", func(r chi.Router) {
-				r.Post("/top", handle6.NodeHolderHandler(db.GetDB().GetTopLabels))
-				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubLabels))
+				r.Post("/top", handle6.NodeHolderHandler(top, db.GetDB().GetLabelsIn))
+				r.Post("/sub", handle6.NodeHolderHandler(sub, db.GetDB().GetLabelsIn))
 			})
 			r.Route("/roles", func(r chi.Router) {
-				r.Post("/top", handle6.NodeHolderHandler(db.GetDB().GetTopRoles))
-				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubRoles))
+				r.Post("/top", handle6.NodeHolderHandler(top, db.GetDB().GetRolesIn))
+				r.Post("/sub", handle6.NodeHolderHandler(sub, db.GetDB().GetRolesIn))
 			})
 			r.Route("/tension_templates", func(r chi.Router) {
-				r.Post("/top", handle6.NodeHolderHandler(db.GetDB().GetTopTensionTemplates))
-				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubTensionTemplates))
+				r.Post("/top", handle6.NodeHolderHandler(top, db.GetDB().GetTopTensionTemplatesIn))
+				r.Post("/sub", handle6.NodeHolderHandler(sub, db.GetDB().GetTensionTemplatesIn))
 			})
 			r.Route("/projects", func(r chi.Router) {
-				r.Post("/sub", handle6.NodeHolderHandler(db.GetDB().GetSubProjects))
+				r.Post("/sub", handle6.NodeHolderHandler(sub, db.GetDB().GetProjectsIn))
 			})
 
 			// Special tension query (nested filters and counts)

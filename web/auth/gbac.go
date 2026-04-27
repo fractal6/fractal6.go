@@ -305,45 +305,39 @@ func GetPeersFromTid(tid string) ([]model.User, error) {
 // Sanitize TensionQuery
 //
 
-// NodeVisibilityFilter checks a set of node nameids and returns only those
-// the user is authorized to see based on visibility rules:
+// IsNodeVisible returns true when uctx may see a node with the given visibility:
 //   - Public nodes are always visible
 //   - Private nodes require org membership
 //   - Secret nodes require a role in the circle
-func NodeVisibilityFilter(uctx *model.UserCtx, nameids []string) (map[string]bool, error) {
-	visible := make(map[string]bool)
-	if len(nameids) == 0 {
-		return visible, nil
-	}
-
-	res, err := db.GetDB().Query(*uctx, "node", "nameid", nameids, "nameid visibility")
+func IsNodeVisible(uctx *model.UserCtx, nameid string, vis model.NodeVisibility) (bool, error) {
+	nid, err := codec.Nid2pid(nameid)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
+	switch vis {
+	case model.NodeVisibilityPrivate:
+		return UserIsMember(uctx, nid) >= 0, nil
+	case model.NodeVisibilitySecret:
+		return UserHasRole(uctx, nid) >= 0, nil
+	default: // Public
+		return true, nil
+	}
+}
 
-	for _, r := range res {
-		nameid := r["nameid"]
-		visibility := r["visibility"]
-		nid, err := codec.Nid2pid(nameid)
+// ClassifyVisibleNameids returns the subset of nameids in visMap that uctx
+// is authorized to see (per IsNodeVisible).
+func ClassifyVisibleNameids(uctx *model.UserCtx, visMap map[string]model.NodeVisibility) ([]string, error) {
+	out := make([]string, 0, len(visMap))
+	for nameid, vis := range visMap {
+		ok, err := IsNodeVisible(uctx, nameid, vis)
 		if err != nil {
 			return nil, err
 		}
-
-		switch visibility {
-		case string(model.NodeVisibilityPrivate):
-			if UserIsMember(uctx, nid) >= 0 {
-				visible[nameid] = true
-			}
-		case string(model.NodeVisibilitySecret):
-			if UserHasRole(uctx, nid) >= 0 {
-				visible[nameid] = true
-			}
-		default: // Public
-			visible[nameid] = true
+		if ok {
+			out = append(out, nameid)
 		}
 	}
-
-	return visible, nil
+	return out, nil
 }
 
 // NameidsProtected and Username information into the query.
@@ -352,7 +346,7 @@ func QueryAuthFilter(uctx model.UserCtx, q *db.TensionQuery) error {
 		return fmt.Errorf("Empty query")
 	}
 
-	res, err := db.GetDB().Query(uctx, "node", "nameid", q.Nameids, "nameid visibility")
+	visMap, err := db.GetDB().GetNodeVisibilities(q.Nameids)
 	if err != nil {
 		return err
 	}
@@ -362,25 +356,19 @@ func QueryAuthFilter(uctx model.UserCtx, q *db.TensionQuery) error {
 	// For circle with restricted visibility right
 	var nameidsProtected []string
 
-	for _, r := range res {
-		nameid := r["nameid"]
-		visibility := r["visibility"]
-
-		// Get the nearest circle
-		nid, err := codec.Nid2pid(r["nameid"])
+	for _, nameid := range q.Nameids {
+		vis, ok := visMap[nameid]
+		if !ok {
+			continue
+		}
+		visible, err := IsNodeVisible(&uctx, nameid, vis)
 		if err != nil {
 			return err
 		}
-
-		if visibility == string(model.NodeVisibilityPrivate) && UserIsMember(&uctx, nid) < 0 {
-			// If Private & non Member
-			nameidsProtected = append(nameidsProtected, nameid)
-		} else if visibility == string(model.NodeVisibilitySecret) && UserHasRole(&uctx, nid) < 0 {
-			// If Secret & non Peer
-			nameidsProtected = append(nameidsProtected, nameid)
-		} else {
-			// else (Public or with rights)
+		if visible {
 			nameids = append(nameids, nameid)
+		} else {
+			nameidsProtected = append(nameidsProtected, nameid)
 		}
 	}
 

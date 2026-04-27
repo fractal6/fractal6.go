@@ -162,7 +162,7 @@ POST /auth/{resetpassword,resetpassword2,resetpasswordchallenge,uuidcheck,update
 POST /auth/{createorga,setusercanjoin,setguestcancreatetension,setlexicon,makeowner}
 POST /auth/createorga/spreadsheet      Org import (see import-orga.md)
 
-# REST queries (visibility-filtered)
+# REST queries (visibility-filtered, see "Visibility filtering" below)
 POST /q/nodes/sub
 POST /q/members/sub
 POST /q/labels/{top,sub}
@@ -180,6 +180,10 @@ GET  /playground  /ping  /assets/*  /*
 ```
 
 Middleware stack: `RequestID` → `RealIP` → `CORS` → `JWT verify` → `JWT decode` → `Logger` → `Recovery` → `Timeout (60s)`.
+
+### Visibility filtering on `/q/*`
+
+The `/q/*` routes follow a two-phase shape: a cheap DQL call collects `{nameid → visibility}` for the requested subtree (or ancestor chain), `auth.ClassifyVisibleNameids` classifies visible nameids in Go via `UserIsMember` / `UserHasRole`, then a second DQL call fetches artefacts (members, labels, roles, tension templates, projects, tensions) restricted to that visible set. This bypasses the heavy `Node @auth` evaluator and stays correct under pagination — phase 3 only sees authorized circles, so any future `first/offset` cursor applies to the visible result, never the unfiltered one.
 
 ## Notifications
 
