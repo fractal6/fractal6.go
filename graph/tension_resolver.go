@@ -141,7 +141,7 @@ func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, e
 		return data, err
 	}
 	if ok {
-		go SyncTensionSearchMessage(id)
+		GoSyncSearchMessage(id)
 		PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: id, History: history})
 		return data, err
 	}
@@ -190,6 +190,11 @@ func updateTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any
 			data, err := next(ctx)
 			if err != nil {
 				return data, err
+			}
+			// Rebuild the denormalized search index AFTER the mutation has been
+			// persisted; firing it earlier would read pre-mutation state.
+			if HistoryNeedsSearchSync(history) {
+				GoSyncSearchMessage(ids[0])
 			}
 			PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: ids[0], History: history})
 			return data, err

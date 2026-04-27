@@ -22,7 +22,6 @@ package graph
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"fractale/fractal6.go/db"
@@ -43,12 +42,11 @@ func init() {
 			Auth: MemberStrictHook,
 		},
 		model.TensionEventCommentPushed: EventMap{
-			Auth:   MemberHook | AuthorHook,
-			Action: syncSearchAction,
+			Auth: MemberHook | AuthorHook,
 		},
 		model.TensionEventCommentDeleted: EventMap{
 			Auth:   MemberHook | AuthorHook,
-			Action: RemoveCommentAndSync,
+			Action: RemoveComment,
 		},
 		model.TensionEventBlobCreated: EventMap{
 			Auth: MemberStrictHook,
@@ -73,12 +71,10 @@ func init() {
 			Propagate: "status",
 		},
 		model.TensionEventLabelAdded: EventMap{
-			Auth:   TargetCoordoHook | AuthorHook | AssigneeHook,
-			Action: syncSearchAction,
+			Auth: TargetCoordoHook | AuthorHook | AssigneeHook,
 		},
 		model.TensionEventLabelRemoved: EventMap{
-			Auth:   TargetCoordoHook | AuthorHook | AssigneeHook,
-			Action: syncSearchAction,
+			Auth: TargetCoordoHook | AuthorHook | AssigneeHook,
 		},
 		model.TensionEventAssigneeAdded: EventMap{
 			Auth: TargetCoordoHook,
@@ -731,52 +727,6 @@ func UnpinTension(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 // generic "Event not implemented" fallback.
 func RejectInternalEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
 	return false, fmt.Errorf("%s is emitted internally and cannot be set via updateTension.", *event.EventType)
-}
-
-// SyncTensionSearchMessage rebuilds the denormalized Post.message field on a
-// tension so that label names and the first comment body become searchable via
-// the fulltext index on Post.message.
-func SyncTensionSearchMessage(tid string) {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Printf("error: SyncTensionSearchMessage panic: %v\n", r)
-		}
-	}()
-
-	labels, firstComment, err := db.GetDB().GetTensionSearchData(tid)
-	if err != nil {
-		fmt.Printf("error: SyncTensionSearchMessage fetch: %v\n", err)
-		return
-	}
-
-	var parts []string
-	if len(labels) > 0 {
-		parts = append(parts, "---\n"+strings.Join(labels, ", ")+"\n---")
-	}
-	if firstComment != "" {
-		parts = append(parts, firstComment)
-	}
-
-	msg := strings.Join(parts, "\n\n")
-	// Escape for DQL RDF string literal (SetFieldById template wraps value in double quotes)
-	msg = QuoteString(msg)
-	err = db.GetDB().SetFieldById(tid, "Post.message", msg)
-	if err != nil {
-		fmt.Printf("error: SyncTensionSearchMessage set: %v\n", err)
-	}
-}
-
-func syncSearchAction(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	go SyncTensionSearchMessage(tension.ID)
-	return true, nil
-}
-
-func RemoveCommentAndSync(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	ok, err := RemoveComment(uctx, tension, event, b)
-	if ok && err == nil {
-		go SyncTensionSearchMessage(tension.ID)
-	}
-	return ok, err
 }
 
 func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
