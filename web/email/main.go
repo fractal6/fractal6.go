@@ -32,14 +32,31 @@ import (
 	"github.com/spf13/viper"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
+	"github.com/yuin/goldmark/util"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/internal/tools"
 )
 
+// Inline parsers without RawHTMLParser: text like "<tension>" stays literal
+// (escaped to &lt;tension&gt;) instead of being parsed as raw HTML and dropped.
+// Bracketed autolinks (<https://...>, <a@b>) keep working via AutoLinkParser.
+var inlineParsersNoRawHTML = []util.PrioritizedValue{
+	util.Prioritized(parser.NewCodeSpanParser(), 100),
+	util.Prioritized(parser.NewLinkParser(), 200),
+	util.Prioritized(parser.NewAutoLinkParser(), 300),
+	util.Prioritized(parser.NewEmphasisParser(), 500),
+}
+
 var md goldmark.Markdown = goldmark.New(
+	goldmark.WithParser(parser.NewParser(
+		parser.WithBlockParsers(parser.DefaultBlockParsers()...),
+		parser.WithInlineParsers(inlineParsersNoRawHTML...),
+		parser.WithParagraphTransformers(parser.DefaultParagraphTransformers()...),
+	)),
 	goldmark.WithExtensions(
 		extension.GFM,
 		&detailsExtension{},
