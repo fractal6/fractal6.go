@@ -184,6 +184,30 @@ _:ttempl_local <TensionTemplate.type_> "Operational" .
 _:ttempl_local <TensionTemplate.nodes> _:org .
 _:org <Node.tension_templates> _:ttempl_local .
 
+# --- test-org Project (Public) ---
+# Used to verify @auth Public branch on Project / ProjectColumn.
+_:proj_public <dgraph.type> "Project" .
+_:proj_public <Project.nameid> "public-project" .
+_:proj_public <Project.rootnameid> "test-org" .
+_:proj_public <Project.parentnameid> "test-org" .
+_:proj_public <Project.name> "Public Project" .
+_:proj_public <Project.description> "Project on the public test-org" .
+_:proj_public <Project.status> "Open" .
+_:proj_public <Project.createdAt> "2026-01-01T00:00:00Z" .
+_:proj_public <Project.updatedAt> "2026-01-01T00:00:00Z" .
+_:proj_public <Project.peerCanEditProject> "false" .
+_:proj_public <Project.guestCanEditProject> "false" .
+_:proj_public <Project.createdBy> _:user1 .
+_:proj_public <Project.nodes> _:org .
+_:org <Node.projects> _:proj_public .
+
+_:col_public <dgraph.type> "ProjectColumn" .
+_:col_public <ProjectColumn.name> "col-public" .
+_:col_public <ProjectColumn.pos> "0" .
+_:col_public <ProjectColumn.col_type> "NormalColumn" .
+_:col_public <ProjectColumn.project> _:proj_public .
+_:proj_public <Project.columns> _:col_public .
+
 # --- sec-org: Private organisation for security/visibility tests ---
 _:secorg <dgraph.type> "Node" .
 _:secorg <Node.nameid> "sec-org" .
@@ -343,3 +367,28 @@ _:proj_secret <Project.guestCanEditProject> "false" .
 _:proj_secret <Project.createdBy> _:user2 .
 _:proj_secret <Project.nodes> _:secorg_secret .
 _:secorg_secret <Node.projects> _:proj_secret .
+
+# --- ProjectColumns (one per project) ---
+# Used to verify ProjectColumn @auth piggybacks on its project's visibility.
+# Names are uniquely identifiable so visibility tests can match them.
+
+_:col_root <dgraph.type> "ProjectColumn" .
+_:col_root <ProjectColumn.name> "col-root" .
+_:col_root <ProjectColumn.pos> "0" .
+_:col_root <ProjectColumn.col_type> "NormalColumn" .
+_:col_root <ProjectColumn.project> _:proj_root .
+_:proj_root <Project.columns> _:col_root .
+
+_:col_private <dgraph.type> "ProjectColumn" .
+_:col_private <ProjectColumn.name> "col-private" .
+_:col_private <ProjectColumn.pos> "0" .
+_:col_private <ProjectColumn.col_type> "NormalColumn" .
+_:col_private <ProjectColumn.project> _:proj_private .
+_:proj_private <Project.columns> _:col_private .
+
+_:col_secret <dgraph.type> "ProjectColumn" .
+_:col_secret <ProjectColumn.name> "col-secret" .
+_:col_secret <ProjectColumn.pos> "0" .
+_:col_secret <ProjectColumn.col_type> "NormalColumn" .
+_:col_secret <ProjectColumn.project> _:proj_secret .
+_:proj_secret <Project.columns> _:col_secret .

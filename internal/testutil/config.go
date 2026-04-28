@@ -43,4 +43,14 @@ const (
 	SecOrgRootProject    = "Root Project"
 	SecOrgPrivateProject = "Private Project"
 	SecOrgSecretProject  = "Secret Project"
+
+	// Project nameids (used by visibility tests)
+	PublicProjectNameid  = "public-project"  // on test-org (Public)
+	PrivateProjectNameid = "private-project" // on sec-org#private-circle (Private)
+	SecretProjectNameid  = "secret-project"  // on sec-org#secret-circle (Secret)
+
+	// ProjectColumn names (used by visibility tests)
+	PublicColumnName  = "col-public"
+	PrivateColumnName = "col-private"
+	SecretColumnName  = "col-secret"
 )

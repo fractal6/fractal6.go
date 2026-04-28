@@ -151,15 +151,19 @@ func TestSubProjects_UnauthenticatedSeesNothingOnPrivateOrg(t *testing.T) {
 // --- test-org basic tests ---
 // test-org is Public with no projects seeded — just verify the endpoint works.
 
-func TestSubProjects_PublicOrgNoProjects(t *testing.T) {
-	// test-org has no projects, should return empty/null
+func TestSubProjects_PublicOrgVisibleToAnyone(t *testing.T) {
+	// test-org is Public; its public-project must be visible regardless of auth.
 	rr := doRequest("POST", "/q/projects/sub",
 		NodeQuery{Nameid: "test-org", IncludeSelf: true})
 	requireStatus(t, rr, http.StatusOK)
 
 	projects := decodeProjects(t, rr.Body.Bytes())
-	if len(projects) != 0 {
-		t.Errorf("expected no projects for test-org, got %d", len(projects))
+	names := make(map[string]bool, len(projects))
+	for _, p := range projects {
+		names[p.Name] = true
+	}
+	if !names["Public Project"] {
+		t.Errorf("expected to see %q in test-org projects, got: %v", "Public Project", names)
 	}
 }
 
