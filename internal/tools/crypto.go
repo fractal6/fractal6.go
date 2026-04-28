@@ -39,13 +39,15 @@ import (
 // Crypt utils
 //
 
-// HashPassword generates a hash using the bcrypt.GenerateFromPassword
-func HashPassword(password string) string {
+// HashPassword generates a hash using the bcrypt.GenerateFromPassword.
+// Returns an error for caller-handleable failures (e.g. bcrypt.ErrPasswordTooLong
+// for inputs over 72 bytes) rather than panicking on user-controllable input.
+func HashPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return string(hash)
+	return string(hash), nil
 }
 
 // VerifyPassword compares the hash of a password with the password

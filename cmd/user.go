@@ -78,7 +78,11 @@ func init() {
 }
 
 func AddUser(args []string) {
-	creds.Password = tools.HashPassword(creds.Password)
+	hashed, err := tools.HashPassword(creds.Password)
+	if err != nil {
+		panic(err)
+	}
+	creds.Password = hashed
 	u, err := auth.CreateNewUser(creds)
 	if err != nil {
 		panic(err)

@@ -293,11 +293,11 @@ func ValidateEmail(s string) error {
 }
 
 func ValidatePassword(p string) error {
-	// Size control
+	// Size control — bcrypt rejects inputs over 72 bytes.
 	if len(p) < 8 {
 		return ErrPasswordTooShort
 	}
-	if len(p) > 100 {
+	if len(p) > 72 {
 		return ErrPasswordTooLong
 	}
 	if !(numReg.MatchString(p) && letterReg.MatchString(p)) {
@@ -310,11 +310,11 @@ func ValidatePassword(p string) error {
 // old user that may not satisfy the primary validation method.
 // @hint: this could be used to sent email alert if password to weak.
 func ValidateSimplePassword(p string) error {
-	// Size control
+	// Size control — bcrypt rejects inputs over 72 bytes.
 	if len(p) < 8 {
 		return ErrPasswordTooShort
 	}
-	if len(p) > 100 {
+	if len(p) > 72 {
 		return ErrPasswordTooLong
 	}
 	return nil

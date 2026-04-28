@@ -84,7 +84,11 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	email_token := sessions.GenerateToken()
-	passwd := HashPassword(creds.Password)
+	passwd, err := HashPassword(creds.Password)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
 	if pending["id"] != nil {
 		// Update pending user
 		err = db.GetDB().Update(db.GetDB().GetRootUctx(), "pendingUser", model.UpdatePendingUserInput{
@@ -190,7 +194,12 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), 401)
 				return
 			}
-			creds.Password = HashPassword(creds.Password)
+			hashed, err := HashPassword(creds.Password)
+			if err != nil {
+				http.Error(w, err.Error(), 400)
+				return
+			}
+			creds.Password = hashed
 		}
 	} else {
 		http.Error(w, "token validation error", 500)
@@ -492,7 +501,12 @@ func ResetPassword2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set the new password for the given user
-	err = db.GetDB().SetFieldByEq("User.email", mail, "User.password", HashPassword(data.Password))
+	hashed, err := HashPassword(data.Password)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	err = db.GetDB().SetFieldByEq("User.email", mail, "User.password", hashed)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -580,7 +594,12 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set the new password for the given user
-	err = db.GetDB().SetFieldByEq("User.username", data.Username, "User.password", HashPassword(data.NewPassword))
+	hashed, err := HashPassword(data.NewPassword)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	err = db.GetDB().SetFieldByEq("User.username", data.Username, "User.password", hashed)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

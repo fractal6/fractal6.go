@@ -41,9 +41,17 @@ var seedNquads string
 // contents). Password placeholders are substituted with bcrypt hashes here so
 // the file stays a static, editor-friendly N-Quads document.
 func seedTestData(dgc *dgo.Dgraph) error {
+	pw1, err := HashPassword(testutil.TestPassword)
+	if err != nil {
+		return err
+	}
+	pw2, err := HashPassword(testutil.TestPassword2)
+	if err != nil {
+		return err
+	}
 	nquads := strings.NewReplacer(
-		"__PW1__", HashPassword(testutil.TestPassword),
-		"__PW2__", HashPassword(testutil.TestPassword2),
+		"__PW1__", pw1,
+		"__PW2__", pw2,
 	).Replace(seedNquads)
 
 	txn := dgc.NewTxn()
