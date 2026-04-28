@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.8.11] - 2026-04-28
+
+### New features
+
+- **Project drafts** can now have labels and assignees.
+- **Tension <-> Project integration**: project changes (added, removed, column moved) now emit tension events and are tracked in the tension history.
+- **Sub-circle pins**: new `showSubCirclePins` root option.
+
+### Improvements
+
+- **Activity heatmap**: noisy events are filtered out from the daily counter for cleaner activity stats.
+- **Faster `/q/*` routes**: node visibility is now resolved directly in DQL, removing an extra auth roundtrip and making pagination safer.
+- **Lighter search sync**: tension search re-indexing is now triggered only on label events instead of every change.
+- **Project board updates** are smoother: draft event lookups are skipped when not needed, and tension history writes are dispatched asynchronously.
+
+### Bug fixes
+
+- **Email replies**: inline quote headers are handled correctly and the Fractale footer is stripped; angle-bracket words are preserved in notification markdown.
+- **Authorization**: ProjectColumn visibility is now properly gated, and Secret-circle bootstrap has been tightened.
+- **Artefact safety**: `§` is rejected in names/colors to protect the descriptor parser.
+- **Templates API**: non-recursive tension template queries now correctly include the targeted node.
+- **TensionLight payload** fixed.
+
+### Testing
+
+- Added integration test coverage for visibility rules.
+
+
 ## [0.8.10] - 2026-04-07
 
 ### 🐛 Bug Fixes
