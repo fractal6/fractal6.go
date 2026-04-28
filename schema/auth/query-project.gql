@@ -24,12 +24,15 @@
           }
         }
     }""" },
-    # -- children (including secret circle!)
+    # -- bootstrap: Coordinator of the parent circle (a freshly-created Secret
+    #    circle has no member yet, so only a Coordinator from the parent can
+    #    open it). Restricted to role_type=Coordinator to avoid leaking secret
+    #    siblings to every Member of any sibling circle.
     { rule: """query ($USERNAME: String!) {
         queryProject {
           nodes(filter: {visibility: {eq: Secret}}) {
             parent {
-              children {
+              children(filter: {role_type: {eq: Coordinator}}) {
                 first_link(filter: {username: {eq: $USERNAME}}) { username }
               }
             }

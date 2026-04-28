@@ -250,7 +250,9 @@ type Project @auth(
   guestCanEditProject: Boolean!  @x_alter
 }
 
-type ProjectColumn @hook_ {
+type ProjectColumn @auth(
+  query: <<query-projectColumn>>
+) @hook_ {
   id: ID!
   name: String! @x_alter
   description: String @x_alter(r:"maxLen", n:280)
