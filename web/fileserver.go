@@ -74,6 +74,10 @@ func FileServer(r chi.Router, publicUri string, location string, cacheControl st
 		publicUri += "/"
 	}
 
+	// setCC writes a path-aware Cache-Control header so deploys propagate cleanly:
+	// hashed assets cache forever, the SPA shell and service worker revalidate every
+	// visit. Without this, http.ServeFile only sets Last-Modified and browsers fall
+	// back to heuristic freshness (RFC 7234 §4.2.2), serving stale shells.
 	setCC := func(w http.ResponseWriter, p string) {
 		switch {
 		case strings.Contains(p, "/static/"):
@@ -81,7 +85,7 @@ func FileServer(r chi.Router, publicUri string, location string, cacheControl st
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		case strings.HasSuffix(p, "/index.html"),
 			strings.HasSuffix(p, "/service-worker.js"):
-			// SPA entry point and service worker must revalidate so new builds are picked up.
+			// no-cache = revalidate every time (cheap 304 via Last-Modified when unchanged).
 			w.Header().Set("Cache-Control", "no-cache")
 		case cacheControl != "":
 			w.Header().Set("Cache-Control", cacheControl)
@@ -144,6 +148,10 @@ func FileServer(r chi.Router, publicUri string, location string, cacheControl st
 				fn = fmt.Sprintf("%s/index.html", lang)
 			}
 
+			// SPA fallback hits this branch for /, /o/*, /{user}, etc.
+			// Without this, http.ServeFile sets Last-Modified and the browser
+			// uses heuristic freshness, serving stale shells across deploys.
+			setCC(w, fn)
 			http.ServeFile(w, r, path.Join(root, fn))
 		}
 	}))
