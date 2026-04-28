@@ -74,20 +74,28 @@ func FileServer(r chi.Router, publicUri string, location string, cacheControl st
 		publicUri += "/"
 	}
 
-	r.Get(publicUri+"*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Headers
-		// --
-		// Set Cache control
-		if cacheControl != "" {
+	setCC := func(w http.ResponseWriter, p string) {
+		switch {
+		case strings.Contains(p, "/static/"):
+			// Webpack content-hashes these filenames; safe to cache forever.
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		case strings.HasSuffix(p, "/index.html"),
+			strings.HasSuffix(p, "/service-worker.js"):
+			// SPA entry point and service worker must revalidate so new builds are picked up.
+			w.Header().Set("Cache-Control", "no-cache")
+		case cacheControl != "":
 			w.Header().Set("Cache-Control", cacheControl)
 		}
+	}
 
+	r.Get(publicUri+"*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Redirect to appropriate Language
 		// Check file existence, and redirect to index if file not exists
 		var lang string = DEFAULT_LANG // Default language
 		fn := strings.Replace(r.RequestURI, publicUri, "/", 1)
 		if fi, err := os.Stat(root + fn); err == nil && !fi.IsDir() {
 			// Serve requested file if path exists on filesystem and is not dir.
+			setCC(w, fn)
 			fs.ServeHTTP(w, r)
 		} else if p := strings.Split(fn, "/"); len(p) > 1 && langsD[p[1]] {
 			// Redirect to URI with Lang set in Cookie
