@@ -1,0 +1,28 @@
+---
+# Install the systemd unit, enable it on boot, and ensure it's running.
+
+- name: Install systemd unit
+  ansible.builtin.template:
+    src: garage.service.j2
+    dest: /etc/systemd/system/garage.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart garage
+
+- name: Flush handlers (start before bootstrap)
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure garage is enabled and running
+  ansible.builtin.systemd:
+    name: garage
+    enabled: true
+    state: started
+
+- name: Wait for the admin API to respond
+  ansible.builtin.wait_for:
+    host: "{{ garage_admin_bind_addr | regex_replace('^\\[?([^\\]]+)\\]?:.*$', '\\1') }}"
+    port: "{{ garage_admin_bind_addr | regex_replace('^.*:(\\d+)$', '\\1') | int }}"
+    timeout: 30

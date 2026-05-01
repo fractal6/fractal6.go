@@ -1,0 +1,41 @@
+---
+# Download + verify + install the Garage binary. Idempotent: skipped when the
+# installed binary already matches garage_download_sha256.
+
+- name: Stat installed binary
+  ansible.builtin.stat:
+    path: "{{ garage_install_path }}"
+    checksum_algorithm: sha256
+  register: garage_installed_stat
+
+- name: Decide whether to (re)download
+  ansible.builtin.set_fact:
+    garage_needs_download: >-
+      {{ not garage_installed_stat.stat.exists
+         or garage_installed_stat.stat.checksum != garage_download_sha256 }}
+
+- name: Download garage binary to a staging path
+  ansible.builtin.get_url:
+    url: "{{ garage_download_url }}"
+    dest: "/tmp/garage-{{ garage_version }}"
+    mode: "0755"
+    checksum: "sha256:{{ garage_download_sha256 }}"
+    timeout: 60
+  when: garage_needs_download
+
+- name: Install garage binary
+  ansible.builtin.copy:
+    src: "/tmp/garage-{{ garage_version }}"
+    dest: "{{ garage_install_path }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+  when: garage_needs_download
+  notify: Restart garage
+
+- name: Clean staging file
+  ansible.builtin.file:
+    path: "/tmp/garage-{{ garage_version }}"
+    state: absent
+  when: garage_needs_download

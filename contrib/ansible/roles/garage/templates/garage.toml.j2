@@ -1,0 +1,49 @@
+{# templates/garage.toml.j2 — rendered to /etc/garage/garage.toml.        #}
+{# Reference: https://garagehq.deuxfleurs.fr/documentation/reference-manual/configuration/ #}
+{# Targets Garage v2.x. The v0.10 rename of replication_mode (string) →    #}
+{# replication_factor (int) + consistency_mode is reflected here.          #}
+
+# Managed by the `garage` Ansible role. Manual edits will be overwritten.
+
+metadata_dir = "{{ garage_metadata_dir }}"
+data_dir     = "{{ garage_data_dir }}"
+
+# Metadata storage engine. lmdb is the recommended default (v0.9+).
+db_engine = "{{ garage_db_engine }}"
+
+{% if garage_metadata_auto_snapshot_interval %}
+# Periodic crash-safe snapshot of metadata.
+metadata_auto_snapshot_interval = "{{ garage_metadata_auto_snapshot_interval }}"
+{% endif %}
+
+# Replication & consistency. Single-node bootstrap = factor 1.
+# Multi-node HA: bump to 3 (and provision 3+ nodes with the same rpc_secret).
+replication_factor = {{ garage_replication_factor }}
+consistency_mode   = "{{ garage_consistency_mode }}"
+
+# Tunables — see defaults/main.yml for guidance.
+block_size        = "{{ garage_block_size }}"
+compression_level = {{ garage_compression_level }}
+
+# RPC: cluster gossip + replication. Secret MUST match on every node of a
+# multi-node cluster. Bind to private network or localhost only.
+rpc_bind_addr   = "{{ garage_rpc_bind_addr }}"
+rpc_public_addr = "{{ garage_rpc_public_addr }}"
+rpc_secret      = "{{ garage_rpc_secret }}"
+
+# S3 API. Bind localhost — terminate TLS in nginx/caddy/traefik in front.
+[s3_api]
+api_bind_addr = "{{ garage_s3_bind_addr }}"
+s3_region     = "garage"
+root_domain   = "{{ garage_s3_root_domain }}"
+
+# Admin API: cluster ops, key management, /metrics.
+[admin]
+api_bind_addr  = "{{ garage_admin_bind_addr }}"
+admin_token    = "{{ garage_admin_token }}"
+metrics_token  = "{{ garage_metrics_token }}"
+
+{% if garage_k2v_enabled %}
+[k2v_api]
+api_bind_addr = "{{ garage_k2v_bind_addr }}"
+{% endif %}

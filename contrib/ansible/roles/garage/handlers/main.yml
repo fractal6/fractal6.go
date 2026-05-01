@@ -1,0 +1,11 @@
+---
+# handlers/main.yml — restarted lazily after config changes.
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart garage
+  ansible.builtin.systemd:
+    name: garage
+    state: restarted

@@ -742,6 +742,11 @@ func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
 		return false, LogErr("Access denied", fmt.Errorf("Only the author of the comment can delete it."))
 	}
 
+	// Best-effort GC of S3 attachments. Any failure is logged inside; the
+	// DQL deleteComment template still drops the File nodes regardless, so
+	// leftover objects can be swept out-of-band.
+	_ = db.GetDB().CleanupCommentFiles(cid)
+
 	// Delete comment
 	_, err = db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
 	return true, err

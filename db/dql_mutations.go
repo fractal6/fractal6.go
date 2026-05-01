@@ -329,13 +329,48 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             var(func: uid({{.cid}})) {
                 c as uid
                 reactions as Comment.reactions
+                files as Comment.files
             }
         }`,
 		M: []X{{
 			D: `uid(t) <Tension.comments> uid(c) .
 				uid(reactions) * *  .
+				uid(files) * * .
 				uid(c) * * .
 				`,
+		}},
+	},
+	// addFileToComment creates a File node attached to a comment.
+	// Inputs (all required): cid, username, filename, contentType, sizeStr (decimal),
+	//                        storageKey, now (RFC3339).
+	// Caller has already verified comment and user exist via getCommentAuth + JWT,
+	// so no @if guard is needed.
+	"addFileToComment": {
+		Q: `query {
+            var(func: uid({{.cid}})) { c as uid }
+            var(func: eq(User.username, "{{.username}}")) { u as uid }
+        }`,
+		M: []X{{
+			S: `_:f <dgraph.type> "File" .
+				_:f <File.storageKey> "{{.storageKey}}" .
+				_:f <File.filename> "{{.filename}}" .
+				_:f <File.contentType> "{{.contentType}}" .
+				_:f <File.size> "{{.sizeStr}}" .
+				_:f <File.createdAt> "{{.now}}" .
+				_:f <File.createdBy> uid(u) .
+				_:f <File.comment> uid(c) .
+				uid(c) <Comment.files> _:f .
+				`,
+		}},
+	},
+	// deleteFile removes a File node by uid. The reverse edge from the parent
+	// comment is dropped automatically by Dgraph when the node is deleted.
+	"deleteFile": {
+		Q: `query {
+            var(func: uid({{.id}})) { f as uid }
+        }`,
+		M: []X{{
+			D: `uid(f) * * .`,
 		}},
 	},
 	// Deleting user by replacing its authoring by the ghost user.

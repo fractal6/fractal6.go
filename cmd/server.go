@@ -203,6 +203,18 @@ func RunServer() {
 		})
 	})
 
+	// File attachments (S3-backed). See docs/file-attachments.md.
+	// /file/<id>            : auth-checked 302 to a presigned URL (read)
+	// POST /file/upload     : multipart upload, comment-author only
+	// DELETE /file/<id>     : comment-author only
+	r.Group(func(r chi.Router) {
+		r.Route("/file", func(r chi.Router) {
+			r.Post("/upload", handle6.FileUpload)
+			r.Get("/{id}", handle6.FileGet)
+			r.Delete("/{id}", handle6.FileDelete)
+		})
+	})
+
 	// MTA communication Endpoints
 	// --
 	// Notifications endpoint

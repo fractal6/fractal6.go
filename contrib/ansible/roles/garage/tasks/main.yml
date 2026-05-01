@@ -1,0 +1,35 @@
+---
+# tasks/main.yml — install + configure Garage, then optionally bootstrap.
+#
+# Phases (kept in separate include files for readability):
+#   01_preflight  — sanity-check required vars & secrets
+#   02_user       — system user + directories
+#   03_binary     — download + verify + install /usr/local/bin/garage
+#   04_config     — render /etc/garage/garage.toml
+#   05_systemd    — install unit, enable, start
+#   06_bootstrap  — (optional) cluster layout, bucket, access key
+
+- name: Preflight checks
+  ansible.builtin.import_tasks: 01_preflight.yml
+  tags: [garage, garage-preflight]
+
+- name: System user & directories
+  ansible.builtin.import_tasks: 02_user.yml
+  tags: [garage, garage-system]
+
+- name: Install garage binary
+  ansible.builtin.import_tasks: 03_binary.yml
+  tags: [garage, garage-install]
+
+- name: Render configuration
+  ansible.builtin.import_tasks: 04_config.yml
+  tags: [garage, garage-config]
+
+- name: Install systemd unit
+  ansible.builtin.import_tasks: 05_systemd.yml
+  tags: [garage, garage-systemd]
+
+- name: Bootstrap cluster + bucket
+  ansible.builtin.import_tasks: 06_bootstrap.yml
+  when: garage_bootstrap_cluster or garage_bootstrap_bucket
+  tags: [garage, garage-bootstrap]

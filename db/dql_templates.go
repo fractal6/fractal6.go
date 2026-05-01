@@ -690,4 +690,50 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
+	// getFileAuth fetches everything the /file/<id> proxy needs in a single hop:
+	// the storage key + content meta to mint a presigned URL, plus the parent
+	// comment author and the parent tension's receiver visibility/nameid for the
+	// auth check. {{.id}} is the File uid.
+	"getFileAuth": `{
+        all(func: uid({{.id}})) {
+            File.storageKey
+            File.filename
+            File.contentType
+            File.size
+            File.comment {
+                Post.createdBy { User.username }
+                Comment.tension: ~Tension.comments {
+                    Tension.receiver {
+                        Node.nameid
+                        Node.visibility
+                    }
+                }
+            }
+        }
+    }`,
+	// getCommentAuth: from a comment id, return its author and parent tension's
+	// receiver nameid+visibility. Used by the upload handler before persisting a
+	// new File node — only the comment author may attach files.
+	"getCommentAuth": `{
+        all(func: uid({{.id}})) {
+            Post.createdBy { User.username }
+            Comment.tension: ~Tension.comments {
+                Tension.receiver {
+                    Node.nameid
+                    Node.visibility
+                }
+            }
+        }
+    }`,
+	// getCommentFiles: list a comment's File nodes with their storage keys.
+	// Used by the comment-delete cleanup path to GC objects from S3 before the
+	// File nodes are removed from Dgraph.
+	"getCommentFiles": `{
+        all(func: uid({{.id}})) {
+            Comment.files {
+                uid
+                File.storageKey
+            }
+        }
+    }`,
 }

@@ -388,6 +388,33 @@ type Comment implements Post @auth(
 ) @hook_ {
   message: String! @search(by: [fulltext]) @x_alter
   reactions: [Reaction!] @hasInverse(field: comment)
+  # File attachments. Read-only via GraphQL; bytes are served by REST /file/<id>
+  # which re-checks the parent comment's tension visibility.
+  # Uploads/deletes go through REST /file (POST/DELETE) too — never via GraphQL.
+  files: [File!] @hasInverse(field: comment) @x_ro
+}
+
+# File metadata for attachments stored in S3-compatible storage (Garage/MinIO).
+# Auth model:
+#   - GraphQL mutations are root-only: clients NEVER add/update/delete File via GraphQL.
+#   - Bytes are NOT served via GraphQL. The /file/<id> REST endpoint re-runs the parent
+#     comment's tension visibility check, then 302-redirects to a short-lived presigned URL.
+#   - Direct queryFile/getFile is left open intentionally: storageKey alone is useless
+#     without going through /file/<id>. Listing is harmless (filename/size/contentType).
+# See docs/file-attachments.md.
+type File @auth(
+  add: <<is-root>>,
+  update: <<is-root>>,
+  delete: <<is-root>>
+) {
+  id: ID!
+  createdBy: User!
+  createdAt: DateTime! @search
+  comment: Comment!     # parent comment — single source of truth for auth
+  filename: String!
+  contentType: String!
+  size: Int!
+  storageKey: String! @id # S3 object key, e.g. "comments/<cid>/<uuid>-<safe-name>"
 }
 
 type Reaction @auth(
