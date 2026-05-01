@@ -11,6 +11,7 @@ enum ErrorBla {
 
 type BuildInfo {
   client_version: String!
+  reload_mode: String
 }
 
 type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"

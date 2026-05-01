@@ -371,12 +371,15 @@ type ComplexityRoot struct {
 
 	BuildInfo struct {
 		ClientVersion func(childComplexity int) int
+		ReloadMode    func(childComplexity int) int
 	}
 
 	BuildInfoAggregateResult struct {
 		ClientVersionMax func(childComplexity int) int
 		ClientVersionMin func(childComplexity int) int
 		Count            func(childComplexity int) int
+		ReloadModeMax    func(childComplexity int) int
+		ReloadModeMin    func(childComplexity int) int
 	}
 
 	Comment struct {
@@ -2480,6 +2483,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.BuildInfo.ClientVersion(childComplexity), true
 
+	case "BuildInfo.reload_mode":
+		if e.complexity.BuildInfo.ReloadMode == nil {
+			break
+		}
+
+		return e.complexity.BuildInfo.ReloadMode(childComplexity), true
+
 	case "BuildInfoAggregateResult.client_versionMax":
 		if e.complexity.BuildInfoAggregateResult.ClientVersionMax == nil {
 			break
@@ -2500,6 +2510,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.BuildInfoAggregateResult.Count(childComplexity), true
+
+	case "BuildInfoAggregateResult.reload_modeMax":
+		if e.complexity.BuildInfoAggregateResult.ReloadModeMax == nil {
+			break
+		}
+
+		return e.complexity.BuildInfoAggregateResult.ReloadModeMax(childComplexity), true
+
+	case "BuildInfoAggregateResult.reload_modeMin":
+		if e.complexity.BuildInfoAggregateResult.ReloadModeMin == nil {
+			break
+		}
+
+		return e.complexity.BuildInfoAggregateResult.ReloadModeMin(childComplexity), true
 
 	case "Comment.createdAt":
 		if e.complexity.Comment.CreatedAt == nil {
@@ -11112,6 +11136,7 @@ directive @w_meta_patch(f: String!, k: String) on INPUT_FIELD_DEFINITION
 
 type BuildInfo {
   client_version: String!
+  reload_mode: String
 }
 
 type Node {
@@ -11725,35 +11750,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @cascade(fields: [String]) on FIELD
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @id on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 type ActivityAggregateResult {
   count: Int
@@ -11846,6 +11871,7 @@ type AddBlobPayload {
 
 input AddBuildInfoInput {
   client_version: String!
+  reload_mode: String
 }
 
 type AddBuildInfoPayload {
@@ -12394,6 +12420,8 @@ type BuildInfoAggregateResult {
   count: Int
   client_versionMin: String
   client_versionMax: String
+  reload_modeMin: String
+  reload_modeMax: String
 }
 
 input BuildInfoFilter {
@@ -12405,6 +12433,7 @@ input BuildInfoFilter {
 
 enum BuildInfoHasFilter {
   client_version
+  reload_mode
 }
 
 input BuildInfoOrder {
@@ -12415,14 +12444,17 @@ input BuildInfoOrder {
 
 enum BuildInfoOrderable {
   client_version
+  reload_mode
 }
 
 input BuildInfoPatch {
   client_version: String @x_patch_ro
+  reload_mode: String @x_patch_ro
 }
 
 input BuildInfoRef {
   client_version: String
+  reload_mode: String
 }
 
 input CardKindFilter {

@@ -142,7 +142,7 @@ generate:
 #
 
 publish_prod: build_release_prod
-	@git push origin prod
+	@git push origin prod --force-with-lease
 	@echo "-- Please upload your release to github: $(RELEASE_DIR)/$(RELEASE_NAME)"
 
 build_release_prod: pre_build_prod install_client_prod extract_client install_dgraph \
@@ -172,7 +172,7 @@ install_client_prod:
 #
 
 publish_op: build_release_op upload_release_op
-	@git push f6 op
+	@git push f6 op --force-with-lease
 	@echo "-- op release published"
 
 build_release_op: pre_build_op install_client_op extract_client install_dgraph \

@@ -471,7 +471,8 @@ func (r *mutationResolver) DeleteActivity(ctx context.Context, filter model.Acti
 
 // QueryBuildInfo is the resolver for the queryBuildInfo field.
 func (r *queryResolver) QueryBuildInfo(ctx context.Context, filter *model.BuildInfoFilter, order *model.BuildInfoOrder, first *int, offset *int) ([]*model.BuildInfo, error) {
-	return []*model.BuildInfo{{ClientVersion: auth.ClientVersion}}, nil
+	rm := auth.ReloadMode
+	return []*model.BuildInfo{{ClientVersion: auth.ClientVersion, ReloadMode: &rm}}, nil
 }
 
 // AggregateBuildInfo is the resolver for the aggregateBuildInfo field.

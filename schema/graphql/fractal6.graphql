@@ -20,6 +20,11 @@
 
 type BuildInfo {
   client_version: String!
+  # Reload policy advertised to clients on version mismatch.
+  # Values: "banner" (default) - show navbar notification, user reloads.
+  #         "hotfix"            - silent reload triggered by client.
+  # Nullable so older deploys without a reload_mode file are treated as banner.
+  reload_mode: String
 }
 
 #

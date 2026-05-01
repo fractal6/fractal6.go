@@ -100,7 +100,8 @@ type AddBlobPayload struct {
 }
 
 type AddBuildInfoInput struct {
-	ClientVersion string `json:"client_version"`
+	ClientVersion string  `json:"client_version"`
+	ReloadMode    *string `json:"reload_mode,omitempty"`
 }
 
 type AddBuildInfoPayload struct {
@@ -638,13 +639,16 @@ type BlobTypeHash struct {
 }
 
 type BuildInfo struct {
-	ClientVersion string `json:"client_version"`
+	ClientVersion string  `json:"client_version"`
+	ReloadMode    *string `json:"reload_mode,omitempty"`
 }
 
 type BuildInfoAggregateResult struct {
 	Count            *int    `json:"count,omitempty"`
 	ClientVersionMin *string `json:"client_versionMin,omitempty"`
 	ClientVersionMax *string `json:"client_versionMax,omitempty"`
+	ReloadModeMin    *string `json:"reload_modeMin,omitempty"`
+	ReloadModeMax    *string `json:"reload_modeMax,omitempty"`
 }
 
 type BuildInfoFilter struct {
@@ -662,10 +666,12 @@ type BuildInfoOrder struct {
 
 type BuildInfoPatch struct {
 	ClientVersion *string `json:"client_version,omitempty"`
+	ReloadMode    *string `json:"reload_mode,omitempty"`
 }
 
 type BuildInfoRef struct {
 	ClientVersion *string `json:"client_version,omitempty"`
+	ReloadMode    *string `json:"reload_mode,omitempty"`
 }
 
 type CardKindFilter struct {
@@ -3511,15 +3517,17 @@ type BuildInfoHasFilter string
 
 const (
 	BuildInfoHasFilterClientVersion BuildInfoHasFilter = "client_version"
+	BuildInfoHasFilterReloadMode    BuildInfoHasFilter = "reload_mode"
 )
 
 var AllBuildInfoHasFilter = []BuildInfoHasFilter{
 	BuildInfoHasFilterClientVersion,
+	BuildInfoHasFilterReloadMode,
 }
 
 func (e BuildInfoHasFilter) IsValid() bool {
 	switch e {
-	case BuildInfoHasFilterClientVersion:
+	case BuildInfoHasFilterClientVersion, BuildInfoHasFilterReloadMode:
 		return true
 	}
 	return false
@@ -3550,15 +3558,17 @@ type BuildInfoOrderable string
 
 const (
 	BuildInfoOrderableClientVersion BuildInfoOrderable = "client_version"
+	BuildInfoOrderableReloadMode    BuildInfoOrderable = "reload_mode"
 )
 
 var AllBuildInfoOrderable = []BuildInfoOrderable{
 	BuildInfoOrderableClientVersion,
+	BuildInfoOrderableReloadMode,
 }
 
 func (e BuildInfoOrderable) IsValid() bool {
 	switch e {
-	case BuildInfoOrderableClientVersion:
+	case BuildInfoOrderableClientVersion, BuildInfoOrderableReloadMode:
 		return true
 	}
 	return false

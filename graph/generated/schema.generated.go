@@ -13207,6 +13207,8 @@ func (ec *executionContext) fieldContext_AddBuildInfoPayload_buildInfo(ctx conte
 			switch field.Name {
 			case "client_version":
 				return ec.fieldContext_BuildInfo_client_version(ctx, field)
+			case "reload_mode":
+				return ec.fieldContext_BuildInfo_reload_mode(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BuildInfo", field.Name)
 		},
@@ -17285,6 +17287,44 @@ func (ec *executionContext) fieldContext_BuildInfo_client_version(_ context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _BuildInfo_reload_mode(ctx context.Context, field graphql.CollectedField, obj *model.BuildInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BuildInfo_reload_mode(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReloadMode, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BuildInfo_reload_mode(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BuildInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _BuildInfoAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.BuildInfoAggregateResult) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_BuildInfoAggregateResult_count(ctx, field)
 	if err != nil {
@@ -17387,6 +17427,82 @@ func (ec *executionContext) _BuildInfoAggregateResult_client_versionMax(ctx cont
 }
 
 func (ec *executionContext) fieldContext_BuildInfoAggregateResult_client_versionMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BuildInfoAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BuildInfoAggregateResult_reload_modeMin(ctx context.Context, field graphql.CollectedField, obj *model.BuildInfoAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BuildInfoAggregateResult_reload_modeMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReloadModeMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BuildInfoAggregateResult_reload_modeMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BuildInfoAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BuildInfoAggregateResult_reload_modeMax(ctx context.Context, field graphql.CollectedField, obj *model.BuildInfoAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BuildInfoAggregateResult_reload_modeMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReloadModeMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BuildInfoAggregateResult_reload_modeMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "BuildInfoAggregateResult",
 		Field:      field,
@@ -20129,6 +20245,8 @@ func (ec *executionContext) fieldContext_DeleteBuildInfoPayload_buildInfo(ctx co
 			switch field.Name {
 			case "client_version":
 				return ec.fieldContext_BuildInfo_client_version(ctx, field)
+			case "reload_mode":
+				return ec.fieldContext_BuildInfo_reload_mode(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BuildInfo", field.Name)
 		},
@@ -46743,6 +46861,8 @@ func (ec *executionContext) fieldContext_Query_queryBuildInfo(ctx context.Contex
 			switch field.Name {
 			case "client_version":
 				return ec.fieldContext_BuildInfo_client_version(ctx, field)
+			case "reload_mode":
+				return ec.fieldContext_BuildInfo_reload_mode(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BuildInfo", field.Name)
 		},
@@ -46800,6 +46920,10 @@ func (ec *executionContext) fieldContext_Query_aggregateBuildInfo(ctx context.Co
 				return ec.fieldContext_BuildInfoAggregateResult_client_versionMin(ctx, field)
 			case "client_versionMax":
 				return ec.fieldContext_BuildInfoAggregateResult_client_versionMax(ctx, field)
+			case "reload_modeMin":
+				return ec.fieldContext_BuildInfoAggregateResult_reload_modeMin(ctx, field)
+			case "reload_modeMax":
+				return ec.fieldContext_BuildInfoAggregateResult_reload_modeMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BuildInfoAggregateResult", field.Name)
 		},
@@ -59129,6 +59253,8 @@ func (ec *executionContext) fieldContext_UpdateBuildInfoPayload_buildInfo(ctx co
 			switch field.Name {
 			case "client_version":
 				return ec.fieldContext_BuildInfo_client_version(ctx, field)
+			case "reload_mode":
+				return ec.fieldContext_BuildInfo_reload_mode(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BuildInfo", field.Name)
 		},
@@ -67955,7 +68081,7 @@ func (ec *executionContext) unmarshalInputAddBuildInfoInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"client_version"}
+	fieldsInOrder := [...]string{"client_version", "reload_mode"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -67969,6 +68095,13 @@ func (ec *executionContext) unmarshalInputAddBuildInfoInput(ctx context.Context,
 				return it, err
 			}
 			it.ClientVersion = data
+		case "reload_mode":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reload_mode"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReloadMode = data
 		}
 	}
 
@@ -72625,7 +72758,7 @@ func (ec *executionContext) unmarshalInputBuildInfoPatch(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"client_version"}
+	fieldsInOrder := [...]string{"client_version", "reload_mode"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72654,6 +72787,28 @@ func (ec *executionContext) unmarshalInputBuildInfoPatch(ctx context.Context, ob
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "reload_mode":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reload_mode"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.ReloadMode = data
+			} else if tmp == nil {
+				it.ReloadMode = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -72667,7 +72822,7 @@ func (ec *executionContext) unmarshalInputBuildInfoRef(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"client_version"}
+	fieldsInOrder := [...]string{"client_version", "reload_mode"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -72681,6 +72836,13 @@ func (ec *executionContext) unmarshalInputBuildInfoRef(ctx context.Context, obj 
 				return it, err
 			}
 			it.ClientVersion = data
+		case "reload_mode":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reload_mode"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReloadMode = data
 		}
 	}
 
@@ -90285,6 +90447,8 @@ func (ec *executionContext) _BuildInfo(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "reload_mode":
+			out.Values[i] = ec._BuildInfo_reload_mode(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -90325,6 +90489,10 @@ func (ec *executionContext) _BuildInfoAggregateResult(ctx context.Context, sel a
 			out.Values[i] = ec._BuildInfoAggregateResult_client_versionMin(ctx, field, obj)
 		case "client_versionMax":
 			out.Values[i] = ec._BuildInfoAggregateResult_client_versionMax(ctx, field, obj)
+		case "reload_modeMin":
+			out.Values[i] = ec._BuildInfoAggregateResult_reload_modeMin(ctx, field, obj)
+		case "reload_modeMax":
+			out.Values[i] = ec._BuildInfoAggregateResult_reload_modeMax(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

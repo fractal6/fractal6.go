@@ -24,6 +24,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -37,6 +38,7 @@ import (
 
 var (
 	ClientVersion    string
+	ReloadMode       string
 	ReservedUsername map[string]bool
 	MAX_PUBLIC_ORGA  int
 	MAX_PRIVATE_ORGA int
@@ -47,6 +49,7 @@ var (
 func init() {
 	var err error
 	ClientVersion = viper.GetString("server.client_version")
+	ReloadMode = readReloadModeFile("./public/reload_mode")
 	MAX_PUBLIC_ORGA, err = strconv.Atoi(viper.GetString("admin.max_public_orgas"))
 	if err != nil {
 		fmt.Println("max_public_orgas conf not found, setting to 100")
@@ -391,4 +394,17 @@ func CanNewOrga(uctx model.UserCtx, form model.OrgaForm) (bool, error) {
 
 	ok = true
 	return ok, err
+}
+
+// readReloadModeFile reads the reload_mode advertised to clients on version mismatch.
+// Returns "hotfix" if file content is "hotfix", otherwise "banner" (incl. missing file).
+func readReloadModeFile(path string) string {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "banner"
+	}
+	if strings.TrimSpace(string(b)) == "hotfix" {
+		return "hotfix"
+	}
+	return "banner"
 }
