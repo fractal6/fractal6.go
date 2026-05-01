@@ -72,7 +72,7 @@ func CheckNodesAuth(uctx *model.UserCtx, nodes []model.NodeRef, passAll bool) (b
 	mode := model.NodeModeCoordinated
 	for _, n := range nodes {
 		if n.Nameid == nil {
-			return false, LogErr("Access denied", fmt.Errorf("nameid in required in artefact nodes fields."))
+			return false, LogErr("Access denied", fmt.Errorf("nameid in required in nodes fields."))
 		}
 
 		ok, err = HasCoordoAuth(uctx, *n.Nameid, &mode)

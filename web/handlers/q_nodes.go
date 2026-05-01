@@ -50,7 +50,7 @@ type nodeQuery struct {
 
 // nodeHolder is satisfied by types returned by /q/{labels,roles,tension_templates,projects}.
 type nodeHolder interface {
-	model.Label | model.RoleExt | model.TensionTemplate | db.ProjectFull
+	model.Label | model.RoleExt | model.TensionTemplate | model.ProjectTemplate | db.ProjectFull
 }
 
 // VisFetcher fetches per-circle visibility for a recursion shape (sub-tree or ancestor chain).

@@ -262,6 +262,7 @@ type AddNodeInput struct {
 	Labels                          []*LabelRef           `json:"labels,omitempty"`
 	Roles                           []*RoleExtRef         `json:"roles,omitempty"`
 	TensionTemplates                []*TensionTemplateRef `json:"tension_templates,omitempty"`
+	ProjectTemplates                []*ProjectTemplateRef `json:"project_templates,omitempty"`
 	RoleExt                         *RoleExtRef           `json:"role_ext,omitempty"`
 	RoleType                        *RoleType             `json:"role_type,omitempty"`
 	Color                           *string               `json:"color,omitempty"`
@@ -397,6 +398,20 @@ type AddProjectInput struct {
 type AddProjectPayload struct {
 	Project []*Project `json:"project,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type AddProjectTemplateInput struct {
+	Rootnameid  string     `json:"rootnameid"`
+	Name        string     `json:"name"`
+	Description *string    `json:"description,omitempty"`
+	Nodes       []*NodeRef `json:"nodes,omitempty"`
+	IsRecursive bool       `json:"is_recursive"`
+	ColumnsJSON string     `json:"columns_json"`
+}
+
+type AddProjectTemplatePayload struct {
+	ProjectTemplate []*ProjectTemplate `json:"projectTemplate,omitempty"`
+	NumUids         *int               `json:"numUids,omitempty"`
 }
 
 type AddReactionInput struct {
@@ -1001,6 +1016,12 @@ type DeleteProjectPayload struct {
 	NumUids *int       `json:"numUids,omitempty"`
 }
 
+type DeleteProjectTemplatePayload struct {
+	ProjectTemplate []*ProjectTemplate `json:"projectTemplate,omitempty"`
+	Msg             *string            `json:"msg,omitempty"`
+	NumUids         *int               `json:"numUids,omitempty"`
+}
+
 type DeleteReactionPayload struct {
 	Reaction []*Reaction `json:"reaction,omitempty"`
 	Msg      *string     `json:"msg,omitempty"`
@@ -1441,6 +1462,7 @@ type Node struct {
 	Labels                          []*Label                        `json:"labels,omitempty"`
 	Roles                           []*RoleExt                      `json:"roles,omitempty"`
 	TensionTemplates                []*TensionTemplate              `json:"tension_templates,omitempty"`
+	ProjectTemplates                []*ProjectTemplate              `json:"project_templates,omitempty"`
 	RoleExt                         *RoleExt                        `json:"role_ext,omitempty"`
 	RoleType                        *RoleType                       `json:"role_type,omitempty"`
 	Color                           *string                         `json:"color,omitempty"`
@@ -1458,6 +1480,7 @@ type Node struct {
 	LabelsAggregate                 *LabelAggregateResult           `json:"labelsAggregate,omitempty"`
 	RolesAggregate                  *RoleExtAggregateResult         `json:"rolesAggregate,omitempty"`
 	TensionTemplatesAggregate       *TensionTemplateAggregateResult `json:"tension_templatesAggregate,omitempty"`
+	ProjectTemplatesAggregate       *ProjectTemplateAggregateResult `json:"project_templatesAggregate,omitempty"`
 	ContractsAggregate              *VoteAggregateResult            `json:"contractsAggregate,omitempty"`
 	EventsHistoryAggregate          *EventAggregateResult           `json:"events_historyAggregate,omitempty"`
 	ActivityAggregate               *ActivityAggregateResult        `json:"activityAggregate,omitempty"`
@@ -1627,6 +1650,7 @@ type NodePatch struct {
 	Labels                          []*LabelRef           `json:"labels,omitempty"`
 	Roles                           []*RoleExtRef         `json:"roles,omitempty"`
 	TensionTemplates                []*TensionTemplateRef `json:"tension_templates,omitempty"`
+	ProjectTemplates                []*ProjectTemplateRef `json:"project_templates,omitempty"`
 	RoleExt                         *RoleExtRef           `json:"role_ext,omitempty"`
 	RoleType                        *RoleType             `json:"role_type,omitempty"`
 	Color                           *string               `json:"color,omitempty"`
@@ -1670,6 +1694,7 @@ type NodeRef struct {
 	Labels                          []*LabelRef           `json:"labels,omitempty"`
 	Roles                           []*RoleExtRef         `json:"roles,omitempty"`
 	TensionTemplates                []*TensionTemplateRef `json:"tension_templates,omitempty"`
+	ProjectTemplates                []*ProjectTemplateRef `json:"project_templates,omitempty"`
 	RoleExt                         *RoleExtRef           `json:"role_ext,omitempty"`
 	RoleType                        *RoleType             `json:"role_type,omitempty"`
 	Color                           *string               `json:"color,omitempty"`
@@ -2266,6 +2291,64 @@ type ProjectRef struct {
 type ProjectStatusHash struct {
 	Eq *ProjectStatus   `json:"eq,omitempty"`
 	In []*ProjectStatus `json:"in,omitempty"`
+}
+
+type ProjectTemplate struct {
+	ID             string               `json:"id"`
+	Rootnameid     string               `json:"rootnameid"`
+	Name           string               `json:"name"`
+	Description    *string              `json:"description,omitempty"`
+	Nodes          []*Node              `json:"nodes,omitempty"`
+	IsRecursive    bool                 `json:"is_recursive"`
+	ColumnsJSON    string               `json:"columns_json"`
+	NodesAggregate *NodeAggregateResult `json:"nodesAggregate,omitempty"`
+}
+
+type ProjectTemplateAggregateResult struct {
+	Count          *int    `json:"count,omitempty"`
+	RootnameidMin  *string `json:"rootnameidMin,omitempty"`
+	RootnameidMax  *string `json:"rootnameidMax,omitempty"`
+	NameMin        *string `json:"nameMin,omitempty"`
+	NameMax        *string `json:"nameMax,omitempty"`
+	DescriptionMin *string `json:"descriptionMin,omitempty"`
+	DescriptionMax *string `json:"descriptionMax,omitempty"`
+	ColumnsJSONMin *string `json:"columns_jsonMin,omitempty"`
+	ColumnsJSONMax *string `json:"columns_jsonMax,omitempty"`
+}
+
+type ProjectTemplateFilter struct {
+	ID         []string                          `json:"id,omitempty"`
+	Rootnameid *StringHashFilter                 `json:"rootnameid,omitempty"`
+	Name       *StringHashFilterStringTermFilter `json:"name,omitempty"`
+	Has        []*ProjectTemplateHasFilter       `json:"has,omitempty"`
+	And        []*ProjectTemplateFilter          `json:"and,omitempty"`
+	Or         []*ProjectTemplateFilter          `json:"or,omitempty"`
+	Not        *ProjectTemplateFilter            `json:"not,omitempty"`
+}
+
+type ProjectTemplateOrder struct {
+	Asc  *ProjectTemplateOrderable `json:"asc,omitempty"`
+	Desc *ProjectTemplateOrderable `json:"desc,omitempty"`
+	Then *ProjectTemplateOrder     `json:"then,omitempty"`
+}
+
+type ProjectTemplatePatch struct {
+	Rootnameid  *string    `json:"rootnameid,omitempty"`
+	Name        *string    `json:"name,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	Nodes       []*NodeRef `json:"nodes,omitempty"`
+	IsRecursive *bool      `json:"is_recursive,omitempty"`
+	ColumnsJSON *string    `json:"columns_json,omitempty"`
+}
+
+type ProjectTemplateRef struct {
+	ID          *string    `json:"id,omitempty"`
+	Rootnameid  *string    `json:"rootnameid,omitempty"`
+	Name        *string    `json:"name,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	Nodes       []*NodeRef `json:"nodes,omitempty"`
+	IsRecursive *bool      `json:"is_recursive,omitempty"`
+	ColumnsJSON *string    `json:"columns_json,omitempty"`
 }
 
 type Query struct {
@@ -2882,6 +2965,17 @@ type UpdateProjectInput struct {
 type UpdateProjectPayload struct {
 	Project []*Project `json:"project,omitempty"`
 	NumUids *int       `json:"numUids,omitempty"`
+}
+
+type UpdateProjectTemplateInput struct {
+	Filter *ProjectTemplateFilter `json:"filter"`
+	Set    *ProjectTemplatePatch  `json:"set,omitempty"`
+	Remove *ProjectTemplatePatch  `json:"remove,omitempty"`
+}
+
+type UpdateProjectTemplatePayload struct {
+	ProjectTemplate []*ProjectTemplate `json:"projectTemplate,omitempty"`
+	NumUids         *int               `json:"numUids,omitempty"`
 }
 
 type UpdateReactionInput struct {
@@ -4814,6 +4908,7 @@ const (
 	NodeHasFilterLabels                          NodeHasFilter = "labels"
 	NodeHasFilterRoles                           NodeHasFilter = "roles"
 	NodeHasFilterTensionTemplates                NodeHasFilter = "tension_templates"
+	NodeHasFilterProjectTemplates                NodeHasFilter = "project_templates"
 	NodeHasFilterRoleExt                         NodeHasFilter = "role_ext"
 	NodeHasFilterRoleType                        NodeHasFilter = "role_type"
 	NodeHasFilterColor                           NodeHasFilter = "color"
@@ -4856,6 +4951,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterLabels,
 	NodeHasFilterRoles,
 	NodeHasFilterTensionTemplates,
+	NodeHasFilterProjectTemplates,
 	NodeHasFilterRoleExt,
 	NodeHasFilterRoleType,
 	NodeHasFilterColor,
@@ -4868,7 +4964,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterIsTemplateTensionOnly, NodeHasFilterIsPinnedTensionfetchRecursively, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterTensionTemplates, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterCascadeDirective:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterIsTemplateTensionOnly, NodeHasFilterIsPinnedTensionfetchRecursively, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterTensionTemplates, NodeHasFilterProjectTemplates, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterCascadeDirective:
 		return true
 	}
 	return false
@@ -6014,6 +6110,100 @@ func (e *ProjectStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ProjectStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectTemplateHasFilter string
+
+const (
+	ProjectTemplateHasFilterRootnameid  ProjectTemplateHasFilter = "rootnameid"
+	ProjectTemplateHasFilterName        ProjectTemplateHasFilter = "name"
+	ProjectTemplateHasFilterDescription ProjectTemplateHasFilter = "description"
+	ProjectTemplateHasFilterNodes       ProjectTemplateHasFilter = "nodes"
+	ProjectTemplateHasFilterIsRecursive ProjectTemplateHasFilter = "is_recursive"
+	ProjectTemplateHasFilterColumnsJSON ProjectTemplateHasFilter = "columns_json"
+)
+
+var AllProjectTemplateHasFilter = []ProjectTemplateHasFilter{
+	ProjectTemplateHasFilterRootnameid,
+	ProjectTemplateHasFilterName,
+	ProjectTemplateHasFilterDescription,
+	ProjectTemplateHasFilterNodes,
+	ProjectTemplateHasFilterIsRecursive,
+	ProjectTemplateHasFilterColumnsJSON,
+}
+
+func (e ProjectTemplateHasFilter) IsValid() bool {
+	switch e {
+	case ProjectTemplateHasFilterRootnameid, ProjectTemplateHasFilterName, ProjectTemplateHasFilterDescription, ProjectTemplateHasFilterNodes, ProjectTemplateHasFilterIsRecursive, ProjectTemplateHasFilterColumnsJSON:
+		return true
+	}
+	return false
+}
+
+func (e ProjectTemplateHasFilter) String() string {
+	return string(e)
+}
+
+func (e *ProjectTemplateHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectTemplateHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectTemplateHasFilter", str)
+	}
+	return nil
+}
+
+func (e ProjectTemplateHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectTemplateOrderable string
+
+const (
+	ProjectTemplateOrderableRootnameid  ProjectTemplateOrderable = "rootnameid"
+	ProjectTemplateOrderableName        ProjectTemplateOrderable = "name"
+	ProjectTemplateOrderableDescription ProjectTemplateOrderable = "description"
+	ProjectTemplateOrderableColumnsJSON ProjectTemplateOrderable = "columns_json"
+)
+
+var AllProjectTemplateOrderable = []ProjectTemplateOrderable{
+	ProjectTemplateOrderableRootnameid,
+	ProjectTemplateOrderableName,
+	ProjectTemplateOrderableDescription,
+	ProjectTemplateOrderableColumnsJSON,
+}
+
+func (e ProjectTemplateOrderable) IsValid() bool {
+	switch e {
+	case ProjectTemplateOrderableRootnameid, ProjectTemplateOrderableName, ProjectTemplateOrderableDescription, ProjectTemplateOrderableColumnsJSON:
+		return true
+	}
+	return false
+}
+
+func (e ProjectTemplateOrderable) String() string {
+	return string(e)
+}
+
+func (e *ProjectTemplateOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectTemplateOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectTemplateOrderable", str)
+	}
+	return nil
+}
+
+func (e ProjectTemplateOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

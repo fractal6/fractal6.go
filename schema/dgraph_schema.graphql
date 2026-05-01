@@ -102,6 +102,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   labels: [Label!]
   roles: [RoleExt!]
   tension_templates: [TensionTemplate!] @hasInverse(field: nodes)
+  project_templates: [ProjectTemplate!] @hasInverse(field: nodes)
   role_ext: RoleExt
   role_type: RoleType @search
   color: String
@@ -301,6 +302,63 @@ type TensionTemplate @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   type_: TensionType!
   labels: [Label!]
   assignees: [User!]
+}
+
+type ProjectTemplate @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($OWNIDS: [String]) {
+        queryProjectTemplate {
+          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
+        }
+    }"""
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryProjectTemplate(filter: {rootnameid: {in: $ROOTIDS}}) {
+          nodes(filter: {visibility: {eq: Private}}) { id }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryProjectTemplate {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }"""
+},{ rule:"""query ($USERNAME: String!) {
+        queryProjectTemplate {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            parent {
+              children(filter: {role_type: {eq: Coordinator}}) {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
+        }
+    }"""
+}]
+}, add:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryProjectTemplate(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryProjectTemplate(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}, delete:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+},{ rule:"""query ($ROOTIDS: [String]) {
+        queryProjectTemplate(filter: {rootnameid: {in: $ROOTIDS}}) { id }
+    }"""
+}]
+}) {
+  id: ID!
+  rootnameid: String! @search(by:[hash])
+  name: String! @search(by:[hash, term])
+  description: String
+  nodes: [Node!] @hasInverse(field: project_templates)
+  is_recursive: Boolean!
+  columns_json: String!
 }
 
 type Project @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"

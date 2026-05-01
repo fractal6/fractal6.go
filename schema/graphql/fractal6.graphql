@@ -123,6 +123,7 @@ type Node @auth(
   Available tensions means that there are visible when creating new tension.
   """
   tension_templates: [TensionTemplate!] @hasInverse(field: nodes)
+  project_templates: [ProjectTemplate!] @hasInverse(field: nodes)
 
   # Role only... is a Leaf
   role_ext: RoleExt
@@ -229,6 +230,22 @@ type TensionTemplate @auth(
   assignees: [User!]   @x_alter(r:"ref")
 }
 
+
+type ProjectTemplate @auth(
+  query: <<query-project-template>>,
+  add: <<alter-project-template>>,
+  update: <<alter-project-template>>,
+  delete: <<alter-project-template>>
+) @hook_ {
+  id: ID!
+  rootnameid: String!  @search(by: [hash])
+  name: String!        @search(by: [hash, term]) @x_alter(r:"minLen", n:1)
+  description: String  @x_alter(r:"minLen", n:3)
+  nodes: [Node!]       @hasInverse(field: project_templates) @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean!         @x_alter
+  # Payload
+  columns_json: String!       @x_alter # json: list[dict(name,description,order)]
+}
 type Project @auth(
   query: <<query-project>>,
   add: <<alter-project>>,

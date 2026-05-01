@@ -60,6 +60,8 @@ type DirectiveRoot struct {
 	Hook_addProjectDraft            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addProjectDraftInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addProjectInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectTemplate         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_addProjectTemplateInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addReaction                func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addReactionInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_addRoleExt                 func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -86,6 +88,8 @@ type DirectiveRoot struct {
 	Hook_deleteProjectDraft         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteProjectDraftInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteProjectInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectTemplate      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_deleteProjectTemplateInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteReaction             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteReactionInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_deleteRoleExt              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -105,6 +109,7 @@ type DirectiveRoot struct {
 	Hook_getProjectColumnInput      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getProjectDraftInput       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getProjectInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_getProjectTemplateInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getReactionInput           func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getRoleExtInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_getTensionInput            func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -118,6 +123,7 @@ type DirectiveRoot struct {
 	Hook_queryProjectColumnInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryProjectDraftInput     func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryProjectInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_queryProjectTemplateInput  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryReactionInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryRoleExtInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_queryTensionInput          func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -138,6 +144,8 @@ type DirectiveRoot struct {
 	Hook_updateProjectDraft         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateProjectDraftInput    func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateProjectInput         func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectTemplate      func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Hook_updateProjectTemplateInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateReaction             func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateReactionInput        func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Hook_updateRoleExt              func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
@@ -297,6 +305,11 @@ type ComplexityRoot struct {
 	AddProjectPayload struct {
 		NumUids func(childComplexity int) int
 		Project func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
+	}
+
+	AddProjectTemplatePayload struct {
+		NumUids         func(childComplexity int) int
+		ProjectTemplate func(childComplexity int, filter *model.ProjectTemplateFilter, order *model.ProjectTemplateOrder, first *int, offset *int) int
 	}
 
 	AddReactionPayload struct {
@@ -565,6 +578,12 @@ type ComplexityRoot struct {
 		Project func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
 	}
 
+	DeleteProjectTemplatePayload struct {
+		Msg             func(childComplexity int) int
+		NumUids         func(childComplexity int) int
+		ProjectTemplate func(childComplexity int, filter *model.ProjectTemplateFilter, order *model.ProjectTemplateOrder, first *int, offset *int) int
+	}
+
 	DeleteReactionPayload struct {
 		Msg      func(childComplexity int) int
 		NumUids  func(childComplexity int) int
@@ -745,6 +764,7 @@ type ComplexityRoot struct {
 		AddProjectDraft         func(childComplexity int, input []*model.AddProjectDraftInput) int
 		AddProjectField         func(childComplexity int, input []*model.AddProjectFieldInput) int
 		AddProjectFieldValue    func(childComplexity int, input []*model.AddProjectFieldValueInput) int
+		AddProjectTemplate      func(childComplexity int, input []*model.AddProjectTemplateInput) int
 		AddReaction             func(childComplexity int, input []*model.AddReactionInput, upsert *bool) int
 		AddRoleExt              func(childComplexity int, input []*model.AddRoleExtInput) int
 		AddTension              func(childComplexity int, input []*model.AddTensionInput) int
@@ -774,6 +794,7 @@ type ComplexityRoot struct {
 		DeleteProjectDraft      func(childComplexity int, filter model.ProjectDraftFilter) int
 		DeleteProjectField      func(childComplexity int, filter model.ProjectFieldFilter) int
 		DeleteProjectFieldValue func(childComplexity int, filter model.ProjectFieldValueFilter) int
+		DeleteProjectTemplate   func(childComplexity int, filter model.ProjectTemplateFilter) int
 		DeleteReaction          func(childComplexity int, filter model.ReactionFilter) int
 		DeleteRoleExt           func(childComplexity int, filter model.RoleExtFilter) int
 		DeleteTension           func(childComplexity int, filter model.TensionFilter) int
@@ -803,6 +824,7 @@ type ComplexityRoot struct {
 		UpdateProjectDraft      func(childComplexity int, input model.UpdateProjectDraftInput) int
 		UpdateProjectField      func(childComplexity int, input model.UpdateProjectFieldInput) int
 		UpdateProjectFieldValue func(childComplexity int, input model.UpdateProjectFieldValueInput) int
+		UpdateProjectTemplate   func(childComplexity int, input model.UpdateProjectTemplateInput) int
 		UpdateReaction          func(childComplexity int, input model.UpdateReactionInput) int
 		UpdateRoleExt           func(childComplexity int, input model.UpdateRoleExtInput) int
 		UpdateTension           func(childComplexity int, input model.UpdateTensionInput) int
@@ -844,6 +866,8 @@ type ComplexityRoot struct {
 		Parent                          func(childComplexity int, filter *model.NodeFilter) int
 		Pinned                          func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
 		PinnedAggregate                 func(childComplexity int, filter *model.TensionFilter) int
+		ProjectTemplates                func(childComplexity int, filter *model.ProjectTemplateFilter, order *model.ProjectTemplateOrder, first *int, offset *int) int
+		ProjectTemplatesAggregate       func(childComplexity int, filter *model.ProjectTemplateFilter) int
 		Projects                        func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
 		ProjectsAggregate               func(childComplexity int, filter *model.ProjectFilter) int
 		Rights                          func(childComplexity int) int
@@ -1149,6 +1173,29 @@ type ComplexityRoot struct {
 		ValueMin func(childComplexity int) int
 	}
 
+	ProjectTemplate struct {
+		ColumnsJSON    func(childComplexity int) int
+		Description    func(childComplexity int) int
+		ID             func(childComplexity int) int
+		IsRecursive    func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Nodes          func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
+		NodesAggregate func(childComplexity int, filter *model.NodeFilter) int
+		Rootnameid     func(childComplexity int) int
+	}
+
+	ProjectTemplateAggregateResult struct {
+		ColumnsJSONMax func(childComplexity int) int
+		ColumnsJSONMin func(childComplexity int) int
+		Count          func(childComplexity int) int
+		DescriptionMax func(childComplexity int) int
+		DescriptionMin func(childComplexity int) int
+		NameMax        func(childComplexity int) int
+		NameMin        func(childComplexity int) int
+		RootnameidMax  func(childComplexity int) int
+		RootnameidMin  func(childComplexity int) int
+	}
+
 	Query struct {
 		AggregateActivity          func(childComplexity int, filter *model.ActivityFilter) int
 		AggregateBlob              func(childComplexity int, filter *model.BlobFilter) int
@@ -1171,6 +1218,7 @@ type ComplexityRoot struct {
 		AggregateProjectDraft      func(childComplexity int, filter *model.ProjectDraftFilter) int
 		AggregateProjectField      func(childComplexity int, filter *model.ProjectFieldFilter) int
 		AggregateProjectFieldValue func(childComplexity int, filter *model.ProjectFieldValueFilter) int
+		AggregateProjectTemplate   func(childComplexity int, filter *model.ProjectTemplateFilter) int
 		AggregateReaction          func(childComplexity int, filter *model.ReactionFilter) int
 		AggregateRoleExt           func(childComplexity int, filter *model.RoleExtFilter) int
 		AggregateTension           func(childComplexity int, filter *model.TensionFilter) int
@@ -1195,6 +1243,7 @@ type ComplexityRoot struct {
 		GetProjectCard             func(childComplexity int, id string) int
 		GetProjectColumn           func(childComplexity int, id string) int
 		GetProjectDraft            func(childComplexity int, id string) int
+		GetProjectTemplate         func(childComplexity int, id string) int
 		GetReaction                func(childComplexity int, id *string, reactionid *string) int
 		GetRoleExt                 func(childComplexity int, id string) int
 		GetTension                 func(childComplexity int, id string) int
@@ -1223,6 +1272,7 @@ type ComplexityRoot struct {
 		QueryProjectDraft          func(childComplexity int, filter *model.ProjectDraftFilter, order *model.ProjectDraftOrder, first *int, offset *int) int
 		QueryProjectField          func(childComplexity int, filter *model.ProjectFieldFilter, first *int, offset *int) int
 		QueryProjectFieldValue     func(childComplexity int, filter *model.ProjectFieldValueFilter, order *model.ProjectFieldValueOrder, first *int, offset *int) int
+		QueryProjectTemplate       func(childComplexity int, filter *model.ProjectTemplateFilter, order *model.ProjectTemplateOrder, first *int, offset *int) int
 		QueryReaction              func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
 		QueryRoleExt               func(childComplexity int, filter *model.RoleExtFilter, order *model.RoleExtOrder, first *int, offset *int) int
 		QueryTension               func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
@@ -1466,6 +1516,11 @@ type ComplexityRoot struct {
 	UpdateProjectPayload struct {
 		NumUids func(childComplexity int) int
 		Project func(childComplexity int, filter *model.ProjectFilter, order *model.ProjectOrder, first *int, offset *int) int
+	}
+
+	UpdateProjectTemplatePayload struct {
+		NumUids         func(childComplexity int) int
+		ProjectTemplate func(childComplexity int, filter *model.ProjectTemplateFilter, order *model.ProjectTemplateOrder, first *int, offset *int) int
 	}
 
 	UpdateReactionPayload struct {
@@ -2140,6 +2195,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddProjectPayload.Project(childComplexity, args["filter"].(*model.ProjectFilter), args["order"].(*model.ProjectOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddProjectTemplatePayload.numUids":
+		if e.complexity.AddProjectTemplatePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddProjectTemplatePayload.NumUids(childComplexity), true
+
+	case "AddProjectTemplatePayload.projectTemplate":
+		if e.complexity.AddProjectTemplatePayload.ProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_AddProjectTemplatePayload_projectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddProjectTemplatePayload.ProjectTemplate(childComplexity, args["filter"].(*model.ProjectTemplateFilter), args["order"].(*model.ProjectTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "AddReactionPayload.numUids":
 		if e.complexity.AddReactionPayload.NumUids == nil {
@@ -3456,6 +3530,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeleteProjectPayload.Project(childComplexity, args["filter"].(*model.ProjectFilter), args["order"].(*model.ProjectOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "DeleteProjectTemplatePayload.msg":
+		if e.complexity.DeleteProjectTemplatePayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteProjectTemplatePayload.Msg(childComplexity), true
+
+	case "DeleteProjectTemplatePayload.numUids":
+		if e.complexity.DeleteProjectTemplatePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteProjectTemplatePayload.NumUids(childComplexity), true
+
+	case "DeleteProjectTemplatePayload.projectTemplate":
+		if e.complexity.DeleteProjectTemplatePayload.ProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteProjectTemplatePayload_projectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteProjectTemplatePayload.ProjectTemplate(childComplexity, args["filter"].(*model.ProjectTemplateFilter), args["order"].(*model.ProjectTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "DeleteReactionPayload.msg":
 		if e.complexity.DeleteReactionPayload.Msg == nil {
 			break
@@ -4485,6 +4585,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddProjectFieldValue(childComplexity, args["input"].([]*model.AddProjectFieldValueInput)), true
 
+	case "Mutation.addProjectTemplate":
+		if e.complexity.Mutation.AddProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addProjectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddProjectTemplate(childComplexity, args["input"].([]*model.AddProjectTemplateInput)), true
+
 	case "Mutation.addReaction":
 		if e.complexity.Mutation.AddReaction == nil {
 			break
@@ -4833,6 +4945,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteProjectFieldValue(childComplexity, args["filter"].(model.ProjectFieldValueFilter)), true
 
+	case "Mutation.deleteProjectTemplate":
+		if e.complexity.Mutation.DeleteProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteProjectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteProjectTemplate(childComplexity, args["filter"].(model.ProjectTemplateFilter)), true
+
 	case "Mutation.deleteReaction":
 		if e.complexity.Mutation.DeleteReaction == nil {
 			break
@@ -5180,6 +5304,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateProjectFieldValue(childComplexity, args["input"].(model.UpdateProjectFieldValueInput)), true
+
+	case "Mutation.updateProjectTemplate":
+		if e.complexity.Mutation.UpdateProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateProjectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateProjectTemplate(childComplexity, args["input"].(model.UpdateProjectTemplateInput)), true
 
 	case "Mutation.updateReaction":
 		if e.complexity.Mutation.UpdateReaction == nil {
@@ -5561,6 +5697,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.PinnedAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
+
+	case "Node.project_templates":
+		if e.complexity.Node.ProjectTemplates == nil {
+			break
+		}
+
+		args, err := ec.field_Node_project_templates_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.ProjectTemplates(childComplexity, args["filter"].(*model.ProjectTemplateFilter), args["order"].(*model.ProjectTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Node.project_templatesAggregate":
+		if e.complexity.Node.ProjectTemplatesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Node_project_templatesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.ProjectTemplatesAggregate(childComplexity, args["filter"].(*model.ProjectTemplateFilter)), true
 
 	case "Node.projects":
 		if e.complexity.Node.Projects == nil {
@@ -7429,6 +7589,135 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectFieldValueAggregateResult.ValueMin(childComplexity), true
 
+	case "ProjectTemplate.columns_json":
+		if e.complexity.ProjectTemplate.ColumnsJSON == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplate.ColumnsJSON(childComplexity), true
+
+	case "ProjectTemplate.description":
+		if e.complexity.ProjectTemplate.Description == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplate.Description(childComplexity), true
+
+	case "ProjectTemplate.id":
+		if e.complexity.ProjectTemplate.ID == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplate.ID(childComplexity), true
+
+	case "ProjectTemplate.is_recursive":
+		if e.complexity.ProjectTemplate.IsRecursive == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplate.IsRecursive(childComplexity), true
+
+	case "ProjectTemplate.name":
+		if e.complexity.ProjectTemplate.Name == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplate.Name(childComplexity), true
+
+	case "ProjectTemplate.nodes":
+		if e.complexity.ProjectTemplate.Nodes == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectTemplate_nodes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectTemplate.Nodes(childComplexity, args["filter"].(*model.NodeFilter), args["order"].(*model.NodeOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "ProjectTemplate.nodesAggregate":
+		if e.complexity.ProjectTemplate.NodesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectTemplate_nodesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectTemplate.NodesAggregate(childComplexity, args["filter"].(*model.NodeFilter)), true
+
+	case "ProjectTemplate.rootnameid":
+		if e.complexity.ProjectTemplate.Rootnameid == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplate.Rootnameid(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.columns_jsonMax":
+		if e.complexity.ProjectTemplateAggregateResult.ColumnsJSONMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.ColumnsJSONMax(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.columns_jsonMin":
+		if e.complexity.ProjectTemplateAggregateResult.ColumnsJSONMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.ColumnsJSONMin(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.count":
+		if e.complexity.ProjectTemplateAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.Count(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.descriptionMax":
+		if e.complexity.ProjectTemplateAggregateResult.DescriptionMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.DescriptionMax(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.descriptionMin":
+		if e.complexity.ProjectTemplateAggregateResult.DescriptionMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.DescriptionMin(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.nameMax":
+		if e.complexity.ProjectTemplateAggregateResult.NameMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.NameMax(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.nameMin":
+		if e.complexity.ProjectTemplateAggregateResult.NameMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.NameMin(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.rootnameidMax":
+		if e.complexity.ProjectTemplateAggregateResult.RootnameidMax == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.RootnameidMax(childComplexity), true
+
+	case "ProjectTemplateAggregateResult.rootnameidMin":
+		if e.complexity.ProjectTemplateAggregateResult.RootnameidMin == nil {
+			break
+		}
+
+		return e.complexity.ProjectTemplateAggregateResult.RootnameidMin(childComplexity), true
+
 	case "Query.aggregateActivity":
 		if e.complexity.Query.AggregateActivity == nil {
 			break
@@ -7680,6 +7969,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AggregateProjectFieldValue(childComplexity, args["filter"].(*model.ProjectFieldValueFilter)), true
+
+	case "Query.aggregateProjectTemplate":
+		if e.complexity.Query.AggregateProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateProjectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateProjectTemplate(childComplexity, args["filter"].(*model.ProjectTemplateFilter)), true
 
 	case "Query.aggregateReaction":
 		if e.complexity.Query.AggregateReaction == nil {
@@ -7968,6 +8269,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetProjectDraft(childComplexity, args["id"].(string)), true
+
+	case "Query.getProjectTemplate":
+		if e.complexity.Query.GetProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getProjectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetProjectTemplate(childComplexity, args["id"].(string)), true
 
 	case "Query.getReaction":
 		if e.complexity.Query.GetReaction == nil {
@@ -8304,6 +8617,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryProjectFieldValue(childComplexity, args["filter"].(*model.ProjectFieldValueFilter), args["order"].(*model.ProjectFieldValueOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryProjectTemplate":
+		if e.complexity.Query.QueryProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryProjectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryProjectTemplate(childComplexity, args["filter"].(*model.ProjectTemplateFilter), args["order"].(*model.ProjectTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryReaction":
 		if e.complexity.Query.QueryReaction == nil {
@@ -9712,6 +10037,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateProjectPayload.Project(childComplexity, args["filter"].(*model.ProjectFilter), args["order"].(*model.ProjectOrder), args["first"].(*int), args["offset"].(*int)), true
 
+	case "UpdateProjectTemplatePayload.numUids":
+		if e.complexity.UpdateProjectTemplatePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateProjectTemplatePayload.NumUids(childComplexity), true
+
+	case "UpdateProjectTemplatePayload.projectTemplate":
+		if e.complexity.UpdateProjectTemplatePayload.ProjectTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateProjectTemplatePayload_projectTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateProjectTemplatePayload.ProjectTemplate(childComplexity, args["filter"].(*model.ProjectTemplateFilter), args["order"].(*model.ProjectTemplateOrder), args["first"].(*int), args["offset"].(*int)), true
+
 	case "UpdateReactionPayload.numUids":
 		if e.complexity.UpdateReactionPayload.NumUids == nil {
 			break
@@ -10700,6 +11044,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAddProjectFieldInput,
 		ec.unmarshalInputAddProjectFieldValueInput,
 		ec.unmarshalInputAddProjectInput,
+		ec.unmarshalInputAddProjectTemplateInput,
 		ec.unmarshalInputAddReactionInput,
 		ec.unmarshalInputAddRoleExtInput,
 		ec.unmarshalInputAddTensionInput,
@@ -10820,6 +11165,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputProjectPatch,
 		ec.unmarshalInputProjectRef,
 		ec.unmarshalInputProjectStatus_hash,
+		ec.unmarshalInputProjectTemplateFilter,
+		ec.unmarshalInputProjectTemplateOrder,
+		ec.unmarshalInputProjectTemplatePatch,
+		ec.unmarshalInputProjectTemplateRef,
 		ec.unmarshalInputReactionFilter,
 		ec.unmarshalInputReactionOrder,
 		ec.unmarshalInputReactionPatch,
@@ -10869,6 +11218,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateProjectFieldInput,
 		ec.unmarshalInputUpdateProjectFieldValueInput,
 		ec.unmarshalInputUpdateProjectInput,
+		ec.unmarshalInputUpdateProjectTemplateInput,
 		ec.unmarshalInputUpdateReactionInput,
 		ec.unmarshalInputUpdateRoleExtInput,
 		ec.unmarshalInputUpdateTensionInput,
@@ -11012,6 +11362,12 @@ directive @hook_updateTensionTemplateInput on ARGUMENT_DEFINITION
 directive @hook_updateTensionTemplate on FIELD_DEFINITION
 directive @hook_deleteTensionTemplateInput on ARGUMENT_DEFINITION
 directive @hook_deleteTensionTemplate on FIELD_DEFINITION
+directive @hook_addProjectTemplateInput on ARGUMENT_DEFINITION
+directive @hook_addProjectTemplate on FIELD_DEFINITION
+directive @hook_updateProjectTemplateInput on ARGUMENT_DEFINITION
+directive @hook_updateProjectTemplate on FIELD_DEFINITION
+directive @hook_deleteProjectTemplateInput on ARGUMENT_DEFINITION
+directive @hook_deleteProjectTemplate on FIELD_DEFINITION
 directive @hook_addProjectInput on ARGUMENT_DEFINITION
 directive @hook_addProject on FIELD_DEFINITION
 directive @hook_updateProjectInput on ARGUMENT_DEFINITION
@@ -11078,6 +11434,8 @@ directive @hook_getRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_queryRoleExtInput on ARGUMENT_DEFINITION
 directive @hook_getTensionTemplateInput on ARGUMENT_DEFINITION
 directive @hook_queryTensionTemplateInput on ARGUMENT_DEFINITION
+directive @hook_getProjectTemplateInput on ARGUMENT_DEFINITION
+directive @hook_queryProjectTemplateInput on ARGUMENT_DEFINITION
 directive @hook_getProjectInput on ARGUMENT_DEFINITION
 directive @hook_queryProjectInput on ARGUMENT_DEFINITION
 directive @hook_getProjectColumnInput on ARGUMENT_DEFINITION
@@ -11172,6 +11530,7 @@ type Node {
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   roles(filter: RoleExtFilter, order: RoleExtOrder, first: Int, offset: Int): [RoleExt!]
   tension_templates(filter: TensionTemplateFilter, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate!]
+  project_templates(filter: ProjectTemplateFilter, order: ProjectTemplateOrder, first: Int, offset: Int): [ProjectTemplate!]
   role_ext(filter: RoleExtFilter): RoleExt
   role_type: RoleType
   color: String
@@ -11190,6 +11549,7 @@ type Node {
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   rolesAggregate(filter: RoleExtFilter): RoleExtAggregateResult
   tension_templatesAggregate(filter: TensionTemplateFilter): TensionTemplateAggregateResult
+  project_templatesAggregate(filter: ProjectTemplateFilter): ProjectTemplateAggregateResult
   contractsAggregate(filter: VoteFilter): VoteAggregateResult
   events_historyAggregate(filter: EventFilter): EventAggregateResult
   activityAggregate(filter: ActivityFilter): ActivityAggregateResult
@@ -11263,6 +11623,18 @@ type TensionTemplate {
   nodesAggregate(filter: NodeFilter): NodeAggregateResult
   labelsAggregate(filter: LabelFilter): LabelAggregateResult
   assigneesAggregate(filter: UserFilter): UserAggregateResult
+}
+
+type ProjectTemplate {
+  id: ID!
+  rootnameid: String!
+  name: String!
+  description: String
+  nodes(filter: NodeFilter, order: NodeOrder, first: Int, offset: Int): [Node!]
+  is_recursive: Boolean!
+  columns_json: String!
+
+  nodesAggregate(filter: NodeFilter): NodeAggregateResult
 }
 
 type Project {
@@ -11750,35 +12122,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @id on FIELD_DEFINITION
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @lambda on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
 
 type ActivityAggregateResult {
   count: Int
@@ -12032,6 +12404,7 @@ input AddNodeInput {
   labels: [LabelRef!]
   roles: [RoleExtRef!]
   tension_templates: [TensionTemplateRef!]
+  project_templates: [ProjectTemplateRef!]
   role_ext: RoleExtRef
   role_type: RoleType
   color: String
@@ -12166,6 +12539,20 @@ input AddProjectInput {
 
 type AddProjectPayload {
   project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
+  numUids: Int
+}
+
+input AddProjectTemplateInput {
+  rootnameid: String!
+  name: String! @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"minLen", n:3)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean!
+  columns_json: String!
+}
+
+type AddProjectTemplatePayload {
+  projectTemplate(filter: ProjectTemplateFilter, order: ProjectTemplateOrder, first: Int, offset: Int): [ProjectTemplate]
   numUids: Int
 }
 
@@ -12796,6 +13183,12 @@ type DeleteProjectPayload {
   numUids: Int
 }
 
+type DeleteProjectTemplatePayload {
+  projectTemplate(filter: ProjectTemplateFilter, order: ProjectTemplateOrder, first: Int, offset: Int): [ProjectTemplate]
+  msg: String
+  numUids: Int
+}
+
 type DeleteReactionPayload {
   reaction(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction]
   msg: String
@@ -13290,6 +13683,9 @@ type Mutation {
   addTensionTemplate(input: [AddTensionTemplateInput!]! @hook_addTensionTemplateInput): AddTensionTemplatePayload @hook_addTensionTemplate
   updateTensionTemplate(input: UpdateTensionTemplateInput! @hook_updateTensionTemplateInput): UpdateTensionTemplatePayload @hook_updateTensionTemplate
   deleteTensionTemplate(filter: TensionTemplateFilter! @hook_deleteTensionTemplateInput): DeleteTensionTemplatePayload @hook_deleteTensionTemplate
+  addProjectTemplate(input: [AddProjectTemplateInput!]! @hook_addProjectTemplateInput): AddProjectTemplatePayload @hook_addProjectTemplate
+  updateProjectTemplate(input: UpdateProjectTemplateInput! @hook_updateProjectTemplateInput): UpdateProjectTemplatePayload @hook_updateProjectTemplate
+  deleteProjectTemplate(filter: ProjectTemplateFilter! @hook_deleteProjectTemplateInput): DeleteProjectTemplatePayload @hook_deleteProjectTemplate
   addProject(input: [AddProjectInput!]! @hook_addProjectInput): AddProjectPayload @hook_addProject
   updateProject(input: UpdateProjectInput! @hook_updateProjectInput): UpdateProjectPayload @hook_updateProject
   deleteProject(filter: ProjectFilter! @hook_deleteProjectInput): DeleteProjectPayload @hook_deleteProject
@@ -13524,6 +13920,7 @@ enum NodeHasFilter {
   labels
   roles
   tension_templates
+  project_templates
   role_ext
   role_type
   color
@@ -13588,6 +13985,7 @@ input NodePatch {
   labels: [LabelRef!] @x_patch_ro
   roles: [RoleExtRef!] @x_patch_ro
   tension_templates: [TensionTemplateRef!] @x_patch_ro
+  project_templates: [ProjectTemplateRef!] @x_patch_ro
   role_ext: RoleExtRef @x_patch_ro
   role_type: RoleType @x_patch_ro
   color: String @x_patch_ro
@@ -13631,6 +14029,7 @@ input NodeRef {
   labels: [LabelRef!]
   roles: [RoleExtRef!]
   tension_templates: [TensionTemplateRef!]
+  project_templates: [ProjectTemplateRef!]
   role_ext: RoleExtRef
   role_type: RoleType
   color: String
@@ -14261,6 +14660,69 @@ input ProjectStatus_hash {
   in: [ProjectStatus]
 }
 
+type ProjectTemplateAggregateResult {
+  count: Int
+  rootnameidMin: String
+  rootnameidMax: String
+  nameMin: String
+  nameMax: String
+  descriptionMin: String
+  descriptionMax: String
+  columns_jsonMin: String
+  columns_jsonMax: String
+}
+
+input ProjectTemplateFilter {
+  id: [ID!]
+  rootnameid: StringHashFilter
+  name: StringHashFilter_StringTermFilter
+  has: [ProjectTemplateHasFilter]
+  and: [ProjectTemplateFilter]
+  or: [ProjectTemplateFilter]
+  not: ProjectTemplateFilter
+}
+
+enum ProjectTemplateHasFilter {
+  rootnameid
+  name
+  description
+  nodes
+  is_recursive
+  columns_json
+}
+
+input ProjectTemplateOrder {
+  asc: ProjectTemplateOrderable
+  desc: ProjectTemplateOrderable
+  then: ProjectTemplateOrder
+}
+
+enum ProjectTemplateOrderable {
+  rootnameid
+  name
+  description
+  columns_json
+}
+
+input ProjectTemplatePatch {
+  rootnameid: String @x_patch_ro
+  name: String @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"minLen", n:3)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean
+  columns_json: String
+}
+
+input ProjectTemplateRef {
+  id: ID
+  rootnameid: String
+  name: String @x_alter(r:"minLen", n:1)
+  description: String @x_alter(r:"minLen", n:3)
+  nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
+  is_recursive: Boolean
+  columns_json: String
+}
+
 type Query {
   queryBuildInfo(filter: BuildInfoFilter, order: BuildInfoOrder, first: Int, offset: Int): [BuildInfo]
   aggregateBuildInfo(filter: BuildInfoFilter): BuildInfoAggregateResult
@@ -14282,6 +14744,9 @@ type Query {
   getTensionTemplate(id: ID!): TensionTemplate
   queryTensionTemplate(filter: TensionTemplateFilter @hook_queryTensionTemplateInput, order: TensionTemplateOrder, first: Int, offset: Int): [TensionTemplate]
   aggregateTensionTemplate(filter: TensionTemplateFilter): TensionTemplateAggregateResult
+  getProjectTemplate(id: ID!): ProjectTemplate
+  queryProjectTemplate(filter: ProjectTemplateFilter @hook_queryProjectTemplateInput, order: ProjectTemplateOrder, first: Int, offset: Int): [ProjectTemplate]
+  aggregateProjectTemplate(filter: ProjectTemplateFilter): ProjectTemplateAggregateResult
   getProject(id: ID!): Project
   queryProject(filter: ProjectFilter @hook_queryProjectInput, order: ProjectOrder, first: Int, offset: Int): [Project]
   aggregateProject(filter: ProjectFilter): ProjectAggregateResult
@@ -14965,6 +15430,17 @@ input UpdateProjectInput {
 
 type UpdateProjectPayload {
   project(filter: ProjectFilter, order: ProjectOrder, first: Int, offset: Int): [Project]
+  numUids: Int
+}
+
+input UpdateProjectTemplateInput {
+  filter: ProjectTemplateFilter!
+  set: ProjectTemplatePatch
+  remove: ProjectTemplatePatch
+}
+
+type UpdateProjectTemplatePayload {
+  projectTemplate(filter: ProjectTemplateFilter, order: ProjectTemplateOrder, first: Int, offset: Int): [ProjectTemplate]
   numUids: Int
 }
 

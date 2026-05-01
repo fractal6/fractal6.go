@@ -1,0 +1,43 @@
+{ or: [
+    # Authorize root
+    { rule: "{ $USERTYPE: {eq: \"Root\"} }" },
+    # Authorize public data OR Owner
+    { rule: """query ($OWNIDS: [String]) {
+        queryProjectTemplate {
+          nodes(filter: {visibility: {eq: Public}, or: [{rootnameid: {in: $OWNIDS}}]}) { id }
+        }
+    }""" },
+    # Authorize private data (members only)
+    { rule: """query ($ROOTIDS: [String]) {
+        queryProjectTemplate(filter: {rootnameid: {in: $ROOTIDS}}) {
+          nodes(filter: {visibility: {eq: Private}}) { id }
+        }
+    }""" },
+    # Authorize secret data (explicit member only)
+    # -- parent
+    { rule: """query ($USERNAME: String!) {
+        queryProjectTemplate {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            children {
+              first_link(filter: {username: {eq: $USERNAME}}) { username }
+            }
+          }
+        }
+    }""" },
+    # -- bootstrap: Coordinator of the parent circle (a freshly-created Secret
+    #    circle has no member yet, so only a Coordinator from the parent can
+    #    open it). Restricted to role_type=Coordinator to avoid leaking secret
+    #    siblings to every Member of any sibling circle.
+    { rule: """query ($USERNAME: String!) {
+        queryProjectTemplate {
+          nodes(filter: {visibility: {eq: Secret}}) {
+            parent {
+              children(filter: {role_type: {eq: Coordinator}}) {
+                first_link(filter: {username: {eq: $USERNAME}}) { username }
+              }
+            }
+          }
+        }
+    }""" }
+  ]
+}
