@@ -184,6 +184,10 @@ func RunServer() {
 				r.Post("/top", handle6.NodeHolderHandler(top, db.GetDB().GetTopTensionTemplatesIn))
 				r.Post("/sub", handle6.NodeHolderHandler(sub, db.GetDB().GetTensionTemplatesIn))
 			})
+			r.Route("/project_templates", func(r chi.Router) {
+				r.Post("/top", handle6.NodeHolderHandler(top, db.GetDB().GetTopProjectTemplatesIn))
+				r.Post("/sub", handle6.NodeHolderHandler(sub, db.GetDB().GetProjectTemplatesIn))
+			})
 			r.Route("/projects", func(r chi.Router) {
 				r.Post("/sub", handle6.NodeHolderHandler(sub, db.GetDB().GetProjectsIn))
 			})

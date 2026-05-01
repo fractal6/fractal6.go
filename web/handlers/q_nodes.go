@@ -48,7 +48,7 @@ type nodeQuery struct {
 	IncludeSelf bool   `json:"include_self"`
 }
 
-// nodeHolder is satisfied by types returned by /q/{labels,roles,tension_templates,projects}.
+// nodeHolder is satisfied by types returned by /q/{labels,roles,tension_templates,project_templates,projects}.
 type nodeHolder interface {
 	model.Label | model.RoleExt | model.TensionTemplate | model.ProjectTemplate | db.ProjectFull
 }

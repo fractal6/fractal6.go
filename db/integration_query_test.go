@@ -510,6 +510,114 @@ func TestGetTopTensionTemplatesIn_ExcludesNonRecursive(t *testing.T) {
 	}
 }
 
+// /q/project_templates/top from test-org with includeSelf=true: visible
+// nameids = ["test-org"] (= self). Self pulls all templates → bug-board present.
+func TestGetTopProjectTemplatesIn_FromSelf(t *testing.T) {
+	t.Parallel()
+	templates, err := GetDB().GetTopProjectTemplatesIn([]string{"test-org"}, "test-org")
+	if err != nil {
+		t.Fatalf("GetTopProjectTemplatesIn returned error: %v", err)
+	}
+	if len(templates) == 0 {
+		t.Fatal("GetTopProjectTemplatesIn returned empty, expected at least 'bug-board'")
+	}
+	found := false
+	for _, pt := range templates {
+		if pt.Name == "bug-board" {
+			found = true
+			if !pt.IsRecursive {
+				t.Error("bug-board is_recursive = false, want true")
+			}
+			if pt.ColumnsJSON == "" {
+				t.Error("bug-board columns_json is empty, want non-empty seeded payload")
+			}
+		}
+	}
+	if !found {
+		names := make([]string, len(templates))
+		for i, pt := range templates {
+			names[i] = pt.Name
+		}
+		t.Errorf("project_templates = %v, expected to contain %q", names, "bug-board")
+	}
+}
+
+// /q/project_templates/sub from test-org: visible nameids include test-org —
+// pulls all templates attached, including bug-board.
+func TestGetProjectTemplatesIn_Integration(t *testing.T) {
+	t.Parallel()
+	templates, err := GetDB().GetProjectTemplatesIn([]string{"test-org"}, "")
+	if err != nil {
+		t.Fatalf("GetProjectTemplatesIn returned error: %v", err)
+	}
+	if len(templates) == 0 {
+		t.Fatal("GetProjectTemplatesIn returned empty, expected at least 'bug-board'")
+	}
+	found := false
+	for _, pt := range templates {
+		if pt.Name == "bug-board" {
+			found = true
+		}
+	}
+	if !found {
+		names := make([]string, len(templates))
+		for i, pt := range templates {
+			names[i] = pt.Name
+		}
+		t.Errorf("project_templates = %v, expected to contain %q", names, "bug-board")
+	}
+}
+
+// /q/project_templates/top from a child role with includeSelf=false. Visible
+// nameids only contain ancestor "test-org"; the is_recursive=true filter must
+// keep "bug-board" but drop "local-board".
+func TestGetTopProjectTemplatesIn_FromChild(t *testing.T) {
+	t.Parallel()
+	templates, err := GetDB().GetTopProjectTemplatesIn([]string{"test-org"}, "test-org##:coordo")
+	if err != nil {
+		t.Fatalf("GetTopProjectTemplatesIn from child: %v", err)
+	}
+
+	foundRecursive := false
+	foundLocal := false
+	for _, pt := range templates {
+		switch pt.Name {
+		case "bug-board":
+			foundRecursive = true
+		case "local-board":
+			foundLocal = true
+		}
+	}
+
+	if !foundRecursive {
+		names := make([]string, len(templates))
+		for i, pt := range templates {
+			names[i] = pt.Name
+		}
+		t.Errorf("top project templates from child = %v, expected recursive template %q to be present", names, "bug-board")
+	}
+	if foundLocal {
+		t.Errorf("top project templates from child should NOT contain non-recursive template %q, but it was returned", "local-board")
+	}
+}
+
+// /q/project_templates/top from a child role with includeSelf=true. Visible
+// nameids = [child, ancestor]. Ancestors get is_recursive=true filter; self
+// (the coordo role) has no templates. Only recursive templates should appear.
+func TestGetTopProjectTemplatesIn_ExcludesNonRecursive(t *testing.T) {
+	t.Parallel()
+	templates, err := GetDB().GetTopProjectTemplatesIn([]string{"test-org##:coordo", "test-org"}, "test-org##:coordo")
+	if err != nil {
+		t.Fatalf("GetTopProjectTemplatesIn (non-recursive check): %v", err)
+	}
+
+	for _, pt := range templates {
+		if !pt.IsRecursive {
+			t.Errorf("top query returned non-recursive template %q (is_recursive=false); only recursive templates should appear", pt.Name)
+		}
+	}
+}
+
 func TestFormatTensionIntExtMap_PatternFilter(t *testing.T) {
 	t.Parallel()
 	pattern := "search term"

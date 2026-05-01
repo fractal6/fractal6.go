@@ -244,7 +244,7 @@ type ProjectTemplate @auth(
   nodes: [Node!]       @hasInverse(field: project_templates) @x_alter(r:"oneByOne") @x_alter(r:"ref")
   is_recursive: Boolean!         @x_alter
   # Payload
-  columns_json: String!       @x_alter # json: list[dict(name,description,order)]
+  columns_json: String!       @x_alter(r:"json") # json: list[dict(name,description,order)]
 }
 type Project @auth(
   query: <<query-project>>,

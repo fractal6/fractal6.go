@@ -12548,7 +12548,7 @@ input AddProjectTemplateInput {
   description: String @x_alter(r:"minLen", n:3)
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   is_recursive: Boolean!
-  columns_json: String!
+  columns_json: String! @x_alter(r:"json")
 }
 
 type AddProjectTemplatePayload {
@@ -14710,7 +14710,7 @@ input ProjectTemplatePatch {
   description: String @x_alter(r:"minLen", n:3)
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   is_recursive: Boolean
-  columns_json: String
+  columns_json: String @x_alter(r:"json")
 }
 
 input ProjectTemplateRef {
@@ -14720,7 +14720,7 @@ input ProjectTemplateRef {
   description: String @x_alter(r:"minLen", n:3)
   nodes: [NodeRef!] @x_alter(r:"oneByOne") @x_alter(r:"ref")
   is_recursive: Boolean
-  columns_json: String
+  columns_json: String @x_alter(r:"json")
 }
 
 type Query {

@@ -38,7 +38,7 @@ Defined in `schema/graphql/fractal6.graphql`. Core types:
 | `Comment` / `Event` / `Blob` | All `Post` implementations attached to a Tension |
 | `Contract` / `Vote` | Voting mechanism for events that need peer validation |
 | `User` | Platform user with roles, subscriptions, events |
-| `Label` / `RoleExt` / `TensionTemplate` | Reusable artefacts scoped to circles |
+| `Label` / `RoleExt` / `TensionTemplate` / `ProjectTemplate` | Reusable artefacts scoped to circles |
 | `Project` | Kanban project with columns, cards, fields |
 
 ### Codegen pipeline (`make genall`)
@@ -128,7 +128,7 @@ Per-domain hook implementations:
 | File | Domain |
 |------|--------|
 | `graph/tension_resolver.go` | Tension lifecycle + event processing |
-| `graph/node_resolver.go` | Label / RoleExt / TensionTemplate / Project auth + CRUD |
+| `graph/node_resolver.go` | Label / RoleExt / TensionTemplate / ProjectTemplate / Project auth + CRUD |
 | `graph/contract_resolver.go` | Contract lifecycle + voting |
 | `graph/card_resolver.go` / `column_resolver.go` | Project board position management |
 | `graph/draft_resolver.go` | Draft author ownership |
@@ -168,6 +168,7 @@ POST /q/members/sub
 POST /q/labels/{top,sub}
 POST /q/roles/{top,sub}
 POST /q/tension_templates/{top,sub}
+POST /q/project_templates/{top,sub}
 POST /q/projects/sub
 POST /q/tensions/{light,int,ext,all}
 POST /q/tensions/count

@@ -273,6 +273,38 @@ var dqlQueries map[string]string = map[string]string{
             TensionTemplate.nodes { Node.nameid Node.visibility }
         }
     }`,
+	"getProjectTemplatesByNameids": `{
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false)) {
+            l as Node.project_templates
+        }
+
+        all(func: uid(l)) {
+            uid
+            ProjectTemplate.name
+            ProjectTemplate.description
+            ProjectTemplate.is_recursive
+            ProjectTemplate.columns_json
+            ProjectTemplate.nodes { Node.nameid Node.visibility }
+        }
+    }`,
+	"getTopProjectTemplatesByNameids": `{
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false) AND NOT eq(Node.{{.fieldid}}, "{{.objid}}")) {
+            la as Node.project_templates @filter(eq(ProjectTemplate.is_recursive, true))
+        }
+
+        var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false) AND eq(Node.{{.fieldid}}, "{{.objid}}")) {
+            ls as Node.project_templates
+        }
+
+        all(func: uid(la, ls)) {
+            uid
+            ProjectTemplate.name
+            ProjectTemplate.description
+            ProjectTemplate.is_recursive
+            ProjectTemplate.columns_json
+            ProjectTemplate.nodes { Node.nameid Node.visibility }
+        }
+    }`,
 	"getProjectsByNameids": `{
         var(func: eq(Node.nameid, [{{.nameids}}])) @filter(eq(Node.isArchived, false)) {
             p as Node.projects

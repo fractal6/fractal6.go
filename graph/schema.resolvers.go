@@ -125,18 +125,21 @@ func (r *mutationResolver) DeleteTensionTemplate(ctx context.Context, filter mod
 }
 
 // AddProjectTemplate is the resolver for the addProjectTemplate field.
-func (r *mutationResolver) AddProjectTemplate(ctx context.Context, input []*model.AddProjectTemplateInput) (*model.AddProjectTemplatePayload, error) {
-	panic(fmt.Errorf("not implemented: AddProjectTemplate - addProjectTemplate"))
+func (r *mutationResolver) AddProjectTemplate(ctx context.Context, input []*model.AddProjectTemplateInput) (data *model.AddProjectTemplatePayload, errors error) {
+	errors = r.DgraphAddBridge(ctx, input, nil, &data)
+	return data, errors
 }
 
 // UpdateProjectTemplate is the resolver for the updateProjectTemplate field.
-func (r *mutationResolver) UpdateProjectTemplate(ctx context.Context, input model.UpdateProjectTemplateInput) (*model.UpdateProjectTemplatePayload, error) {
-	panic(fmt.Errorf("not implemented: UpdateProjectTemplate - updateProjectTemplate"))
+func (r *mutationResolver) UpdateProjectTemplate(ctx context.Context, input model.UpdateProjectTemplateInput) (data *model.UpdateProjectTemplatePayload, errors error) {
+	errors = r.DgraphUpdateBridge(ctx, input, &data)
+	return data, errors
 }
 
 // DeleteProjectTemplate is the resolver for the deleteProjectTemplate field.
-func (r *mutationResolver) DeleteProjectTemplate(ctx context.Context, filter model.ProjectTemplateFilter) (*model.DeleteProjectTemplatePayload, error) {
-	panic(fmt.Errorf("not implemented: DeleteProjectTemplate - deleteProjectTemplate"))
+func (r *mutationResolver) DeleteProjectTemplate(ctx context.Context, filter model.ProjectTemplateFilter) (data *model.DeleteProjectTemplatePayload, errors error) {
+	errors = r.DgraphDeleteBridge(ctx, filter, &data)
+	return data, errors
 }
 
 // AddProject is the resolver for the addProject field.
@@ -591,18 +594,20 @@ func (r *queryResolver) AggregateTensionTemplate(ctx context.Context, filter *mo
 }
 
 // GetProjectTemplate is the resolver for the getProjectTemplate field.
-func (r *queryResolver) GetProjectTemplate(ctx context.Context, id string) (*model.ProjectTemplate, error) {
-	panic(fmt.Errorf("not implemented: GetProjectTemplate - getProjectTemplate"))
+func (r *queryResolver) GetProjectTemplate(ctx context.Context, id string) (data *model.ProjectTemplate, errors error) {
+	errors = r.DgraphBridgeRaw(ctx, &data)
+	return data, errors
 }
 
 // QueryProjectTemplate is the resolver for the queryProjectTemplate field.
-func (r *queryResolver) QueryProjectTemplate(ctx context.Context, filter *model.ProjectTemplateFilter, order *model.ProjectTemplateOrder, first *int, offset *int) ([]*model.ProjectTemplate, error) {
-	panic(fmt.Errorf("not implemented: QueryProjectTemplate - queryProjectTemplate"))
+func (r *queryResolver) QueryProjectTemplate(ctx context.Context, filter *model.ProjectTemplateFilter, order *model.ProjectTemplateOrder, first *int, offset *int) (data []*model.ProjectTemplate, errors error) {
+	errors = r.DgraphQueryBridge(ctx, filter, order, first, offset, &data)
+	return data, errors
 }
 
 // AggregateProjectTemplate is the resolver for the aggregateProjectTemplate field.
-func (r *queryResolver) AggregateProjectTemplate(ctx context.Context, filter *model.ProjectTemplateFilter) (*model.ProjectTemplateAggregateResult, error) {
-	panic(fmt.Errorf("not implemented: AggregateProjectTemplate - aggregateProjectTemplate"))
+func (r *queryResolver) AggregateProjectTemplate(ctx context.Context, filter *model.ProjectTemplateFilter) (data *model.ProjectTemplateAggregateResult, errors error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // GetProject is the resolver for the getProject field.

@@ -7,6 +7,7 @@
 #       - Roles: test-org##@testuser (Owner), test-org##:coordo (Coordinator)
 #       - 1 Tension (Open, Operational) with blob, event, comment, label
 #       - 2 TensionTemplates (recursive + non-recursive)
+#       - 2 ProjectTemplates (recursive + non-recursive)
 #   - sec-org: Private organisation for security/visibility tests
 #       - Sub-circles: private-circle (Private), secret-circle (Secret)
 #       - Roles: testuser=Member of sec-org, testuser2=Owner of sec-org + Coordinator of secret-circle
@@ -183,6 +184,26 @@ _:ttempl_local <TensionTemplate.comment> "Local scope only" .
 _:ttempl_local <TensionTemplate.type_> "Operational" .
 _:ttempl_local <TensionTemplate.nodes> _:org .
 _:org <Node.tension_templates> _:ttempl_local .
+
+# ProjectTemplate on test-org (recursive — visible from descendants)
+_:ptempl <dgraph.type> "ProjectTemplate" .
+_:ptempl <ProjectTemplate.rootnameid> "test-org" .
+_:ptempl <ProjectTemplate.name> "bug-board" .
+_:ptempl <ProjectTemplate.description> "Template for bug-tracking boards" .
+_:ptempl <ProjectTemplate.is_recursive> "true" .
+_:ptempl <ProjectTemplate.columns_json> "[{\"name\":\"Todo\",\"description\":\"\",\"order\":0},{\"name\":\"Done\",\"description\":\"\",\"order\":1}]" .
+_:ptempl <ProjectTemplate.nodes> _:org .
+_:org <Node.project_templates> _:ptempl .
+
+# Non-recursive ProjectTemplate on test-org (should NOT appear in top queries from children)
+_:ptempl_local <dgraph.type> "ProjectTemplate" .
+_:ptempl_local <ProjectTemplate.rootnameid> "test-org" .
+_:ptempl_local <ProjectTemplate.name> "local-board" .
+_:ptempl_local <ProjectTemplate.description> "Non-recursive project template" .
+_:ptempl_local <ProjectTemplate.is_recursive> "false" .
+_:ptempl_local <ProjectTemplate.columns_json> "[{\"name\":\"Inbox\",\"description\":\"\",\"order\":0}]" .
+_:ptempl_local <ProjectTemplate.nodes> _:org .
+_:org <Node.project_templates> _:ptempl_local .
 
 # --- test-org Project (Public) ---
 # Used to verify @auth Public branch on Project / ProjectColumn.

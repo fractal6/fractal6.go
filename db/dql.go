@@ -224,72 +224,36 @@ func (dg Dgraph) GetMembersIn(nameids []string, userPayload string) ([]model.Nod
 	return DecodeDql[[]model.Node](results)
 }
 
-// GetLabelsIn returns labels attached to circles in the given visible-nameids list.
-// Labels deduplicated by name. objid is unused; present to match ArtefactFetcher.
-func (dg Dgraph) GetLabelsIn(nameids []string, objid string) ([]model.Label, error) {
+// fetchByNameids runs a Meta query parameterized only by the visible-nameids
+// list and decodes the result into []T. If dedupeKey is non-nil, results are
+// de-duplicated by its return value.
+func fetchByNameids[T any](dg Dgraph, queryName string, nameids []string, dedupeKey func(T) string) ([]T, error) {
 	if len(nameids) == 0 {
-		return []model.Label{}, nil
+		return []T{}, nil
 	}
-	results, err := dg.Meta("getLabelsByNameids", map[string]string{
+	results, err := dg.Meta(queryName, map[string]string{
 		"nameids": quoteNameids(nameids),
 	})
 	if err != nil {
 		return nil, err
 	}
-	data, err := DecodeDql[[]model.Label](results)
+	data, err := DecodeDql[[]T](results)
 	if err != nil {
 		return nil, err
 	}
-	return Dedupe(data, func(l model.Label) string { return l.Name }), nil
+	if dedupeKey == nil {
+		return data, nil
+	}
+	return Dedupe(data, dedupeKey), nil
 }
 
-// GetRolesIn returns role templates attached to circles in the given visible-nameids list.
-// Roles deduplicated by name. objid is unused; present to match ArtefactFetcher.
-func (dg Dgraph) GetRolesIn(nameids []string, objid string) ([]model.RoleExt, error) {
+// fetchTopByNameids is fetchByNameids for "top" queries that distinguish self
+// vs ancestors via (fieldid, objid).
+func fetchTopByNameids[T any](dg Dgraph, queryName string, nameids []string, objid string, dedupeKey func(T) string) ([]T, error) {
 	if len(nameids) == 0 {
-		return []model.RoleExt{}, nil
+		return []T{}, nil
 	}
-	results, err := dg.Meta("getRolesByNameids", map[string]string{
-		"nameids": quoteNameids(nameids),
-	})
-	if err != nil {
-		return nil, err
-	}
-	data, err := DecodeDql[[]model.RoleExt](results)
-	if err != nil {
-		return nil, err
-	}
-	return Dedupe(data, func(r model.RoleExt) string { return r.Name }), nil
-}
-
-// GetTensionTemplatesIn returns all tension templates attached to circles in
-// the given visible-nameids list. Used by /q/tension_templates/sub. objid is
-// unused; present to match ArtefactFetcher.
-func (dg Dgraph) GetTensionTemplatesIn(nameids []string, objid string) ([]model.TensionTemplate, error) {
-	if len(nameids) == 0 {
-		return []model.TensionTemplate{}, nil
-	}
-	results, err := dg.Meta("getTensionTemplatesByNameids", map[string]string{
-		"nameids": quoteNameids(nameids),
-	})
-	if err != nil {
-		return nil, err
-	}
-	data, err := DecodeDql[[]model.TensionTemplate](results)
-	if err != nil {
-		return nil, err
-	}
-	return Dedupe(data, func(t model.TensionTemplate) string { return t.ID }), nil
-}
-
-// GetTopTensionTemplatesIn returns templates inherited from ancestors
-// (is_recursive=true only) plus all templates from self (when self is in
-// the visible set). Used by /q/tension_templates/top.
-func (dg Dgraph) GetTopTensionTemplatesIn(nameids []string, objid string) ([]model.TensionTemplate, error) {
-	if len(nameids) == 0 {
-		return []model.TensionTemplate{}, nil
-	}
-	results, err := dg.Meta("getTopTensionTemplatesByNameids", map[string]string{
+	results, err := dg.Meta(queryName, map[string]string{
 		"nameids": quoteNameids(nameids),
 		"fieldid": "nameid",
 		"objid":   objid,
@@ -297,26 +261,60 @@ func (dg Dgraph) GetTopTensionTemplatesIn(nameids []string, objid string) ([]mod
 	if err != nil {
 		return nil, err
 	}
-	data, err := DecodeDql[[]model.TensionTemplate](results)
+	data, err := DecodeDql[[]T](results)
 	if err != nil {
 		return nil, err
 	}
-	return Dedupe(data, func(t model.TensionTemplate) string { return t.ID }), nil
+	if dedupeKey == nil {
+		return data, nil
+	}
+	return Dedupe(data, dedupeKey), nil
+}
+
+// GetLabelsIn returns labels attached to circles in the given visible-nameids list.
+// Labels deduplicated by name. objid is unused; present to match ArtefactFetcher.
+func (dg Dgraph) GetLabelsIn(nameids []string, _ string) ([]model.Label, error) {
+	return fetchByNameids(dg, "getLabelsByNameids", nameids, func(l model.Label) string { return l.Name })
+}
+
+// GetRolesIn returns role templates attached to circles in the given visible-nameids list.
+// Roles deduplicated by name. objid is unused; present to match ArtefactFetcher.
+func (dg Dgraph) GetRolesIn(nameids []string, _ string) ([]model.RoleExt, error) {
+	return fetchByNameids(dg, "getRolesByNameids", nameids, func(r model.RoleExt) string { return r.Name })
+}
+
+// GetTensionTemplatesIn returns all tension templates attached to circles in
+// the given visible-nameids list. Used by /q/tension_templates/sub. objid is
+// unused; present to match ArtefactFetcher.
+func (dg Dgraph) GetTensionTemplatesIn(nameids []string, _ string) ([]model.TensionTemplate, error) {
+	return fetchByNameids(dg, "getTensionTemplatesByNameids", nameids, func(t model.TensionTemplate) string { return t.ID })
+}
+
+// GetTopTensionTemplatesIn returns templates inherited from ancestors
+// (is_recursive=true only) plus all templates from self (when self is in
+// the visible set). Used by /q/tension_templates/top.
+func (dg Dgraph) GetTopTensionTemplatesIn(nameids []string, objid string) ([]model.TensionTemplate, error) {
+	return fetchTopByNameids(dg, "getTopTensionTemplatesByNameids", nameids, objid, func(t model.TensionTemplate) string { return t.ID })
+}
+
+// GetProjectTemplatesIn returns all project templates attached to circles in
+// the given visible-nameids list. Used by /q/project_templates/sub. objid is
+// unused; present to match ArtefactFetcher.
+func (dg Dgraph) GetProjectTemplatesIn(nameids []string, _ string) ([]model.ProjectTemplate, error) {
+	return fetchByNameids(dg, "getProjectTemplatesByNameids", nameids, func(t model.ProjectTemplate) string { return t.ID })
+}
+
+// GetTopProjectTemplatesIn returns templates inherited from ancestors
+// (is_recursive=true only) plus all templates from self (when self is in
+// the visible set). Used by /q/project_templates/top.
+func (dg Dgraph) GetTopProjectTemplatesIn(nameids []string, objid string) ([]model.ProjectTemplate, error) {
+	return fetchTopByNameids(dg, "getTopProjectTemplatesByNameids", nameids, objid, func(t model.ProjectTemplate) string { return t.ID })
 }
 
 // GetProjectsIn returns projects attached to circles in the given visible-nameids list.
 // objid is unused; present to match ArtefactFetcher.
-func (dg Dgraph) GetProjectsIn(nameids []string, objid string) ([]ProjectFull, error) {
-	if len(nameids) == 0 {
-		return []ProjectFull{}, nil
-	}
-	results, err := dg.Meta("getProjectsByNameids", map[string]string{
-		"nameids": quoteNameids(nameids),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return DecodeDql[[]ProjectFull](results)
+func (dg Dgraph) GetProjectsIn(nameids []string, _ string) ([]ProjectFull, error) {
+	return fetchByNameids[ProjectFull](dg, "getProjectsByNameids", nameids, nil)
 }
 
 // IsChild returns true is a node parent has the given child.

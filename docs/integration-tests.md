@@ -96,7 +96,7 @@ The setup is resilient to Dgraph startup races: schema upload retries on transie
 Each test package's `TestMain` only verifies that the data exists (no setup logic).
 
 **Shared seed data** (see `seed.nq` for the full picture):
-- `test-org` (Public): general-purpose org with users `testuser` / `testuser2`, Owner + Coordinator roles, one tension with blob/event/comment/label, and tension templates
+- `test-org` (Public): general-purpose org with users `testuser` / `testuser2`, Owner + Coordinator roles, one tension with blob/event/comment/label, plus tension and project templates (recursive + non-recursive)
 - `sec-org` (Private): security/visibility org with `private-circle` (Private) and `secret-circle` (Secret) sub-circles, plus three Projects scoped to each visibility level
 
 **Nameid convention:**

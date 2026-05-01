@@ -22,6 +22,7 @@ package graph
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -45,6 +46,7 @@ func init() {
 		"ref":              ref,
 		"minLen":           minLength,
 		"maxLen":           maxLength,
+		"json":             validJSON,
 	}
 }
 
@@ -316,6 +318,40 @@ func minLength(ctx context.Context, obj any, next graphql.Resolver, f *string, e
 		return nil, fmt.Errorf("`%s' to short. Minimum length is '%d'", field, *n)
 	}
 	return data, err
+}
+
+// validJSON ensures the field value parses as JSON. The string-typed field is
+// otherwise opaque to the schema (e.g. ProjectTemplate.columns_json), so this
+// rule rejects malformed payloads at write time instead of letting them reach
+// downstream consumers.
+func validJSON(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
+	data, err := next(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var s string
+	switch d := data.(type) {
+	case nil:
+		return data, nil
+	case *string:
+		if d == nil {
+			return data, nil
+		}
+		s = *d
+	case string:
+		s = d
+	default:
+		field := *graphql.GetPathContext(ctx).Field
+		return nil, fmt.Errorf("Type unknown for field '%s'", field)
+	}
+
+	var v any
+	if err := json.Unmarshal([]byte(s), &v); err != nil {
+		field := *graphql.GetPathContext(ctx).Field
+		return nil, fmt.Errorf("`%s' is not valid JSON: %v", field, err)
+	}
+	return data, nil
 }
 
 // inputMaxLength the that the size of the field is stricly greater than the given value
