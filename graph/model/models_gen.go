@@ -115,6 +115,7 @@ type AddCommentInput struct {
 	UpdatedAt *string        `json:"updatedAt,omitempty"`
 	Message   *string        `json:"message,omitempty"`
 	Reactions []*ReactionRef `json:"reactions,omitempty"`
+	Files     []*FileRef     `json:"files,omitempty"`
 }
 
 type AddCommentPayload struct {
@@ -182,6 +183,21 @@ type AddEventInput struct {
 type AddEventPayload struct {
 	Event   []*Event `json:"event,omitempty"`
 	NumUids *int     `json:"numUids,omitempty"`
+}
+
+type AddFileInput struct {
+	CreatedBy   *UserRef    `json:"createdBy"`
+	CreatedAt   string      `json:"createdAt"`
+	Comment     *CommentRef `json:"comment"`
+	Filename    string      `json:"filename"`
+	ContentType string      `json:"contentType"`
+	Size        int         `json:"size"`
+	StorageKey  string      `json:"storageKey"`
+}
+
+type AddFilePayload struct {
+	File    []*File `json:"file,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type AddLabelInput struct {
@@ -703,11 +719,13 @@ type CardKindRef struct {
 type Comment struct {
 	Message            string                   `json:"message"`
 	Reactions          []*Reaction              `json:"reactions,omitempty"`
+	Files              []*File                  `json:"files,omitempty"`
 	ID                 string                   `json:"id"`
 	CreatedBy          *User                    `json:"createdBy"`
 	CreatedAt          string                   `json:"createdAt"`
 	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
 	ReactionsAggregate *ReactionAggregateResult `json:"reactionsAggregate,omitempty"`
+	FilesAggregate     *FileAggregateResult     `json:"filesAggregate,omitempty"`
 }
 
 type CommentAggregateResult struct {
@@ -742,6 +760,7 @@ type CommentPatch struct {
 	UpdatedAt *string        `json:"updatedAt,omitempty"`
 	Message   *string        `json:"message,omitempty"`
 	Reactions []*ReactionRef `json:"reactions,omitempty"`
+	Files     []*FileRef     `json:"files,omitempty"`
 }
 
 type CommentRef struct {
@@ -751,6 +770,7 @@ type CommentRef struct {
 	UpdatedAt *string        `json:"updatedAt,omitempty"`
 	Message   *string        `json:"message,omitempty"`
 	Reactions []*ReactionRef `json:"reactions,omitempty"`
+	Files     []*FileRef     `json:"files,omitempty"`
 }
 
 type ContainsFilter struct {
@@ -936,6 +956,12 @@ type DeleteEventPayload struct {
 	Event   []*Event `json:"event,omitempty"`
 	Msg     *string  `json:"msg,omitempty"`
 	NumUids *int     `json:"numUids,omitempty"`
+}
+
+type DeleteFilePayload struct {
+	File    []*File `json:"file,omitempty"`
+	Msg     *string `json:"msg,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
 }
 
 type DeleteLabelPayload struct {
@@ -1239,6 +1265,69 @@ type EventRef struct {
 	Mentioned *TensionRef   `json:"mentioned,omitempty"`
 	Old       *string       `json:"old,omitempty"`
 	New       *string       `json:"new,omitempty"`
+}
+
+type File struct {
+	ID          string   `json:"id"`
+	CreatedBy   *User    `json:"createdBy"`
+	CreatedAt   string   `json:"createdAt"`
+	Comment     *Comment `json:"comment"`
+	Filename    string   `json:"filename"`
+	ContentType string   `json:"contentType"`
+	Size        int      `json:"size"`
+	StorageKey  string   `json:"storageKey"`
+}
+
+type FileAggregateResult struct {
+	Count          *int     `json:"count,omitempty"`
+	CreatedAtMin   *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax   *string  `json:"createdAtMax,omitempty"`
+	FilenameMin    *string  `json:"filenameMin,omitempty"`
+	FilenameMax    *string  `json:"filenameMax,omitempty"`
+	ContentTypeMin *string  `json:"contentTypeMin,omitempty"`
+	ContentTypeMax *string  `json:"contentTypeMax,omitempty"`
+	SizeMin        *int     `json:"sizeMin,omitempty"`
+	SizeMax        *int     `json:"sizeMax,omitempty"`
+	SizeSum        *int     `json:"sizeSum,omitempty"`
+	SizeAvg        *float64 `json:"sizeAvg,omitempty"`
+	StorageKeyMin  *string  `json:"storageKeyMin,omitempty"`
+	StorageKeyMax  *string  `json:"storageKeyMax,omitempty"`
+}
+
+type FileFilter struct {
+	ID         []string          `json:"id,omitempty"`
+	CreatedAt  *DateTimeFilter   `json:"createdAt,omitempty"`
+	StorageKey *StringHashFilter `json:"storageKey,omitempty"`
+	Has        []*FileHasFilter  `json:"has,omitempty"`
+	And        []*FileFilter     `json:"and,omitempty"`
+	Or         []*FileFilter     `json:"or,omitempty"`
+	Not        *FileFilter       `json:"not,omitempty"`
+}
+
+type FileOrder struct {
+	Asc  *FileOrderable `json:"asc,omitempty"`
+	Desc *FileOrderable `json:"desc,omitempty"`
+	Then *FileOrder     `json:"then,omitempty"`
+}
+
+type FilePatch struct {
+	CreatedBy   *UserRef    `json:"createdBy,omitempty"`
+	CreatedAt   *string     `json:"createdAt,omitempty"`
+	Comment     *CommentRef `json:"comment,omitempty"`
+	Filename    *string     `json:"filename,omitempty"`
+	ContentType *string     `json:"contentType,omitempty"`
+	Size        *int        `json:"size,omitempty"`
+}
+
+type FileRef struct {
+	ID          *string     `json:"id,omitempty"`
+	CreatedBy   *UserRef    `json:"createdBy,omitempty"`
+	CreatedAt   *string     `json:"createdAt,omitempty"`
+	Comment     *CommentRef `json:"comment,omitempty"`
+	Filename    *string     `json:"filename,omitempty"`
+	ContentType *string     `json:"contentType,omitempty"`
+	Size        *int        `json:"size,omitempty"`
+	StorageKey  *string     `json:"storageKey,omitempty"`
 }
 
 type FloatFilter struct {
@@ -2824,6 +2913,17 @@ type UpdateEventPayload struct {
 	NumUids *int     `json:"numUids,omitempty"`
 }
 
+type UpdateFileInput struct {
+	Filter *FileFilter `json:"filter"`
+	Set    *FilePatch  `json:"set,omitempty"`
+	Remove *FilePatch  `json:"remove,omitempty"`
+}
+
+type UpdateFilePayload struct {
+	File    []*File `json:"file,omitempty"`
+	NumUids *int    `json:"numUids,omitempty"`
+}
+
 type UpdateLabelInput struct {
 	Filter *LabelFilter `json:"filter"`
 	Set    *LabelPatch  `json:"set,omitempty"`
@@ -3738,6 +3838,7 @@ const (
 	CommentHasFilterUpdatedAt CommentHasFilter = "updatedAt"
 	CommentHasFilterMessage   CommentHasFilter = "message"
 	CommentHasFilterReactions CommentHasFilter = "reactions"
+	CommentHasFilterFiles     CommentHasFilter = "files"
 )
 
 var AllCommentHasFilter = []CommentHasFilter{
@@ -3746,11 +3847,12 @@ var AllCommentHasFilter = []CommentHasFilter{
 	CommentHasFilterUpdatedAt,
 	CommentHasFilterMessage,
 	CommentHasFilterReactions,
+	CommentHasFilterFiles,
 }
 
 func (e CommentHasFilter) IsValid() bool {
 	switch e {
-	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterReactions:
+	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterReactions, CommentHasFilterFiles:
 		return true
 	}
 	return false
@@ -4448,6 +4550,104 @@ func (e *EventOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e EventOrderable) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type FileHasFilter string
+
+const (
+	FileHasFilterCreatedBy   FileHasFilter = "createdBy"
+	FileHasFilterCreatedAt   FileHasFilter = "createdAt"
+	FileHasFilterComment     FileHasFilter = "comment"
+	FileHasFilterFilename    FileHasFilter = "filename"
+	FileHasFilterContentType FileHasFilter = "contentType"
+	FileHasFilterSize        FileHasFilter = "size"
+	FileHasFilterStorageKey  FileHasFilter = "storageKey"
+)
+
+var AllFileHasFilter = []FileHasFilter{
+	FileHasFilterCreatedBy,
+	FileHasFilterCreatedAt,
+	FileHasFilterComment,
+	FileHasFilterFilename,
+	FileHasFilterContentType,
+	FileHasFilterSize,
+	FileHasFilterStorageKey,
+}
+
+func (e FileHasFilter) IsValid() bool {
+	switch e {
+	case FileHasFilterCreatedBy, FileHasFilterCreatedAt, FileHasFilterComment, FileHasFilterFilename, FileHasFilterContentType, FileHasFilterSize, FileHasFilterStorageKey:
+		return true
+	}
+	return false
+}
+
+func (e FileHasFilter) String() string {
+	return string(e)
+}
+
+func (e *FileHasFilter) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = FileHasFilter(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid FileHasFilter", str)
+	}
+	return nil
+}
+
+func (e FileHasFilter) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type FileOrderable string
+
+const (
+	FileOrderableCreatedAt   FileOrderable = "createdAt"
+	FileOrderableFilename    FileOrderable = "filename"
+	FileOrderableContentType FileOrderable = "contentType"
+	FileOrderableSize        FileOrderable = "size"
+	FileOrderableStorageKey  FileOrderable = "storageKey"
+)
+
+var AllFileOrderable = []FileOrderable{
+	FileOrderableCreatedAt,
+	FileOrderableFilename,
+	FileOrderableContentType,
+	FileOrderableSize,
+	FileOrderableStorageKey,
+}
+
+func (e FileOrderable) IsValid() bool {
+	switch e {
+	case FileOrderableCreatedAt, FileOrderableFilename, FileOrderableContentType, FileOrderableSize, FileOrderableStorageKey:
+		return true
+	}
+	return false
+}
+
+func (e FileOrderable) String() string {
+	return string(e)
+}
+
+func (e *FileOrderable) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = FileOrderable(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid FileOrderable", str)
+	}
+	return nil
+}
+
+func (e FileOrderable) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

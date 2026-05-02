@@ -284,6 +284,21 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, filter model.Comme
 	panic(fmt.Errorf("not implemented"))
 }
 
+// AddFile is the resolver for the addFile field.
+func (r *mutationResolver) AddFile(ctx context.Context, input []*model.AddFileInput, upsert *bool) (*model.AddFilePayload, error) {
+	panic(fmt.Errorf("not implemented: AddFile - addFile"))
+}
+
+// UpdateFile is the resolver for the updateFile field.
+func (r *mutationResolver) UpdateFile(ctx context.Context, input model.UpdateFileInput) (*model.UpdateFilePayload, error) {
+	panic(fmt.Errorf("not implemented: UpdateFile - updateFile"))
+}
+
+// DeleteFile is the resolver for the deleteFile field.
+func (r *mutationResolver) DeleteFile(ctx context.Context, filter model.FileFilter) (*model.DeleteFilePayload, error) {
+	panic(fmt.Errorf("not implemented: DeleteFile - deleteFile"))
+}
+
 // AddReaction is the resolver for the addReaction field.
 func (r *mutationResolver) AddReaction(ctx context.Context, input []*model.AddReactionInput, upsert *bool) (data *model.AddReactionPayload, errors error) {
 	errors = r.DgraphAddBridge(ctx, input, upsert, &data)
@@ -739,6 +754,21 @@ func (r *queryResolver) QueryComment(ctx context.Context, filter *model.CommentF
 // AggregateComment is the resolver for the aggregateComment field.
 func (r *queryResolver) AggregateComment(ctx context.Context, filter *model.CommentFilter) (data *model.CommentAggregateResult, errors error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+// GetFile is the resolver for the getFile field.
+func (r *queryResolver) GetFile(ctx context.Context, id *string, storageKey *string) (*model.File, error) {
+	panic(fmt.Errorf("not implemented: GetFile - getFile"))
+}
+
+// QueryFile is the resolver for the queryFile field.
+func (r *queryResolver) QueryFile(ctx context.Context, filter *model.FileFilter, order *model.FileOrder, first *int, offset *int) ([]*model.File, error) {
+	panic(fmt.Errorf("not implemented: QueryFile - queryFile"))
+}
+
+// AggregateFile is the resolver for the aggregateFile field.
+func (r *queryResolver) AggregateFile(ctx context.Context, filter *model.FileFilter) (*model.FileAggregateResult, error) {
+	panic(fmt.Errorf("not implemented: AggregateFile - aggregateFile"))
 }
 
 // GetReaction is the resolver for the getReaction field.

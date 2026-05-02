@@ -36,6 +36,7 @@ Defined in `schema/graphql/fractal6.graphql`. Core types:
 | `Node` | Circle or Role in the org tree |
 | `Tension` | Issue/communication between nodes |
 | `Comment` / `Event` / `Blob` | All `Post` implementations attached to a Tension |
+| `File` | S3-backed attachment metadata; bytes served via `/file/<id>` |
 | `Contract` / `Vote` | Voting mechanism for events that need peer validation |
 | `User` | Platform user with roles, subscriptions, events |
 | `Label` / `RoleExt` / `TensionTemplate` / `ProjectTemplate` | Reusable artefacts scoped to circles |
@@ -173,6 +174,11 @@ POST /q/projects/sub
 POST /q/tensions/{light,int,ext,all}
 POST /q/tensions/count
 
+# File attachments (see file-attachments.md)
+POST   /file/upload                    Multipart upload, comment-author only
+GET    /file/{id}                      Auth-checked 302 to a presigned S3 URL
+DELETE /file/{id}                      Comment-author only
+
 # Webhooks
 POST /notifications  /mailing  /postal_webhook
 
@@ -211,4 +217,5 @@ Event categories: `EventNotif` (tension events), `ContractNotif` (contract votin
 | Modify field-level auth | `graph/FieldAuthorization.go` |
 | Add a DQL-backed computed field | declare with `@meta` in SDL → add template to `dqlQueries` in `db/dql.go` |
 | Add an HTTP route | `web/handlers/` + register in `web/router.go` |
+| Handle file attachments | `docs/file-attachments.md` |
 | Run integration tests | `docs/integration-tests.md` |

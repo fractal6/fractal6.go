@@ -247,6 +247,11 @@ type ComplexityRoot struct {
 		NumUids func(childComplexity int) int
 	}
 
+	AddFilePayload struct {
+		File    func(childComplexity int, filter *model.FileFilter, order *model.FileOrder, first *int, offset *int) int
+		NumUids func(childComplexity int) int
+	}
+
 	AddLabelPayload struct {
 		Label   func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
@@ -398,6 +403,8 @@ type ComplexityRoot struct {
 	Comment struct {
 		CreatedAt          func(childComplexity int) int
 		CreatedBy          func(childComplexity int, filter *model.UserFilter) int
+		Files              func(childComplexity int, filter *model.FileFilter, order *model.FileOrder, first *int, offset *int) int
+		FilesAggregate     func(childComplexity int, filter *model.FileFilter) int
 		ID                 func(childComplexity int) int
 		Message            func(childComplexity int) int
 		Reactions          func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
@@ -496,6 +503,12 @@ type ComplexityRoot struct {
 
 	DeleteEventPayload struct {
 		Event   func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		Msg     func(childComplexity int) int
+		NumUids func(childComplexity int) int
+	}
+
+	DeleteFilePayload struct {
+		File    func(childComplexity int, filter *model.FileFilter, order *model.FileOrder, first *int, offset *int) int
 		Msg     func(childComplexity int) int
 		NumUids func(childComplexity int) int
 	}
@@ -695,6 +708,33 @@ type ComplexityRoot struct {
 		OldMin func(childComplexity int) int
 	}
 
+	File struct {
+		Comment     func(childComplexity int, filter *model.CommentFilter) int
+		ContentType func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		CreatedBy   func(childComplexity int, filter *model.UserFilter) int
+		Filename    func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Size        func(childComplexity int) int
+		StorageKey  func(childComplexity int) int
+	}
+
+	FileAggregateResult struct {
+		ContentTypeMax func(childComplexity int) int
+		ContentTypeMin func(childComplexity int) int
+		Count          func(childComplexity int) int
+		CreatedAtMax   func(childComplexity int) int
+		CreatedAtMin   func(childComplexity int) int
+		FilenameMax    func(childComplexity int) int
+		FilenameMin    func(childComplexity int) int
+		SizeAvg        func(childComplexity int) int
+		SizeMax        func(childComplexity int) int
+		SizeMin        func(childComplexity int) int
+		SizeSum        func(childComplexity int) int
+		StorageKeyMax  func(childComplexity int) int
+		StorageKeyMin  func(childComplexity int) int
+	}
+
 	Label struct {
 		Color             func(childComplexity int) int
 		Description       func(childComplexity int) int
@@ -752,6 +792,7 @@ type ComplexityRoot struct {
 		AddEvent                func(childComplexity int, input []*model.AddEventInput) int
 		AddEventCount           func(childComplexity int, input []*model.AddEventCountInput) int
 		AddEventFragment        func(childComplexity int, input []*model.AddEventFragmentInput) int
+		AddFile                 func(childComplexity int, input []*model.AddFileInput, upsert *bool) int
 		AddLabel                func(childComplexity int, input []*model.AddLabelInput) int
 		AddMandate              func(childComplexity int, input []*model.AddMandateInput) int
 		AddNode                 func(childComplexity int, input []*model.AddNodeInput, upsert *bool) int
@@ -781,6 +822,7 @@ type ComplexityRoot struct {
 		DeleteEvent             func(childComplexity int, filter model.EventFilter) int
 		DeleteEventCount        func(childComplexity int, filter model.EventCountFilter) int
 		DeleteEventFragment     func(childComplexity int, filter model.EventFragmentFilter) int
+		DeleteFile              func(childComplexity int, filter model.FileFilter) int
 		DeleteLabel             func(childComplexity int, filter model.LabelFilter) int
 		DeleteMandate           func(childComplexity int, filter model.MandateFilter) int
 		DeleteNode              func(childComplexity int, filter model.NodeFilter) int
@@ -811,6 +853,7 @@ type ComplexityRoot struct {
 		UpdateEvent             func(childComplexity int, input model.UpdateEventInput) int
 		UpdateEventCount        func(childComplexity int, input model.UpdateEventCountInput) int
 		UpdateEventFragment     func(childComplexity int, input model.UpdateEventFragmentInput) int
+		UpdateFile              func(childComplexity int, input model.UpdateFileInput) int
 		UpdateLabel             func(childComplexity int, input model.UpdateLabelInput) int
 		UpdateMandate           func(childComplexity int, input model.UpdateMandateInput) int
 		UpdateNode              func(childComplexity int, input model.UpdateNodeInput) int
@@ -1205,6 +1248,7 @@ type ComplexityRoot struct {
 		AggregateEvent             func(childComplexity int, filter *model.EventFilter) int
 		AggregateEventCount        func(childComplexity int, filter *model.EventCountFilter) int
 		AggregateEventFragment     func(childComplexity int, filter *model.EventFragmentFilter) int
+		AggregateFile              func(childComplexity int, filter *model.FileFilter) int
 		AggregateLabel             func(childComplexity int, filter *model.LabelFilter) int
 		AggregateMandate           func(childComplexity int, filter *model.MandateFilter) int
 		AggregateNode              func(childComplexity int, filter *model.NodeFilter) int
@@ -1232,6 +1276,7 @@ type ComplexityRoot struct {
 		GetComment                 func(childComplexity int, id string) int
 		GetContract                func(childComplexity int, id *string, contractid *string) int
 		GetEvent                   func(childComplexity int, id string) int
+		GetFile                    func(childComplexity int, id *string, storageKey *string) int
 		GetLabel                   func(childComplexity int, id string) int
 		GetMandate                 func(childComplexity int, id string) int
 		GetNode                    func(childComplexity int, id *string, nameid *string) int
@@ -1259,6 +1304,7 @@ type ComplexityRoot struct {
 		QueryEvent                 func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
 		QueryEventCount            func(childComplexity int, filter *model.EventCountFilter, order *model.EventCountOrder, first *int, offset *int) int
 		QueryEventFragment         func(childComplexity int, filter *model.EventFragmentFilter, order *model.EventFragmentOrder, first *int, offset *int) int
+		QueryFile                  func(childComplexity int, filter *model.FileFilter, order *model.FileOrder, first *int, offset *int) int
 		QueryLabel                 func(childComplexity int, filter *model.LabelFilter, order *model.LabelOrder, first *int, offset *int) int
 		QueryMandate               func(childComplexity int, filter *model.MandateFilter, order *model.MandateOrder, first *int, offset *int) int
 		QueryNode                  func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
@@ -1450,6 +1496,11 @@ type ComplexityRoot struct {
 
 	UpdateEventPayload struct {
 		Event   func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
+		NumUids func(childComplexity int) int
+	}
+
+	UpdateFilePayload struct {
+		File    func(childComplexity int, filter *model.FileFilter, order *model.FileOrder, first *int, offset *int) int
 		NumUids func(childComplexity int) int
 	}
 
@@ -1967,6 +2018,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AddEventPayload.NumUids(childComplexity), true
+
+	case "AddFilePayload.file":
+		if e.complexity.AddFilePayload.File == nil {
+			break
+		}
+
+		args, err := ec.field_AddFilePayload_file_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.AddFilePayload.File(childComplexity, args["filter"].(*model.FileFilter), args["order"].(*model.FileOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "AddFilePayload.numUids":
+		if e.complexity.AddFilePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.AddFilePayload.NumUids(childComplexity), true
 
 	case "AddLabelPayload.label":
 		if e.complexity.AddLabelPayload.Label == nil {
@@ -2618,6 +2688,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
+	case "Comment.files":
+		if e.complexity.Comment.Files == nil {
+			break
+		}
+
+		args, err := ec.field_Comment_files_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Comment.Files(childComplexity, args["filter"].(*model.FileFilter), args["order"].(*model.FileOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Comment.filesAggregate":
+		if e.complexity.Comment.FilesAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Comment_filesAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Comment.FilesAggregate(childComplexity, args["filter"].(*model.FileFilter)), true
+
 	case "Comment.id":
 		if e.complexity.Comment.ID == nil {
 			break
@@ -3191,6 +3285,32 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeleteEventPayload.NumUids(childComplexity), true
+
+	case "DeleteFilePayload.file":
+		if e.complexity.DeleteFilePayload.File == nil {
+			break
+		}
+
+		args, err := ec.field_DeleteFilePayload_file_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.DeleteFilePayload.File(childComplexity, args["filter"].(*model.FileFilter), args["order"].(*model.FileOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "DeleteFilePayload.msg":
+		if e.complexity.DeleteFilePayload.Msg == nil {
+			break
+		}
+
+		return e.complexity.DeleteFilePayload.Msg(childComplexity), true
+
+	case "DeleteFilePayload.numUids":
+		if e.complexity.DeleteFilePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.DeleteFilePayload.NumUids(childComplexity), true
 
 	case "DeleteLabelPayload.label":
 		if e.complexity.DeleteLabelPayload.Label == nil {
@@ -4094,6 +4214,163 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EventFragmentAggregateResult.OldMin(childComplexity), true
 
+	case "File.comment":
+		if e.complexity.File.Comment == nil {
+			break
+		}
+
+		args, err := ec.field_File_comment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.File.Comment(childComplexity, args["filter"].(*model.CommentFilter)), true
+
+	case "File.contentType":
+		if e.complexity.File.ContentType == nil {
+			break
+		}
+
+		return e.complexity.File.ContentType(childComplexity), true
+
+	case "File.createdAt":
+		if e.complexity.File.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.File.CreatedAt(childComplexity), true
+
+	case "File.createdBy":
+		if e.complexity.File.CreatedBy == nil {
+			break
+		}
+
+		args, err := ec.field_File_createdBy_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.File.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
+
+	case "File.filename":
+		if e.complexity.File.Filename == nil {
+			break
+		}
+
+		return e.complexity.File.Filename(childComplexity), true
+
+	case "File.id":
+		if e.complexity.File.ID == nil {
+			break
+		}
+
+		return e.complexity.File.ID(childComplexity), true
+
+	case "File.size":
+		if e.complexity.File.Size == nil {
+			break
+		}
+
+		return e.complexity.File.Size(childComplexity), true
+
+	case "File.storageKey":
+		if e.complexity.File.StorageKey == nil {
+			break
+		}
+
+		return e.complexity.File.StorageKey(childComplexity), true
+
+	case "FileAggregateResult.contentTypeMax":
+		if e.complexity.FileAggregateResult.ContentTypeMax == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.ContentTypeMax(childComplexity), true
+
+	case "FileAggregateResult.contentTypeMin":
+		if e.complexity.FileAggregateResult.ContentTypeMin == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.ContentTypeMin(childComplexity), true
+
+	case "FileAggregateResult.count":
+		if e.complexity.FileAggregateResult.Count == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.Count(childComplexity), true
+
+	case "FileAggregateResult.createdAtMax":
+		if e.complexity.FileAggregateResult.CreatedAtMax == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.CreatedAtMax(childComplexity), true
+
+	case "FileAggregateResult.createdAtMin":
+		if e.complexity.FileAggregateResult.CreatedAtMin == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.CreatedAtMin(childComplexity), true
+
+	case "FileAggregateResult.filenameMax":
+		if e.complexity.FileAggregateResult.FilenameMax == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.FilenameMax(childComplexity), true
+
+	case "FileAggregateResult.filenameMin":
+		if e.complexity.FileAggregateResult.FilenameMin == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.FilenameMin(childComplexity), true
+
+	case "FileAggregateResult.sizeAvg":
+		if e.complexity.FileAggregateResult.SizeAvg == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.SizeAvg(childComplexity), true
+
+	case "FileAggregateResult.sizeMax":
+		if e.complexity.FileAggregateResult.SizeMax == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.SizeMax(childComplexity), true
+
+	case "FileAggregateResult.sizeMin":
+		if e.complexity.FileAggregateResult.SizeMin == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.SizeMin(childComplexity), true
+
+	case "FileAggregateResult.sizeSum":
+		if e.complexity.FileAggregateResult.SizeSum == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.SizeSum(childComplexity), true
+
+	case "FileAggregateResult.storageKeyMax":
+		if e.complexity.FileAggregateResult.StorageKeyMax == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.StorageKeyMax(childComplexity), true
+
+	case "FileAggregateResult.storageKeyMin":
+		if e.complexity.FileAggregateResult.StorageKeyMin == nil {
+			break
+		}
+
+		return e.complexity.FileAggregateResult.StorageKeyMin(childComplexity), true
+
 	case "Label.color":
 		if e.complexity.Label.Color == nil {
 			break
@@ -4440,6 +4717,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddEventFragment(childComplexity, args["input"].([]*model.AddEventFragmentInput)), true
+
+	case "Mutation.addFile":
+		if e.complexity.Mutation.AddFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddFile(childComplexity, args["input"].([]*model.AddFileInput), args["upsert"].(*bool)), true
 
 	case "Mutation.addLabel":
 		if e.complexity.Mutation.AddLabel == nil {
@@ -4788,6 +5077,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteEventFragment(childComplexity, args["filter"].(model.EventFragmentFilter)), true
+
+	case "Mutation.deleteFile":
+		if e.complexity.Mutation.DeleteFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteFile(childComplexity, args["filter"].(model.FileFilter)), true
 
 	case "Mutation.deleteLabel":
 		if e.complexity.Mutation.DeleteLabel == nil {
@@ -5148,6 +5449,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateEventFragment(childComplexity, args["input"].(model.UpdateEventFragmentInput)), true
+
+	case "Mutation.updateFile":
+		if e.complexity.Mutation.UpdateFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateFile(childComplexity, args["input"].(model.UpdateFileInput)), true
 
 	case "Mutation.updateLabel":
 		if e.complexity.Mutation.UpdateLabel == nil {
@@ -7814,6 +8127,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AggregateEventFragment(childComplexity, args["filter"].(*model.EventFragmentFilter)), true
 
+	case "Query.aggregateFile":
+		if e.complexity.Query.AggregateFile == nil {
+			break
+		}
+
+		args, err := ec.field_Query_aggregateFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AggregateFile(childComplexity, args["filter"].(*model.FileFilter)), true
+
 	case "Query.aggregateLabel":
 		if e.complexity.Query.AggregateLabel == nil {
 			break
@@ -8138,6 +8463,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetEvent(childComplexity, args["id"].(string)), true
 
+	case "Query.getFile":
+		if e.complexity.Query.GetFile == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetFile(childComplexity, args["id"].(*string), args["storageKey"].(*string)), true
+
 	case "Query.getLabel":
 		if e.complexity.Query.GetLabel == nil {
 			break
@@ -8461,6 +8798,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.QueryEventFragment(childComplexity, args["filter"].(*model.EventFragmentFilter), args["order"].(*model.EventFragmentOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Query.queryFile":
+		if e.complexity.Query.QueryFile == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryFile(childComplexity, args["filter"].(*model.FileFilter), args["order"].(*model.FileOrder), args["first"].(*int), args["offset"].(*int)), true
 
 	case "Query.queryLabel":
 		if e.complexity.Query.QueryLabel == nil {
@@ -9790,6 +10139,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UpdateEventPayload.NumUids(childComplexity), true
 
+	case "UpdateFilePayload.file":
+		if e.complexity.UpdateFilePayload.File == nil {
+			break
+		}
+
+		args, err := ec.field_UpdateFilePayload_file_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.UpdateFilePayload.File(childComplexity, args["filter"].(*model.FileFilter), args["order"].(*model.FileOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "UpdateFilePayload.numUids":
+		if e.complexity.UpdateFilePayload.NumUids == nil {
+			break
+		}
+
+		return e.complexity.UpdateFilePayload.NumUids(childComplexity), true
+
 	case "UpdateLabelPayload.label":
 		if e.complexity.UpdateLabelPayload.Label == nil {
 			break
@@ -11032,6 +11400,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAddEventCountInput,
 		ec.unmarshalInputAddEventFragmentInput,
 		ec.unmarshalInputAddEventInput,
+		ec.unmarshalInputAddFileInput,
 		ec.unmarshalInputAddLabelInput,
 		ec.unmarshalInputAddMandateInput,
 		ec.unmarshalInputAddNodeFragmentInput,
@@ -11093,6 +11462,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputEventOrder,
 		ec.unmarshalInputEventPatch,
 		ec.unmarshalInputEventRef,
+		ec.unmarshalInputFileFilter,
+		ec.unmarshalInputFileOrder,
+		ec.unmarshalInputFilePatch,
+		ec.unmarshalInputFileRef,
 		ec.unmarshalInputFloatFilter,
 		ec.unmarshalInputFloatRange,
 		ec.unmarshalInputGenerateMutationParams,
@@ -11205,6 +11578,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateEventCountInput,
 		ec.unmarshalInputUpdateEventFragmentInput,
 		ec.unmarshalInputUpdateEventInput,
+		ec.unmarshalInputUpdateFileInput,
 		ec.unmarshalInputUpdateLabelInput,
 		ec.unmarshalInputUpdateMandateInput,
 		ec.unmarshalInputUpdateNodeFragmentInput,
@@ -11778,12 +12152,25 @@ type Tension {
 type Comment {
   message: String!
   reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
+  files(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File!]
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
   updatedAt: DateTime
 
   reactionsAggregate(filter: ReactionFilter): ReactionAggregateResult
+  filesAggregate(filter: FileFilter): FileAggregateResult
+}
+
+type File {
+  id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  comment(filter: CommentFilter): Comment!
+  filename: String!
+  contentType: String!
+  size: Int!
+  storageKey: String!
 }
 
 type Reaction {
@@ -12122,35 +12509,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @id on FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @lambda on FIELD_DEFINITION
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
 directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @lambda on FIELD_DEFINITION
 
 type ActivityAggregateResult {
   count: Int
@@ -12257,6 +12644,7 @@ input AddCommentInput {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   reactions: [ReactionRef!]
+  files: [FileRef!]
 }
 
 type AddCommentPayload {
@@ -12323,6 +12711,21 @@ input AddEventInput {
 
 type AddEventPayload {
   event(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event]
+  numUids: Int
+}
+
+input AddFileInput {
+  createdBy: UserRef!
+  createdAt: DateTime!
+  comment: CommentRef!
+  filename: String!
+  contentType: String!
+  size: Int!
+  storageKey: String!
+}
+
+type AddFilePayload {
+  file(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File]
   numUids: Int
 }
 
@@ -12886,6 +13289,7 @@ enum CommentHasFilter {
   updatedAt
   message
   reactions
+  files
 }
 
 input CommentOrder {
@@ -12906,6 +13310,7 @@ input CommentPatch {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   reactions: [ReactionRef!] @x_patch_ro
+  files: [FileRef!] @x_ro
 }
 
 input CommentRef {
@@ -12915,6 +13320,7 @@ input CommentRef {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   reactions: [ReactionRef!]
+  files: [FileRef!] @x_ro
 }
 
 input ContainsFilter {
@@ -13101,6 +13507,12 @@ type DeleteEventFragmentPayload {
 
 type DeleteEventPayload {
   event(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event]
+  msg: String
+  numUids: Int
+}
+
+type DeleteFilePayload {
+  file(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File]
   msg: String
   numUids: Int
 }
@@ -13456,6 +13868,76 @@ input EventRef {
   new: String
 }
 
+type FileAggregateResult {
+  count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+  filenameMin: String
+  filenameMax: String
+  contentTypeMin: String
+  contentTypeMax: String
+  sizeMin: Int
+  sizeMax: Int
+  sizeSum: Int
+  sizeAvg: Float
+  storageKeyMin: String
+  storageKeyMax: String
+}
+
+input FileFilter {
+  id: [ID!]
+  createdAt: DateTimeFilter
+  storageKey: StringHashFilter
+  has: [FileHasFilter]
+  and: [FileFilter]
+  or: [FileFilter]
+  not: FileFilter
+}
+
+enum FileHasFilter {
+  createdBy
+  createdAt
+  comment
+  filename
+  contentType
+  size
+  storageKey
+}
+
+input FileOrder {
+  asc: FileOrderable
+  desc: FileOrderable
+  then: FileOrder
+}
+
+enum FileOrderable {
+  createdAt
+  filename
+  contentType
+  size
+  storageKey
+}
+
+input FilePatch {
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  comment: CommentRef @x_patch_ro
+  filename: String @x_patch_ro
+  contentType: String @x_patch_ro
+  size: Int @x_patch_ro
+}
+
+input FileRef {
+  id: ID
+  createdBy: UserRef
+  createdAt: DateTime
+  comment: CommentRef
+  filename: String
+  contentType: String
+  size: Int
+  storageKey: String
+}
+
 input FloatFilter {
   eq: Float
   in: [Float]
@@ -13712,6 +14194,9 @@ type Mutation {
   addComment(input: [AddCommentInput!]! @hook_addCommentInput): AddCommentPayload @hook_addComment
   updateComment(input: UpdateCommentInput! @hook_updateCommentInput): UpdateCommentPayload @hook_updateComment
   deleteComment(filter: CommentFilter! @hook_deleteCommentInput): DeleteCommentPayload @hook_deleteComment
+  addFile(input: [AddFileInput!]!, upsert: Boolean): AddFilePayload
+  updateFile(input: UpdateFileInput!): UpdateFilePayload
+  deleteFile(filter: FileFilter!): DeleteFilePayload
   addReaction(input: [AddReactionInput!]! @hook_addReactionInput, upsert: Boolean): AddReactionPayload @hook_addReaction
   updateReaction(input: UpdateReactionInput! @hook_updateReactionInput): UpdateReactionPayload @hook_updateReaction
   deleteReaction(filter: ReactionFilter! @hook_deleteReactionInput): DeleteReactionPayload @hook_deleteReaction
@@ -14772,6 +15257,9 @@ type Query {
   getComment(id: ID!): Comment
   queryComment(filter: CommentFilter @hook_queryCommentInput, order: CommentOrder, first: Int, offset: Int): [Comment]
   aggregateComment(filter: CommentFilter): CommentAggregateResult
+  getFile(id: ID, storageKey: String): File
+  queryFile(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File]
+  aggregateFile(filter: FileFilter): FileAggregateResult
   getReaction(id: ID, reactionid: String): Reaction
   queryReaction(filter: ReactionFilter @hook_queryReactionInput, order: ReactionOrder, first: Int, offset: Int): [Reaction]
   aggregateReaction(filter: ReactionFilter): ReactionAggregateResult
@@ -15287,6 +15775,17 @@ input UpdateEventInput {
 
 type UpdateEventPayload {
   event(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event]
+  numUids: Int
+}
+
+input UpdateFileInput {
+  filter: FileFilter!
+  set: FilePatch
+  remove: FilePatch
+}
+
+type UpdateFilePayload {
+  file(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File]
   numUids: Int
 }
 

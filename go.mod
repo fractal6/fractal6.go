@@ -11,6 +11,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/lestrrat-go/jwx/v2 v2.0.21
 	github.com/microcosm-cc/bluemonday v1.0.26
+	github.com/minio/minio-go/v7 v7.1.0
 	github.com/prometheus/client_golang v1.19.1
 	github.com/rs/cors v1.11.0
 	github.com/spf13/cobra v1.8.1
@@ -56,7 +57,6 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect

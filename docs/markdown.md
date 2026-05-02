@@ -52,6 +52,15 @@ All in `web/email/main.go`:
 - **Tension update/comment** (~line 397): Converts comment text
 - **Contract notification** (~line 587): Converts contract notification messages
 
+## File-attachment URLs in emails
+
+Markdown bodies may contain `![](/file/<id>)` references (see
+`docs/file-attachments.md`). The renderer leaves these as relative URLs in the
+email HTML: recipients clicking through must be authenticated, and inline
+preview in mail clients will fail to load the image. This is intentional —
+attachments inherit the parent comment's tension visibility and the mail
+client has no auth context.
+
 ## Details/Summary Extension
 
 Custom goldmark extension (`web/email/goldmark_details.go`) — parses `<details>` / `<summary>` blocks where the body is regular markdown. The `open` attribute is supported. The sanitizer above is configured to let these elements through.

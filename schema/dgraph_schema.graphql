@@ -630,6 +630,21 @@ type Comment implements Post @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root
 }]
 }) {
   reactions: [Reaction!] @hasInverse(field: comment)
+  files: [File!] @hasInverse(field: comment)
+}
+
+type File @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+}, update:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+}, delete:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
+}) {
+  id: ID!
+  createdBy: User!
+  createdAt: DateTime! @search
+  comment: Comment!
+  filename: String!
+  contentType: String!
+  size: Int!
+  storageKey: String! @id
 }
 
 type Reaction @auth(add:{ rule:"""query ($USERNAME: String!) {
