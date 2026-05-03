@@ -232,16 +232,25 @@ func TestRemoveComment_DeletesAttachedFiles(t *testing.T) {
 		t.Fatal("RemoveComment returned false")
 	}
 
-	// Object must be gone from MinIO. The comment node + File node are also
-	// dropped by the deleteComment template, so deleteTestComment in defer is
-	// idempotent (the existing helper tolerates missing nodes).
-	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
-	exists, err = testStorageCli.Exists(ctx, storageKey)
-	cancel()
-	if err != nil {
-		t.Fatalf("storage Exists post-check: %v", err)
-	}
-	if exists {
-		t.Errorf("expected object %q to be removed by RemoveComment", storageKey)
+	// Object must be gone from MinIO. RemoveComment fires the S3 delete in a
+	// goroutine, so poll briefly. The comment node + File node are dropped
+	// synchronously by the deleteComment template, so deleteTestComment in
+	// defer is idempotent (the existing helper tolerates missing nodes).
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		ctx, cancel = context.WithTimeout(context.Background(), 1*time.Second)
+		exists, err = testStorageCli.Exists(ctx, storageKey)
+		cancel()
+		if err != nil {
+			t.Fatalf("storage Exists post-check: %v", err)
+		}
+		if !exists {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Errorf("expected object %q to be removed by RemoveComment", storageKey)
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
 	}
 }

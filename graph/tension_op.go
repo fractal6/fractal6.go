@@ -21,6 +21,7 @@
 package graph
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -743,15 +744,39 @@ func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
 		return false, LogErr("Access denied", fmt.Errorf("Only the author of the comment can delete it."))
 	}
 
-	// Best-effort GC of S3 attachments. Any failure is logged inside; the
-	// DQL deleteComment template still drops the File nodes regardless, so
-	// leftover objects can be swept out-of-band. storage.Global() is nil when
-	// [storage] is unset — CleanupCommentFiles handles that cleanly.
-	_ = db.GetDB().CleanupCommentFiles(cid, storage.Global())
+	// Delete comment. The template's `all` block returns the storage keys of
+	// the comment's files in the same round-trip, so the GC below skips a
+	// second DQL query.
+	resp, err := db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
+	if err != nil {
+		return false, err
+	}
 
-	// Delete comment
-	_, err = db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
-	return true, err
+	// Fire-and-forget S3 cleanup. storage.Global() is nil when [storage] is
+	// unset; orphan objects can be swept out-of-band.
+	if cli := storage.Global(); cli != nil && len(resp) > 0 {
+		keys := make([]string, 0, len(resp))
+		for _, m := range resp {
+			if k, ok := m["storageKey"].(string); ok && k != "" {
+				keys = append(keys, k)
+			}
+		}
+		if len(keys) > 0 {
+			go deleteStorageKeys(cli, keys)
+		}
+	}
+
+	return true, nil
+}
+
+func deleteStorageKeys(cli *storage.Client, keys []string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	for _, k := range keys {
+		if delErr := cli.Delete(ctx, k); delErr != nil {
+			fmt.Printf("RemoveComment: failed to delete %s: %v\n", k, delErr)
+		}
+	}
 }
 
 //

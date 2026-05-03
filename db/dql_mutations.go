@@ -324,12 +324,19 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 		}},
 	},
 	"deleteComment": {
+		// The `all` block returns the storage keys of the files attached to
+		// the comment so the caller can GC the S3 objects without a second
+		// round-trip. Upsert evaluates the query before applying mutations,
+		// so the keys reflect the pre-delete state.
 		Q: `query {
 			t as var(func: uid({{.tid}}))
             var(func: uid({{.cid}})) {
                 c as uid
                 reactions as Comment.reactions
                 files as Comment.files
+            }
+            all(func: uid(files)) {
+                File.storageKey
             }
         }`,
 		M: []X{{
