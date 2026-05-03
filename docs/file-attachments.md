@@ -152,15 +152,23 @@ sets up systemd, and (optionally) bootstraps the bucket and access keys.
 doesn't generate a reverse predicate. The auth templates (`getCommentAuth`,
 `getFileAuth`) therefore start their walk at the parent `Tension` and filter
 with `uid_in(Tension.comments, <comment uid>)` rather than `~Tension.comments`.
-The same pattern is reused in `getCommentFiles`. Don't switch back to a
-reverse-edge walk without first declaring the predicate as `@reverse` in the
-underlying DQL schema (which the GraphQL admin won't do for you).
+Don't switch back to a reverse-edge walk without first declaring the predicate
+as `@reverse` in the underlying DQL schema (which the GraphQL admin won't do
+for you). `getCommentFiles` walks forward from comment to its files via
+`Comment.files` and is unaffected.
+
+Note: `db.Meta()` runs every response through `tools.CleanDqlMap`, which strips
+`Type.` prefixes (`File.storageKey` → `storageKey`, `Post.createdBy` →
+`createdBy`, `uid` → `id`). The decoders in `db/files.go` look up the cleaned
+keys; a previous version used the raw keys and silently returned empty values.
 
 ## Operational notes
 
-- **Comment delete** triggers `db.GetDB().CleanupCommentFiles(cid)` before the
-  DQL `deleteComment` runs. Per-file failures are logged but do not block the
-  delete; orphan objects can be GC'd by listing keys under `comments/<cid>/`.
+- **Comment delete** triggers `db.GetDB().CleanupCommentFiles(cid, storage.Global())`
+  before the DQL `deleteComment` runs. Per-file failures are logged but do not
+  block the delete; orphan objects can be GC'd by listing keys under
+  `comments/<cid>/`. When `storage.Global()` is `nil` (no `[storage]` block),
+  the call is a no-op and the DQL still drops the `File` nodes.
 - **No revocation**: a presigned URL captured by a user remains valid until
   TTL expires. Rotating credentials invalidates *all* outstanding URLs (last
   resort).

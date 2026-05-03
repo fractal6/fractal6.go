@@ -38,6 +38,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sync/atomic"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -68,16 +69,18 @@ type Client struct {
 //
 // We expose a setter rather than a sync.Once-guarded factory so tests can
 // inject a fake without poking at package internals, and so a transient init
-// failure isn't cached for the process lifetime.
-var global *Client
+// failure isn't cached for the process lifetime. Backed by atomic.Pointer so
+// concurrent reads/writes are race-safe under -race even though SetGlobal
+// is normally called once at startup.
+var global atomic.Pointer[Client]
 
 // SetGlobal registers the process-wide storage client. Pass nil to clear
 // (e.g. when [storage] is unset).
-func SetGlobal(c *Client) { global = c }
+func SetGlobal(c *Client) { global.Store(c) }
 
 // Global returns the process-wide storage client registered via SetGlobal.
 // Returns nil when storage is not configured; callers MUST nil-check.
-func Global() *Client { return global }
+func Global() *Client { return global.Load() }
 
 // LoadConfig reads the [storage] section of config.toml via viper.
 // Missing fields fall back to sensible defaults so dev environments can

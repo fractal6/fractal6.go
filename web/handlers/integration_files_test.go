@@ -303,6 +303,55 @@ func TestFileGet_Public_Anonymous_302WithHeaders(t *testing.T) {
 	}
 }
 
+// TestFileGet_BytesRoundTrip follows the 302 to MinIO and verifies the bytes,
+// MIME type, and Content-Disposition all survive the presign hand-off. The
+// other GET tests stop at the redirect, which doesn't catch presign-signature
+// errors, response-content-disposition rejection, or bucket-policy issues —
+// real concerns when swapping MinIO for Garage.
+func TestFileGet_BytesRoundTrip(t *testing.T) {
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	body := pngBytes()
+	resp := decodeUpload(t, uploadFile(t, cid, "rt.png", "image/png", body, jwt))
+	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
+
+	rr := getFile(t, resp.ID, jwt)
+	requireStatus(t, rr, http.StatusFound)
+	loc := rr.Header().Get("Location")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "GET", loc, nil)
+	if err != nil {
+		t.Fatalf("build presigned request: %v", err)
+	}
+	httpResp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("fetch presigned URL: %v", err)
+	}
+	defer httpResp.Body.Close()
+	if httpResp.StatusCode != http.StatusOK {
+		preview, _ := io.ReadAll(httpResp.Body)
+		t.Fatalf("MinIO returned %d for presigned URL %q\nbody: %s",
+			httpResp.StatusCode, loc, string(preview))
+	}
+	got, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		t.Fatalf("read body: %v", err)
+	}
+	if !bytes.Equal(got, body) {
+		t.Errorf("body length mismatch: got %d bytes, want %d", len(got), len(body))
+	}
+	if ct := httpResp.Header.Get("Content-Type"); !strings.HasPrefix(ct, "image/png") {
+		t.Errorf("Content-Type = %q, want image/png", ct)
+	}
+	// The handler set response-content-disposition=inline; MinIO must echo it
+	// back as the Content-Disposition response header.
+	if dispo := httpResp.Header.Get("Content-Disposition"); !strings.HasPrefix(dispo, "inline") {
+		t.Errorf("Content-Disposition = %q, want inline (set by response-content-disposition param)", dispo)
+	}
+}
+
 func TestFileGet_Private_MemberSees(t *testing.T) {
 	// Author = testuser2, on sec-org#private-circle. Upload as the author.
 	authorJWT := loginAs(testutil.TestUser2, testutil.TestPassword2)
@@ -476,5 +525,3 @@ func pngBytes() []byte {
 	}
 }
 
-// Avoid unused-import diagnostics in case any helper changes.
-var _ = io.Copy

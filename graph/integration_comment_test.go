@@ -23,8 +23,12 @@
 package graph_test
 
 import (
+	"bytes"
+	"context"
+	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"fractale/fractal6.go/db"
 	. "fractale/fractal6.go/graph"
@@ -148,5 +152,96 @@ func TestRemoveComment_NonOwnerCannotDelete(t *testing.T) {
 	}
 	if ok {
 		t.Fatal("RemoveComment by non-author returned true, expected false")
+	}
+}
+
+// TestRemoveComment_DeletesAttachedFiles is the end-to-end test for the
+// comment-delete S3 GC hook in graph/tension_op.go. It exercises the actual
+// resolver path (RemoveComment → CleanupCommentFiles → storage.Delete) rather
+// than calling CleanupCommentFiles directly the way the web/handlers test
+// does, so a regression that breaks the wiring between RemoveComment and
+// storage.Global() will be caught here.
+func TestRemoveComment_DeletesAttachedFiles(t *testing.T) {
+	if testStorageCli == nil {
+		t.Skip("storage client not initialised — see graph/integration_test.go::TestMain")
+	}
+
+	tids, err := db.GetDB().GetIDs("Tension.title", "Test tension", nil, nil)
+	if err != nil || len(tids) == 0 {
+		t.Fatalf("could not find seeded tension: %v", err)
+	}
+	tensionUID := tids[0]
+
+	uids, err := db.GetDB().GetIDs("User.username", testutil.TestUser, nil, nil)
+	if err != nil || len(uids) == 0 {
+		t.Fatalf("could not find testuser: %v", err)
+	}
+	userUID := uids[0]
+
+	commentUID := createTestComment(t, tensionUID, userUID)
+	defer deleteTestComment(t, tensionUID, commentUID) // safety net if test fails before RemoveComment
+
+	// Drop a small object straight via the storage client and register it as
+	// a File node attached to the comment. This sidesteps the HTTP handler
+	// (which lives in another package) but exercises the same db + S3 surface
+	// that RemoveComment will GC.
+	body := []byte("hello-from-graph-gc-test")
+	storageKey := fmt.Sprintf("comments/%s/test-%d.bin", commentUID, time.Now().UnixNano())
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	if putErr := testStorageCli.Put(ctx, storageKey, bytes.NewReader(body), int64(len(body)), "application/octet-stream"); putErr != nil {
+		cancel()
+		t.Fatalf("storage Put: %v", putErr)
+	}
+	cancel()
+
+	fileUID, err := db.GetDB().AddFileToComment(
+		commentUID, testutil.TestUser, "test.bin", "application/octet-stream",
+		storageKey, time.Now().UTC().Format(time.RFC3339), int64(len(body)),
+	)
+	if err != nil {
+		// Best-effort: drop the orphan S3 object before failing.
+		ctx2, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)
+		_ = testStorageCli.Delete(ctx2, storageKey)
+		cancel2()
+		t.Fatalf("AddFileToComment: %v", err)
+	}
+	t.Cleanup(func() { _ = db.GetDB().DeleteFile(fileUID) })
+
+	// Sanity: object visible to MinIO before we remove the comment.
+	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+	exists, err := testStorageCli.Exists(ctx, storageKey)
+	cancel()
+	if err != nil {
+		t.Fatalf("storage Exists pre-check: %v", err)
+	}
+	if !exists {
+		t.Fatalf("precondition: object %q should exist before RemoveComment", storageKey)
+	}
+
+	// Drive the actual resolver path. RemoveComment reads storage.Global() —
+	// TestMain registered testStorageCli there.
+	uctx := &model.UserCtx{Username: testutil.TestUser}
+	tension := &model.Tension{ID: tensionUID}
+	event := &model.EventRef{Old: &commentUID}
+	ok, err := RemoveComment(uctx, tension, event, nil)
+	if err != nil {
+		t.Fatalf("RemoveComment failed: %v", err)
+	}
+	if !ok {
+		t.Fatal("RemoveComment returned false")
+	}
+
+	// Object must be gone from MinIO. The comment node + File node are also
+	// dropped by the deleteComment template, so deleteTestComment in defer is
+	// idempotent (the existing helper tolerates missing nodes).
+	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+	exists, err = testStorageCli.Exists(ctx, storageKey)
+	cancel()
+	if err != nil {
+		t.Fatalf("storage Exists post-check: %v", err)
+	}
+	if exists {
+		t.Errorf("expected object %q to be removed by RemoveComment", storageKey)
 	}
 }
