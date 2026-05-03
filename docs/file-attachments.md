@@ -55,6 +55,13 @@ Handlers are constructed via `FileGetHandler(cli)` / `FileUploadHandler(cli)` /
 `[storage]` section is unset, `cmd/server.go` passes `nil` and the handlers
 return **503** instead of panicking. This also lets tests inject a fake.
 
+The same client is also registered as a process-wide handle via
+`storage.SetGlobal(cli)` in `cmd/server.go`, so non-handler callers (the
+comment-delete GC in `graph.RemoveComment`) can read it via `storage.Global()`
+without growing a parameter chain. `storage.Global()` returns `nil` when storage
+is unset; callers MUST nil-check (this is the fast path through
+`db.CleanupCommentFiles(cid, nil)`).
+
 `POST /file/upload` returns:
 
 ```json
@@ -138,6 +145,16 @@ Leave `endpoint` empty in dev environments to disable upload features cleanly
 For self-hosted Garage on a separate VM, see the standalone Ansible role at
 `contrib/ansible/roles/garage/`. It installs the binary, renders the TOML config,
 sets up systemd, and (optionally) bootstraps the bucket and access keys.
+
+## DQL note: no reverse edge on `Tension.comments`
+
+`Tension.comments` has no `@hasInverse` in the GraphQL schema, so Dgraph
+doesn't generate a reverse predicate. The auth templates (`getCommentAuth`,
+`getFileAuth`) therefore start their walk at the parent `Tension` and filter
+with `uid_in(Tension.comments, <comment uid>)` rather than `~Tension.comments`.
+The same pattern is reused in `getCommentFiles`. Don't switch back to a
+reverse-edge walk without first declaring the predicate as `@reverse` in the
+underlying DQL schema (which the GraphQL admin won't do for you).
 
 ## Operational notes
 

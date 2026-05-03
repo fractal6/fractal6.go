@@ -211,12 +211,15 @@ func RunServer() {
 	//
 	// Initialise the storage client once at startup. A failure (e.g. [storage]
 	// unset in dev) is non-fatal: handlers receive nil and respond 503, the
-	// rest of the server keeps running.
-	storageCli, storageErr := storage.GetDefault()
+	// rest of the server keeps running. The same client is registered as the
+	// package global so non-handler callers (e.g. graph.RemoveComment) can
+	// reuse it for cleanup.
+	storageCli, storageErr := storage.New(storage.LoadConfig())
 	if storageErr != nil {
 		log.Printf("File storage not configured (%v) — /file/* will return 503", storageErr)
 		storageCli = nil
 	}
+	storage.SetGlobal(storageCli)
 	r.Group(func(r chi.Router) {
 		r.Route("/file", func(r chi.Router) {
 			r.Post("/upload", handle6.FileUploadHandler(storageCli))

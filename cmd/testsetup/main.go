@@ -41,6 +41,7 @@ import (
 	"github.com/dgraph-io/dgo/v200/protos/api"
 	"google.golang.org/grpc"
 
+	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/internal/testutil"
 )
 
@@ -74,7 +75,46 @@ func main() {
 		log.Fatalf("Failed to seed test data: %v", err)
 	}
 
+	// Bootstrap the MinIO bucket used by /file/* integration tests. Failures are
+	// fatal — the tests need it; if MinIO isn't running, the suite must be told.
+	if err := ensureTestBucket(); err != nil {
+		log.Fatalf("Failed to bootstrap test bucket: %v", err)
+	}
+
 	log.Println("Integration test setup complete.")
+}
+
+// ensureTestBucket creates the fixed test bucket on the MinIO instance from
+// docker-compose.test.yml. Idempotent: succeeds if the bucket already exists.
+func ensureTestBucket() error {
+	cli, err := storage.New(storage.Config{
+		Endpoint:  testutil.MinioAddr,
+		Region:    "us-east-1",
+		Bucket:    testutil.TestBucket,
+		AccessKey: testutil.MinioAccessKey,
+		SecretKey: testutil.MinioSecretKey,
+		UseSSL:    false,
+	})
+	if err != nil {
+		return fmt.Errorf("storage.New: %w", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	// Poll until MinIO is reachable, then create the bucket. The compose
+	// healthcheck normally gates on `up --wait`, but be defensive.
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		err = cli.EnsureBucket(ctx)
+		if err == nil {
+			log.Printf("Test bucket %q ready on %s", testutil.TestBucket, testutil.MinioAddr)
+			return nil
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("EnsureBucket: %w", err)
+		}
+		log.Printf("Waiting for MinIO at %s: %v", testutil.MinioAddr, err)
+		time.Sleep(500 * time.Millisecond)
+	}
 }
 
 func newDgraphClient() (*dgo.Dgraph, func(), error) {

@@ -27,6 +27,7 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/storage"
 	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
@@ -744,8 +745,9 @@ func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
 
 	// Best-effort GC of S3 attachments. Any failure is logged inside; the
 	// DQL deleteComment template still drops the File nodes regardless, so
-	// leftover objects can be swept out-of-band.
-	_ = db.GetDB().CleanupCommentFiles(cid)
+	// leftover objects can be swept out-of-band. storage.Global() is nil when
+	// [storage] is unset — CleanupCommentFiles handles that cleanly.
+	_ = db.GetDB().CleanupCommentFiles(cid, storage.Global())
 
 	// Delete comment
 	_, err = db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})

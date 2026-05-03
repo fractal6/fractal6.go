@@ -54,6 +54,16 @@ type CommentAuth struct {
 // GetFileAuth runs the getFileAuth template and flattens the nested DQL
 // response into a FileAuth. Returns (nil, nil) when no file matches; the
 // caller surfaces 404 in that case.
+//
+// Note: db.Meta runs the response through tools.CleanDqlMap which strips
+// "Type." prefixes from keys. So we look up "comments" not "Tension.comments",
+// "createdBy" not "Post.createdBy", etc.
+//
+// Response shape (single Tension at the root — see the template comment):
+//
+//	all[0] = { receiver: {nameid, visibility},
+//	           comments: [{ createdBy: {username},
+//	                        files: [{ storageKey, filename, contentType, size }] }] }
 func (dg Dgraph) GetFileAuth(fileid string) (*FileAuth, error) {
 	res, err := dg.Meta("getFileAuth", map[string]string{"id": fileid})
 	if err != nil {
@@ -62,32 +72,36 @@ func (dg Dgraph) GetFileAuth(fileid string) (*FileAuth, error) {
 	if len(res) == 0 {
 		return nil, nil
 	}
-	r := res[0]
-	out := &FileAuth{
-		StorageKey:  asString(r["File.storageKey"]),
-		Filename:    asString(r["File.filename"]),
-		ContentType: asString(r["File.contentType"]),
-		Size:        asInt(r["File.size"]),
-	}
-	c, ok := firstChild(r, "File.comment")
+	t := res[0]
+	c, ok := firstChild(t, "comments")
 	if !ok {
 		return nil, fmt.Errorf("file %s: missing parent comment", fileid)
 	}
-	out.AuthorUsername = nestedUsername(c, "Post.createdBy")
-	t, ok := firstChild(c, "Comment.tension")
+	f, ok := firstChild(c, "files")
 	if !ok {
-		return nil, fmt.Errorf("file %s: missing parent tension", fileid)
+		return nil, fmt.Errorf("file %s: missing file metadata", fileid)
 	}
-	rcv, ok := firstChild(t, "Tension.receiver")
+	rcv, ok := firstChild(t, "receiver")
 	if !ok {
 		return nil, fmt.Errorf("file %s: missing tension receiver", fileid)
 	}
-	out.ReceiverNameid = asString(rcv["Node.nameid"])
-	out.ReceiverVisible = model.NodeVisibility(asString(rcv["Node.visibility"]))
-	return out, nil
+	return &FileAuth{
+		StorageKey:      asString(f["storageKey"]),
+		Filename:        asString(f["filename"]),
+		ContentType:     asString(f["contentType"]),
+		Size:            asInt(f["size"]),
+		AuthorUsername:  nestedUsername(c, "createdBy"),
+		ReceiverNameid:  asString(rcv["nameid"]),
+		ReceiverVisible: model.NodeVisibility(asString(rcv["visibility"])),
+	}, nil
 }
 
 // GetCommentAuth resolves the upload-time auth for a comment id.
+//
+// Same key-cleaning caveat as GetFileAuth. Response shape:
+//
+//	all[0] = { receiver: {nameid, visibility},
+//	           comments: [{ createdBy: {username} }] }
 func (dg Dgraph) GetCommentAuth(cid string) (*CommentAuth, error) {
 	res, err := dg.Meta("getCommentAuth", map[string]string{"id": cid})
 	if err != nil {
@@ -96,21 +110,20 @@ func (dg Dgraph) GetCommentAuth(cid string) (*CommentAuth, error) {
 	if len(res) == 0 {
 		return nil, nil
 	}
-	r := res[0]
-	out := &CommentAuth{
-		AuthorUsername: nestedUsername(r, "Post.createdBy"),
-	}
-	t, ok := firstChild(r, "Comment.tension")
+	t := res[0]
+	c, ok := firstChild(t, "comments")
 	if !ok {
-		return nil, fmt.Errorf("comment %s: missing parent tension", cid)
+		return nil, fmt.Errorf("comment %s: missing in parent tension", cid)
 	}
-	rcv, ok := firstChild(t, "Tension.receiver")
+	rcv, ok := firstChild(t, "receiver")
 	if !ok {
 		return nil, fmt.Errorf("comment %s: missing tension receiver", cid)
 	}
-	out.ReceiverNameid = asString(rcv["Node.nameid"])
-	out.ReceiverVisible = model.NodeVisibility(asString(rcv["Node.visibility"]))
-	return out, nil
+	return &CommentAuth{
+		AuthorUsername:  nestedUsername(c, "createdBy"),
+		ReceiverNameid:  asString(rcv["nameid"]),
+		ReceiverVisible: model.NodeVisibility(asString(rcv["visibility"])),
+	}, nil
 }
 
 // AddFileToComment inserts a File node and returns its newly assigned uid.
@@ -153,7 +166,9 @@ func (dg Dgraph) GetCommentFileKeys(cid string) ([]struct{ UID, StorageKey strin
 	if len(res) == 0 {
 		return nil, nil
 	}
-	files, _ := res[0]["Comment.files"].([]any)
+	// Keys are cleaned by tools.CleanDqlMap (see GetFileAuth comment), so
+	// "Comment.files" → "files", "uid" → "id", "File.storageKey" → "storageKey".
+	files, _ := res[0]["files"].([]any)
 	out := make([]struct{ UID, StorageKey string }, 0, len(files))
 	for _, f := range files {
 		m, ok := f.(map[string]any)
@@ -161,8 +176,8 @@ func (dg Dgraph) GetCommentFileKeys(cid string) ([]struct{ UID, StorageKey strin
 			continue
 		}
 		out = append(out, struct{ UID, StorageKey string }{
-			UID:        asString(m["uid"]),
-			StorageKey: asString(m["File.storageKey"]),
+			UID:        asString(m["id"]),
+			StorageKey: asString(m["storageKey"]),
 		})
 	}
 	return out, nil
@@ -174,21 +189,18 @@ func (dg Dgraph) GetCommentFileKeys(cid string) ([]struct{ UID, StorageKey strin
 // abort: leaving an orphan object is preferable to blocking the delete (the
 // bucket can be swept out-of-band).
 //
+// cli may be nil when [storage] is unset — comment deletion still proceeds and
+// the DQL template drops the File nodes; operators can sweep the bucket
+// out-of-band if storage is reattached later.
+//
 // Lives in the db package (not web/handlers) so graph/ can call it without
 // creating an import cycle (handlers already imports graph).
-func (dg Dgraph) CleanupCommentFiles(cid string) error {
+func (dg Dgraph) CleanupCommentFiles(cid string, cli *storage.Client) error {
 	files, err := dg.GetCommentFileKeys(cid)
 	if err != nil {
 		return err
 	}
-	if len(files) == 0 {
-		return nil
-	}
-	cli, err := storage.GetDefault()
-	if err != nil {
-		// Storage not configured — comment-deletion still proceeds; the DQL
-		// template will drop the File nodes. Operators can sweep the bucket
-		// out-of-band if storage is reattached later.
+	if len(files) == 0 || cli == nil {
 		return nil
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -240,13 +252,15 @@ func firstChild(parent map[string]any, key string) (map[string]any, bool) {
 	return nil, false
 }
 
-// nestedUsername extracts Post.createdBy > User.username through the parent map.
+// nestedUsername extracts createdBy > username through the parent map. Keys are
+// post-CleanDqlMap (see GetFileAuth comment): "createdBy" not "Post.createdBy",
+// "username" not "User.username".
 func nestedUsername(parent map[string]any, edge string) string {
 	c, ok := firstChild(parent, edge)
 	if !ok {
 		return ""
 	}
-	return asString(c["User.username"])
+	return asString(c["username"])
 }
 
 // escapeNQuad escapes characters that would break an N-Quad literal.

@@ -53,4 +53,16 @@ const (
 	PublicColumnName  = "col-public"
 	PrivateColumnName = "col-private"
 	SecretColumnName  = "col-secret"
+
+	// MinIO/S3 backend for /file/* tests (see docker-compose.test.yml).
+	MinioAddr      = "localhost:9100"
+	MinioAccessKey = "minioadmin"
+	MinioSecretKey = "minioadmin"
+	TestBucket     = "fractale-test"
+
+	// Unique seed-comment markers used by file-attachment tests; the integration
+	// suite resolves these to uids at runtime via Post.message lookup.
+	FileTestPublicCommentByUser1  = "file-test: public comment by testuser"
+	FileTestPublicCommentByUser2  = "file-test: public comment by testuser2"
+	FileTestPrivateCommentByUser2 = "file-test: private-circle comment by testuser2"
 )

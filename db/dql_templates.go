@@ -694,19 +694,28 @@ var dqlQueries map[string]string = map[string]string{
 	// the storage key + content meta to mint a presigned URL, plus the parent
 	// comment author and the parent tension's receiver visibility/nameid for the
 	// auth check. {{.id}} is the File uid.
+	//
+	// We start the query at the parent Tension (filtered by uid_in on
+	// Tension.comments → comment) because Tension.comments is NOT declared with
+	// @hasInverse in the GraphQL schema, so a reverse-edge walk (~Tension.comments)
+	// is unavailable. Starting at Tension lets us project File metadata, the
+	// comment author, and the receiver in one round-trip.
 	"getFileAuth": `{
-        all(func: uid({{.id}})) {
-            File.storageKey
-            File.filename
-            File.contentType
-            File.size
-            File.comment {
+        var(func: uid({{.id}})) {
+            File.comment { c as uid }
+        }
+        all(func: type(Tension)) @filter(uid_in(Tension.comments, uid(c))) {
+            Tension.receiver {
+                Node.nameid
+                Node.visibility
+            }
+            Tension.comments @filter(uid(c)) {
                 Post.createdBy { User.username }
-                Comment.tension: ~Tension.comments {
-                    Tension.receiver {
-                        Node.nameid
-                        Node.visibility
-                    }
+                Comment.files @filter(uid({{.id}})) {
+                    File.storageKey
+                    File.filename
+                    File.contentType
+                    File.size
                 }
             }
         }
@@ -714,14 +723,18 @@ var dqlQueries map[string]string = map[string]string{
 	// getCommentAuth: from a comment id, return its author and parent tension's
 	// receiver nameid+visibility. Used by the upload handler before persisting a
 	// new File node — only the comment author may attach files.
+	//
+	// See getFileAuth above: same forward-walk pattern (no reverse edge on
+	// Tension.comments).
 	"getCommentAuth": `{
-        all(func: uid({{.id}})) {
-            Post.createdBy { User.username }
-            Comment.tension: ~Tension.comments {
-                Tension.receiver {
-                    Node.nameid
-                    Node.visibility
-                }
+        var(func: uid({{.id}})) { c as uid }
+        all(func: type(Tension)) @filter(uid_in(Tension.comments, uid(c))) {
+            Tension.receiver {
+                Node.nameid
+                Node.visibility
+            }
+            Tension.comments @filter(uid(c)) {
+                Post.createdBy { User.username }
             }
         }
     }`,

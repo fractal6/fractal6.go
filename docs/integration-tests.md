@@ -76,6 +76,8 @@ Ports are offset by +100 to avoid collision with dev instances:
 | alpha HTTP | 8080 | 8180 |
 | alpha gRPC | 9080 | 9180 |
 | Redis | 6379 | 6479 |
+| MinIO S3 | 9000 | 9100 |
+| MinIO console | 9101 | 9101 |
 
 No volumes are mounted - data is ephemeral and destroyed on `docker compose down`.
 
@@ -134,10 +136,12 @@ Uses a real chi router with JWT middleware and tests handlers end-to-end.
 - `integration_test.go` - TestMain: verify seed data, start mock email server, build test router. Also provides shared helpers: `doRequest()`, `loginAs()`, `requireStatus()`, `requireJWTCookie()`.
 - `integration_auth_test.go` - Auth handler tests (Login, Logout, Signup, SignupValidate, TokenAck, UpdatePassword)
 - `integration_org_test.go` - Org handler tests (CreateOrga, SetUserCanJoin, SetGuestCanCreateTension)
+- `integration_files_test.go` - `/file/*` end-to-end tests (upload auth, MIME-sniff, GET 302+headers, inline/attachment policy, DELETE 404 leak guard, comment-delete S3 GC). Uses MinIO from compose.
 
 **Dependencies mocked:**
 - Email API: A local `httptest.Server` accepts all POST requests (configured via `email.SetTestConfig`)
 - Redis: Uses the Docker Redis on port 6479 (configured via `REDIS_ADDR` env var)
+- S3: Uses the Docker MinIO on port 9100; the bucket (`fractale-test`) is bootstrapped by `cmd/testsetup` via `storage.EnsureBucket`. Test setup constants live in `internal/testutil/config.go`.
 
 ### Adding New Tests
 

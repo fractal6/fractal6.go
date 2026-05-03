@@ -161,6 +161,24 @@ _:comment <Post.createdAt> "2026-01-01T00:01:00Z" .
 _:comment <Post.message> "This is the first comment on the test tension" .
 _:tension <Tension.comments> _:comment .
 
+# Comments used by /file/* integration tests. Messages are unique markers so
+# the suite can resolve uids at runtime (uids are not stable across DropAll).
+
+# Public-org comment authored by testuser (file upload happy path).
+_:file_pub_c1 <dgraph.type> "Comment" .
+_:file_pub_c1 <Post.createdBy> _:user1 .
+_:file_pub_c1 <Post.createdAt> "2026-01-01T00:02:00Z" .
+_:file_pub_c1 <Post.message> "file-test: public comment by testuser" .
+_:tension <Tension.comments> _:file_pub_c1 .
+
+# Public-org comment authored by testuser2 (used to assert non-author cannot
+# attach files to a comment they did not author).
+_:file_pub_c2 <dgraph.type> "Comment" .
+_:file_pub_c2 <Post.createdBy> _:user2 .
+_:file_pub_c2 <Post.createdAt> "2026-01-01T00:03:00Z" .
+_:file_pub_c2 <Post.message> "file-test: public comment by testuser2" .
+_:tension <Tension.comments> _:file_pub_c2 .
+
 # TensionTemplate on test-org
 _:ttempl <dgraph.type> "TensionTemplate" .
 _:ttempl <TensionTemplate.rootnameid> "test-org" .
@@ -338,6 +356,29 @@ _:secret_coordo <Node.createdBy> _:user2 .
 _:secret_coordo <Node.createdAt> "2026-01-01T00:00:00Z" .
 _:secorg_secret <Node.children> _:secret_coordo .
 _:user2 <User.roles> _:secret_coordo .
+
+# --- sec-org private-circle tension + comment for /file/* visibility tests ---
+# A tension whose receiver is the Private sub-circle. testuser is a member of
+# sec-org so they can read it; an unauthenticated client cannot.
+
+_:sectens <dgraph.type> "Tension" .
+_:sectens <Tension.title> "Sec-org private tension" .
+_:sectens <Tension.status> "Open" .
+_:sectens <Tension.type_> "Operational" .
+_:sectens <Tension.emitter> _:secorg_private .
+_:sectens <Tension.emitterid> "sec-org#private-circle" .
+_:sectens <Tension.receiver> _:secorg_private .
+_:sectens <Tension.receiverid> "sec-org#private-circle" .
+_:sectens <Post.createdBy> _:user2 .
+_:sectens <Post.createdAt> "2026-01-01T00:00:00Z" .
+_:secorg_private <Node.tensions_out> _:sectens .
+_:secorg_private <Node.tensions_in> _:sectens .
+
+_:file_priv_c1 <dgraph.type> "Comment" .
+_:file_priv_c1 <Post.createdBy> _:user2 .
+_:file_priv_c1 <Post.createdAt> "2026-01-01T00:04:00Z" .
+_:file_priv_c1 <Post.message> "file-test: private-circle comment by testuser2" .
+_:sectens <Tension.comments> _:file_priv_c1 .
 
 # --- Projects linked to sec-org nodes ---
 

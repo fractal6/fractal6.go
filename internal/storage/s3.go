@@ -36,8 +36,8 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
-	"sync"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -62,11 +62,22 @@ type Client struct {
 	mc  *minio.Client
 }
 
-var (
-	defaultClient *Client
-	once          sync.Once
-	initErr       error
-)
+// global is the process-wide storage handle, set explicitly by cmd/server.go
+// at startup (and by tests in their TestMain). It MAY be nil when the
+// [storage] section of config.toml is unset; callers MUST handle nil.
+//
+// We expose a setter rather than a sync.Once-guarded factory so tests can
+// inject a fake without poking at package internals, and so a transient init
+// failure isn't cached for the process lifetime.
+var global *Client
+
+// SetGlobal registers the process-wide storage client. Pass nil to clear
+// (e.g. when [storage] is unset).
+func SetGlobal(c *Client) { global = c }
+
+// Global returns the process-wide storage client registered via SetGlobal.
+// Returns nil when storage is not configured; callers MUST nil-check.
+func Global() *Client { return global }
 
 // LoadConfig reads the [storage] section of config.toml via viper.
 // Missing fields fall back to sensible defaults so dev environments can
@@ -109,15 +120,6 @@ func New(cfg Config) (*Client, error) {
 	return &Client{cfg: cfg, mc: mc}, nil
 }
 
-// GetDefault returns a process-wide singleton initialised from viper config.
-// Initialisation is lazy + cached; subsequent calls reuse the same client.
-func GetDefault() (*Client, error) {
-	once.Do(func() {
-		defaultClient, initErr = New(LoadConfig())
-	})
-	return defaultClient, initErr
-}
-
 // Bucket returns the configured bucket name (mainly for logging/diagnostics).
 func (c *Client) Bucket() string { return c.cfg.Bucket }
 
@@ -138,6 +140,20 @@ func (c *Client) Put(ctx context.Context, key string, body io.Reader, size int64
 // Delete removes an object. Idempotent: deleting a missing key is not an error.
 func (c *Client) Delete(ctx context.Context, key string) error {
 	return c.mc.RemoveObject(ctx, c.cfg.Bucket, key, minio.RemoveObjectOptions{})
+}
+
+// Exists reports whether an object exists at key. Used by integration tests to
+// verify upload rollback and comment-delete cleanup; not used in request paths.
+func (c *Client) Exists(ctx context.Context, key string) (bool, error) {
+	_, err := c.mc.StatObject(ctx, c.cfg.Bucket, key, minio.StatObjectOptions{})
+	if err == nil {
+		return true, nil
+	}
+	resp := minio.ToErrorResponse(err)
+	if resp.Code == "NoSuchKey" || resp.StatusCode == http.StatusNotFound {
+		return false, nil
+	}
+	return false, err
 }
 
 // PresignGet returns a short-lived URL that the browser can hit directly.
