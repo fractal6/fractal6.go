@@ -32,6 +32,7 @@ import (
 	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/web"
 	"fractale/fractal6.go/web/auth"
 	handle6 "fractale/fractal6.go/web/handlers"
@@ -207,11 +208,20 @@ func RunServer() {
 	// /file/<id>            : auth-checked 302 to a presigned URL (read)
 	// POST /file/upload     : multipart upload, comment-author only
 	// DELETE /file/<id>     : comment-author only
+	//
+	// Initialise the storage client once at startup. A failure (e.g. [storage]
+	// unset in dev) is non-fatal: handlers receive nil and respond 503, the
+	// rest of the server keeps running.
+	storageCli, storageErr := storage.GetDefault()
+	if storageErr != nil {
+		log.Printf("File storage not configured (%v) — /file/* will return 503", storageErr)
+		storageCli = nil
+	}
 	r.Group(func(r chi.Router) {
 		r.Route("/file", func(r chi.Router) {
-			r.Post("/upload", handle6.FileUpload)
-			r.Get("/{id}", handle6.FileGet)
-			r.Delete("/{id}", handle6.FileDelete)
+			r.Post("/upload", handle6.FileUploadHandler(storageCli))
+			r.Get("/{id}", handle6.FileGetHandler(storageCli))
+			r.Delete("/{id}", handle6.FileDeleteHandler(storageCli))
 		})
 	})
 

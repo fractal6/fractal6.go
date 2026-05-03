@@ -46,9 +46,14 @@ over either pure proxying or returning presigned URLs to the client directly.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `GET` | `/file/<id>` | Comment read auth | 302 to presigned URL |
+| `GET` | `/file/<id>` | Comment read auth | 302 to presigned URL; **404** on miss *or* unauthorised (no existence leak) |
 | `POST` | `/file/upload` | Comment author | multipart, fields: `comment_id`, `file` |
-| `DELETE` | `/file/<id>` | Comment author | S3 first, then DB |
+| `DELETE` | `/file/<id>` | Comment author | 404 on miss/not-yours; S3 first, then DB on success |
+
+Handlers are constructed via `FileGetHandler(cli)` / `FileUploadHandler(cli)` /
+`FileDeleteHandler(cli)` taking an injected `*storage.Client`. When the
+`[storage]` section is unset, `cmd/server.go` passes `nil` and the handlers
+return **503** instead of panicking. This also lets tests inject a fake.
 
 `POST /file/upload` returns:
 

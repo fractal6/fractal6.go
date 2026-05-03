@@ -55,3 +55,35 @@ func TestCommentKeyPrefix(t *testing.T) {
 		t.Errorf("commentKeyPrefix = %q, want %q", got, "comments/0xabc123/")
 	}
 }
+
+func TestContentDispositionFor(t *testing.T) {
+	cases := []struct {
+		ct, name, want string
+	}{
+		// inline-safe types
+		{"image/png", "p.png", "inline; filename*=UTF-8''p.png"},
+		{"image/jpeg", "x.jpg", "inline; filename*=UTF-8''x.jpg"},
+		{"application/pdf", "doc.pdf", "inline; filename*=UTF-8''doc.pdf"},
+		// SVG must NOT be inline (XSS via embedded <script>)
+		{"image/svg+xml", "evil.svg", "attachment; filename*=UTF-8''evil.svg"},
+		// HTML must NOT be inline
+		{"text/html", "page.html", "attachment; filename*=UTF-8''page.html"},
+		// unknown defaults to attachment
+		{"application/octet-stream", "blob.bin", "attachment; filename*=UTF-8''blob.bin"},
+		// charset suffix should not break the lookup
+		{"text/plain; charset=utf-8", "n.txt", "inline; filename*=UTF-8''n.txt"},
+		// case-insensitive content type
+		{"IMAGE/PNG", "x.png", "inline; filename*=UTF-8''x.png"},
+		// non-ASCII filename gets percent-encoded
+		{"image/png", "café.png", "inline; filename*=UTF-8''caf%C3%A9.png"},
+		// missing filename emits just the verb
+		{"image/png", "", "inline"},
+		{"text/html", "", "attachment"},
+	}
+	for _, c := range cases {
+		got := contentDispositionFor(c.ct, c.name)
+		if got != c.want {
+			t.Errorf("contentDispositionFor(%q, %q) = %q, want %q", c.ct, c.name, got, c.want)
+		}
+	}
+}

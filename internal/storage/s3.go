@@ -144,14 +144,15 @@ func (c *Client) Delete(ctx context.Context, key string) error {
 // ttl SHOULD be a few minutes — long enough to render an image, short enough
 // that a leaked URL has limited blast radius. See docs/file-attachments.md.
 //
-// downloadName, when non-empty, sets the Content-Disposition filename so the
-// browser uses the original filename on save (S3 stores opaque keys).
-func (c *Client) PresignGet(ctx context.Context, key string, ttl time.Duration, downloadName string) (string, error) {
+// contentDisposition, when non-empty, is forwarded as the S3
+// `response-content-disposition` parameter so the storage backend stamps it
+// on the served response. Callers compose the full header value (e.g.
+// `inline; filename*=UTF-8''hello.png` or `attachment; filename=...`); see
+// the inline-safe MIME allowlist in web/handlers/files.go for the policy.
+func (c *Client) PresignGet(ctx context.Context, key string, ttl time.Duration, contentDisposition string) (string, error) {
 	reqParams := url.Values{}
-	if downloadName != "" {
-		// RFC 5987 encoding for non-ASCII filenames; minio-go forwards this verbatim.
-		reqParams.Set("response-content-disposition",
-			fmt.Sprintf(`inline; filename*=UTF-8''%s`, url.QueryEscape(downloadName)))
+	if contentDisposition != "" {
+		reqParams.Set("response-content-disposition", contentDisposition)
 	}
 	u, err := c.mc.PresignedGetObject(ctx, c.cfg.Bucket, key, ttl, reqParams)
 	if err != nil {
