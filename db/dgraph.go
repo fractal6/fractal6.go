@@ -371,7 +371,13 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
 // MutateWithQueryDql runs an upsert block mutation by first querying query
 // and then mutate based on the result.
 func (dg Dgraph) MutateWithQueryDql(query string, mu *api.Mutation) error {
-	// init client
+	_, err := dg.mutateWithQueryDqlResp(query, mu)
+	return err
+}
+
+// mutateWithQueryDqlResp is MutateWithQueryDql but exposes the response so
+// callers can read query-block projections (e.g. storage keys for cascade GC).
+func (dg Dgraph) mutateWithQueryDqlResp(query string, mu *api.Mutation) (*api.Response, error) {
 	dgc, cancel := dg.getDgraphClient()
 	defer cancel()
 	ctx := context.Background()
@@ -383,9 +389,7 @@ func (dg Dgraph) MutateWithQueryDql(query string, mu *api.Mutation) error {
 		Mutations: []*api.Mutation{mu},
 		CommitNow: true,
 	}
-
-	_, err := txn.Do(ctx, req)
-	return err
+	return txn.Do(ctx, req)
 }
 
 // MutateWithQueryDql3 runs an upsert block mutations by first querying query

@@ -110,6 +110,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   contracts: [Vote!] @hasInverse(field: node)
   events_history(query: String): [Event!]
   activity(from: String, to: String): [Activity!]
+  avatar: File @hasInverse(field: node)
   cascade_directive: Boolean
 }
 
@@ -640,11 +641,15 @@ type File @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   id: ID!
   createdBy: User!
   createdAt: DateTime! @search
-  comment: Comment!
   filename: String!
   contentType: String!
   size: Int!
   storageKey: String! @id
+  comment: Comment
+  tension: Tension
+  user: User
+  node: Node
+  embedded: Boolean
 }
 
 type Reaction @auth(add:{ rule:"""query ($USERNAME: String!) {
@@ -784,6 +789,7 @@ type User @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   markAllAsRead: String
   event_count: EventCount
   activity(from: String, to: String): [Activity!]
+  avatar: File @hasInverse(field: user)
 }
 
 type PendingUser {

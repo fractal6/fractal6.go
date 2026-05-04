@@ -47,6 +47,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/internal/testutil"
+	"fractale/fractal6.go/internal/tools"
 )
 
 // --- Helpers ---
@@ -66,30 +67,86 @@ func resolveCommentByMessage(t *testing.T, marker string) string {
 	return ids[0]
 }
 
+// resolveTensionByTitle returns the seeded tension uid matching `title`.
+func resolveTensionByTitle(t *testing.T, title string) string {
+	t.Helper()
+	ids, err := db.GetDB().GetIDs("Tension.title", title, nil, nil)
+	if err != nil {
+		t.Fatalf("resolveTensionByTitle(%q): %v", title, err)
+	}
+	if len(ids) == 0 {
+		t.Fatalf("resolveTensionByTitle(%q): no tension found — re-run cmd/testsetup", title)
+	}
+	return ids[0]
+}
+
+// resolveUserByUsername returns the User uid for a given username.
+func resolveUserByUsername(t *testing.T, username string) string {
+	t.Helper()
+	ids, err := db.GetDB().GetIDs("User.username", username, nil, nil)
+	if err != nil || len(ids) == 0 {
+		t.Fatalf("resolveUserByUsername(%q): %v", username, err)
+	}
+	return ids[0]
+}
+
+// resolveNodeByNameid returns the Node uid for a given nameid.
+func resolveNodeByNameid(t *testing.T, nameid string) string {
+	t.Helper()
+	ids, err := db.GetDB().GetIDs("Node.nameid", nameid, nil, nil)
+	if err != nil || len(ids) == 0 {
+		t.Fatalf("resolveNodeByNameid(%q): %v", nameid, err)
+	}
+	return ids[0]
+}
+
+// uploadOpts is the form-field carrier for /file/upload tests. Exactly one
+// anchor triple should be set per call; mirroring the handler's expectations.
+type uploadOpts struct {
+	Tid      string
+	Cid      string
+	Userid   string
+	Orgaid   string
+	Filename string
+	// declaredContentType is what the client claims; the handler should sniff
+	// the body and persist the sniffed value if different.
+	DeclaredContentType string
+	Body                []byte
+}
+
 // uploadFile builds a multipart POST /file/upload request and runs it through
-// the test router. The body field name and form field names match the handler
-// in web/handlers/files.go.
-func uploadFile(t *testing.T, commentID, filename, declaredContentType string, body []byte, jwt *http.Cookie) *httptest.ResponseRecorder {
+// the test router. Form fields match resolveAnchor in web/handlers/files.go.
+func uploadFile(t *testing.T, opts uploadOpts, jwt *http.Cookie) *httptest.ResponseRecorder {
 	t.Helper()
 	var buf bytes.Buffer
 	mw := multipart.NewWriter(&buf)
-	if err := mw.WriteField("comment_id", commentID); err != nil {
-		t.Fatalf("multipart write field: %v", err)
+
+	for k, v := range map[string]string{
+		"tid":    opts.Tid,
+		"cid":    opts.Cid,
+		"userid": opts.Userid,
+		"orgaid": opts.Orgaid,
+	} {
+		if v == "" {
+			continue
+		}
+		if err := mw.WriteField(k, v); err != nil {
+			t.Fatalf("multipart write field %s: %v", k, err)
+		}
 	}
-	// Build the file part with an explicit Content-Type so we can verify the
-	// server's MIME-sniff overrides the client claim.
+
 	hdr := make(map[string][]string)
 	hdr["Content-Disposition"] = []string{
-		fmt.Sprintf(`form-data; name="file"; filename=%q`, filename),
+		fmt.Sprintf(`form-data; name="file"; filename=%q`, opts.Filename),
 	}
-	if declaredContentType != "" {
-		hdr["Content-Type"] = []string{declaredContentType}
+	if opts.DeclaredContentType != "" {
+		hdr["Content-Type"] = []string{opts.DeclaredContentType}
 	}
 	part, err := mw.CreatePart(hdr)
 	if err != nil {
 		t.Fatalf("multipart create part: %v", err)
 	}
-	if _, err := part.Write(body); err != nil {
+	if _, err := part.Write(opts.Body); err != nil {
 		t.Fatalf("multipart write body: %v", err)
 	}
 	if err := mw.Close(); err != nil {
@@ -106,6 +163,18 @@ func uploadFile(t *testing.T, commentID, filename, declaredContentType string, b
 	return rr
 }
 
+// uploadCommentFile is a convenience for the (tid, cid)-anchored case used by
+// most existing tests.
+func uploadCommentFile(t *testing.T, tid, cid, filename, contentType string, body []byte, jwt *http.Cookie) *httptest.ResponseRecorder {
+	return uploadFile(t, uploadOpts{
+		Tid:                 tid,
+		Cid:                 cid,
+		Filename:            filename,
+		DeclaredContentType: contentType,
+		Body:                body,
+	}, jwt)
+}
+
 // uploadResp is the JSON shape returned by POST /file/upload.
 type uploadResp struct {
 	ID          string `json:"id"`
@@ -113,6 +182,7 @@ type uploadResp struct {
 	Filename    string `json:"filename"`
 	ContentType string `json:"contentType"`
 	Size        int64  `json:"size"`
+	Embedded    bool   `json:"embedded"`
 }
 
 func decodeUpload(t *testing.T, rr *httptest.ResponseRecorder) uploadResp {
@@ -174,9 +244,10 @@ func purgeFile(t *testing.T, fileID, storageKey string) {
 
 func TestFileUpload_AsAuthor_Succeeds(t *testing.T) {
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 
-	rr := uploadFile(t, cid, "hello.png", "image/png", pngBytes(), jwt)
+	rr := uploadCommentFile(t, tid, cid, "hello.png", "image/png", pngBytes(), jwt)
 	requireStatus(t, rr, http.StatusOK)
 
 	resp := decodeUpload(t, rr)
@@ -204,32 +275,39 @@ func TestFileUpload_AsAuthor_Succeeds(t *testing.T) {
 func TestFileUpload_AsNonAuthor_Forbidden(t *testing.T) {
 	// testuser2's comment, attempting upload as testuser → 403.
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser2)
 
-	rr := uploadFile(t, cid, "x.txt", "text/plain", []byte("nope"), jwt)
+	rr := uploadCommentFile(t, tid, cid, "x.txt", "text/plain", []byte("nope"), jwt)
 	requireStatus(t, rr, http.StatusForbidden)
 }
 
 func TestFileUpload_Unauthenticated_401(t *testing.T) {
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 
-	rr := uploadFile(t, cid, "x.txt", "text/plain", []byte("hi"), nil)
+	rr := uploadCommentFile(t, tid, cid, "x.txt", "text/plain", []byte("hi"), nil)
 	requireStatus(t, rr, http.StatusUnauthorized)
 }
 
-func TestFileUpload_MissingCommentId_400(t *testing.T) {
+func TestFileUpload_MissingAnchor_400(t *testing.T) {
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
 
-	rr := uploadFile(t, "", "x.txt", "text/plain", []byte("hi"), jwt)
+	rr := uploadFile(t, uploadOpts{
+		Filename:            "x.txt",
+		DeclaredContentType: "text/plain",
+		Body:                []byte("hi"),
+	}, jwt)
 	requireStatus(t, rr, http.StatusBadRequest)
 }
 
-func TestFileUpload_NonExistentComment_404(t *testing.T) {
+func TestFileUpload_NonExistentComment_400(t *testing.T) {
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 
-	// 0xdead is a valid uid format but should not match any comment.
-	rr := uploadFile(t, "0xdead", "x.txt", "text/plain", []byte("hi"), jwt)
-	requireStatus(t, rr, http.StatusNotFound)
+	// 0xdead is a valid uid format but should not match any comment in tid.
+	rr := uploadCommentFile(t, tid, "0xdead", "x.txt", "text/plain", []byte("hi"), jwt)
+	requireStatus(t, rr, http.StatusBadRequest)
 }
 
 func TestFileUpload_TooLarge_400(t *testing.T) {
@@ -239,9 +317,10 @@ func TestFileUpload_TooLarge_400(t *testing.T) {
 	defer viper.Set("storage.max_upload_bytes", prev)
 
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 
-	rr := uploadFile(t, cid, "big.bin", "application/octet-stream", bytes.Repeat([]byte("A"), 1024), jwt)
+	rr := uploadCommentFile(t, tid, cid, "big.bin", "application/octet-stream", bytes.Repeat([]byte("A"), 1024), jwt)
 	requireStatus(t, rr, http.StatusBadRequest)
 }
 
@@ -250,10 +329,11 @@ func TestFileUpload_MIMESniffOverridesClientType(t *testing.T) {
 	// sniffed type (text/html), and the GET must serve `attachment` so the
 	// browser doesn't render the script.
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 
 	htmlBody := []byte(`<html><body><script>alert(1)</script></body></html>`)
-	rr := uploadFile(t, cid, "evil.png", "image/png", htmlBody, jwt)
+	rr := uploadCommentFile(t, tid, cid, "evil.png", "image/png", htmlBody, jwt)
 	requireStatus(t, rr, http.StatusOK)
 
 	resp := decodeUpload(t, rr)
@@ -275,8 +355,9 @@ func TestFileUpload_MIMESniffOverridesClientType(t *testing.T) {
 
 func TestFileGet_Public_Anonymous_302WithHeaders(t *testing.T) {
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
-	resp := decodeUpload(t, uploadFile(t, cid, "ok.png", "image/png", pngBytes(), jwt))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "ok.png", "image/png", pngBytes(), jwt))
 	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
 
 	// Anonymous fetch (test-org tension is Public).
@@ -310,9 +391,10 @@ func TestFileGet_Public_Anonymous_302WithHeaders(t *testing.T) {
 // real concerns when swapping MinIO for Garage.
 func TestFileGet_BytesRoundTrip(t *testing.T) {
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 	body := pngBytes()
-	resp := decodeUpload(t, uploadFile(t, cid, "rt.png", "image/png", body, jwt))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "rt.png", "image/png", body, jwt))
 	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
 
 	rr := getFile(t, resp.ID, jwt)
@@ -355,8 +437,9 @@ func TestFileGet_BytesRoundTrip(t *testing.T) {
 func TestFileGet_Private_MemberSees(t *testing.T) {
 	// Author = testuser2, on sec-org#private-circle. Upload as the author.
 	authorJWT := loginAs(testutil.TestUser2, testutil.TestPassword2)
+	tid := resolveTensionByTitle(t, "Sec-org private tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPrivateCommentByUser2)
-	resp := decodeUpload(t, uploadFile(t, cid, "p.png", "image/png", pngBytes(), authorJWT))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "p.png", "image/png", pngBytes(), authorJWT))
 	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
 
 	// testuser is a Member of sec-org → may see Private circles.
@@ -368,8 +451,9 @@ func TestFileGet_Private_MemberSees(t *testing.T) {
 func TestFileGet_Private_Anonymous_404(t *testing.T) {
 	// Same setup as above but anonymous client must get 404 (existence hidden).
 	authorJWT := loginAs(testutil.TestUser2, testutil.TestPassword2)
+	tid := resolveTensionByTitle(t, "Sec-org private tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPrivateCommentByUser2)
-	resp := decodeUpload(t, uploadFile(t, cid, "p.png", "image/png", pngBytes(), authorJWT))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "p.png", "image/png", pngBytes(), authorJWT))
 	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
 
 	rr := getFile(t, resp.ID, nil)
@@ -383,8 +467,9 @@ func TestFileGet_NonExistentId_404(t *testing.T) {
 
 func TestFileGet_PNG_AllowsInline(t *testing.T) {
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
-	resp := decodeUpload(t, uploadFile(t, cid, "img.png", "image/png", pngBytes(), jwt))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "img.png", "image/png", pngBytes(), jwt))
 	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
 
 	rr := getFile(t, resp.ID, jwt)
@@ -397,9 +482,10 @@ func TestFileGet_PNG_AllowsInline(t *testing.T) {
 func TestFileGet_SVG_ForcesAttachment(t *testing.T) {
 	// SVG isn't on the inline-safe allowlist (XSS via <script>) — must download.
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 	svg := []byte(`<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"/>`)
-	resp := decodeUpload(t, uploadFile(t, cid, "x.svg", "image/svg+xml", svg, jwt))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "x.svg", "image/svg+xml", svg, jwt))
 	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
 
 	rr := getFile(t, resp.ID, jwt)
@@ -413,8 +499,9 @@ func TestFileGet_SVG_ForcesAttachment(t *testing.T) {
 
 func TestFileDelete_AsAuthor_204_AndObjectGone(t *testing.T) {
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
-	resp := decodeUpload(t, uploadFile(t, cid, "del.png", "image/png", pngBytes(), jwt))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "del.png", "image/png", pngBytes(), jwt))
 	key := storageKeyOf(t, resp.ID)
 
 	rr := doRequest("DELETE", "/file/"+resp.ID, nil, jwt)
@@ -434,8 +521,9 @@ func TestFileDelete_AsNonAuthor_404(t *testing.T) {
 	// Upload as testuser, then attempt DELETE as testuser2 → 404 (not 403,
 	// to avoid leaking existence).
 	authorJWT := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
-	resp := decodeUpload(t, uploadFile(t, cid, "x.png", "image/png", pngBytes(), authorJWT))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "x.png", "image/png", pngBytes(), authorJWT))
 	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
 
 	intruderJWT := loginAs(testutil.TestUser2, testutil.TestPassword2)
@@ -451,8 +539,9 @@ func TestCommentDelete_GCsAttachments(t *testing.T) {
 	// mutation simulation through graph.RemoveComment is in another package;
 	// instead exercise db.CleanupCommentFiles directly with the same wiring.
 	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
-	resp := decodeUpload(t, uploadFile(t, cid, "gc.png", "image/png", pngBytes(), jwt))
+	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "gc.png", "image/png", pngBytes(), jwt))
 	key := storageKeyOf(t, resp.ID)
 
 	// Sanity.
@@ -474,6 +563,339 @@ func TestCommentDelete_GCsAttachments(t *testing.T) {
 	// File node still exists in Dgraph (CleanupCommentFiles is S3-only).
 	// Delete it so the seeded comment is back to a clean state.
 	_ = db.GetDB().DeleteFile(resp.ID)
+}
+
+// --- Avatar tests ---
+
+func TestAvatarUserReplaceFlow(t *testing.T) {
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+
+	// First upload — creates the avatar.
+	rr := uploadFile(t, uploadOpts{
+		Userid: testutil.TestUser, Filename: "av1.png",
+		DeclaredContentType: "image/png", Body: pngBytes(),
+	}, jwt)
+	requireStatus(t, rr, http.StatusOK)
+	first := decodeUpload(t, rr)
+	firstKey := storageKeyOf(t, first.ID)
+	if !strings.HasPrefix(firstKey, "users/"+testutil.TestUser+"/") {
+		t.Errorf("storageKey = %q, want prefix users/%s/", firstKey, testutil.TestUser)
+	}
+	if !objectExists(t, firstKey) {
+		t.Errorf("first avatar object missing: %q", firstKey)
+	}
+
+	// Anonymous GET succeeds — user avatars are public.
+	if g := getFile(t, first.ID, nil); g.Code != http.StatusFound {
+		t.Errorf("anonymous GET first avatar: status %d, want 302", g.Code)
+	}
+
+	// Second upload — replaces the first.
+	rr = uploadFile(t, uploadOpts{
+		Userid: testutil.TestUser, Filename: "av2.png",
+		DeclaredContentType: "image/png", Body: pngBytes(),
+	}, jwt)
+	requireStatus(t, rr, http.StatusOK)
+	second := decodeUpload(t, rr)
+	defer purgeFile(t, second.ID, storageKeyOf(t, second.ID))
+	if second.ID == first.ID {
+		t.Error("expected new fid on replace")
+	}
+
+	// Old object is async-deleted; poll briefly.
+	deadline := time.Now().Add(5 * time.Second)
+	for objectExists(t, firstKey) {
+		if time.Now().After(deadline) {
+			t.Errorf("expected old avatar object %q to be removed", firstKey)
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	// First file row should be gone too.
+	if g := getFile(t, first.ID, nil); g.Code != http.StatusNotFound {
+		t.Errorf("GET old avatar after replace: status %d, want 404", g.Code)
+	}
+}
+
+func TestAvatarUserUpload_AsOtherUser_403(t *testing.T) {
+	jwt := loginAs(testutil.TestUser2, testutil.TestPassword2)
+	rr := uploadFile(t, uploadOpts{
+		Userid: testutil.TestUser, Filename: "av.png",
+		DeclaredContentType: "image/png", Body: pngBytes(),
+	}, jwt)
+	requireStatus(t, rr, http.StatusForbidden)
+}
+
+func TestAvatarNodeFollowsVisibility(t *testing.T) {
+	// Public root: testuser is Coordinator on test-org → may upload.
+	pubJWT := loginAs(testutil.TestUser, testutil.TestPassword)
+	rr := uploadFile(t, uploadOpts{
+		Orgaid: "test-org", Filename: "logo.png",
+		DeclaredContentType: "image/png", Body: pngBytes(),
+	}, pubJWT)
+	requireStatus(t, rr, http.StatusOK)
+	pub := decodeUpload(t, rr)
+	defer purgeFile(t, pub.ID, storageKeyOf(t, pub.ID))
+
+	// Public node → anonymous GET succeeds.
+	if g := getFile(t, pub.ID, nil); g.Code != http.StatusFound {
+		t.Errorf("anon GET public-org avatar: status %d, want 302", g.Code)
+	}
+
+	// Private root: testuser2 is Owner on sec-org → may upload.
+	privJWT := loginAs(testutil.TestUser2, testutil.TestPassword2)
+	rr = uploadFile(t, uploadOpts{
+		Orgaid: "sec-org", Filename: "logo.png",
+		DeclaredContentType: "image/png", Body: pngBytes(),
+	}, privJWT)
+	requireStatus(t, rr, http.StatusOK)
+	priv := decodeUpload(t, rr)
+	defer purgeFile(t, priv.ID, storageKeyOf(t, priv.ID))
+
+	// Anonymous GET on private-node avatar → 404 (existence hidden).
+	if g := getFile(t, priv.ID, nil); g.Code != http.StatusNotFound {
+		t.Errorf("anon GET private-org avatar: status %d, want 404", g.Code)
+	}
+	// Member testuser sees it (Member of sec-org).
+	memberJWT := loginAs(testutil.TestUser, testutil.TestPassword)
+	if g := getFile(t, priv.ID, memberJWT); g.Code != http.StatusFound {
+		t.Errorf("member GET private-org avatar: status %d, want 302", g.Code)
+	}
+}
+
+func TestAvatarNodeUpload_AsNonCoordo_403(t *testing.T) {
+	// testuser is plain Member of sec-org (no coordo) → may not set its avatar.
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	rr := uploadFile(t, uploadOpts{
+		Orgaid: "sec-org", Filename: "logo.png",
+		DeclaredContentType: "image/png", Body: pngBytes(),
+	}, jwt)
+	requireStatus(t, rr, http.StatusForbidden)
+}
+
+// --- Anchor validation ---
+
+func TestUploadAnchorValidation(t *testing.T) {
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+
+	// Zero anchors → 400.
+	rr := uploadFile(t, uploadOpts{
+		Filename: "x.png", DeclaredContentType: "image/png", Body: pngBytes(),
+	}, jwt)
+	requireStatus(t, rr, http.StatusBadRequest)
+
+	// Multiple anchors (cid+tid AND userid) → 400.
+	tid := resolveTensionByTitle(t, "Test tension")
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	rr = uploadFile(t, uploadOpts{
+		Tid: tid, Cid: cid, Userid: testutil.TestUser,
+		Filename: "x.png", DeclaredContentType: "image/png", Body: pngBytes(),
+	}, jwt)
+	requireStatus(t, rr, http.StatusBadRequest)
+
+	// cid without tid → 400.
+	rr = uploadFile(t, uploadOpts{
+		Cid: cid, Filename: "x.png", DeclaredContentType: "image/png", Body: pngBytes(),
+	}, jwt)
+	requireStatus(t, rr, http.StatusBadRequest)
+}
+
+func TestUploadRejectsCrossTension(t *testing.T) {
+	// cid belongs to "Test tension"; pass the unrelated sec-org tension's tid.
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	wrongTid := resolveTensionByTitle(t, "Sec-org private tension")
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	rr := uploadCommentFile(t, wrongTid, cid, "x.png", "image/png", pngBytes(), jwt)
+	requireStatus(t, rr, http.StatusBadRequest)
+}
+
+// --- Inline screenshot tests ---
+
+// withCommentMessage temporarily overrides Post.message for the duration of
+// fn, restoring the original on exit. Tests that exercise the message-rewrite
+// path mutate the seeded comment in place to set up the markdown reference.
+// SetFieldById embeds the value verbatim into an N-Quad literal, so values
+// with newlines/quotes must be pre-escaped via tools.QuoteString.
+func withCommentMessage(t *testing.T, cid, newMsg string, fn func()) {
+	t.Helper()
+	prev, err := db.GetDB().GetFieldById(cid, "Post.message")
+	if err != nil {
+		t.Fatalf("read message of %s: %v", cid, err)
+	}
+	prevStr, _ := prev.(string)
+	if err := db.GetDB().SetFieldById(cid, "Post.message", tools.QuoteString(newMsg)); err != nil {
+		t.Fatalf("set message of %s: %v", cid, err)
+	}
+	defer func() { _ = db.GetDB().SetFieldById(cid, "Post.message", tools.QuoteString(prevStr)) }()
+	fn()
+}
+
+func TestInlineScreenshot_UpdateComment(t *testing.T) {
+	// Simulate the frontend flow: the comment was just edited to reference a
+	// pasted screenshot, and the upload follows.
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	filename := fmt.Sprintf("paste-%d.png", time.Now().UnixNano())
+
+	withCommentMessage(t, cid, "see ![](" + filename + ") here", func() {
+		rr := uploadCommentFile(t, tid, cid, filename, "image/png", pngBytes(), jwt)
+		requireStatus(t, rr, http.StatusOK)
+		resp := decodeUpload(t, rr)
+		defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
+
+		if !resp.Embedded {
+			t.Fatal("expected embedded=true")
+		}
+		got, err := db.GetDB().GetFieldById(cid, "Post.message")
+		if err != nil {
+			t.Fatalf("read message: %v", err)
+		}
+		want := "see ![](/file/" + resp.ID + ") here"
+		if s, _ := got.(string); s != want {
+			t.Errorf("rewritten message = %q, want %q", s, want)
+		}
+		// Anonymous GET works (test-org is Public).
+		if g := getFile(t, resp.ID, nil); g.Code != http.StatusFound {
+			t.Errorf("anon GET embedded file: status %d, want 302", g.Code)
+		}
+	})
+}
+
+func TestInlineScreenshot_NewComment(t *testing.T) {
+	// Same wire path as UpdateComment from the backend's POV; named separately
+	// to mirror the front-end "new comment with screenshot" scenario.
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	filename := fmt.Sprintf("paste-new-%d.png", time.Now().UnixNano())
+
+	withCommentMessage(t, cid, "fresh: ![](" + filename + ")", func() {
+		rr := uploadCommentFile(t, tid, cid, filename, "image/png", pngBytes(), jwt)
+		requireStatus(t, rr, http.StatusOK)
+		resp := decodeUpload(t, rr)
+		defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
+		if !resp.Embedded {
+			t.Fatal("expected embedded=true")
+		}
+	})
+}
+
+func TestInlineScreenshot_NewTensionInitialBody(t *testing.T) {
+	// The backend treats the initial-body code path identically — the upload
+	// targets the seeded initial comment of "Test tension" (Post.message
+	// contains the front-matter block in seed.nq).
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
+	// Initial-body comment is the one whose message starts with "---\nbug\n";
+	// derive its uid by querying Tension.comments[0]... easier: simulate by
+	// using the FileTestPublicCommentByUser1 seed slot.
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	filename := fmt.Sprintf("init-%d.png", time.Now().UnixNano())
+
+	withCommentMessage(t, cid, "intro\n\n![](" + filename + ")\n\nend", func() {
+		rr := uploadCommentFile(t, tid, cid, filename, "image/png", pngBytes(), jwt)
+		requireStatus(t, rr, http.StatusOK)
+		resp := decodeUpload(t, rr)
+		defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
+		if !resp.Embedded {
+			t.Fatal("expected embedded=true on initial body")
+		}
+	})
+}
+
+func TestRegularAttachmentNotEmbedded(t *testing.T) {
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	// Use a filename guaranteed not to appear in the seeded message.
+	filename := fmt.Sprintf("attachment-%d.bin", time.Now().UnixNano())
+
+	prev, _ := db.GetDB().GetFieldById(cid, "Post.message")
+	rr := uploadCommentFile(t, tid, cid, filename, "application/octet-stream", []byte("hi"), jwt)
+	requireStatus(t, rr, http.StatusOK)
+	resp := decodeUpload(t, rr)
+	defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
+
+	if resp.Embedded {
+		t.Error("expected embedded=false for non-referenced attachment")
+	}
+	now, _ := db.GetDB().GetFieldById(cid, "Post.message")
+	if prevStr, _ := prev.(string); prevStr != "" {
+		if nowStr, _ := now.(string); nowStr != prevStr {
+			t.Errorf("comment message must not change for non-embedded upload\nbefore: %q\nafter:  %q", prevStr, nowStr)
+		}
+	}
+}
+
+func TestCodeBlockSkipsRewrite(t *testing.T) {
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	filename := fmt.Sprintf("inblock-%d.png", time.Now().UnixNano())
+	body := "before\n```\n![](" + filename + ")\n```\nafter"
+
+	withCommentMessage(t, cid, body, func() {
+		rr := uploadCommentFile(t, tid, cid, filename, "image/png", pngBytes(), jwt)
+		requireStatus(t, rr, http.StatusOK)
+		resp := decodeUpload(t, rr)
+		defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
+		if resp.Embedded {
+			t.Error("expected embedded=false: filename mentioned only in fenced block")
+		}
+		got, _ := db.GetDB().GetFieldById(cid, "Post.message")
+		if s, _ := got.(string); s != body {
+			t.Errorf("message must remain unchanged when match is in code block\ngot:  %q\nwant: %q", s, body)
+		}
+	})
+}
+
+func TestParallelUploadsToSameComment(t *testing.T) {
+	// Two distinct filenames; both Files must land + be embedded=true. The
+	// message itself is last-writer-wins on the rewrite — we don't assert
+	// both substitutions made it into Comment.message because that's a known
+	// race we accept (see embedIfReferenced).
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+	now := time.Now().UnixNano()
+	fnA := fmt.Sprintf("a-%d.png", now)
+	fnB := fmt.Sprintf("b-%d.png", now)
+
+	withCommentMessage(t, cid, "x ![]("+fnA+") y ![]("+fnB+") z", func() {
+		type result struct {
+			RR *httptest.ResponseRecorder
+		}
+		ch := make(chan result, 2)
+		for _, fn := range []string{fnA, fnB} {
+			fn := fn
+			go func() {
+				ch <- result{RR: uploadCommentFile(t, tid, cid, fn, "image/png", pngBytes(), jwt)}
+			}()
+		}
+		results := []result{<-ch, <-ch}
+		for _, r := range results {
+			if r.RR.Code != http.StatusOK {
+				t.Fatalf("parallel upload failed: status %d body %s", r.RR.Code, r.RR.Body.String())
+			}
+			resp := decodeUpload(t, r.RR)
+			defer purgeFile(t, resp.ID, storageKeyOf(t, resp.ID))
+			if !resp.Embedded {
+				t.Errorf("parallel upload not embedded: id=%s filename=%s", resp.ID, resp.Filename)
+			}
+			// Both files must be readable independently of who won the message race.
+			if g := getFile(t, resp.ID, jwt); g.Code != http.StatusFound {
+				t.Errorf("GET parallel-uploaded file: status %d, want 302", g.Code)
+			}
+		}
+		// At least one of the two original filenames must have been rewritten —
+		// the loser of the race may still be present, but not both.
+		got, _ := db.GetDB().GetFieldById(cid, "Post.message")
+		s, _ := got.(string)
+		if strings.Contains(s, fnA) && strings.Contains(s, fnB) {
+			t.Errorf("both originals still present in message — neither write applied: %q", s)
+		}
+	})
 }
 
 // --- internal helpers (need access to handler internals only via routing) ---

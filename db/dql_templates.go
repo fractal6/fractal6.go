@@ -603,12 +603,17 @@ var dqlQueries map[string]string = map[string]string{
         }
     }`,
 	// Deletion - Used by DeepDelete
+	//
+	// Cascades to File nodes attached to comments (both tension and contract
+	// comments). The `file_keys` block lets the caller fire-and-forget the S3
+	// objects without a second round-trip.
 	"deleteTension": `{
         id as var(func: uid({{.id}})) {
           rid_emitter as Tension.emitter
           rid_receiver as Tension.receiver
           comments as Tension.comments {
             reactions as Comment.reactions
+            files as Comment.files
           }
           b as Tension.blobs {
               bn as Blob.node {
@@ -620,13 +625,17 @@ var dqlQueries map[string]string = map[string]string{
               votes as Contract.participants
               comments2 as Contract.comments {
                 reactions2 as Comment.reactions
+                files2 as Comment.files
               }
           }
           events as Tension.history
           mentions as Tension.mentions
         }
-        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,c,e,votes,comments2,reactions2)) {
+        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,c,e,votes,comments2,reactions2,files,files2)) {
             all_ids as uid
+        }
+        file_keys(func: uid(files,files2)) {
+            File.storageKey
         }
     }`,
 	"deleteContract": `{
@@ -690,52 +699,44 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
-	// getFileAuth fetches everything the /file/<id> proxy needs in a single hop:
-	// the storage key + content meta to mint a presigned URL, plus the parent
-	// comment author and the parent tension's receiver visibility/nameid for the
-	// auth check. {{.id}} is the File uid.
+	// getFileAuth_v2 fetches everything the /file/<id> proxy needs in a single
+	// hop. File is anchor-polymorphic: exactly one of comment/user/node is set.
+	// File.tension is denormalised alongside File.comment for the comment branch
+	// so we can fetch the tension receiver (nameid + visibility) without walking
+	// back through Tension.comments. {{.id}} is the File uid.
 	//
-	// We start the query at the parent Tension (filtered by uid_in on
-	// Tension.comments → comment) because Tension.comments is NOT declared with
-	// @hasInverse in the GraphQL schema, so a reverse-edge walk (~Tension.comments)
-	// is unavailable. Starting at Tension lets us project File metadata, the
-	// comment author, and the receiver in one round-trip.
-	"getFileAuth": `{
-        var(func: uid({{.id}})) {
-            File.comment { c as uid }
-        }
-        all(func: type(Tension)) @filter(uid_in(Tension.comments, uid(c))) {
-            Tension.receiver {
-                Node.nameid
-                Node.visibility
-            }
-            Tension.comments @filter(uid(c)) {
-                Post.createdBy { User.username }
-                Comment.files @filter(uid({{.id}})) {
-                    File.storageKey
-                    File.filename
-                    File.contentType
-                    File.size
+	// All three branches are projected; Go side picks the populated one.
+	"getFileAuth_v2": `{
+        all(func: uid({{.id}})) {
+            File.storageKey
+            File.filename
+            File.contentType
+            File.size
+            File.createdBy { User.username }
+            File.comment { Post.createdBy { User.username } }
+            File.tension {
+                Tension.receiver {
+                    Node.nameid
+                    Node.visibility
                 }
             }
+            File.user { User.username }
+            File.node { Node.nameid Node.visibility }
         }
     }`,
-	// getCommentAuth: from a comment id, return its author and parent tension's
-	// receiver nameid+visibility. Used by the upload handler before persisting a
-	// new File node — only the comment author may attach files.
-	//
-	// See getFileAuth above: same forward-walk pattern (no reverse edge on
-	// Tension.comments).
-	"getCommentAuth": `{
-        var(func: uid({{.id}})) { c as uid }
-        all(func: type(Tension)) @filter(uid_in(Tension.comments, uid(c))) {
-            Tension.receiver {
-                Node.nameid
-                Node.visibility
+	// getCommentMessage: read Comment.message + author, but only if `cid`
+	// belongs to `tid`. Used by the upload handler for the inline-screenshot
+	// rewrite *and* the comment-author check. Empty `all` response means cid
+	// doesn't belong to tid (or doesn't exist).
+	"getCommentMessage": `{
+        var(func: uid({{.tid}})) {
+            Tension.comments @filter(uid({{.cid}})) {
+                cmatch as uid
             }
-            Tension.comments @filter(uid(c)) {
-                Post.createdBy { User.username }
-            }
+        }
+        all(func: uid(cmatch)) {
+            Post.message
+            Post.createdBy { User.username }
         }
     }`,
 	// getCommentFiles: list a comment's File nodes with their storage keys.

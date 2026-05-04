@@ -129,7 +129,8 @@ func DelUser(args []string) {
 	// Deep delete an user:
 	// - Clean user orphan data
 	// - Replace all createdBy field by ghost (del old_user + and ghost)
-	_, err = db.GetDB().Meta("deleteUser", map[string]string{"username": username, "ghostid": ghostid})
+	// - Drop the user's avatar File row + fire async S3 GC
+	err = db.GetDB().DeleteUser(username, ghostid)
 	if err != nil {
 		panic(err)
 	}

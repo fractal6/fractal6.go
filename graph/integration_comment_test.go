@@ -195,16 +195,16 @@ func TestRemoveComment_DeletesAttachedFiles(t *testing.T) {
 	}
 	cancel()
 
-	fileUID, err := db.GetDB().AddFileToComment(
-		commentUID, testutil.TestUser, "test.bin", "application/octet-stream",
-		storageKey, time.Now().UTC().Format(time.RFC3339), int64(len(body)),
+	fileUID, err := db.GetDB().AddCommentFile(
+		tensionUID, commentUID, testutil.TestUser, "test.bin", "application/octet-stream",
+		storageKey, int64(len(body)), time.Now().UTC().Format(time.RFC3339),
 	)
 	if err != nil {
 		// Best-effort: drop the orphan S3 object before failing.
 		ctx2, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)
 		_ = testStorageCli.Delete(ctx2, storageKey)
 		cancel2()
-		t.Fatalf("AddFileToComment: %v", err)
+		t.Fatalf("AddCommentFile: %v", err)
 	}
 	t.Cleanup(func() { _ = db.GetDB().DeleteFile(fileUID) })
 

@@ -347,14 +347,19 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 				`,
 		}},
 	},
-	// addFileToComment creates a File node attached to a comment.
-	// Inputs (all required): cid, username, filename, contentType, sizeStr (decimal),
-	//                        storageKey, now (RFC3339).
-	// Caller has already verified comment and user exist via getCommentAuth + JWT,
-	// so no @if guard is needed.
-	"addFileToComment": {
+	// addCommentFile inserts a File anchored to a comment, with `tension`
+	// denormalised. The caller (web/handlers/files.go) has already verified that
+	// uctx.Username may post in the tension and that cid belongs to tid.
+	// File.embedded is set to false here; a follow-up call to
+	// embedCommentMessage flips it to true and rewrites the message when the
+	// upload was an inline screenshot paste.
+	//
+	// Inputs (all required): cid, tid, username, filename, contentType,
+	//                        sizeStr (decimal), storageKey, now (RFC3339).
+	"addCommentFile": {
 		Q: `query {
             var(func: uid({{.cid}})) { c as uid }
+            var(func: uid({{.tid}})) { t as uid }
             var(func: eq(User.username, "{{.username}}")) { u as uid }
         }`,
 		M: []X{{
@@ -366,18 +371,129 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 				_:f <File.createdAt> "{{.now}}" .
 				_:f <File.createdBy> uid(u) .
 				_:f <File.comment> uid(c) .
+				_:f <File.tension> uid(t) .
+				_:f <File.embedded> "false" .
 				uid(c) <Comment.files> _:f .
 				`,
 		}},
 	},
-	// deleteFile removes a File node by uid. The reverse edge from the parent
-	// comment is dropped automatically by Dgraph when the node is deleted.
-	"deleteFile": {
+	// embedCommentMessage rewrites Comment.message to point at the freshly
+	// uploaded file and flips File.embedded=true. Last-writer-wins: if two
+	// uploads race against the same comment, the second overwrite of
+	// Comment.message can drop the first's rewrite. Acceptable trade-off — the
+	// File rows themselves are independent and both stay queryable; the UI is
+	// already lenient about embedded=true files whose URL no longer appears in
+	// the message (rendered as a regular attachment).
+	//
+	// Inputs (all required): cid, fid, newMessage.
+	"embedCommentMessage": {
 		Q: `query {
-            var(func: uid({{.id}})) { f as uid }
+            var(func: uid({{.cid}})) { c as uid }
         }`,
 		M: []X{{
-			D: `uid(f) * * .`,
+			S: `uid(c) <Post.message> "{{.newMessage}}" .
+                <{{.fid}}> <File.embedded> "true" .
+                `,
+		}},
+	},
+	// replaceUserAvatar inserts a new avatar File for user `username` and drops
+	// the previous one (if any). The mutation returns the previous storageKey
+	// so the caller can fire-and-forget the S3 GC.
+	//
+	// Inputs (all required): username, filename, contentType, sizeStr,
+	//                        storageKey, now.
+	"replaceUserAvatar": {
+		Q: `query {
+            var(func: eq(User.username, "{{.username}}")) {
+                u as uid
+                User.avatar {
+                    old as uid
+                }
+            }
+            all(func: uid(old)) {
+                File.storageKey
+            }
+        }`,
+		M: []X{
+			{
+				C: `@if(eq(len(old), 1))`,
+				D: `uid(old) * * .
+                    uid(u) <User.avatar> uid(old) .
+                    `,
+			},
+			{
+				S: `_:f <dgraph.type> "File" .
+                    _:f <File.storageKey> "{{.storageKey}}" .
+                    _:f <File.filename> "{{.filename}}" .
+                    _:f <File.contentType> "{{.contentType}}" .
+                    _:f <File.size> "{{.sizeStr}}" .
+                    _:f <File.createdAt> "{{.now}}" .
+                    _:f <File.createdBy> uid(u) .
+                    _:f <File.user> uid(u) .
+                    uid(u) <User.avatar> _:f .
+                    `,
+			},
+		},
+	},
+	// replaceNodeAvatar mirrors replaceUserAvatar for org (root Node) avatars.
+	//
+	// Inputs (all required): nameid (Node.nameid), username (uploader),
+	//                        filename, contentType, sizeStr, storageKey, now.
+	"replaceNodeAvatar": {
+		Q: `query {
+            var(func: eq(Node.nameid, "{{.nameid}}")) {
+                n as uid
+                Node.avatar {
+                    old as uid
+                }
+            }
+            var(func: eq(User.username, "{{.username}}")) {
+                u as uid
+            }
+            all(func: uid(old)) {
+                File.storageKey
+            }
+        }`,
+		M: []X{
+			{
+				C: `@if(eq(len(old), 1))`,
+				D: `uid(old) * * .
+                    uid(n) <Node.avatar> uid(old) .
+                    `,
+			},
+			{
+				S: `_:f <dgraph.type> "File" .
+                    _:f <File.storageKey> "{{.storageKey}}" .
+                    _:f <File.filename> "{{.filename}}" .
+                    _:f <File.contentType> "{{.contentType}}" .
+                    _:f <File.size> "{{.sizeStr}}" .
+                    _:f <File.createdAt> "{{.now}}" .
+                    _:f <File.createdBy> uid(u) .
+                    _:f <File.node> uid(n) .
+                    uid(n) <Node.avatar> _:f .
+                    `,
+			},
+		},
+	},
+	// deleteFile removes a File node by uid and drops the reverse edges from
+	// any anchor (Comment.files, User.avatar, Node.avatar). DQL doesn't auto-
+	// maintain @hasInverse, so each candidate parent is named explicitly — the
+	// `uid(parent)` references are no-ops when the binding is empty.
+	"deleteFile": {
+		Q: `query {
+            var(func: uid({{.id}})) {
+                f as uid
+                File.comment { commentParent as uid }
+                File.user    { userParent as uid }
+                File.node    { nodeParent as uid }
+            }
+        }`,
+		M: []X{{
+			D: `uid(commentParent) <Comment.files> uid(f) .
+                uid(userParent)    <User.avatar>   uid(f) .
+                uid(nodeParent)    <Node.avatar>   uid(f) .
+                uid(f) * * .
+                `,
 		}},
 	},
 	// Deleting user by replacing its authoring by the ghost user.
@@ -393,6 +509,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             var(func: eq(User.username, "{{.username}}")) {
                 u as uid
                 ur as User.UserRights
+                avatar as User.avatar
                 assigned as User.tensions_assigned
                 roles as User.roles @filter(not eq(Node.role_type, ["Guest", "Member", "Owner", "Retired", "Pending"])) {
                     Node.source { Blob.node { frag as NodeFragment.first_link }}
@@ -419,6 +536,9 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             project_created as var(func: has(Project.createdBy)) @cascade {
                 Project.createdBy @filter(eq(User.username, "{{.username}}"))
             }
+            file_keys(func: uid(avatar)) {
+                File.storageKey
+            }
         }`,
 		M: []X{{
 			S: `
@@ -428,6 +548,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
         `,
 			D: `
         uid(ur) * *  .
+        uid(avatar) * * .
         uid(assigned) <Tension.assignees> uid(u) .
         uid(roles) <Node.first_link> * .
         uid(membership) * * .

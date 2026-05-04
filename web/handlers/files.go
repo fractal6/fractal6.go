@@ -20,36 +20,27 @@
 
 // File-attachment HTTP handlers.
 //
-// Design (see docs/file-attachments.md for the full picture):
+// Files are anchor-polymorphic: a comment attachment carries (tid, cid),
+// a user avatar carries username, an org avatar carries rootnameid. Exactly
+// one anchor triple is set per upload; the handler picks the auth path from
+// the populated triple.
 //
-//   - Bytes never travel through Fractale. Every read goes through /file/<id>,
-//     which re-runs the parent comment's tension visibility check, then issues
-//     a 302 to a short-lived presigned URL minted by the storage backend.
-//
-//   - The same /file/<id> URL is used for both first-class attachments and
-//     markdown-embedded images. There is one auth path, one stable URL shape.
-//
-//   - Uploads (POST /file/upload) require the caller to be the comment author —
-//     attachments are bound to a comment at creation time and inherit its auth.
-//
-//   - Deletes (DELETE /file/<id>) require the comment author too. The S3 object
-//     is removed first, then the Dgraph node; if S3 deletion fails, the DB
-//     record is kept so we can retry rather than leak orphan bytes.
-//
-// Handlers are constructed with an injected *storage.Client (or nil when the
-// [storage] section of config.toml is unset). This keeps the storage backend
-// swappable in tests and lets `cmd/server.go` fail closed (503) when storage
-// is not configured rather than panicking at request time.
+// Bytes never travel through Fractale: every read goes through GET /file/<id>,
+// which re-authorises against the populated anchor and 302-redirects to a
+// short-lived presigned URL. See docs/file-attachments.md.
 package handlers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 
@@ -57,6 +48,8 @@ import (
 	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/graph"
+	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/web/auth"
 )
@@ -91,6 +84,67 @@ var inlineSafeContentTypes = map[string]bool{
 	"text/plain":      true,
 }
 
+// --- anchor parsing ---
+
+// uploadAnchor is the resolved (validated) form input. Exactly one of the
+// kind-specific fields is populated; Kind records which.
+type uploadAnchor struct {
+	Kind db.FileKind
+	// KindComment.
+	Tid string
+	Cid string
+	// KindUser.
+	Username string
+	// KindNode.
+	Rootnameid string
+}
+
+// resolveAnchor inspects the form and returns the single populated anchor.
+// Returns an HTTP-status-coded error if zero or multiple anchors are present,
+// or if the parts within a triple are missing.
+func resolveAnchor(r *http.Request) (uploadAnchor, int, error) {
+	tid := strings.TrimSpace(r.FormValue("tid"))
+	cid := strings.TrimSpace(r.FormValue("cid"))
+	userid := strings.TrimSpace(r.FormValue("userid"))
+	orgaid := strings.TrimSpace(r.FormValue("orgaid"))
+
+	// `tid` and `cid` must travel together.
+	commentSet := tid != "" || cid != ""
+	if commentSet && (tid == "" || cid == "") {
+		return uploadAnchor{}, http.StatusBadRequest, fmt.Errorf("tid and cid must be provided together")
+	}
+
+	count := 0
+	if commentSet {
+		count++
+	}
+	if userid != "" {
+		count++
+	}
+	if orgaid != "" {
+		count++
+	}
+	switch count {
+	case 0:
+		return uploadAnchor{}, http.StatusBadRequest, fmt.Errorf("an anchor is required: (tid+cid) | userid | orgaid")
+	case 1:
+		// fallthrough
+	default:
+		return uploadAnchor{}, http.StatusBadRequest, fmt.Errorf("exactly one anchor allowed; got multiple")
+	}
+
+	switch {
+	case commentSet:
+		return uploadAnchor{Kind: db.KindComment, Tid: tid, Cid: cid}, 0, nil
+	case userid != "":
+		return uploadAnchor{Kind: db.KindUser, Username: userid}, 0, nil
+	default:
+		return uploadAnchor{Kind: db.KindNode, Rootnameid: orgaid}, 0, nil
+	}
+}
+
+// --- Handlers ---
+
 // FileGetHandler returns the GET /file/<id> handler. cli may be nil — in that
 // case the handler returns 503 (storage not configured).
 func FileGetHandler(cli *storage.Client) http.HandlerFunc {
@@ -108,20 +162,19 @@ func FileGetHandler(cli *storage.Client) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		// 404 covers both "no such file" and "you can't see this file".
-		// Returning 403 in the second case would leak existence to anyone
-		// probing IDs (Dgraph uids aren't sequential, but it's a free fix).
 		if fa == nil {
 			http.NotFound(w, r)
 			return
 		}
 
-		visible, err := auth.IsNodeVisible(&uctx, fa.ReceiverNameid, fa.ReceiverVisible)
+		visible, err := isFileVisible(&uctx, fa)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if !visible {
+			// 404 covers "no such file" and "you can't see this file" alike,
+			// to avoid leaking existence to anyone probing IDs.
 			http.NotFound(w, r)
 			return
 		}
@@ -150,12 +203,31 @@ func FileGetHandler(cli *storage.Client) http.HandlerFunc {
 	}
 }
 
-// FileUploadHandler returns the POST /file/upload handler. multipart fields:
+// isFileVisible runs the GET-time visibility check appropriate to the file's
+// anchor kind. User avatars are public; comment files inherit their parent
+// tension's receiver visibility; node avatars follow the node's visibility.
+func isFileVisible(uctx *model.UserCtx, fa *db.FileAuth) (bool, error) {
+	switch fa.Kind {
+	case db.KindUser:
+		return true, nil
+	case db.KindComment:
+		return auth.IsNodeVisible(uctx, fa.ReceiverNameid, fa.ReceiverVisible)
+	case db.KindNode:
+		return auth.IsNodeVisible(uctx, fa.NodeNameid, fa.NodeVisibility)
+	default:
+		return false, fmt.Errorf("unknown file kind: %q", fa.Kind)
+	}
+}
+
+// FileUploadHandler returns the POST /file/upload handler. Multipart fields:
 //
-//	comment_id : Dgraph uid of the parent comment (required)
-//	file       : the file part (required)
+//	one of:
+//	  tid + cid           — comment attachment
+//	  userid              — user avatar
+//	  orgaid              — org (root Node) avatar
+//	file                  — the file part (required)
 //
-// On success, returns JSON: {"id": "<file uid>", "url": "/file/<id>", ...meta}.
+// On success, returns JSON: {"id": "...", "url": "/file/<id>", "embedded": …}.
 func FileUploadHandler(cli *storage.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_, uctx, err := auth.GetUserContext(r.Context())
@@ -176,9 +248,9 @@ func FileUploadHandler(cli *storage.Client) http.HandlerFunc {
 			return
 		}
 
-		cid := strings.TrimSpace(r.FormValue("comment_id"))
-		if cid == "" {
-			http.Error(w, "comment_id is required", http.StatusBadRequest)
+		anchor, status, err := resolveAnchor(r)
+		if err != nil {
+			http.Error(w, err.Error(), status)
 			return
 		}
 
@@ -188,22 +260,6 @@ func FileUploadHandler(cli *storage.Client) http.HandlerFunc {
 			return
 		}
 		defer file.Close()
-
-		// Auth: only the comment author may attach files. This mirrors the existing
-		// rule for editing/deleting one's own comments (see graph/tension_op.go).
-		ca, err := db.GetDB().GetCommentAuth(cid)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if ca == nil {
-			http.Error(w, "comment not found", http.StatusNotFound)
-			return
-		}
-		if ca.AuthorUsername != uctx.Username {
-			http.Error(w, "only the comment author can attach files", http.StatusForbidden)
-			return
-		}
 
 		// MIME sniff: never trust the client-provided Content-Type header,
 		// otherwise an attacker can upload an HTML file labelled image/png and
@@ -217,45 +273,184 @@ func FileUploadHandler(cli *storage.Client) http.HandlerFunc {
 			return
 		}
 		contentType := http.DetectContentType(sniffBuf[:n])
-
-		// Sanitise filename: strip path components and limit length. The original
-		// name is preserved as metadata for Content-Disposition; the storage key
-		// uses a uuid prefix to prevent collisions and key-guessing.
 		safeName := safeFilename(header.Filename)
 
-		keyPrefix := commentKeyPrefix(cid)
-		storageKey := keyPrefix + randomID() + "-" + safeName
-
-		if err := cli.Put(r.Context(), storageKey, file, header.Size, contentType); err != nil {
-			http.Error(w, "upload failed: "+err.Error(), http.StatusBadGateway)
-			return
+		switch anchor.Kind {
+		case db.KindComment:
+			handleCommentUpload(w, r, cli, uctx, anchor, file, header, safeName, contentType)
+		case db.KindUser:
+			handleUserAvatarUpload(w, r, cli, uctx, anchor, file, header, safeName, contentType)
+		case db.KindNode:
+			handleNodeAvatarUpload(w, r, cli, uctx, anchor, file, header, safeName, contentType)
+		default:
+			http.Error(w, "unknown anchor kind", http.StatusBadRequest)
 		}
-
-		uid, err := db.GetDB().AddFileToComment(
-			cid, uctx.Username, safeName, contentType, storageKey,
-			time.Now().UTC().Format(time.RFC3339), header.Size,
-		)
-		if err != nil {
-			// DB persistence failed after the upload succeeded — roll back the
-			// object so we don't accumulate orphans. Log but don't fail the rollback
-			// to the client; the original error is what matters.
-			_ = cli.Delete(r.Context(), storageKey)
-			http.Error(w, "persist failed: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		writeJSON(w, map[string]any{
-			"id":          uid,
-			"url":         "/file/" + uid,
-			"filename":    safeName,
-			"contentType": contentType,
-			"size":        header.Size,
-		})
 	}
 }
 
-// FileDeleteHandler returns the DELETE /file/<id> handler. Author-only; same
-// 404-instead-of-403 policy as FileGet.
+// --- per-anchor upload paths ---
+
+func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Client, uctx *model.UserCtx, anchor uploadAnchor, file io.Reader, header *multipart.FileHeader, safeName, contentType string) {
+	// Auth: caller must be allowed to push CommentPushed on the tension. We
+	// reuse the EMAP entry so any future tightening (e.g. quota, throttle)
+	// applies uniformly. ProcessEvent with doProcess=false runs Check only —
+	// no side effects.
+	tension, err := db.GetDB().GetTensionHook(anchor.Tid, false, nil)
+	if err != nil || tension == nil {
+		http.Error(w, "tension not found", http.StatusNotFound)
+		return
+	}
+	e := model.TensionEventCommentPushed
+	event := &model.EventRef{EventType: &e}
+	ok, _, err := graph.ProcessEvent(uctx, tension, event, nil, nil, true, false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+	if !ok {
+		http.Error(w, "not authorised to attach files in this tension", http.StatusForbidden)
+		return
+	}
+
+	// Verify cid belongs to tid + read message + author in the same hop.
+	c, err := db.GetDB().GetCommentForUpload(anchor.Tid, anchor.Cid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if !c.Found {
+		http.Error(w, "comment does not belong to tension", http.StatusBadRequest)
+		return
+	}
+	if c.AuthorUsername != uctx.Username {
+		http.Error(w, "only the comment author can attach files", http.StatusForbidden)
+		return
+	}
+	oldMessage := c.Message
+
+	// Put bytes first, then DB. Rollback the object on DB failure.
+	storageKey := commentKeyPrefix(anchor.Cid) + randomID() + "-" + safeName
+	if err := cli.Put(r.Context(), storageKey, file, header.Size, contentType); err != nil {
+		http.Error(w, "upload failed: "+err.Error(), http.StatusBadGateway)
+		return
+	}
+
+	fid, err := db.GetDB().AddCommentFile(
+		anchor.Tid, anchor.Cid, uctx.Username, safeName, contentType, storageKey,
+		header.Size, time.Now().UTC().Format(time.RFC3339),
+	)
+	if err != nil {
+		_ = cli.Delete(r.Context(), storageKey)
+		http.Error(w, "persist failed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Inline-screenshot rewrite: if `safeName` appears as a bare ![](filename)
+	// token in the comment, swap it for /file/<fid> and flip File.embedded=true.
+	embedded := embedIfReferenced(anchor.Cid, fid, safeName, oldMessage)
+
+	writeJSON(w, map[string]any{
+		"id":          fid,
+		"url":         "/file/" + fid,
+		"filename":    safeName,
+		"contentType": contentType,
+		"size":        header.Size,
+		"embedded":    embedded,
+	})
+}
+
+// embedIfReferenced rewrites the comment message in place when the uploaded
+// filename is referenced as an inline `![alt](filename)` token. Last-writer-
+// wins on Comment.message: if two uploads race, the second overwrite can
+// drop the first's URL substitution. The File rows themselves are unaffected
+// (they're independent), and the UI is lenient about embedded=true files
+// whose URL is no longer in the message (renders them as plain attachments).
+func embedIfReferenced(cid, fid, filename, message string) bool {
+	newMsg, matched := rewriteMessageForFile(message, filename, fid)
+	if !matched {
+		return false
+	}
+	if err := db.GetDB().EmbedCommentMessage(cid, fid, newMsg); err != nil {
+		fmt.Printf("embedCommentMessage: %v\n", err)
+		return false
+	}
+	return true
+}
+
+func handleUserAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage.Client, uctx *model.UserCtx, anchor uploadAnchor, file io.Reader, header *multipart.FileHeader, safeName, contentType string) {
+	if !strings.EqualFold(anchor.Username, uctx.Username) {
+		http.Error(w, "you may only upload your own avatar", http.StatusForbidden)
+		return
+	}
+	storageKey := userKeyPrefix(uctx.Username) + randomID() + "-" + safeName
+	if err := cli.Put(r.Context(), storageKey, file, header.Size, contentType); err != nil {
+		http.Error(w, "upload failed: "+err.Error(), http.StatusBadGateway)
+		return
+	}
+	fid, oldKey, err := db.GetDB().ReplaceUserAvatar(
+		uctx.Username, safeName, contentType, storageKey,
+		header.Size, time.Now().UTC().Format(time.RFC3339),
+	)
+	if err != nil {
+		_ = cli.Delete(r.Context(), storageKey)
+		http.Error(w, "persist failed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if oldKey != "" {
+		go asyncDelete(cli, oldKey)
+	}
+	writeJSON(w, map[string]any{
+		"id":          fid,
+		"url":         "/file/" + fid,
+		"filename":    safeName,
+		"contentType": contentType,
+		"size":        header.Size,
+	})
+}
+
+func handleNodeAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage.Client, uctx *model.UserCtx, anchor uploadAnchor, file io.Reader, header *multipart.FileHeader, safeName, contentType string) {
+	if auth.UserHasCoordoRole(uctx, anchor.Rootnameid) < 0 {
+		http.Error(w, "coordinator role required", http.StatusForbidden)
+		return
+	}
+	storageKey := orgaKeyPrefix(anchor.Rootnameid) + randomID() + "-" + safeName
+	if err := cli.Put(r.Context(), storageKey, file, header.Size, contentType); err != nil {
+		http.Error(w, "upload failed: "+err.Error(), http.StatusBadGateway)
+		return
+	}
+	fid, oldKey, err := db.GetDB().ReplaceNodeAvatar(
+		anchor.Rootnameid, uctx.Username, safeName, contentType, storageKey,
+		header.Size, time.Now().UTC().Format(time.RFC3339),
+	)
+	if err != nil {
+		_ = cli.Delete(r.Context(), storageKey)
+		http.Error(w, "persist failed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if oldKey != "" {
+		go asyncDelete(cli, oldKey)
+	}
+	writeJSON(w, map[string]any{
+		"id":          fid,
+		"url":         "/file/" + fid,
+		"filename":    safeName,
+		"contentType": contentType,
+		"size":        header.Size,
+	})
+}
+
+func asyncDelete(cli *storage.Client, key string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := cli.Delete(ctx, key); err != nil {
+		fmt.Printf("asyncDelete: %s: %v\n", key, err)
+	}
+}
+
+// --- delete ---
+
+// FileDeleteHandler returns the DELETE /file/<id> handler. Uploader-only
+// across all anchor kinds; same 404-instead-of-403 policy as FileGet.
 func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_, uctx, err := auth.GetUserContext(r.Context())
@@ -278,16 +473,11 @@ func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		if fa == nil || fa.AuthorUsername != uctx.Username {
-			// Same 404 policy as FileGet — don't differentiate "missing" vs
-			// "not yours".
+		if fa == nil || fa.UploaderUsername != uctx.Username {
 			http.NotFound(w, r)
 			return
 		}
 
-		// Delete the object first. If this fails we keep the DB record so we can
-		// retry cleanup; the alternative would leak bytes that are no longer
-		// referenced from Dgraph.
 		if err := cli.Delete(r.Context(), fa.StorageKey); err != nil {
 			http.Error(w, "storage delete failed: "+err.Error(), http.StatusBadGateway)
 			return
@@ -300,11 +490,145 @@ func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 	}
 }
 
+// --- markdown rewrite ---
+
+// markdownImageRe matches `![alt](url)`. The url group captures everything up
+// to the first whitespace or closing paren — that's the entire URL token.
+var markdownImageRe = regexp.MustCompile(`!\[[^\]]*\]\(([^)\s]+)\)`)
+
+// rewriteMessageForFile substitutes the first ![alt](filename) whose URL is
+// the bare token `filename` (no slashes, no scheme) with `![alt](/file/<fid>)`.
+// Code regions (fenced ``` and ~~~ blocks, inline backticks) are masked
+// before matching so filenames mentioned in code don't trigger a rewrite.
+//
+// Returns (newMessage, true) when a substitution was made; (msg, false) when
+// the filename is not referenced inline.
+func rewriteMessageForFile(msg, filename, fid string) (string, bool) {
+	if msg == "" || filename == "" || fid == "" {
+		return msg, false
+	}
+	masked := maskCodeRegions(msg)
+
+	matches := markdownImageRe.FindAllStringSubmatchIndex(masked, -1)
+	for _, m := range matches {
+		urlStart, urlEnd := m[2], m[3]
+		urlInOriginal := msg[urlStart:urlEnd]
+		if urlInOriginal != filename {
+			continue
+		}
+		// Bare token only: no path separators, no scheme.
+		if strings.ContainsAny(urlInOriginal, "/") || strings.Contains(urlInOriginal, "://") {
+			continue
+		}
+		newMsg := msg[:urlStart] + "/file/" + fid + msg[urlEnd:]
+		return newMsg, true
+	}
+	return msg, false
+}
+
+// maskCodeRegions replaces fenced (``` and ~~~) blocks and inline backtick
+// spans with same-length runs of spaces, so regex matches against the masked
+// string have offsets that line up with the original. Filenames mentioned
+// inside code are thereby invisible to the matcher.
+//
+// Triple-fence detection is line-anchored. Inline backticks span until the
+// next backtick on the same line; mismatched ticks degrade to no-mask
+// (acceptable: the user gets best-effort behaviour, not a security gate).
+func maskCodeRegions(s string) string {
+	out := []byte(s)
+	n := len(out)
+
+	// Fenced blocks first.
+	mask := func(from, to int) {
+		for i := from; i < to && i < n; i++ {
+			if out[i] != '\n' {
+				out[i] = ' '
+			}
+		}
+	}
+	for _, fence := range []string{"```", "~~~"} {
+		i := 0
+		for {
+			start := indexAfterNewline(out, i, fence)
+			if start < 0 {
+				break
+			}
+			// Find end of opening fence line.
+			lineEnd := indexByte(out, start, '\n')
+			if lineEnd < 0 {
+				lineEnd = n
+			}
+			// Find matching closing fence at start of a line.
+			end := indexAfterNewline(out, lineEnd+1, fence)
+			if end < 0 {
+				// Unclosed fence: mask through EOF.
+				mask(start, n)
+				break
+			}
+			closeLineEnd := indexByte(out, end, '\n')
+			if closeLineEnd < 0 {
+				closeLineEnd = n
+			}
+			mask(start, closeLineEnd)
+			i = closeLineEnd
+		}
+	}
+
+	// Inline backticks (single-line spans).
+	for i := 0; i < n; i++ {
+		if out[i] != '`' {
+			continue
+		}
+		// Find closing backtick on the same line.
+		end := -1
+		for j := i + 1; j < n; j++ {
+			if out[j] == '\n' {
+				break
+			}
+			if out[j] == '`' {
+				end = j
+				break
+			}
+		}
+		if end < 0 {
+			continue
+		}
+		mask(i, end+1)
+		i = end
+	}
+	return string(out)
+}
+
+// indexByte returns the index of the first occurrence of c at or after start;
+// -1 if none.
+func indexByte(b []byte, start int, c byte) int {
+	for i := start; i < len(b); i++ {
+		if b[i] == c {
+			return i
+		}
+	}
+	return -1
+}
+
+// indexAfterNewline returns the index of `needle` if it appears at the start
+// of a line (or at the start of the buffer) at or after start; -1 if none.
+func indexAfterNewline(b []byte, start int, needle string) int {
+	for i := start; i+len(needle) <= len(b); i++ {
+		if string(b[i:i+len(needle)]) != needle {
+			continue
+		}
+		if i == 0 || b[i-1] == '\n' {
+			return i
+		}
+	}
+	return -1
+}
+
 // --- helpers ---
 
-// contentDispositionFor returns the Content-Disposition header value for a file
-// served by /file/<id>. Inline-safe MIME types render in the page; everything
-// else is forced to attachment (browser saves to disk instead of executing).
+// contentDispositionFor returns the Content-Disposition header value for a
+// file served by /file/<id>. Inline-safe MIME types render in the page;
+// everything else is forced to attachment.
 func contentDispositionFor(contentType, filename string) string {
 	verb := "attachment"
 	if inlineSafeContentTypes[strings.ToLower(strings.TrimSpace(strings.SplitN(contentType, ";", 2)[0]))] {
@@ -313,8 +637,6 @@ func contentDispositionFor(contentType, filename string) string {
 	if filename == "" {
 		return verb
 	}
-	// RFC 5987 encoding for non-ASCII filenames; storage backends forward this
-	// verbatim via the response-content-disposition presign parameter.
 	return fmt.Sprintf(`%s; filename*=UTF-8''%s`, verb, url.QueryEscape(filename))
 }
 
@@ -325,8 +647,6 @@ func safeFilename(name string) string {
 	if name == "" || name == "." || name == "/" {
 		name = "file"
 	}
-	// Strip control characters and anything that would break an N-Quad literal
-	// without escaping; storage keys live in URLs and Dgraph predicates.
 	var b strings.Builder
 	for _, r := range name {
 		switch {
@@ -345,11 +665,11 @@ func safeFilename(name string) string {
 	return out
 }
 
-// commentKeyPrefix is the namespacing convention; see config.toml [storage]
-// for the per-kind prefixes (comments/, avatars/, orgas/...).
-func commentKeyPrefix(cid string) string {
-	return "comments/" + cid + "/"
-}
+// commentKeyPrefix / userKeyPrefix / orgaKeyPrefix are the per-anchor
+// namespacing conventions. See docs/file-attachments.md.
+func commentKeyPrefix(cid string) string { return "comments/" + cid + "/" }
+func userKeyPrefix(username string) string { return "users/" + username + "/" }
+func orgaKeyPrefix(rootnameid string) string { return "orgas/" + rootnameid + "/" }
 
 // randomID returns a 16-hex-char random string (~64 bits of entropy) used as
 // a storage-key collision guard. Not security-critical (auth is server-side).

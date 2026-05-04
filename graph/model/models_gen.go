@@ -188,11 +188,15 @@ type AddEventPayload struct {
 type AddFileInput struct {
 	CreatedBy   *UserRef    `json:"createdBy"`
 	CreatedAt   string      `json:"createdAt"`
-	Comment     *CommentRef `json:"comment"`
 	Filename    string      `json:"filename"`
 	ContentType string      `json:"contentType"`
 	Size        int         `json:"size"`
 	StorageKey  string      `json:"storageKey"`
+	Comment     *CommentRef `json:"comment,omitempty"`
+	Tension     *TensionRef `json:"tension,omitempty"`
+	User        *UserRef    `json:"user,omitempty"`
+	Node        *NodeRef    `json:"node,omitempty"`
+	Embedded    *bool       `json:"embedded,omitempty"`
 }
 
 type AddFilePayload struct {
@@ -286,6 +290,7 @@ type AddNodeInput struct {
 	Contracts                       []*VoteRef            `json:"contracts,omitempty"`
 	EventsHistory                   []*EventRef           `json:"events_history,omitempty"`
 	Activity                        []*ActivityRef        `json:"activity,omitempty"`
+	Avatar                          *FileRef              `json:"avatar,omitempty"`
 	CascadeDirective                *bool                 `json:"cascade_directive,omitempty"`
 }
 
@@ -544,6 +549,7 @@ type AddUserInput struct {
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
 	Activity         []*ActivityRef  `json:"activity,omitempty"`
+	Avatar           *FileRef        `json:"avatar,omitempty"`
 }
 
 type AddUserPayload struct {
@@ -1271,11 +1277,15 @@ type File struct {
 	ID          string   `json:"id"`
 	CreatedBy   *User    `json:"createdBy"`
 	CreatedAt   string   `json:"createdAt"`
-	Comment     *Comment `json:"comment"`
 	Filename    string   `json:"filename"`
 	ContentType string   `json:"contentType"`
 	Size        int      `json:"size"`
 	StorageKey  string   `json:"storageKey"`
+	Comment     *Comment `json:"comment,omitempty"`
+	Tension     *Tension `json:"tension,omitempty"`
+	User        *User    `json:"user,omitempty"`
+	Node        *Node    `json:"node,omitempty"`
+	Embedded    *bool    `json:"embedded,omitempty"`
 }
 
 type FileAggregateResult struct {
@@ -1313,21 +1323,29 @@ type FileOrder struct {
 type FilePatch struct {
 	CreatedBy   *UserRef    `json:"createdBy,omitempty"`
 	CreatedAt   *string     `json:"createdAt,omitempty"`
-	Comment     *CommentRef `json:"comment,omitempty"`
 	Filename    *string     `json:"filename,omitempty"`
 	ContentType *string     `json:"contentType,omitempty"`
 	Size        *int        `json:"size,omitempty"`
+	Comment     *CommentRef `json:"comment,omitempty"`
+	Tension     *TensionRef `json:"tension,omitempty"`
+	User        *UserRef    `json:"user,omitempty"`
+	Node        *NodeRef    `json:"node,omitempty"`
+	Embedded    *bool       `json:"embedded,omitempty"`
 }
 
 type FileRef struct {
 	ID          *string     `json:"id,omitempty"`
 	CreatedBy   *UserRef    `json:"createdBy,omitempty"`
 	CreatedAt   *string     `json:"createdAt,omitempty"`
-	Comment     *CommentRef `json:"comment,omitempty"`
 	Filename    *string     `json:"filename,omitempty"`
 	ContentType *string     `json:"contentType,omitempty"`
 	Size        *int        `json:"size,omitempty"`
 	StorageKey  *string     `json:"storageKey,omitempty"`
+	Comment     *CommentRef `json:"comment,omitempty"`
+	Tension     *TensionRef `json:"tension,omitempty"`
+	User        *UserRef    `json:"user,omitempty"`
+	Node        *NodeRef    `json:"node,omitempty"`
+	Embedded    *bool       `json:"embedded,omitempty"`
 }
 
 type FloatFilter struct {
@@ -1559,6 +1577,7 @@ type Node struct {
 	Contracts                       []*Vote                         `json:"contracts,omitempty"`
 	EventsHistory                   []*Event                        `json:"events_history,omitempty"`
 	Activity                        []*Activity                     `json:"activity,omitempty"`
+	Avatar                          *File                           `json:"avatar,omitempty"`
 	CascadeDirective                *bool                           `json:"cascade_directive,omitempty"`
 	TensionsOutAggregate            *TensionAggregateResult         `json:"tensions_outAggregate,omitempty"`
 	TensionsInAggregate             *TensionAggregateResult         `json:"tensions_inAggregate,omitempty"`
@@ -1747,6 +1766,7 @@ type NodePatch struct {
 	Contracts                       []*VoteRef            `json:"contracts,omitempty"`
 	EventsHistory                   []*EventRef           `json:"events_history,omitempty"`
 	Activity                        []*ActivityRef        `json:"activity,omitempty"`
+	Avatar                          *FileRef              `json:"avatar,omitempty"`
 	CascadeDirective                *bool                 `json:"cascade_directive,omitempty"`
 }
 
@@ -1791,6 +1811,7 @@ type NodeRef struct {
 	Contracts                       []*VoteRef            `json:"contracts,omitempty"`
 	EventsHistory                   []*EventRef           `json:"events_history,omitempty"`
 	Activity                        []*ActivityRef        `json:"activity,omitempty"`
+	Avatar                          *FileRef              `json:"avatar,omitempty"`
 	CascadeDirective                *bool                 `json:"cascade_directive,omitempty"`
 }
 
@@ -3193,6 +3214,7 @@ type User struct {
 	MarkAllAsRead             *string                   `json:"markAllAsRead,omitempty"`
 	EventCount                *EventCount               `json:"event_count,omitempty"`
 	Activity                  []*Activity               `json:"activity,omitempty"`
+	Avatar                    *File                     `json:"avatar,omitempty"`
 	SubscriptionsAggregate    *TensionAggregateResult   `json:"subscriptionsAggregate,omitempty"`
 	WatchingAggregate         *NodeAggregateResult      `json:"watchingAggregate,omitempty"`
 	RolesAggregate            *NodeAggregateResult      `json:"rolesAggregate,omitempty"`
@@ -3314,6 +3336,7 @@ type UserPatch struct {
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
 	Activity         []*ActivityRef  `json:"activity,omitempty"`
+	Avatar           *FileRef        `json:"avatar,omitempty"`
 }
 
 type UserRef struct {
@@ -3343,6 +3366,7 @@ type UserRef struct {
 	MarkAllAsRead    *string         `json:"markAllAsRead,omitempty"`
 	EventCount       *EventCountRef  `json:"event_count,omitempty"`
 	Activity         []*ActivityRef  `json:"activity,omitempty"`
+	Avatar           *FileRef        `json:"avatar,omitempty"`
 }
 
 type UserRights struct {
@@ -4558,26 +4582,34 @@ type FileHasFilter string
 const (
 	FileHasFilterCreatedBy   FileHasFilter = "createdBy"
 	FileHasFilterCreatedAt   FileHasFilter = "createdAt"
-	FileHasFilterComment     FileHasFilter = "comment"
 	FileHasFilterFilename    FileHasFilter = "filename"
 	FileHasFilterContentType FileHasFilter = "contentType"
 	FileHasFilterSize        FileHasFilter = "size"
 	FileHasFilterStorageKey  FileHasFilter = "storageKey"
+	FileHasFilterComment     FileHasFilter = "comment"
+	FileHasFilterTension     FileHasFilter = "tension"
+	FileHasFilterUser        FileHasFilter = "user"
+	FileHasFilterNode        FileHasFilter = "node"
+	FileHasFilterEmbedded    FileHasFilter = "embedded"
 )
 
 var AllFileHasFilter = []FileHasFilter{
 	FileHasFilterCreatedBy,
 	FileHasFilterCreatedAt,
-	FileHasFilterComment,
 	FileHasFilterFilename,
 	FileHasFilterContentType,
 	FileHasFilterSize,
 	FileHasFilterStorageKey,
+	FileHasFilterComment,
+	FileHasFilterTension,
+	FileHasFilterUser,
+	FileHasFilterNode,
+	FileHasFilterEmbedded,
 }
 
 func (e FileHasFilter) IsValid() bool {
 	switch e {
-	case FileHasFilterCreatedBy, FileHasFilterCreatedAt, FileHasFilterComment, FileHasFilterFilename, FileHasFilterContentType, FileHasFilterSize, FileHasFilterStorageKey:
+	case FileHasFilterCreatedBy, FileHasFilterCreatedAt, FileHasFilterFilename, FileHasFilterContentType, FileHasFilterSize, FileHasFilterStorageKey, FileHasFilterComment, FileHasFilterTension, FileHasFilterUser, FileHasFilterNode, FileHasFilterEmbedded:
 		return true
 	}
 	return false
@@ -5116,6 +5148,7 @@ const (
 	NodeHasFilterContracts                       NodeHasFilter = "contracts"
 	NodeHasFilterEventsHistory                   NodeHasFilter = "events_history"
 	NodeHasFilterActivity                        NodeHasFilter = "activity"
+	NodeHasFilterAvatar                          NodeHasFilter = "avatar"
 	NodeHasFilterCascadeDirective                NodeHasFilter = "cascade_directive"
 )
 
@@ -5159,12 +5192,13 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterContracts,
 	NodeHasFilterEventsHistory,
 	NodeHasFilterActivity,
+	NodeHasFilterAvatar,
 	NodeHasFilterCascadeDirective,
 }
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterIsTemplateTensionOnly, NodeHasFilterIsPinnedTensionfetchRecursively, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterTensionTemplates, NodeHasFilterProjectTemplates, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterCascadeDirective:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterIsTemplateTensionOnly, NodeHasFilterIsPinnedTensionfetchRecursively, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterTensionTemplates, NodeHasFilterProjectTemplates, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterAvatar, NodeHasFilterCascadeDirective:
 		return true
 	}
 	return false
@@ -7230,6 +7264,7 @@ const (
 	UserHasFilterMarkAllAsRead    UserHasFilter = "markAllAsRead"
 	UserHasFilterEventCount       UserHasFilter = "event_count"
 	UserHasFilterActivity         UserHasFilter = "activity"
+	UserHasFilterAvatar           UserHasFilter = "avatar"
 )
 
 var AllUserHasFilter = []UserHasFilter{
@@ -7258,11 +7293,12 @@ var AllUserHasFilter = []UserHasFilter{
 	UserHasFilterMarkAllAsRead,
 	UserHasFilterEventCount,
 	UserHasFilterActivity,
+	UserHasFilterAvatar,
 }
 
 func (e UserHasFilter) IsValid() bool {
 	switch e {
-	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount, UserHasFilterActivity:
+	case UserHasFilterCreatedAt, UserHasFilterLastAck, UserHasFilterUsername, UserHasFilterName, UserHasFilterEmail, UserHasFilterPassword, UserHasFilterBio, UserHasFilterLocation, UserHasFilterUtc, UserHasFilterLinks, UserHasFilterSkills, UserHasFilterNotifyByEmail, UserHasFilterLang, UserHasFilterSubscriptions, UserHasFilterWatching, UserHasFilterRights, UserHasFilterRoles, UserHasFilterTensionsCreated, UserHasFilterTensionsAssigned, UserHasFilterContracts, UserHasFilterReactions, UserHasFilterEvents, UserHasFilterMarkAllAsRead, UserHasFilterEventCount, UserHasFilterActivity, UserHasFilterAvatar:
 		return true
 	}
 	return false

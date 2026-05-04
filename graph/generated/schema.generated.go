@@ -3869,6 +3869,51 @@ func (ec *executionContext) field_File_createdBy_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_File_node_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NodeFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalONodeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_File_tension_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_File_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.UserFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOUserFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Label_nodesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -6144,6 +6189,21 @@ func (ec *executionContext) field_Node_activity_args(ctx context.Context, rawArg
 		}
 	}
 	args["to"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_avatar_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.FileFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOFileFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -12520,6 +12580,21 @@ func (ec *executionContext) field_User_activity_args(ctx context.Context, rawArg
 	return args, nil
 }
 
+func (ec *executionContext) field_User_avatar_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.FileFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOFileFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_User_contractsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14620,8 +14695,6 @@ func (ec *executionContext) fieldContext_AddFilePayload_file(ctx context.Context
 				return ec.fieldContext_File_createdBy(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_File_createdAt(ctx, field)
-			case "comment":
-				return ec.fieldContext_File_comment(ctx, field)
 			case "filename":
 				return ec.fieldContext_File_filename(ctx, field)
 			case "contentType":
@@ -14630,6 +14703,16 @@ func (ec *executionContext) fieldContext_AddFilePayload_file(ctx context.Context
 				return ec.fieldContext_File_size(ctx, field)
 			case "storageKey":
 				return ec.fieldContext_File_storageKey(ctx, field)
+			case "comment":
+				return ec.fieldContext_File_comment(ctx, field)
+			case "tension":
+				return ec.fieldContext_File_tension(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
+			case "node":
+				return ec.fieldContext_File_node(ctx, field)
+			case "embedded":
+				return ec.fieldContext_File_embedded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -15120,6 +15203,8 @@ func (ec *executionContext) fieldContext_AddNodePayload_node(ctx context.Context
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -16837,6 +16922,8 @@ func (ec *executionContext) fieldContext_AddUserPayload_user(ctx context.Context
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -17598,6 +17685,8 @@ func (ec *executionContext) fieldContext_Blob_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -18655,8 +18744,6 @@ func (ec *executionContext) fieldContext_Comment_files(ctx context.Context, fiel
 				return ec.fieldContext_File_createdBy(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_File_createdAt(ctx, field)
-			case "comment":
-				return ec.fieldContext_File_comment(ctx, field)
 			case "filename":
 				return ec.fieldContext_File_filename(ctx, field)
 			case "contentType":
@@ -18665,6 +18752,16 @@ func (ec *executionContext) fieldContext_Comment_files(ctx context.Context, fiel
 				return ec.fieldContext_File_size(ctx, field)
 			case "storageKey":
 				return ec.fieldContext_File_storageKey(ctx, field)
+			case "comment":
+				return ec.fieldContext_File_comment(ctx, field)
+			case "tension":
+				return ec.fieldContext_File_tension(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
+			case "node":
+				return ec.fieldContext_File_node(ctx, field)
+			case "embedded":
+				return ec.fieldContext_File_embedded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -18812,6 +18909,8 @@ func (ec *executionContext) fieldContext_Comment_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -19831,6 +19930,8 @@ func (ec *executionContext) fieldContext_Contract_candidates(ctx context.Context
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -20196,6 +20297,8 @@ func (ec *executionContext) fieldContext_Contract_createdBy(ctx context.Context,
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -22252,8 +22355,6 @@ func (ec *executionContext) fieldContext_DeleteFilePayload_file(ctx context.Cont
 				return ec.fieldContext_File_createdBy(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_File_createdAt(ctx, field)
-			case "comment":
-				return ec.fieldContext_File_comment(ctx, field)
 			case "filename":
 				return ec.fieldContext_File_filename(ctx, field)
 			case "contentType":
@@ -22262,6 +22363,16 @@ func (ec *executionContext) fieldContext_DeleteFilePayload_file(ctx context.Cont
 				return ec.fieldContext_File_size(ctx, field)
 			case "storageKey":
 				return ec.fieldContext_File_storageKey(ctx, field)
+			case "comment":
+				return ec.fieldContext_File_comment(ctx, field)
+			case "tension":
+				return ec.fieldContext_File_tension(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
+			case "node":
+				return ec.fieldContext_File_node(ctx, field)
+			case "embedded":
+				return ec.fieldContext_File_embedded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -22904,6 +23015,8 @@ func (ec *executionContext) fieldContext_DeleteNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -25328,6 +25441,8 @@ func (ec *executionContext) fieldContext_DeleteUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -26203,6 +26318,8 @@ func (ec *executionContext) fieldContext_Event_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -27818,6 +27935,8 @@ func (ec *executionContext) fieldContext_File_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -27891,78 +28010,6 @@ func (ec *executionContext) fieldContext_File_createdAt(_ context.Context, field
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
 		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _File_comment(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_File_comment(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Comment, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Comment)
-	fc.Result = res
-	return ec.marshalNComment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_File_comment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "File",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "message":
-				return ec.fieldContext_Comment_message(ctx, field)
-			case "reactions":
-				return ec.fieldContext_Comment_reactions(ctx, field)
-			case "files":
-				return ec.fieldContext_Comment_files(ctx, field)
-			case "id":
-				return ec.fieldContext_Comment_id(ctx, field)
-			case "createdBy":
-				return ec.fieldContext_Comment_createdBy(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Comment_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Comment_updatedAt(ctx, field)
-			case "reactionsAggregate":
-				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
-			case "filesAggregate":
-				return ec.fieldContext_Comment_filesAggregate(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_File_comment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -28126,6 +28173,512 @@ func (ec *executionContext) fieldContext_File_storageKey(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_comment(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_comment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Comment, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Comment)
+	fc.Result = res
+	return ec.marshalOComment2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_comment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "message":
+				return ec.fieldContext_Comment_message(ctx, field)
+			case "reactions":
+				return ec.fieldContext_Comment_reactions(ctx, field)
+			case "files":
+				return ec.fieldContext_Comment_files(ctx, field)
+			case "id":
+				return ec.fieldContext_Comment_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Comment_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Comment_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
+			case "filesAggregate":
+				return ec.fieldContext_Comment_filesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_File_comment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_tension(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_tension(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tension, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTension(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_tension(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "emitter":
+				return ec.fieldContext_Tension_emitter(ctx, field)
+			case "emitterid":
+				return ec.fieldContext_Tension_emitterid(ctx, field)
+			case "receiver":
+				return ec.fieldContext_Tension_receiver(ctx, field)
+			case "receiverid":
+				return ec.fieldContext_Tension_receiverid(ctx, field)
+			case "title":
+				return ec.fieldContext_Tension_title(ctx, field)
+			case "type_":
+				return ec.fieldContext_Tension_type_(ctx, field)
+			case "status":
+				return ec.fieldContext_Tension_status(ctx, field)
+			case "action":
+				return ec.fieldContext_Tension_action(ctx, field)
+			case "assignees":
+				return ec.fieldContext_Tension_assignees(ctx, field)
+			case "labels":
+				return ec.fieldContext_Tension_labels(ctx, field)
+			case "comments":
+				return ec.fieldContext_Tension_comments(ctx, field)
+			case "blobs":
+				return ec.fieldContext_Tension_blobs(ctx, field)
+			case "history":
+				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Tension_contracts(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_Tension_subscribers(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
+			case "n_comments":
+				return ec.fieldContext_Tension_n_comments(ctx, field)
+			case "id":
+				return ec.fieldContext_Tension_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Tension_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Tension_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Tension_updatedAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Tension_message(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_Tension_assigneesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Tension_labelsAggregate(ctx, field)
+			case "commentsAggregate":
+				return ec.fieldContext_Tension_commentsAggregate(ctx, field)
+			case "blobsAggregate":
+				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
+			case "historyAggregate":
+				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
+			case "subscribersAggregate":
+				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_File_tension_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_user(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "lastAck":
+				return ec.fieldContext_User_lastAck(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "bio":
+				return ec.fieldContext_User_bio(ctx, field)
+			case "location":
+				return ec.fieldContext_User_location(ctx, field)
+			case "utc":
+				return ec.fieldContext_User_utc(ctx, field)
+			case "links":
+				return ec.fieldContext_User_links(ctx, field)
+			case "skills":
+				return ec.fieldContext_User_skills(ctx, field)
+			case "notifyByEmail":
+				return ec.fieldContext_User_notifyByEmail(ctx, field)
+			case "lang":
+				return ec.fieldContext_User_lang(ctx, field)
+			case "subscriptions":
+				return ec.fieldContext_User_subscriptions(ctx, field)
+			case "watching":
+				return ec.fieldContext_User_watching(ctx, field)
+			case "rights":
+				return ec.fieldContext_User_rights(ctx, field)
+			case "roles":
+				return ec.fieldContext_User_roles(ctx, field)
+			case "tensions_created":
+				return ec.fieldContext_User_tensions_created(ctx, field)
+			case "tensions_assigned":
+				return ec.fieldContext_User_tensions_assigned(ctx, field)
+			case "contracts":
+				return ec.fieldContext_User_contracts(ctx, field)
+			case "reactions":
+				return ec.fieldContext_User_reactions(ctx, field)
+			case "events":
+				return ec.fieldContext_User_events(ctx, field)
+			case "markAllAsRead":
+				return ec.fieldContext_User_markAllAsRead(ctx, field)
+			case "event_count":
+				return ec.fieldContext_User_event_count(ctx, field)
+			case "activity":
+				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
+			case "subscriptionsAggregate":
+				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
+			case "watchingAggregate":
+				return ec.fieldContext_User_watchingAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_User_rolesAggregate(ctx, field)
+			case "tensions_createdAggregate":
+				return ec.fieldContext_User_tensions_createdAggregate(ctx, field)
+			case "tensions_assignedAggregate":
+				return ec.fieldContext_User_tensions_assignedAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_User_contractsAggregate(ctx, field)
+			case "reactionsAggregate":
+				return ec.fieldContext_User_reactionsAggregate(ctx, field)
+			case "eventsAggregate":
+				return ec.fieldContext_User_eventsAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_User_activityAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_File_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_node(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Node)
+	fc.Result = res
+	return ec.marshalONode2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Node_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Node_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Node_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Node_updatedAt(ctx, field)
+			case "nameid":
+				return ec.fieldContext_Node_nameid(ctx, field)
+			case "rootnameid":
+				return ec.fieldContext_Node_rootnameid(ctx, field)
+			case "source":
+				return ec.fieldContext_Node_source(ctx, field)
+			case "name":
+				return ec.fieldContext_Node_name(ctx, field)
+			case "about":
+				return ec.fieldContext_Node_about(ctx, field)
+			case "skills":
+				return ec.fieldContext_Node_skills(ctx, field)
+			case "isRoot":
+				return ec.fieldContext_Node_isRoot(ctx, field)
+			case "parent":
+				return ec.fieldContext_Node_parent(ctx, field)
+			case "type_":
+				return ec.fieldContext_Node_type_(ctx, field)
+			case "tensions_out":
+				return ec.fieldContext_Node_tensions_out(ctx, field)
+			case "tensions_in":
+				return ec.fieldContext_Node_tensions_in(ctx, field)
+			case "visibility":
+				return ec.fieldContext_Node_visibility(ctx, field)
+			case "mode":
+				return ec.fieldContext_Node_mode(ctx, field)
+			case "rights":
+				return ec.fieldContext_Node_rights(ctx, field)
+			case "isArchived":
+				return ec.fieldContext_Node_isArchived(ctx, field)
+			case "isPersonal":
+				return ec.fieldContext_Node_isPersonal(ctx, field)
+			case "userCanJoin":
+				return ec.fieldContext_Node_userCanJoin(ctx, field)
+			case "guestCanCreateTension":
+				return ec.fieldContext_Node_guestCanCreateTension(ctx, field)
+			case "lexicon":
+				return ec.fieldContext_Node_lexicon(ctx, field)
+			case "isTemplateTensionOnly":
+				return ec.fieldContext_Node_isTemplateTensionOnly(ctx, field)
+			case "isPinnedTensionfetchRecursively":
+				return ec.fieldContext_Node_isPinnedTensionfetchRecursively(ctx, field)
+			case "watchers":
+				return ec.fieldContext_Node_watchers(ctx, field)
+			case "children":
+				return ec.fieldContext_Node_children(ctx, field)
+			case "projects":
+				return ec.fieldContext_Node_projects(ctx, field)
+			case "pinned":
+				return ec.fieldContext_Node_pinned(ctx, field)
+			case "labels":
+				return ec.fieldContext_Node_labels(ctx, field)
+			case "roles":
+				return ec.fieldContext_Node_roles(ctx, field)
+			case "tension_templates":
+				return ec.fieldContext_Node_tension_templates(ctx, field)
+			case "project_templates":
+				return ec.fieldContext_Node_project_templates(ctx, field)
+			case "role_ext":
+				return ec.fieldContext_Node_role_ext(ctx, field)
+			case "role_type":
+				return ec.fieldContext_Node_role_type(ctx, field)
+			case "color":
+				return ec.fieldContext_Node_color(ctx, field)
+			case "first_link":
+				return ec.fieldContext_Node_first_link(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Node_contracts(ctx, field)
+			case "events_history":
+				return ec.fieldContext_Node_events_history(ctx, field)
+			case "activity":
+				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
+			case "cascade_directive":
+				return ec.fieldContext_Node_cascade_directive(ctx, field)
+			case "tensions_outAggregate":
+				return ec.fieldContext_Node_tensions_outAggregate(ctx, field)
+			case "tensions_inAggregate":
+				return ec.fieldContext_Node_tensions_inAggregate(ctx, field)
+			case "watchersAggregate":
+				return ec.fieldContext_Node_watchersAggregate(ctx, field)
+			case "childrenAggregate":
+				return ec.fieldContext_Node_childrenAggregate(ctx, field)
+			case "projectsAggregate":
+				return ec.fieldContext_Node_projectsAggregate(ctx, field)
+			case "pinnedAggregate":
+				return ec.fieldContext_Node_pinnedAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Node_labelsAggregate(ctx, field)
+			case "rolesAggregate":
+				return ec.fieldContext_Node_rolesAggregate(ctx, field)
+			case "tension_templatesAggregate":
+				return ec.fieldContext_Node_tension_templatesAggregate(ctx, field)
+			case "project_templatesAggregate":
+				return ec.fieldContext_Node_project_templatesAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Node_contractsAggregate(ctx, field)
+			case "events_historyAggregate":
+				return ec.fieldContext_Node_events_historyAggregate(ctx, field)
+			case "activityAggregate":
+				return ec.fieldContext_Node_activityAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_File_node_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _File_embedded(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_embedded(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Embedded, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_embedded(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -28861,6 +29414,8 @@ func (ec *executionContext) fieldContext_Label_nodes(ctx context.Context, field 
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -36292,6 +36847,8 @@ func (ec *executionContext) fieldContext_Node_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -36833,6 +37390,8 @@ func (ec *executionContext) fieldContext_Node_parent(ctx context.Context, field 
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -37627,6 +38186,8 @@ func (ec *executionContext) fieldContext_Node_watchers(ctx context.Context, fiel
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -37776,6 +38337,8 @@ func (ec *executionContext) fieldContext_Node_children(ctx context.Context, fiel
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -38550,6 +39113,8 @@ func (ec *executionContext) fieldContext_Node_first_link(ctx context.Context, fi
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -38837,6 +39402,81 @@ func (ec *executionContext) fieldContext_Node_activity(ctx context.Context, fiel
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Node_activity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Node_avatar(ctx context.Context, field graphql.CollectedField, obj *model.Node) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Node_avatar(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Avatar, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.File)
+	fc.Result = res
+	return ec.marshalOFile2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Node_avatar(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Node",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "filename":
+				return ec.fieldContext_File_filename(ctx, field)
+			case "contentType":
+				return ec.fieldContext_File_contentType(ctx, field)
+			case "size":
+				return ec.fieldContext_File_size(ctx, field)
+			case "storageKey":
+				return ec.fieldContext_File_storageKey(ctx, field)
+			case "comment":
+				return ec.fieldContext_File_comment(ctx, field)
+			case "tension":
+				return ec.fieldContext_File_tension(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
+			case "node":
+				return ec.fieldContext_File_node(ctx, field)
+			case "embedded":
+				return ec.fieldContext_File_embedded(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_avatar_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -42083,6 +42723,8 @@ func (ec *executionContext) fieldContext_Notif_createdBy(ctx context.Context, fi
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -43970,6 +44612,8 @@ func (ec *executionContext) fieldContext_Post_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -44518,6 +45162,8 @@ func (ec *executionContext) fieldContext_Project_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -45128,6 +45774,8 @@ func (ec *executionContext) fieldContext_Project_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -45259,6 +45907,8 @@ func (ec *executionContext) fieldContext_Project_collaborators(ctx context.Conte
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -48236,6 +48886,8 @@ func (ec *executionContext) fieldContext_ProjectDraft_assignees(ctx context.Cont
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -48481,6 +49133,8 @@ func (ec *executionContext) fieldContext_ProjectDraft_createdBy(ctx context.Cont
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -50023,6 +50677,8 @@ func (ec *executionContext) fieldContext_ProjectTemplate_nodes(ctx context.Conte
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -50815,6 +51471,8 @@ func (ec *executionContext) fieldContext_Query_getNode(ctx context.Context, fiel
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -50974,6 +51632,8 @@ func (ec *executionContext) fieldContext_Query_queryNode(ctx context.Context, fi
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -54261,8 +54921,6 @@ func (ec *executionContext) fieldContext_Query_getFile(ctx context.Context, fiel
 				return ec.fieldContext_File_createdBy(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_File_createdAt(ctx, field)
-			case "comment":
-				return ec.fieldContext_File_comment(ctx, field)
 			case "filename":
 				return ec.fieldContext_File_filename(ctx, field)
 			case "contentType":
@@ -54271,6 +54929,16 @@ func (ec *executionContext) fieldContext_Query_getFile(ctx context.Context, fiel
 				return ec.fieldContext_File_size(ctx, field)
 			case "storageKey":
 				return ec.fieldContext_File_storageKey(ctx, field)
+			case "comment":
+				return ec.fieldContext_File_comment(ctx, field)
+			case "tension":
+				return ec.fieldContext_File_tension(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
+			case "node":
+				return ec.fieldContext_File_node(ctx, field)
+			case "embedded":
+				return ec.fieldContext_File_embedded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -54328,8 +54996,6 @@ func (ec *executionContext) fieldContext_Query_queryFile(ctx context.Context, fi
 				return ec.fieldContext_File_createdBy(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_File_createdAt(ctx, field)
-			case "comment":
-				return ec.fieldContext_File_comment(ctx, field)
 			case "filename":
 				return ec.fieldContext_File_filename(ctx, field)
 			case "contentType":
@@ -54338,6 +55004,16 @@ func (ec *executionContext) fieldContext_Query_queryFile(ctx context.Context, fi
 				return ec.fieldContext_File_size(ctx, field)
 			case "storageKey":
 				return ec.fieldContext_File_storageKey(ctx, field)
+			case "comment":
+				return ec.fieldContext_File_comment(ctx, field)
+			case "tension":
+				return ec.fieldContext_File_tension(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
+			case "node":
+				return ec.fieldContext_File_node(ctx, field)
+			case "embedded":
+				return ec.fieldContext_File_embedded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -55723,6 +56399,8 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -55844,6 +56522,8 @@ func (ec *executionContext) fieldContext_Query_queryUser(ctx context.Context, fi
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -57332,6 +58012,8 @@ func (ec *executionContext) fieldContext_Reaction_user(ctx context.Context, fiel
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -57983,6 +58665,8 @@ func (ec *executionContext) fieldContext_RoleExt_nodes(ctx context.Context, fiel
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -58320,6 +59004,8 @@ func (ec *executionContext) fieldContext_RoleExt_roles(ctx context.Context, fiel
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -59010,6 +59696,8 @@ func (ec *executionContext) fieldContext_Tension_emitter(ctx context.Context, fi
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -59213,6 +59901,8 @@ func (ec *executionContext) fieldContext_Tension_receiver(ctx context.Context, f
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -59546,6 +60236,8 @@ func (ec *executionContext) fieldContext_Tension_assignees(ctx context.Context, 
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -60111,6 +60803,8 @@ func (ec *executionContext) fieldContext_Tension_subscribers(ctx context.Context
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -60391,6 +61085,8 @@ func (ec *executionContext) fieldContext_Tension_createdBy(ctx context.Context, 
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -62153,6 +62849,8 @@ func (ec *executionContext) fieldContext_TensionTemplate_nodes(ctx context.Conte
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -62517,6 +63215,8 @@ func (ec *executionContext) fieldContext_TensionTemplate_assignees(ctx context.C
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -64103,8 +64803,6 @@ func (ec *executionContext) fieldContext_UpdateFilePayload_file(ctx context.Cont
 				return ec.fieldContext_File_createdBy(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_File_createdAt(ctx, field)
-			case "comment":
-				return ec.fieldContext_File_comment(ctx, field)
 			case "filename":
 				return ec.fieldContext_File_filename(ctx, field)
 			case "contentType":
@@ -64113,6 +64811,16 @@ func (ec *executionContext) fieldContext_UpdateFilePayload_file(ctx context.Cont
 				return ec.fieldContext_File_size(ctx, field)
 			case "storageKey":
 				return ec.fieldContext_File_storageKey(ctx, field)
+			case "comment":
+				return ec.fieldContext_File_comment(ctx, field)
+			case "tension":
+				return ec.fieldContext_File_tension(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
+			case "node":
+				return ec.fieldContext_File_node(ctx, field)
+			case "embedded":
+				return ec.fieldContext_File_embedded(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -64603,6 +65311,8 @@ func (ec *executionContext) fieldContext_UpdateNodePayload_node(ctx context.Cont
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -66419,6 +67129,8 @@ func (ec *executionContext) fieldContext_UpdateUserPayload_user(ctx context.Cont
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -67565,6 +68277,8 @@ func (ec *executionContext) fieldContext_User_watching(ctx context.Context, fiel
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -67790,6 +68504,8 @@ func (ec *executionContext) fieldContext_User_roles(ctx context.Context, field g
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -68565,6 +69281,81 @@ func (ec *executionContext) fieldContext_User_activity(ctx context.Context, fiel
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_User_activity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_avatar(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_avatar(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Avatar, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.File)
+	fc.Result = res
+	return ec.marshalOFile2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFile(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_avatar(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_File_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_File_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_File_createdAt(ctx, field)
+			case "filename":
+				return ec.fieldContext_File_filename(ctx, field)
+			case "contentType":
+				return ec.fieldContext_File_contentType(ctx, field)
+			case "size":
+				return ec.fieldContext_File_size(ctx, field)
+			case "storageKey":
+				return ec.fieldContext_File_storageKey(ctx, field)
+			case "comment":
+				return ec.fieldContext_File_comment(ctx, field)
+			case "tension":
+				return ec.fieldContext_File_tension(ctx, field)
+			case "user":
+				return ec.fieldContext_File_user(ctx, field)
+			case "node":
+				return ec.fieldContext_File_node(ctx, field)
+			case "embedded":
+				return ec.fieldContext_File_embedded(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_avatar_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -70289,6 +71080,8 @@ func (ec *executionContext) fieldContext_UserEvent_user(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -71327,6 +72120,8 @@ func (ec *executionContext) fieldContext_Vote_node(ctx context.Context, field gr
 				return ec.fieldContext_Node_events_history(ctx, field)
 			case "activity":
 				return ec.fieldContext_Node_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_Node_avatar(ctx, field)
 			case "cascade_directive":
 				return ec.fieldContext_Node_cascade_directive(ctx, field)
 			case "tensions_outAggregate":
@@ -71543,6 +72338,8 @@ func (ec *executionContext) fieldContext_Vote_createdBy(ctx context.Context, fie
 				return ec.fieldContext_User_event_count(ctx, field)
 			case "activity":
 				return ec.fieldContext_User_activity(ctx, field)
+			case "avatar":
+				return ec.fieldContext_User_avatar(ctx, field)
 			case "subscriptionsAggregate":
 				return ec.fieldContext_User_subscriptionsAggregate(ctx, field)
 			case "watchingAggregate":
@@ -73186,7 +73983,7 @@ func (ec *executionContext) unmarshalInputAddFileInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "comment", "filename", "contentType", "size", "storageKey"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "filename", "contentType", "size", "storageKey", "comment", "tension", "user", "node", "embedded"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73207,13 +74004,6 @@ func (ec *executionContext) unmarshalInputAddFileInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.CreatedAt = data
-		case "comment":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
-			data, err := ec.unmarshalNCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Comment = data
 		case "filename":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filename"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -73242,6 +74032,41 @@ func (ec *executionContext) unmarshalInputAddFileInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.StorageKey = data
+		case "comment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			data, err := ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Comment = data
+		case "tension":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
+			data, err := ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tension = data
+		case "user":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.User = data
+		case "node":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
+			data, err := ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Node = data
+		case "embedded":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("embedded"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Embedded = data
 		}
 	}
 
@@ -73633,7 +74458,7 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "isPinnedTensionfetchRecursively", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "project_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "isPinnedTensionfetchRecursively", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "project_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "avatar", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73934,6 +74759,13 @@ func (ec *executionContext) unmarshalInputAddNodeInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.Activity = data
+		case "avatar":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			data, err := ec.unmarshalOFileRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Avatar = data
 		case "cascade_directive":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cascade_directive"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -76073,7 +76905,7 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity", "avatar"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -76438,6 +77270,13 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.Activity = data
+		case "avatar":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			data, err := ec.unmarshalOFileRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Avatar = data
 		}
 	}
 
@@ -80253,7 +81092,7 @@ func (ec *executionContext) unmarshalInputFilePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "comment", "filename", "contentType", "size"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "filename", "contentType", "size", "comment", "tension", "user", "node", "embedded"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -80304,30 +81143,6 @@ func (ec *executionContext) unmarshalInputFilePatch(ctx context.Context, obj int
 				it.CreatedAt = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "comment":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.CommentRef); ok {
-				it.Comment = data
-			} else if tmp == nil {
-				it.Comment = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CommentRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "filename":
@@ -80396,6 +81211,124 @@ func (ec *executionContext) unmarshalInputFilePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "comment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.CommentRef); ok {
+				it.Comment = data
+			} else if tmp == nil {
+				it.Comment = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.CommentRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "tension":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.TensionRef); ok {
+				it.Tension = data
+			} else if tmp == nil {
+				it.Tension = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "user":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.UserRef); ok {
+				it.User = data
+			} else if tmp == nil {
+				it.User = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.UserRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "node":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.NodeRef); ok {
+				it.Node = data
+			} else if tmp == nil {
+				it.Node = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.NodeRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "embedded":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("embedded"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*bool); ok {
+				it.Embedded = data
+			} else if tmp == nil {
+				it.Embedded = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -80409,7 +81342,7 @@ func (ec *executionContext) unmarshalInputFileRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "comment", "filename", "contentType", "size", "storageKey"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "filename", "contentType", "size", "storageKey", "comment", "tension", "user", "node", "embedded"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -80437,13 +81370,6 @@ func (ec *executionContext) unmarshalInputFileRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.CreatedAt = data
-		case "comment":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
-			data, err := ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Comment = data
 		case "filename":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filename"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -80472,6 +81398,41 @@ func (ec *executionContext) unmarshalInputFileRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.StorageKey = data
+		case "comment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comment"))
+			data, err := ec.unmarshalOCommentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐCommentRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Comment = data
+		case "tension":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tension"))
+			data, err := ec.unmarshalOTensionRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tension = data
+		case "user":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+			data, err := ec.unmarshalOUserRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐUserRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.User = data
+		case "node":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
+			data, err := ec.unmarshalONodeRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeRef(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Node = data
+		case "embedded":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("embedded"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Embedded = data
 		}
 	}
 
@@ -82468,7 +83429,7 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "isPinnedTensionfetchRecursively", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "project_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "isPinnedTensionfetchRecursively", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "project_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "avatar", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -83355,6 +84316,30 @@ func (ec *executionContext) unmarshalInputNodePatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ActivityRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "avatar":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOFileRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_ro == nil {
+					return nil, errors.New("directive x_ro is not implemented")
+				}
+				return ec.directives.X_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.FileRef); ok {
+				it.Avatar = data
+			} else if tmp == nil {
+				it.Avatar = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.FileRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "cascade_directive":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cascade_directive"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOBoolean2ᚖbool(ctx, v) }
@@ -83390,7 +84375,7 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "isPinnedTensionfetchRecursively", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "project_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "cascade_directive"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "nameid", "rootnameid", "source", "name", "about", "skills", "isRoot", "parent", "type_", "tensions_out", "tensions_in", "visibility", "mode", "rights", "isArchived", "isPersonal", "userCanJoin", "guestCanCreateTension", "lexicon", "isTemplateTensionOnly", "isPinnedTensionfetchRecursively", "watchers", "children", "projects", "pinned", "labels", "roles", "tension_templates", "project_templates", "role_ext", "role_type", "color", "first_link", "contracts", "events_history", "activity", "avatar", "cascade_directive"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -83698,6 +84683,30 @@ func (ec *executionContext) unmarshalInputNodeRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Activity = data
+		case "avatar":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOFileRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_ro == nil {
+					return nil, errors.New("directive x_ro is not implemented")
+				}
+				return ec.directives.X_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.FileRef); ok {
+				it.Avatar = data
+			} else if tmp == nil {
+				it.Avatar = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.FileRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "cascade_directive":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cascade_directive"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -92773,7 +93782,7 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "lastAck", "name", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity"}
+	fieldsInOrder := [...]string{"createdAt", "lastAck", "name", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity", "avatar"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -93318,6 +94327,30 @@ func (ec *executionContext) unmarshalInputUserPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.ActivityRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "avatar":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOFileRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_ro == nil {
+					return nil, errors.New("directive x_ro is not implemented")
+				}
+				return ec.directives.X_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.FileRef); ok {
+				it.Avatar = data
+			} else if tmp == nil {
+				it.Avatar = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.FileRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -93331,7 +94364,7 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity"}
+	fieldsInOrder := [...]string{"id", "createdAt", "lastAck", "username", "name", "email", "password", "bio", "location", "utc", "links", "skills", "notifyByEmail", "lang", "subscriptions", "watching", "rights", "roles", "tensions_created", "tensions_assigned", "contracts", "reactions", "events", "markAllAsRead", "event_count", "activity", "avatar"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -93855,6 +94888,30 @@ func (ec *executionContext) unmarshalInputUserRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Activity = data
+		case "avatar":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+			directive0 := func(ctx context.Context) (interface{}, error) {
+				return ec.unmarshalOFileRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileRef(ctx, v)
+			}
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_ro == nil {
+					return nil, errors.New("directive x_ro is not implemented")
+				}
+				return ec.directives.X_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*model.FileRef); ok {
+				it.Avatar = data
+			} else if tmp == nil {
+				it.Avatar = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.FileRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -98075,11 +99132,6 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "comment":
-			out.Values[i] = ec._File_comment(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "filename":
 			out.Values[i] = ec._File_filename(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -98100,6 +99152,16 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "comment":
+			out.Values[i] = ec._File_comment(ctx, field, obj)
+		case "tension":
+			out.Values[i] = ec._File_tension(ctx, field, obj)
+		case "user":
+			out.Values[i] = ec._File_user(ctx, field, obj)
+		case "node":
+			out.Values[i] = ec._File_node(ctx, field, obj)
+		case "embedded":
+			out.Values[i] = ec._File_embedded(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -98974,6 +100036,8 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Node_events_history(ctx, field, obj)
 		case "activity":
 			out.Values[i] = ec._Node_activity(ctx, field, obj)
+		case "avatar":
+			out.Values[i] = ec._Node_avatar(ctx, field, obj)
 		case "cascade_directive":
 			out.Values[i] = ec._Node_cascade_directive(ctx, field, obj)
 		case "tensions_outAggregate":
@@ -104038,6 +105102,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_event_count(ctx, field, obj)
 		case "activity":
 			out.Values[i] = ec._User_activity(ctx, field, obj)
+		case "avatar":
+			out.Values[i] = ec._User_avatar(ctx, field, obj)
 		case "subscriptionsAggregate":
 			out.Values[i] = ec._User_subscriptionsAggregate(ctx, field, obj)
 		case "watchingAggregate":
@@ -109793,6 +110859,14 @@ func (ec *executionContext) unmarshalOFileRef2ᚕᚖfractaleᚋfractal6ᚗgoᚋg
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalOFileRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFileRef(ctx context.Context, v interface{}) (*model.FileRef, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFileRef(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOFloatRange2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐFloatRange(ctx context.Context, v interface{}) (*model.FloatRange, error) {

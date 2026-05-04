@@ -136,7 +136,7 @@ Uses a real chi router with JWT middleware and tests handlers end-to-end.
 - `integration_test.go` - TestMain: verify seed data, start mock email server, build test router. Also provides shared helpers: `doRequest()`, `loginAs()`, `requireStatus()`, `requireJWTCookie()`.
 - `integration_auth_test.go` - Auth handler tests (Login, Logout, Signup, SignupValidate, TokenAck, UpdatePassword)
 - `integration_org_test.go` - Org handler tests (CreateOrga, SetUserCanJoin, SetGuestCanCreateTension)
-- `integration_files_test.go` - `/file/*` end-to-end tests (upload auth, MIME-sniff, GET 302+headers, inline/attachment policy, DELETE 404 leak guard, comment-delete S3 GC). Uses MinIO from compose.
+- `integration_files_test.go` - `/file/*` end-to-end tests across the three anchor kinds: comment attachments (auth + MIME-sniff + cross-tension rejection), user/org avatars (replace-on-upload + visibility GET), inline-screenshot rewrite (`embedded` flag + code-block masking + parallel uploads), DELETE 404 leak guard, comment-delete S3 GC. Uses MinIO from compose. Companion unit tests for the markdown-rewrite helper live in `files_rewrite_test.go` (no `integration` tag — runs under plain `go test`).
 
 **Dependencies mocked:**
 - Email API: A local `httptest.Server` accepts all POST requests (configured via `email.SetTestConfig`)

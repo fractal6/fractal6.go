@@ -713,10 +713,14 @@ type ComplexityRoot struct {
 		ContentType func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		CreatedBy   func(childComplexity int, filter *model.UserFilter) int
+		Embedded    func(childComplexity int) int
 		Filename    func(childComplexity int) int
 		ID          func(childComplexity int) int
+		Node        func(childComplexity int, filter *model.NodeFilter) int
 		Size        func(childComplexity int) int
 		StorageKey  func(childComplexity int) int
+		Tension     func(childComplexity int, filter *model.TensionFilter) int
+		User        func(childComplexity int, filter *model.UserFilter) int
 	}
 
 	FileAggregateResult struct {
@@ -882,6 +886,7 @@ type ComplexityRoot struct {
 		About                           func(childComplexity int) int
 		Activity                        func(childComplexity int, from *string, to *string) int
 		ActivityAggregate               func(childComplexity int, filter *model.ActivityFilter) int
+		Avatar                          func(childComplexity int, filter *model.FileFilter) int
 		CascadeDirective                func(childComplexity int) int
 		Children                        func(childComplexity int, filter *model.NodeFilter, order *model.NodeOrder, first *int, offset *int) int
 		ChildrenAggregate               func(childComplexity int, filter *model.NodeFilter) int
@@ -1617,6 +1622,7 @@ type ComplexityRoot struct {
 	User struct {
 		Activity                  func(childComplexity int, from *string, to *string) int
 		ActivityAggregate         func(childComplexity int, filter *model.ActivityFilter) int
+		Avatar                    func(childComplexity int, filter *model.FileFilter) int
 		Bio                       func(childComplexity int) int
 		Contracts                 func(childComplexity int, filter *model.ContractFilter, order *model.ContractOrder, first *int, offset *int) int
 		ContractsAggregate        func(childComplexity int, filter *model.ContractFilter) int
@@ -4252,6 +4258,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.File.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
+	case "File.embedded":
+		if e.complexity.File.Embedded == nil {
+			break
+		}
+
+		return e.complexity.File.Embedded(childComplexity), true
+
 	case "File.filename":
 		if e.complexity.File.Filename == nil {
 			break
@@ -4266,6 +4279,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.File.ID(childComplexity), true
 
+	case "File.node":
+		if e.complexity.File.Node == nil {
+			break
+		}
+
+		args, err := ec.field_File_node_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.File.Node(childComplexity, args["filter"].(*model.NodeFilter)), true
+
 	case "File.size":
 		if e.complexity.File.Size == nil {
 			break
@@ -4279,6 +4304,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.File.StorageKey(childComplexity), true
+
+	case "File.tension":
+		if e.complexity.File.Tension == nil {
+			break
+		}
+
+		args, err := ec.field_File_tension_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.File.Tension(childComplexity, args["filter"].(*model.TensionFilter)), true
+
+	case "File.user":
+		if e.complexity.File.User == nil {
+			break
+		}
+
+		args, err := ec.field_File_user_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.File.User(childComplexity, args["filter"].(*model.UserFilter)), true
 
 	case "FileAggregateResult.contentTypeMax":
 		if e.complexity.FileAggregateResult.ContentTypeMax == nil {
@@ -5756,6 +5805,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.ActivityAggregate(childComplexity, args["filter"].(*model.ActivityFilter)), true
+
+	case "Node.avatar":
+		if e.complexity.Node.Avatar == nil {
+			break
+		}
+
+		args, err := ec.field_Node_avatar_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Avatar(childComplexity, args["filter"].(*model.FileFilter)), true
 
 	case "Node.cascade_directive":
 		if e.complexity.Node.CascadeDirective == nil {
@@ -10600,6 +10661,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ActivityAggregate(childComplexity, args["filter"].(*model.ActivityFilter)), true
 
+	case "User.avatar":
+		if e.complexity.User.Avatar == nil {
+			break
+		}
+
+		args, err := ec.field_User_avatar_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Avatar(childComplexity, args["filter"].(*model.FileFilter)), true
+
 	case "User.bio":
 		if e.complexity.User.Bio == nil {
 			break
@@ -11912,6 +11985,7 @@ type Node {
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
   activity(from: String, to: String): [Activity!] @meta(f:"getNodeActivity", k:["rootnameid"])
+  avatar(filter: FileFilter): File
   cascade_directive: Boolean
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -12166,11 +12240,15 @@ type File {
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
-  comment(filter: CommentFilter): Comment!
   filename: String!
   contentType: String!
   size: Int!
   storageKey: String!
+  comment(filter: CommentFilter): Comment
+  tension(filter: TensionFilter): Tension
+  user(filter: UserFilter): User
+  node(filter: NodeFilter): Node
+  embedded: Boolean
 }
 
 type Reaction {
@@ -12277,6 +12355,7 @@ type User {
   markAllAsRead: String
   event_count(filter: EventCountFilter): EventCount @meta(f:"getEventCount", k:["username"])
   activity(from: String, to: String): [Activity!] @meta(f:"getUserActivity", k:["username"])
+  avatar(filter: FileFilter): File
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   watchingAggregate(filter: NodeFilter): NodeAggregateResult
@@ -12509,35 +12588,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @cascade(fields: [String]) on FIELD
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
 directive @id on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 type ActivityAggregateResult {
   count: Int
@@ -12717,11 +12796,15 @@ type AddEventPayload {
 input AddFileInput {
   createdBy: UserRef!
   createdAt: DateTime!
-  comment: CommentRef!
   filename: String!
   contentType: String!
   size: Int!
   storageKey: String!
+  comment: CommentRef
+  tension: TensionRef
+  user: UserRef
+  node: NodeRef
+  embedded: Boolean
 }
 
 type AddFilePayload {
@@ -12815,6 +12898,7 @@ input AddNodeInput {
   contracts: [VoteRef!]
   events_history: [EventRef!]
   activity: [ActivityRef!]
+  avatar: FileRef
   cascade_directive: Boolean
 }
 
@@ -13073,6 +13157,7 @@ input AddUserInput {
   markAllAsRead: String
   event_count: EventCountRef
   activity: [ActivityRef!]
+  avatar: FileRef
 }
 
 type AddUserPayload {
@@ -13897,11 +13982,15 @@ input FileFilter {
 enum FileHasFilter {
   createdBy
   createdAt
-  comment
   filename
   contentType
   size
   storageKey
+  comment
+  tension
+  user
+  node
+  embedded
 }
 
 input FileOrder {
@@ -13921,21 +14010,29 @@ enum FileOrderable {
 input FilePatch {
   createdBy: UserRef @x_patch_ro
   createdAt: DateTime @x_patch_ro
-  comment: CommentRef @x_patch_ro
   filename: String @x_patch_ro
   contentType: String @x_patch_ro
   size: Int @x_patch_ro
+  comment: CommentRef @x_patch_ro
+  tension: TensionRef @x_patch_ro
+  user: UserRef @x_patch_ro
+  node: NodeRef @x_patch_ro
+  embedded: Boolean @x_patch_ro
 }
 
 input FileRef {
   id: ID
   createdBy: UserRef
   createdAt: DateTime
-  comment: CommentRef
   filename: String
   contentType: String
   size: Int
   storageKey: String
+  comment: CommentRef
+  tension: TensionRef
+  user: UserRef
+  node: NodeRef
+  embedded: Boolean
 }
 
 input FloatFilter {
@@ -14413,6 +14510,7 @@ enum NodeHasFilter {
   contracts
   events_history
   activity
+  avatar
   cascade_directive
 }
 
@@ -14478,6 +14576,7 @@ input NodePatch {
   contracts: [VoteRef!] @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
   activity: [ActivityRef!] @x_patch_ro
+  avatar: FileRef @x_ro
   cascade_directive: Boolean @x_patch_ro
 }
 
@@ -14522,6 +14621,7 @@ input NodeRef {
   contracts: [VoteRef!]
   events_history: [EventRef!]
   activity: [ActivityRef!]
+  avatar: FileRef @x_ro
   cascade_directive: Boolean
 }
 
@@ -16140,6 +16240,7 @@ enum UserHasFilter {
   markAllAsRead
   event_count
   activity
+  avatar
 }
 
 input UserOrder {
@@ -16185,6 +16286,7 @@ input UserPatch {
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username")
   event_count: EventCountRef @x_patch_ro
   activity: [ActivityRef!] @x_patch_ro
+  avatar: FileRef @x_ro
 }
 
 input UserRef {
@@ -16214,6 +16316,7 @@ input UserRef {
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username")
   event_count: EventCountRef
   activity: [ActivityRef!]
+  avatar: FileRef @x_ro
 }
 
 type UserRightsAggregateResult {

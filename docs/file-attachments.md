@@ -1,35 +1,57 @@
 # File Attachments
 
-S3-compatible object storage (Garage in production, MinIO compatible) for files
-attached to comments. Bytes are served via a single REST proxy that re-uses
-the existing GBAC auth for the parent comment.
+S3-compatible object storage (Garage in production, MinIO compatible) for the
+three asset kinds Fractale persists outside Dgraph: comment attachments,
+user avatars, and org (root Node) avatars. Bytes are served via a single REST
+proxy that re-authorises against the file's anchor on every read.
 
 ## Where things live
 
 | Concern | File |
 |---|---|
-| Schema (`File` type, `Comment.files`) | `schema/graphql/fractal6.graphql` |
+| Schema (`File`, anchor edges) | `schema/graphql/fractal6.graphql` |
 | S3 client wrapper | `internal/storage/s3.go` |
-| DQL templates (auth, add, delete, list) | `db/dql_templates.go`, `db/dql_mutations.go` |
-| DB helpers (`GetFileAuth`, `AddFileToComment`, `CleanupCommentFiles`, …) | `db/files.go` |
-| HTTP handlers (`/file/*`) | `web/handlers/files.go` |
+| DQL templates (auth, add, replace, delete, list) | `db/dql_templates.go`, `db/dql_mutations.go` |
+| DB helpers (`GetFileAuth`, `AddCommentFile`, `Replace*Avatar`, …) | `db/files.go` |
+| HTTP handlers (`/file/*`) + markdown rewrite | `web/handlers/files.go` |
 | Route wiring | `cmd/server.go` |
 | Comment-delete GC | `graph/tension_op.go::RemoveComment` |
 | Storage config | `[storage]` block in `config.toml` |
 
+## Anchors
+
+Every `File` row has exactly one anchor. The handler picks the auth path from
+the populated triple in the form body:
+
+| Form fields | Kind | GET auth | DB helper |
+|---|---|---|---|
+| `tid` + `cid` | `KindComment` | parent tension's receiver visibility | `AddCommentFile` |
+| `userid` | `KindUser`  | public | `ReplaceUserAvatar` |
+| `orgaid` | `KindNode` | node visibility | `ReplaceNodeAvatar` |
+
+`File.tension` is denormalised alongside `File.comment` so the GET-time auth
+fetch is a single DQL hop. There is no `Tension.files` edge.
+
+User and org avatars are *replace-on-upload*: the helper drops the previous
+`File` row + reverse edge, returns the previous `storageKey`, and the handler
+fires a goroutine to GC the old S3 object.
+
 ## Auth model
 
-There is **one** auth path for both first-class attachments and markdown-embedded
-images. Read access matches the parent comment's tension visibility (re-using
-`auth.IsNodeVisible`); write/delete is restricted to the comment author (same
-rule as `RemoveComment`).
+Read access depends on the anchor kind (table above). Write access:
+
+| Anchor | POST /file/upload | DELETE /file/<id> |
+|---|---|---|
+| comment (`tid`+`cid`) | EMAP[`CommentPushed`].Check on tension AND `cid` belongs to `tid` AND comment author == caller | uploader-only (`File.createdBy.username == uctx.Username`) |
+| user (`userid`) | `userid == uctx.Username` | uploader-only (always self for avatars) |
+| node (`orgaid`) | `auth.UserHasCoordoRole(uctx, orgaid)` | uploader-only |
 
 ```
 GET /file/<id>
    ↓
-db.GetFileAuth(id)              # File → Comment → Tension → receiver(nameid, visibility)
+db.GetFileAuth(id)              # one DQL hop, three branches projected; Kind picked Go-side
    ↓
-auth.IsNodeVisible(uctx, ...)   # 403 on fail
+isFileVisible(uctx, fa)         # public (KindUser) | IsNodeVisible(receiver) | IsNodeVisible(node)
    ↓
 storage.PresignGet(key, ttl)    # short-lived presigned URL
    ↓
@@ -46,9 +68,9 @@ over either pure proxying or returning presigned URLs to the client directly.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `GET` | `/file/<id>` | Comment read auth | 302 to presigned URL; **404** on miss *or* unauthorised (no existence leak) |
-| `POST` | `/file/upload` | Comment author | multipart, fields: `comment_id`, `file` |
-| `DELETE` | `/file/<id>` | Comment author | 404 on miss/not-yours; S3 first, then DB on success |
+| `GET` | `/file/<id>` | per-anchor (table above) | 302 to presigned URL; **404** on miss *or* unauthorised (no existence leak) |
+| `POST` | `/file/upload` | per-anchor (table above) | multipart; pass exactly one anchor: (`tid`+`cid`) \| `userid` \| `orgaid`. `file` part required. |
+| `DELETE` | `/file/<id>` | uploader-only | 404 on miss/not-yours; S3 first, then DB on success |
 
 Handlers are constructed via `FileGetHandler(cli)` / `FileUploadHandler(cli)` /
 `FileDeleteHandler(cli)` taking an injected `*storage.Client`. When the
@@ -65,12 +87,57 @@ is unset; callers MUST nil-check (this is the fast path through
 `POST /file/upload` returns:
 
 ```json
-{ "id": "0x...", "url": "/file/0x...", "filename": "...", "contentType": "...", "size": ... }
+{ "id": "0x...", "url": "/file/0x...", "filename": "...", "contentType": "...", "size": ..., "embedded": false }
 ```
+
+`embedded` is set on the comment-attachment path when the upload's filename
+appeared inline as `![alt](filename)` in the parent comment. The handler then
+rewrites the comment to reference `/file/<id>` and flips `File.embedded=true`
+in a single guarded upsert. See "Inline screenshot pasting" below.
 
 Use `url` directly — for both `<a href="...">` attachments and markdown
 `![alt](/file/0x...)`. The URL is stable for the lifetime of the file; presign
 expiry is invisible to clients (re-issued on every request).
+
+## Inline screenshot pasting
+
+Frontend convention: when the user pastes a screenshot during compose, the
+client embeds `![alt](filename)` *with a unique filename per paste* (e.g.
+`paste-<timestamp>-<counter>.png`) and holds the bytes in browser memory.
+On publish the client does:
+
+1. The GraphQL mutation that creates the carrier (comment / tension+initial
+   comment / `updateComment`).
+2. `POST /file/upload?tid=<tid>&cid=<cid>` once per pasted file, *after* the
+   carrier exists server-side.
+
+The upload handler reads the comment message, finds the bare-token
+`![alt](<filename>)` reference, replaces it with `![alt](/file/<id>)`, and
+flips `File.embedded=true`. The rewrite is a plain read-modify-write —
+**concurrent uploads to the same comment race on `Comment.message` (last
+write wins).** The File rows themselves are independent and both persist;
+only the inline URL substitution can be lost. The UI is lenient about
+`embedded=true` files whose URL is no longer in the message — they render
+as regular attachment chips.
+
+Code regions are masked before matching: filenames mentioned inside fenced
+` ``` ` / `~~~` blocks or inline backticks are not rewritten.
+
+**Filename collisions are the frontend's responsibility.** Two pasted files
+with the same filename inside one comment cannot both be embedded — the
+first match wins, the second is left as a placeholder. To avoid concurrent-
+upload races, frontends should serialise (or low-concurrency batch) the
+per-file `POST /file/upload` calls for the same parent comment.
+
+### Order of operations from the frontend
+
+| Scenario | Sequence |
+|---|---|
+| Edit existing comment with new pastes | `updateComment(cid, message=…filenames…)` → for each file `POST /file/upload?tid=&cid=` |
+| New comment on existing tension | `addComment(tension=tid, message=…filenames…)` → use returned `cid` → for each file `POST /file/upload?tid=&cid=` |
+| New tension with screenshots in body | `addTension(initial body …filenames…)` → use returned `tid` and initial `cid` → for each file `POST /file/upload?tid=&cid=` |
+| User avatar | `POST /file/upload?userid=` |
+| Org avatar | `POST /file/upload?orgaid=` |
 
 ## Storage layout
 
@@ -78,9 +145,9 @@ A single bucket holds all file kinds, namespaced by key prefix:
 
 | Prefix | Purpose |
 |---|---|
-| `comments/<cid>/<rand>-<safe-name>` | comment attachments (wired now) |
-| `avatars/<username>/<rand>-<safe-name>` | user avatars (future) |
-| `orgas/<rootnameid>/<rand>-<safe-name>` | organisation assets (future) |
+| `comments/<cid>/<rand>-<safe-name>` | comment attachments |
+| `users/<username>/<rand>-<safe-name>` | user avatars |
+| `orgas/<rootnameid>/<rand>-<safe-name>` | org (root Node) avatars |
 
 `<rand>` is 16 hex chars (~64 bits) to prevent key guessing and collisions.
 `<safe-name>` is the original filename with control chars + path separators
@@ -90,12 +157,6 @@ stripped, capped at 120 chars. The original filename is also stored in the
 ## Schema (GraphQL)
 
 ```graphql
-type Comment implements Post @auth(update: <<update-comment>>) @hook_ {
-  message: String! @search(by: [fulltext]) @x_alter
-  reactions: [Reaction!] @hasInverse(field: comment)
-  files: [File!] @hasInverse(field: comment) @x_ro
-}
-
 type File @auth(
   add: <<is-root>>,
   update: <<is-root>>,
@@ -104,11 +165,29 @@ type File @auth(
   id: ID!
   createdBy: User!
   createdAt: DateTime! @search
-  comment: Comment!
   filename: String!
   contentType: String!
   size: Int!
   storageKey: String! @id
+
+  # Anchor — exactly one of the three groups below is populated per row.
+  comment: Comment           # comment attachment
+  tension: Tension           # denormalised parent tension uid (co-set with comment)
+  user:    User              # user avatar
+  node:    Node              # node (root org) avatar
+
+  # True when referenced inline in comment.message.
+  embedded: Boolean
+}
+
+type Comment { ...
+  files: [File!] @hasInverse(field: comment) @x_ro
+}
+type User { ...
+  avatar: File @x_ro @hasInverse(field: user)
+}
+type Node { ...
+  avatar: File @x_ro @hasInverse(field: node)
 }
 ```
 
@@ -149,13 +228,11 @@ sets up systemd, and (optionally) bootstraps the bucket and access keys.
 ## DQL note: no reverse edge on `Tension.comments`
 
 `Tension.comments` has no `@hasInverse` in the GraphQL schema, so Dgraph
-doesn't generate a reverse predicate. The auth templates (`getCommentAuth`,
-`getFileAuth`) therefore start their walk at the parent `Tension` and filter
-with `uid_in(Tension.comments, <comment uid>)` rather than `~Tension.comments`.
-Don't switch back to a reverse-edge walk without first declaring the predicate
-as `@reverse` in the underlying DQL schema (which the GraphQL admin won't do
-for you). `getCommentFiles` walks forward from comment to its files via
-`Comment.files` and is unaffected.
+doesn't generate a reverse predicate. `getCommentMessage` therefore walks
+forward from `tid` and filters its `Tension.comments` edge by `cid` rather
+than via a reverse-edge query. `getFileAuth_v2` sidesteps the issue entirely
+by reading `File.tension` (denormalised at insert time). `getCommentFiles`
+walks forward from comment to its files via `Comment.files` and is unaffected.
 
 Note: `db.Meta()` runs every response through `tools.CleanDqlMap`, which strips
 `Type.` prefixes (`File.storageKey` → `storageKey`, `Post.createdBy` →
