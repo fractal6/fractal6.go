@@ -115,7 +115,7 @@ func seedCardEnv(t *testing.T) seededCardEnv {
             `,
 		}},
 	}
-	res, err := db.GetDB().MutateWithQueryDql3(seed, map[string]string{})
+	res, err := db.GetDB().UpsertDql(seed, map[string]string{})
 	if err != nil {
 		t.Fatalf("seed: %v", err)
 	}

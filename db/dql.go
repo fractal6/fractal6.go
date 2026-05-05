@@ -94,8 +94,7 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]any, error
 		res, err = dg.QueryDql(f, maps)
 	} else if _, ok := dqlMutations[f]; ok { // Mutation Case
 		// Send request
-		// @codefactor: unify api...
-		res, err = dg.MutateWithQueryDql3(dqlMutations[f], maps)
+		res, err = dg.UpsertDql(dqlMutations[f], maps)
 	} else {
 		err = fmt.Errorf("Unknown DQL query")
 	}
@@ -110,14 +109,10 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]any, error
 func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]any, error) {
 	// Send Custom DQL request
 	// Returns: array
-	var res *api.Response
-	var err error
-
-	res, err = dg.MutateWithQueryDql3(q, maps)
+	res, err := dg.UpsertDql(q, maps)
 	if res == nil {
 		return nil, err
 	}
-
 	return decodeDqlResp(res)
 }
 
@@ -1001,7 +996,7 @@ func (dg Dgraph) DeepDelete(t string, id string) error {
         uid(all_ids) * * .
     `, reverse)
 
-	resp, err := dg.mutateWithQueryDqlResp(query, &api.Mutation{DelNquads: []byte(mu)})
+	resp, err := dg.runDqlTxn(query, []*api.Mutation{{DelNquads: []byte(mu)}})
 	if err != nil {
 		return err
 	}

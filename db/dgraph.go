@@ -346,95 +346,94 @@ func (dg Dgraph) postql(uctx model.UserCtx, data []byte, res any) error {
 // DQL (ex GraphQL+-) Interface
 //
 
-// QueryDql runs a query on dgraph (...QueryDql)
+// QueryDql runs a read-only DQL query template. Routed through runDqlTxn so
+// transient "Please retry" errors (replication lag, tablet rebalance) are
+// retried transparently — same contract as the upsert path.
 func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, error) {
-	// init client
-	dgc, cancel := dg.getDgraphClient()
-	defer cancel()
-	ctx := context.Background()
-	txn := dgc.NewTxn()
-	defer txn.Discard(ctx)
-
-	// Get the Query
 	q := dg.getDqlQuery(op, maps)
-	// Send Request
 	if viper.GetString("rootCmd") == "api" && !strings.HasPrefix(op, "count") && buildMode == "DEV" {
-		// @DEBUG LEVEL
 		fmt.Println(op)
 	}
-	// fmt.Println(string(q))
-	res, err := txn.Query(ctx, q)
-	// fmt.Println(res)
+	return dg.runDqlTxn(q, nil)
+}
+
+// runDqlTxn executes a query block plus optional mutations in a fresh
+// auto-commit txn. Pass nil/empty mutations for a read-only query. Wrapped
+// in withDqlRetry so transient conflicts/snapshot-staleness are invisible
+// to callers. Same retry contract as QueryGql for the GraphQL path.
+func (dg Dgraph) runDqlTxn(query string, mutations []*api.Mutation) (*api.Response, error) {
+	return withDqlRetry(func() (*api.Response, error) {
+		dgc, cancel := dg.getDgraphClient()
+		defer cancel()
+		ctx := context.Background()
+		txn := dgc.NewTxn()
+		defer txn.Discard(ctx)
+
+		if len(mutations) == 0 {
+			return txn.Query(ctx, query)
+		}
+		return txn.Do(ctx, &api.Request{
+			Query:     query,
+			Mutations: mutations,
+			CommitNow: true,
+		})
+	})
+}
+
+// isDgraphConflict reports whether err is a transient Dgraph error that
+// callers should retry against a fresh txn snapshot. Covers both write
+// conflicts (CommitNow upserts losing the race) and read-side staleness
+// (replication lag, tablet rebalance). Mirrors the marker used by Dgraph's
+// dgo client and the existing GraphQL-path retry at QueryGql.
+func isDgraphConflict(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(err.Error(), "Please retry")
+}
+
+// withDqlRetry runs fn under the same retry policy as the GraphQL path:
+// up to 10 attempts, 10-100ms jittered backoff, only on isDgraphConflict.
+// Logs once when retries fire so contention shows up in observability
+// instead of being silently swallowed.
+func withDqlRetry(fn func() (*api.Response, error)) (*api.Response, error) {
+	const maxAttempts = 10
+	var (
+		res *api.Response
+		err error
+	)
+	for attempt := 0; attempt < maxAttempts; attempt++ {
+		res, err = fn()
+		if !isDgraphConflict(err) {
+			if attempt > 0 {
+				fmt.Printf("dql: succeeded after %d retries\n", attempt)
+			}
+			return res, err
+		}
+		time.Sleep(time.Duration(10+rand.Intn(91)) * time.Millisecond)
+	}
 	return res, err
 }
 
-// MutateWithQueryDql runs an upsert block mutation by first querying query
-// and then mutate based on the result.
-func (dg Dgraph) MutateWithQueryDql(query string, mu *api.Mutation) error {
-	_, err := dg.mutateWithQueryDqlResp(query, mu)
-	return err
-}
-
-// mutateWithQueryDqlResp is MutateWithQueryDql but exposes the response so
-// callers can read query-block projections (e.g. storage keys for cascade GC).
-func (dg Dgraph) mutateWithQueryDqlResp(query string, mu *api.Mutation) (*api.Response, error) {
-	dgc, cancel := dg.getDgraphClient()
-	defer cancel()
-	ctx := context.Background()
-	txn := dgc.NewTxn()
-	defer txn.Discard(ctx)
-
-	req := &api.Request{
-		Query:     query,
-		Mutations: []*api.Mutation{mu},
-		CommitNow: true,
-	}
-	return txn.Do(ctx, req)
-}
-
-// MutateWithQueryDql3 runs an upsert block mutations by first querying query
-// and then mutate based on the result. Accepte conditions.
-func (dg Dgraph) MutateWithQueryDql3(q QueryMut, maps map[string]string) (*api.Response, error) {
-	// init client
-	dgc, cancel := dg.getDgraphClient()
-	defer cancel()
-	ctx := context.Background()
-	txn := dgc.NewTxn()
-	defer txn.Discard(ctx)
-
+// UpsertDql runs an upsert template (QueryMut + variable map): formats
+// Q/M[i].S/D/C, then delegates to runDqlTxn. Retries on conflict.
+func (dg Dgraph) UpsertDql(q QueryMut, maps map[string]string) (*api.Response, error) {
 	query := RawFormat(q.Q, maps)
-	mutations := []*api.Mutation{}
+	mutations := make([]*api.Mutation, 0, len(q.M))
 	for _, m := range q.M {
-		mu := api.Mutation{}
-		muSet := RawFormat(m.S, maps)
-		muDel := RawFormat(m.D, maps)
-		cond := RawFormat(m.C, maps)
-		if muSet != "" {
-			mu.SetNquads = []byte(muSet)
+		mu := &api.Mutation{}
+		if s := RawFormat(m.S, maps); s != "" {
+			mu.SetNquads = []byte(s)
 		}
-		if muDel != "" {
-			mu.DelNquads = []byte(muDel)
+		if d := RawFormat(m.D, maps); d != "" {
+			mu.DelNquads = []byte(d)
 		}
-		if cond != "" {
-			mu.Cond = cond
+		if c := RawFormat(m.C, maps); c != "" {
+			mu.Cond = c
 		}
-		mutations = append(mutations, &mu)
+		mutations = append(mutations, mu)
 	}
-
-	// fmt.Println(query)
-	// fmt.Println(mutations)
-
-	if len(q.M) == 0 {
-		return txn.Query(ctx, query)
-	}
-
-	req := &api.Request{
-		Query:     query,
-		Mutations: mutations,
-		CommitNow: true,
-	}
-
-	return txn.Do(ctx, req)
+	return dg.runDqlTxn(query, mutations)
 }
 
 //

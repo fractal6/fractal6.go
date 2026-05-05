@@ -150,7 +150,7 @@ func (dg Dgraph) GetCommentForUpload(tid, cid string) (CommentForUpload, error) 
 // composing the new message.
 func (dg Dgraph) AddCommentFile(tid, cid, username, filename, contentType, storageKey string, size int64, nowRFC3339 string) (string, error) {
 	q := dqlMutations["addCommentFile"]
-	res, err := dg.MutateWithQueryDql3(q, map[string]string{
+	res, err := dg.UpsertDql(q, map[string]string{
 		"tid":         tid,
 		"cid":         cid,
 		"username":    username,
@@ -175,7 +175,7 @@ func (dg Dgraph) AddCommentFile(tid, cid, username, filename, contentType, stora
 // wins); File rows are independent and both persist regardless.
 func (dg Dgraph) EmbedCommentMessage(cid, fid, newMessage string) error {
 	q := dqlMutations["embedCommentMessage"]
-	_, err := dg.MutateWithQueryDql3(q, map[string]string{
+	_, err := dg.UpsertDql(q, map[string]string{
 		"cid":        cid,
 		"fid":        fid,
 		"newMessage": escapeNQuad(newMessage),
@@ -188,7 +188,7 @@ func (dg Dgraph) EmbedCommentMessage(cid, fid, newMessage string) error {
 // so the caller can fire-and-forget S3 GC.
 func (dg Dgraph) ReplaceUserAvatar(username, filename, contentType, storageKey string, size int64, nowRFC3339 string) (string, string, error) {
 	q := dqlMutations["replaceUserAvatar"]
-	res, err := dg.MutateWithQueryDql3(q, map[string]string{
+	res, err := dg.UpsertDql(q, map[string]string{
 		"username":    username,
 		"filename":    escapeNQuad(filename),
 		"contentType": escapeNQuad(contentType),
@@ -209,7 +209,7 @@ func (dg Dgraph) ReplaceUserAvatar(username, filename, contentType, storageKey s
 // ReplaceNodeAvatar mirrors ReplaceUserAvatar for Node (org) avatars.
 func (dg Dgraph) ReplaceNodeAvatar(nameid, username, filename, contentType, storageKey string, size int64, nowRFC3339 string) (string, string, error) {
 	q := dqlMutations["replaceNodeAvatar"]
-	res, err := dg.MutateWithQueryDql3(q, map[string]string{
+	res, err := dg.UpsertDql(q, map[string]string{
 		"nameid":      nameid,
 		"username":    username,
 		"filename":    escapeNQuad(filename),
@@ -240,7 +240,7 @@ func (dg Dgraph) DeleteFile(fileid string) error {
 // S3 failures are logged in the goroutine and do not surface as errors.
 func (dg Dgraph) DeleteUser(username, ghostid string) error {
 	q := dqlMutations["deleteUser"]
-	res, err := dg.MutateWithQueryDql3(q, map[string]string{
+	res, err := dg.UpsertDql(q, map[string]string{
 		"username": username,
 		"ghostid":  ghostid,
 	})
