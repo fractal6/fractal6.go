@@ -22,7 +22,6 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -247,10 +246,8 @@ func (dg Dgraph) DeleteUser(username, ghostid string) error {
 	if err != nil {
 		return err
 	}
-	if res != nil {
-		if keys := extractStorageKeys(res.Json); len(keys) > 0 {
-			deleteStorageKeysAsync(keys)
-		}
+	if keys := extractStorageKeys(res); len(keys) > 0 {
+		deleteStorageKeysAsync(keys)
 	}
 	return nil
 }
@@ -418,19 +415,12 @@ func escapeNQuad(s string) string {
 // oldKeyFromResp pulls the previous avatar's storageKey from the upsert query
 // block (returned as an `all` array). Empty when no prior avatar.
 func oldKeyFromResp(res *api.Response) string {
-	if res == nil || len(res.Json) == 0 {
+	type row struct {
+		StorageKey string `json:"File.storageKey"`
+	}
+	rows, err := DecodeDqlBlock[row](res, "all")
+	if err != nil || len(rows) == 0 {
 		return ""
 	}
-	var decoded struct {
-		All []struct {
-			StorageKey string `json:"File.storageKey"`
-		} `json:"all"`
-	}
-	if err := json.Unmarshal(res.Json, &decoded); err != nil {
-		return ""
-	}
-	if len(decoded.All) == 0 {
-		return ""
-	}
-	return decoded.All[0].StorageKey
+	return rows[0].StorageKey
 }

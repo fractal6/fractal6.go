@@ -59,13 +59,13 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         all(func: uid(h_in, h_out), first:25, orderdesc: Post.createdAt) @filter(NOT eq(Event.event_type, "BlobCreated")) @cascade {
-            Post.createdAt
-            Post.createdBy { User.username }
-            Event.event_type
-            Event.tension {
-                uid
-                Tension.title
-                Tension.receiver { Node.name Node.nameid }
+            createdAt: Post.createdAt
+            createdBy: Post.createdBy { username: User.username }
+            event_type: Event.event_type
+            tension: Event.tension {
+                id: uid
+                title: Tension.title
+                receiver: Tension.receiver { name: Node.name nameid: Node.nameid }
             }
         }
     }`,

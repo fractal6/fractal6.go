@@ -27,7 +27,6 @@ package graph
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
@@ -305,128 +304,6 @@ func private(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	}
 
 	return nil, fmt.Errorf("'%s' field is private", fieldName)
-}
-
-// Use DQL query to fetch the given field=k.
-// If k is not given, "id" is automatically pass to the query template.
-func meta(ctx context.Context, obj any, next graphql.Resolver, f string, k []string) (any, error) {
-	data, err := next(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	maps := map[string]string{}
-	// Get query fields
-	for i, key := range k {
-		var ok bool
-		var v string
-
-		// Try context first, then fall back to object reflection
-		if v, ok = ctx.Value(key).(string); !ok {
-			o := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(key))
-			if !o.IsValid() {
-				// First key is required (primary key), others are optional
-				if i == 0 {
-					rc := graphql.GetResolverContext(ctx)
-					return nil, fmt.Errorf("'%s' field on '%s' seems not valid or unknown", key, rc.Field.Name)
-				}
-				continue
-			}
-			// Handle pointer fields (e.g., *string for optional fields)
-			if o.Kind() == reflect.Ptr {
-				if o.IsNil() {
-					continue
-				}
-				v = o.Elem().String()
-			} else {
-				v = o.String()
-			}
-		}
-
-		// First key must be non-empty (required)
-		if v == "" && i == 0 {
-			rc := graphql.GetResolverContext(ctx)
-			return nil, fmt.Errorf("'%s' field is needed to query '%s'", key, rc.Field.Name)
-		}
-
-		if v != "" {
-			maps[key] = v
-		}
-	}
-
-	// Collect field arguments into the template map.
-	// gqlgen generates string for required args and *string for optional ones.
-	if fc := graphql.GetFieldContext(ctx); fc != nil {
-		for argName, argVal := range fc.Args {
-			switch v := argVal.(type) {
-			case string:
-				if v != "" {
-					maps[argName] = v
-				}
-			case *string:
-				if v != nil && *v != "" {
-					maps[argName] = *v
-				}
-			}
-		}
-	}
-
-	// Query
-	res, err := db.GetDB().Meta(f, maps)
-	if err != nil {
-		return nil, err
-	}
-
-	// Map result
-	switch data.(type) {
-	case *int:
-		rc := graphql.GetResolverContext(ctx)
-		fieldName := rc.Field.Name
-		for _, s := range res {
-			// assumes only one element is returned
-			v, _ := s[fieldName].(float64)
-			v2 := int(v)
-			data = &v2
-		}
-	default:
-		rt := reflect.TypeOf(data)
-		switch rt.Kind() {
-		case reflect.Slice:
-			// Convert list of map to the desired list of interface
-			newData := reflect.MakeSlice(rt, 0, len(res))
-			for i := 0; i < len(res); i++ {
-				elemPtr := reflect.New(rt.Elem())
-				b, err := json.Marshal(res[i])
-				if err != nil {
-					return data, err
-				}
-				if err := json.Unmarshal(b, elemPtr.Interface()); err != nil {
-					return data, err
-				}
-				newData = reflect.Append(newData, elemPtr.Elem())
-			}
-			data = newData.Interface()
-		default:
-			// Assume interface (pointer type, e.g. *EventCount)
-			// Merge results (needed for user defined returns (i.e. EventCounts))
-			m := make(map[string]any, 2)
-			for _, s := range res {
-				for k, v := range s {
-					m[k] = v
-				}
-			}
-			b, err := json.Marshal(m)
-			if err != nil {
-				return data, err
-			}
-			newVal := reflect.New(reflect.TypeOf(data).Elem())
-			if err := json.Unmarshal(b, newVal.Interface()); err != nil {
-				return data, err
-			}
-			data = newVal.Interface()
-		}
-	}
-	return data, err
 }
 
 func meta_patch(ctx context.Context, obj any, next graphql.Resolver, f string, k *string) (any, error) {

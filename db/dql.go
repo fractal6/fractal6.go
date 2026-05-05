@@ -1002,32 +1002,28 @@ func (dg Dgraph) DeepDelete(t string, id string) error {
 	}
 	// Fire S3 cleanup for tension deletes (the contract template doesn't
 	// project file_keys today; the keys field will simply be absent).
-	if t == "tension" && resp != nil {
-		if keys := extractStorageKeys(resp.Json); len(keys) > 0 {
+	if t == "tension" {
+		if keys := extractStorageKeys(resp); len(keys) > 0 {
 			deleteStorageKeysAsync(keys)
 		}
 	}
 	return nil
 }
 
-// extractStorageKeys reads `file_keys[*].File.storageKey` from a DQL response
-// JSON. Returns nil when the block is absent or empty.
-func extractStorageKeys(body []byte) []string {
-	if len(body) == 0 {
+// extractStorageKeys reads `file_keys[*].File.storageKey` from a DQL response.
+// Returns nil when the block is absent or empty.
+func extractStorageKeys(res *api.Response) []string {
+	type row struct {
+		StorageKey string `json:"File.storageKey"`
+	}
+	rows, err := DecodeDqlBlock[row](res, "file_keys")
+	if err != nil || len(rows) == 0 {
 		return nil
 	}
-	var decoded struct {
-		FileKeys []struct {
-			StorageKey string `json:"File.storageKey"`
-		} `json:"file_keys"`
-	}
-	if err := json.Unmarshal(body, &decoded); err != nil {
-		return nil
-	}
-	out := make([]string, 0, len(decoded.FileKeys))
-	for _, k := range decoded.FileKeys {
-		if k.StorageKey != "" {
-			out = append(out, k.StorageKey)
+	out := make([]string, 0, len(rows))
+	for _, r := range rows {
+		if r.StorageKey != "" {
+			out = append(out, r.StorageKey)
 		}
 	}
 	return out
@@ -1064,6 +1060,35 @@ func unmarshalCountResp(res *api.Response) int {
 		return v
 	}
 	return -1
+}
+
+// DecodeDqlBlock decodes a named result block of a DQL response directly into
+// []T using T's json tags — no CleanDqlMap pass, no re-marshal. Use when the
+// result has a fixed shape and you want to skip the generic-map path taken by
+// Meta/Gamma. block defaults to "all" when empty. Returns (nil, nil) when the
+// response is empty or the block is absent.
+//
+// Typical T uses Dgraph-native keys, e.g. `json:"File.storageKey"`.
+func DecodeDqlBlock[T any](res *api.Response, block string) ([]T, error) {
+	if res == nil || len(res.Json) == 0 {
+		return nil, nil
+	}
+	if block == "" {
+		block = "all"
+	}
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(res.Json, &raw); err != nil {
+		return nil, err
+	}
+	blk, ok := raw[block]
+	if !ok || len(blk) == 0 {
+		return nil, nil
+	}
+	var out []T
+	if err := json.Unmarshal(blk, &out); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // decodeDqlResp decodes an api.Response into cleaned DQL result maps.

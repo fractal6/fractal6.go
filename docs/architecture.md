@@ -71,9 +71,11 @@ The schema relies on directives processed at three levels (schema parsing, codeg
 
 ### `@meta` computed fields
 
-`@meta(f: String!, k: [String!])` declares a field whose value comes from a DQL query template. `f` is the template name (looked up in the `dqlQueries` map in `db/dql.go`); `k` is the list of parent fields used as template parameters. Field arguments (e.g. `query: String`) are also passed to the template.
+`@meta(f: String!, k: [String!])` declares a field whose value comes from a DQL query template. `f` is the template name (looked up in `dqlQueries` in `db/dql_templates.go`); `k` is the list of parent fields used as template parameters. Field arguments (e.g. `query: String`) are also passed to the template.
 
-Examples in the schema: `Node.events_history`, `User.event_count`, `User.activity`, `Node.activity`. Implementation lives in `meta()` (`graph/resolver.go`); the DQL execution happens in `(dg Dgraph).Meta()` (`db/dql.go`).
+Examples in the schema: `Node.events_history`, `User.event_count`, `User.activity`, `Node.activity`. Implementation lives in `graph/meta_directive.go`: each `f` name is registered in `metaRegistry` against its target Go type via `metaSlice[T]` / `metaScalar[T]`, which decode the DQL response directly into `[]*T` / `*T` in one JSON pass.
+
+Adding a new `@meta` field: declare it in the SDL, add the DQL template (aliasing predicates so the JSON keys match the target type's `json:"..."` tags), then add one line to `metaRegistry`.
 
 ## Authorization
 
