@@ -161,14 +161,14 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	nodesGiven := []model.NodeRef{}
 	var x any
 	if len(input.Filter.ID) > 0 { // Updates with UID
-		x, err = db.GetDB().GetSubFieldById(input.Filter.ID[0], typeName+".nodes", "Node.nameid")
+		x, err = db.GetDB().GetByUid(input.Filter.ID[0], typeName+".nodes", "Node.nameid")
 	} else { // Update from hash names
 		if typeName == "Project" && input.Filter.Parentnameid.Eq != nil && input.Filter.Nameid.Eq != nil {
 			// Project like artefacts
-			x, err = db.GetDB().GetSubFieldByEq(typeName+".nameid", *input.Filter.Nameid.Eq, typeName+".nodes", "Node.nameid", typeName+".parentnameid", *input.Filter.Parentnameid.Eq)
+			x, err = db.GetDB().GetByEqFiltered(typeName+".nameid", *input.Filter.Nameid.Eq, typeName+".parentnameid", *input.Filter.Parentnameid.Eq, typeName+".nodes", "Node.nameid")
 		} else if input.Filter.Name.Eq != nil && input.Filter.Rootnameid.Eq != nil {
 			// Other Artefacts update from hash names
-			x, err = db.GetDB().GetSubFieldByEq(typeName+".name", *input.Filter.Name.Eq, typeName+".nodes", "Node.nameid", typeName+".rootnameid", *input.Filter.Rootnameid.Eq)
+			x, err = db.GetDB().GetByEqFiltered(typeName+".name", *input.Filter.Name.Eq, typeName+".rootnameid", *input.Filter.Rootnameid.Eq, typeName+".nodes", "Node.nameid")
 		} else {
 			return nil, LogErr("Access denied", fmt.Errorf("invalid filter to update node artefact."))
 		}
@@ -241,13 +241,13 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	if typeName == "Project" && input.Remove != nil && len(input.Remove.Nodes) > 0 {
 		var pData any
 		if len(input.Filter.ID) > 0 {
-			pData, err = db.GetDB().GetFieldById(input.Filter.ID[0], "uid Project.parentnameid Project.rootnameid")
+			pData, err = db.GetDB().GetByUid(input.Filter.ID[0], "uid Project.parentnameid Project.rootnameid")
 		} else if input.Filter.Parentnameid != nil && input.Filter.Parentnameid.Eq != nil &&
 			input.Filter.Nameid != nil && input.Filter.Nameid.Eq != nil {
-			pData, err = db.GetDB().GetFieldByEq(
+			pData, err = db.GetDB().GetByEqFiltered(
 				"Project.nameid", *input.Filter.Nameid.Eq,
-				"uid Project.parentnameid Project.rootnameid",
 				"Project.parentnameid", *input.Filter.Parentnameid.Eq,
+				"uid Project.parentnameid Project.rootnameid",
 			)
 		}
 		if err != nil {
@@ -288,7 +288,7 @@ func updateNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	old := struct{ Name, Color, Rootnameid string }{}
 	if isRelabeling {
 		// Old value -- Color is embeded in the event new/old value
-		old_, err := db.GetDB().GetFieldById(input.Filter.ID[0], "Label.name Label.color Label.rootnameid")
+		old_, err := db.GetDB().GetByUid(input.Filter.ID[0], "Label.name Label.color Label.rootnameid")
 		if err != nil {
 			return nil, LogErr("Internal error", err)
 		}
@@ -373,9 +373,9 @@ func deleteNodeArtefactHook(ctx context.Context, obj any, next graphql.Resolver)
 	// Get nodes linked to the artefact
 	var x any
 	if len(filter.ID) > 0 {
-		x, err = db.GetDB().GetSubFieldById(filter.ID[0], typeName+".nodes", "Node.nameid")
+		x, err = db.GetDB().GetByUid(filter.ID[0], typeName+".nodes", "Node.nameid")
 	} else if filter.Name != nil && filter.Name.Eq != nil && filter.Rootnameid != nil && filter.Rootnameid.Eq != nil {
-		x, err = db.GetDB().GetSubFieldByEq(typeName+".name", *filter.Name.Eq, typeName+".nodes", "Node.nameid", typeName+".rootnameid", *filter.Rootnameid.Eq)
+		x, err = db.GetDB().GetByEqFiltered(typeName+".name", *filter.Name.Eq, typeName+".rootnameid", *filter.Rootnameid.Eq, typeName+".nodes", "Node.nameid")
 	} else {
 		return nil, LogErr("Access denied", fmt.Errorf("invalid filter to delete node artefact."))
 	}

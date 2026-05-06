@@ -53,7 +53,7 @@ func addContractInputHook(ctx context.Context, obj any, next graphql.Resolver) (
 			if c.Email == nil {
 				continue
 			}
-			if v, _ := db.GetDB().GetFieldByEq("User.email", *c.Email, "User.username"); v != nil {
+			if v, _ := db.GetDB().GetByEq("User.email", *c.Email, "User.username"); v != nil {
 				username := v.(string)
 				candidates = append(candidates, &model.UserRef{Username: &username})
 
@@ -237,7 +237,7 @@ func deleteContractHook(ctx context.Context, obj any, next graphql.Resolver) (an
 	// --
 	var ok bool
 	// isAuthor
-	author, err := db.GetDB().GetSubFieldById(ids[0], "Post.createdBy", "User.username")
+	author, err := db.GetDB().GetByUid(ids[0], "Post.createdBy", "User.username")
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func deleteContractHook(ctx context.Context, obj any, next graphql.Resolver) (an
 	ok = author.(string) == uctx.Username
 	// OR has rights (coordo or assigned).
 	if !ok {
-		nameid, err := db.GetDB().GetSubFieldById(ids[0], "Contract.tension", "Tension.receiverid")
+		nameid, err := db.GetDB().GetByUid(ids[0], "Contract.tension", "Tension.receiverid")
 		if err != nil {
 			return nil, err
 		}

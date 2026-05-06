@@ -20,8 +20,9 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Tests for generic DQL primitives: Count, Exists, IsChild, GetField*,
-// GetSubField*. Tests for named-template queries live in integration_query_test.go.
+// Tests for generic DQL primitives: Count, Exists, IsChild, GetByUid,
+// GetByEq, GetByEqFiltered. Tests for named-template queries live in
+// integration_query_test.go.
 
 package db_test
 
@@ -80,18 +81,18 @@ func TestExists_Integration(t *testing.T) {
 	})
 }
 
-func TestGetFieldByEq_Integration(t *testing.T) {
+func TestGetByEq_Integration(t *testing.T) {
 	t.Parallel()
-	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.name")
+	val, err := GetDB().GetByEq("Node.nameid", "test-org", "Node.name")
 	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
+		t.Fatalf("GetByEq returned error: %v", err)
 	}
 	name, ok := val.(string)
 	if !ok {
-		t.Fatalf("GetFieldByEq returned type %T, want string", val)
+		t.Fatalf("GetByEq returned type %T, want string", val)
 	}
 	if name != "Test Org" {
-		t.Errorf("GetFieldByEq(Node.name) = %q, want %q", name, "Test Org")
+		t.Errorf("GetByEq(Node.name) = %q, want %q", name, "Test Org")
 	}
 }
 
@@ -161,15 +162,15 @@ func TestQueryDql_IntegrationRaw(t *testing.T) {
 	}
 }
 
-func TestGetFieldById_Integration(t *testing.T) {
+func TestGetByUid_Integration(t *testing.T) {
 	t.Parallel()
 	tid := getTensionUID(t)
 
 	t.Run("single_field", func(t *testing.T) {
 		t.Parallel()
-		val, err := GetDB().GetFieldById(tid, "Tension.title")
+		val, err := GetDB().GetByUid(tid, "Tension.title")
 		if err != nil {
-			t.Fatalf("GetFieldById returned error: %v", err)
+			t.Fatalf("GetByUid returned error: %v", err)
 		}
 		title, ok := val.(string)
 		if !ok {
@@ -182,9 +183,9 @@ func TestGetFieldById_Integration(t *testing.T) {
 
 	t.Run("multi_field", func(t *testing.T) {
 		t.Parallel()
-		val, err := GetDB().GetFieldById(tid, "Tension.title Tension.status")
+		val, err := GetDB().GetByUid(tid, "Tension.title Tension.status")
 		if err != nil {
-			t.Fatalf("GetFieldById returned error: %v", err)
+			t.Fatalf("GetByUid returned error: %v", err)
 		}
 		m, ok := val.(map[string]any)
 		if !ok {
@@ -200,9 +201,9 @@ func TestGetFieldById_Integration(t *testing.T) {
 
 	t.Run("not_found", func(t *testing.T) {
 		t.Parallel()
-		val, err := GetDB().GetFieldById("0xdeadbeef", "Tension.title")
+		val, err := GetDB().GetByUid("0xdeadbeef", "Tension.title")
 		if err != nil {
-			t.Fatalf("GetFieldById returned error: %v", err)
+			t.Fatalf("GetByUid returned error: %v", err)
 		}
 		if val != nil {
 			t.Errorf("expected nil for nonexistent uid, got %v", val)
@@ -210,11 +211,11 @@ func TestGetFieldById_Integration(t *testing.T) {
 	})
 }
 
-func TestGetFieldByEq_MultiField_Integration(t *testing.T) {
+func TestGetByEq_MultiField_Integration(t *testing.T) {
 	t.Parallel()
-	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.name Node.about")
+	val, err := GetDB().GetByEq("Node.nameid", "test-org", "Node.name Node.about")
 	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
+		t.Fatalf("GetByEq returned error: %v", err)
 	}
 	m, ok := val.(map[string]any)
 	if !ok {
@@ -228,15 +229,15 @@ func TestGetFieldByEq_MultiField_Integration(t *testing.T) {
 	}
 }
 
-func TestGetSubFieldById_Integration(t *testing.T) {
+func TestGetByUid_Sub_Integration(t *testing.T) {
 	t.Parallel()
 	tid := getTensionUID(t)
 
 	t.Run("scalar_result", func(t *testing.T) {
 		t.Parallel()
-		val, err := GetDB().GetSubFieldById(tid, "Post.createdBy", "User.username")
+		val, err := GetDB().GetByUid(tid, "Post.createdBy", "User.username")
 		if err != nil {
-			t.Fatalf("GetSubFieldById returned error: %v", err)
+			t.Fatalf("GetByUid returned error: %v", err)
 		}
 		username, ok := val.(string)
 		if !ok {
@@ -249,9 +250,9 @@ func TestGetSubFieldById_Integration(t *testing.T) {
 
 	t.Run("not_found", func(t *testing.T) {
 		t.Parallel()
-		val, err := GetDB().GetSubFieldById("0xdeadbeef", "Post.createdBy", "User.username")
+		val, err := GetDB().GetByUid("0xdeadbeef", "Post.createdBy", "User.username")
 		if err != nil {
-			t.Fatalf("GetSubFieldById returned error: %v", err)
+			t.Fatalf("GetByUid returned error: %v", err)
 		}
 		if val != nil {
 			t.Errorf("expected nil for nonexistent uid, got %v", val)
@@ -259,15 +260,15 @@ func TestGetSubFieldById_Integration(t *testing.T) {
 	})
 }
 
-func TestGetSubFieldByEq_Integration(t *testing.T) {
+func TestGetByEq_Sub_Integration(t *testing.T) {
 	t.Parallel()
 
 	t.Run("scalar_result", func(t *testing.T) {
 		t.Parallel()
 		// test-org##@testuser has first_link -> testuser
-		val, err := GetDB().GetSubFieldByEq("Node.nameid", "test-org##@testuser", "Node.first_link", "User.username")
+		val, err := GetDB().GetByEq("Node.nameid", "test-org##@testuser", "Node.first_link", "User.username")
 		if err != nil {
-			t.Fatalf("GetSubFieldByEq returned error: %v", err)
+			t.Fatalf("GetByEq returned error: %v", err)
 		}
 		username, ok := val.(string)
 		if !ok {
@@ -281,9 +282,9 @@ func TestGetSubFieldByEq_Integration(t *testing.T) {
 	t.Run("list_result", func(t *testing.T) {
 		t.Parallel()
 		// test-org has children (roles + coordo), so children returns a list
-		val, err := GetDB().GetSubFieldByEq("Node.nameid", "test-org", "Node.children", "Node.nameid")
+		val, err := GetDB().GetByEq("Node.nameid", "test-org", "Node.children", "Node.nameid")
 		if err != nil {
-			t.Fatalf("GetSubFieldByEq returned error: %v", err)
+			t.Fatalf("GetByEq returned error: %v", err)
 		}
 		list, ok := val.([]any)
 		if !ok {
@@ -296,9 +297,9 @@ func TestGetSubFieldByEq_Integration(t *testing.T) {
 
 	t.Run("not_found", func(t *testing.T) {
 		t.Parallel()
-		val, err := GetDB().GetSubFieldByEq("Node.nameid", "nonexistent-org", "Node.first_link", "User.username")
+		val, err := GetDB().GetByEq("Node.nameid", "nonexistent-org", "Node.first_link", "User.username")
 		if err != nil {
-			t.Fatalf("GetSubFieldByEq returned error: %v", err)
+			t.Fatalf("GetByEq returned error: %v", err)
 		}
 		if val != nil {
 			t.Errorf("expected nil for nonexistent node, got %v", val)
@@ -306,19 +307,19 @@ func TestGetSubFieldByEq_Integration(t *testing.T) {
 	})
 }
 
-func TestGetFieldByEqWithFilter_Integration(t *testing.T) {
+func TestGetByEqFiltered_Integration(t *testing.T) {
 	t.Parallel()
 
 	t.Run("found", func(t *testing.T) {
 		t.Parallel()
 		// Query the "private-project" project by nameid + parentnameid filter
-		val, err := GetDB().GetFieldByEq(
+		val, err := GetDB().GetByEqFiltered(
 			"Project.nameid", "private-project",
-			"uid Project.rootnameid",
 			"Project.parentnameid", "sec-org#private-circle",
+			"uid Project.rootnameid",
 		)
 		if err != nil {
-			t.Fatalf("GetFieldByEq with filter returned error: %v", err)
+			t.Fatalf("GetByEqFiltered returned error: %v", err)
 		}
 		m, ok := val.(map[string]any)
 		if !ok {
@@ -336,13 +337,13 @@ func TestGetFieldByEqWithFilter_Integration(t *testing.T) {
 
 	t.Run("not_found", func(t *testing.T) {
 		t.Parallel()
-		val, err := GetDB().GetFieldByEq(
+		val, err := GetDB().GetByEqFiltered(
 			"Project.nameid", "nonexistent-project",
-			"uid Project.rootnameid",
 			"Project.parentnameid", "sec-org",
+			"uid Project.rootnameid",
 		)
 		if err != nil {
-			t.Fatalf("GetFieldByEq with filter returned error: %v", err)
+			t.Fatalf("GetByEqFiltered returned error: %v", err)
 		}
 		if val != nil {
 			t.Errorf("expected nil for nonexistent project, got %v", val)
@@ -350,15 +351,15 @@ func TestGetFieldByEqWithFilter_Integration(t *testing.T) {
 	})
 }
 
-func TestGetSubSubFieldByEq_Integration(t *testing.T) {
+func TestGetByEq_SubSub_Integration(t *testing.T) {
 	t.Parallel()
 
 	t.Run("found", func(t *testing.T) {
 		t.Parallel()
 		// test-org has source (Blob) -> tension -> uid
-		val, err := GetDB().GetSubSubFieldByEq("Node.nameid", "test-org", "Node.source", "Blob.tension", "uid")
+		val, err := GetDB().GetByEq("Node.nameid", "test-org", "Node.source", "Blob.tension", "uid")
 		if err != nil {
-			t.Fatalf("GetSubSubFieldByEq returned error: %v", err)
+			t.Fatalf("GetByEq returned error: %v", err)
 		}
 		uid, ok := val.(string)
 		if !ok {
@@ -371,9 +372,9 @@ func TestGetSubSubFieldByEq_Integration(t *testing.T) {
 
 	t.Run("not_found", func(t *testing.T) {
 		t.Parallel()
-		val, err := GetDB().GetSubSubFieldByEq("Node.nameid", "nonexistent-org", "Node.source", "Blob.tension", "uid")
+		val, err := GetDB().GetByEq("Node.nameid", "nonexistent-org", "Node.source", "Blob.tension", "uid")
 		if err != nil {
-			t.Fatalf("GetSubSubFieldByEq returned error: %v", err)
+			t.Fatalf("GetByEq returned error: %v", err)
 		}
 		if val != nil {
 			t.Errorf("expected nil for nonexistent node, got %v", val)

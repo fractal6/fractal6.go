@@ -353,95 +353,63 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
 	return result, nil
 }
 
-// Returns a field from id
-func (dg Dgraph) GetFieldById(id string, fieldName string) (any, error) {
-	results, err := dg.Meta("getFieldById", map[string]string{
-		"id":        id,
-		"fieldName": fieldName,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return DecodeField(results, fieldName)
+// GetByUid fetches a value at `path` under the node with the given uid.
+// Path elements use "Type.field" notation; the leaf may be a space-separated
+// multi-field selection (e.g. "uid Tension.title"), in which case the parent
+// map is returned in lieu of a scalar. Cardinality-many edges fan out the
+// result into a slice.
+func (dg Dgraph) GetByUid(uid string, path ...string) (any, error) {
+	return dg.runPathQuery(fmt.Sprintf(`uid("%s")`, uid), "", path)
 }
 
-// Returns a field from objid. Optional filter pair (filterField, filterValue) adds @filter(eq(...)).
-func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string, filter ...string) (any, error) {
-	maps := map[string]string{
-		"fieldid":   fieldid,
-		"value":     objid,
-		"fieldName": fieldName,
-		"filter":    "",
-	}
-	if len(filter) == 2 {
-		maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, filter[0], filter[1])
-	}
-	results, err := dg.Meta("getFieldByEq", maps)
-	if err != nil {
-		return nil, err
-	}
-	return DecodeField(results, fieldName)
+// GetByEq fetches a value at `path` under nodes matching predicate=value.
+func (dg Dgraph) GetByEq(predicate, value string, path ...string) (any, error) {
+	return dg.runPathQuery(fmt.Sprintf(`eq(%s, "%s")`, predicate, value), "", path)
 }
 
-// Returns a subfield from uid
-func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTarget string) (any, error) {
-	results, err := dg.Meta("getSubFieldById", map[string]string{
-		"id":              id,
-		"fieldNameSource": fieldNameSource,
-		"fieldNameTarget": fieldNameTarget,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
+// GetByEqFiltered is GetByEq with an extra @filter(eq(filterPred, filterValue)).
+func (dg Dgraph) GetByEqFiltered(predicate, value, filterPred, filterValue string, path ...string) (any, error) {
+	filter := fmt.Sprintf(`@filter(eq(%s, "%s"))`, filterPred, filterValue)
+	return dg.runPathQuery(fmt.Sprintf(`eq(%s, "%s")`, predicate, value), filter, path)
 }
 
-// Returns a subfield from Eq. Optional filter pair (filterField, filterValue) adds @filter(eq(...)).
-func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, filter ...string) (any, error) {
-	maps := map[string]string{
-		"fieldid":         fieldid,
-		"value":           value,
-		"fieldNameSource": fieldNameSource,
-		"fieldNameTarget": fieldNameTarget,
-		"filter":          "",
+func (dg Dgraph) runPathQuery(root, filter string, path []string) (any, error) {
+	if len(path) == 0 {
+		return nil, fmt.Errorf("path query: empty path")
 	}
-	if len(filter) == 2 {
-		maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, filter[0], filter[1])
-	}
-	results, err := dg.Meta("getSubFieldByEq", maps)
+	res, err := dg.runDqlTxn(buildPathQuery(root, filter, path), nil)
 	if err != nil {
 		return nil, err
 	}
-	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
+	cleaned, err := decodeDqlResp(res)
+	if err != nil {
+		return nil, err
+	}
+	return DecodeAt(cleaned, path...)
 }
 
-// Returns a subsubfield from uid
-func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (any, error) {
-	results, err := dg.Meta("getSubSubFieldById", map[string]string{
-		"id":                 id,
-		"fieldNameSource":    fieldNameSource,
-		"fieldNameTarget":    fieldNameTarget,
-		"subFieldNameTarget": subFieldNameTarget,
-	})
-	if err != nil {
-		return nil, err
+// buildPathQuery renders `{ all(func: <root>) <filter>? { p0 { p1 { ... } } } }`.
+func buildPathQuery(root, filter string, path []string) string {
+	var b strings.Builder
+	b.WriteString("{ all(func: ")
+	b.WriteString(root)
+	b.WriteString(") ")
+	if filter != "" {
+		b.WriteString(filter)
+		b.WriteByte(' ')
 	}
-	return DecodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
-}
-
-// Returns a subsubfield from Eq
-func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (any, error) {
-	results, err := dg.Meta("getSubSubFieldByEq", map[string]string{
-		"fieldid":            fieldid,
-		"value":              value,
-		"fieldNameSource":    fieldNameSource,
-		"fieldNameTarget":    fieldNameTarget,
-		"subFieldNameTarget": subFieldNameTarget,
-	})
-	if err != nil {
-		return nil, err
+	b.WriteString("{ ")
+	for i, p := range path {
+		b.WriteString(p)
+		if i < len(path)-1 {
+			b.WriteString(" { ")
+		}
 	}
-	return DecodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
+	for range path {
+		b.WriteString(" }")
+	}
+	b.WriteString(" }")
+	return b.String()
 }
 
 func (dg Dgraph) GetShortestPath(from string, to string) (float64, error) {

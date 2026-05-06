@@ -199,7 +199,7 @@ func MaybeSetPendingUserToken(email string) error {
 
 func SyncPendingUser(username, email string) error {
 	// Get the linked contract
-	contracts, err := db.GetDB().GetSubFieldByEq("PendingUser.email", email, "PendingUser.contracts", "uid Post.createdAt")
+	contracts, err := db.GetDB().GetByEq("PendingUser.email", email, "PendingUser.contracts", "uid Post.createdAt")
 	if err != nil {
 		return err
 	}

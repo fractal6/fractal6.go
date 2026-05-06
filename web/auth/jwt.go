@@ -307,7 +307,7 @@ func CheckUserCtxIat(uctx *model.UserCtx, nid string) (*model.UserCtx, error) {
 	}
 
 	// Check last node update date
-	updatedAt_, e := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.updatedAt")
+	updatedAt_, e := db.GetDB().GetByEq("Node.nameid", nid, "Node.updatedAt")
 	if e != nil {
 		return uctx, e
 	}

@@ -520,7 +520,7 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 			return ok, err
 		}
 		nid := codec.MemberIdCodec(rootid, *event.Old)
-		n, err := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.name Node.nameid Node.type_ Node.role_type")
+		n, err := db.GetDB().GetByEq("Node.nameid", nid, "Node.name Node.nameid Node.type_ Node.role_type")
 		if err != nil {
 			return ok, err
 		}
@@ -736,7 +736,7 @@ func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
 	cid := *event.Old
 
 	// Check that the user is the author of the comment
-	res, err := db.GetDB().GetSubFieldById(cid, "Post.createdBy", "User.username")
+	res, err := db.GetDB().GetByUid(cid, "Post.createdBy", "User.username")
 	if err != nil {
 		return false, err
 	}

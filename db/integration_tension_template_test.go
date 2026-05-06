@@ -81,9 +81,9 @@ func TestTensionTemplateCRUD_Integration(t *testing.T) {
 	t.Logf("Created TensionTemplate with ID: %s", templateID)
 
 	// --- Query (verify exists via DQL) ---
-	val, err := GetDB().GetFieldByEq("TensionTemplate.name", templateName, "TensionTemplate.title")
+	val, err := GetDB().GetByEq("TensionTemplate.name", templateName, "TensionTemplate.title")
 	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
+		t.Fatalf("GetByEq returned error: %v", err)
 	}
 	if title, ok := val.(string); !ok || title != "Bug Report: " {
 		t.Errorf("TensionTemplate.title = %v, want %q", val, "Bug Report: ")
@@ -102,9 +102,9 @@ func TestTensionTemplateCRUD_Integration(t *testing.T) {
 	}
 
 	// --- Verify deleted ---
-	val, err = GetDB().GetFieldByEq("TensionTemplate.name", templateName, "TensionTemplate.title")
+	val, err = GetDB().GetByEq("TensionTemplate.name", templateName, "TensionTemplate.title")
 	if err != nil {
-		t.Fatalf("GetFieldByEq after delete returned error: %v", err)
+		t.Fatalf("GetByEq after delete returned error: %v", err)
 	}
 	if val != nil {
 		t.Errorf("expected nil after delete, got %v", val)

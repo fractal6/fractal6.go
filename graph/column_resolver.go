@@ -271,7 +271,7 @@ func updateProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 		}
 		projectid = oldColumn.Projectid
 	} else {
-		x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
+		x, err := db.GetDB().GetByUid(id, "ProjectColumn.project", "uid")
 		if err != nil {
 			return nil, err
 		}

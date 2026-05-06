@@ -238,7 +238,7 @@ func SendResetEmail(email, token string) error {
 
 func SendOwnerGrantedEmail(username, nameid, orgName string) error {
 	var email string
-	if x, err := db.GetDB().GetFieldByEq("User.username", username, "User.email"); err != nil {
+	if x, err := db.GetDB().GetByEq("User.username", username, "User.email"); err != nil {
 		return err
 	} else {
 		email = x.(string)
@@ -303,7 +303,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	// Recipient email
 	var email string = ui.User.Email
 	if email == "" {
-		if x, err := db.GetDB().GetFieldByEq("User.username", ui.User.Username, "User.email"); err != nil {
+		if x, err := db.GetDB().GetByEq("User.username", ui.User.Username, "User.email"); err != nil {
 			return err
 		} else {
 			email = x.(string)
@@ -366,7 +366,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		} else if notif.HasEvent(model.TensionEventUserJoined) {
 			u := notif.GetNewUser()
 			itsYou := u == ui.User.Username
-			if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
+			if x, _ := db.GetDB().GetByEq("User.username", u, "User.name"); x != nil {
 				u = fmt.Sprintf("%s (@%s)", x.(string), u)
 			}
 			if itsYou {
@@ -379,10 +379,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
 		} else if notif.HasEvent(model.TensionEventUserLeft) {
 			u := notif.GetExUser()
-			if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
+			if x, _ := db.GetDB().GetByEq("User.username", u, "User.name"); x != nil {
 				u = fmt.Sprintf("%s (@%s)", x.(string), u)
 			}
-			anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
+			anchorTid, _ := db.GetDB().GetByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
 			if anchorTid != nil && anchorTid.(string) == notif.Tid {
 				switch model.RoleType(notif.GetExRoleType()) {
 				case model.RoleTypeGuest:
@@ -398,7 +398,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		} else if notif.HasEvent(model.TensionEventMemberLinked) {
 			u := notif.GetNewUser()
 			itsYou := u == ui.User.Username
-			if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
+			if x, _ := db.GetDB().GetByEq("User.username", u, "User.name"); x != nil {
 				u = fmt.Sprintf("%s (@%s)", x.(string), u)
 			}
 			if itsYou {
@@ -409,10 +409,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		} else if notif.HasEvent(model.TensionEventMemberUnlinked) {
 			u := notif.GetExUser()
 			itsYou := u == ui.User.Username
-			if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
+			if x, _ := db.GetDB().GetByEq("User.username", u, "User.name"); x != nil {
 				u = fmt.Sprintf("%s (@%s)", x.(string), u)
 			}
-			anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
+			anchorTid, _ := db.GetDB().GetByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
 			if anchorTid != nil && anchorTid.(string) == notif.Tid {
 				if itsYou {
 					auto_msg = fmt.Sprintf(`You have been removed from this organisation in <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
@@ -524,7 +524,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	// Recipient email
 	var email string = ui.User.Email
 	if email == "" {
-		if x, err := db.GetDB().GetFieldByEq("User.username", ui.User.Username, "User.email"); err != nil {
+		if x, err := db.GetDB().GetByEq("User.username", ui.User.Username, "User.email"); err != nil {
 			return err
 		} else {
 			email = x.(string)
@@ -550,7 +550,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	vars := []string{}
 	if ui.IsPending {
 		// Puid var is used to identify the pending users from client.
-		token, err := db.GetDB().GetFieldByEq("PendingUser.email", email, "PendingUser.token")
+		token, err := db.GetDB().GetByEq("PendingUser.email", email, "PendingUser.token")
 		if err != nil {
 			return err
 		}
@@ -568,7 +568,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		case model.ContractStatusOpen:
 			switch ui.Reason {
 			case model.ReasonIsInvited:
-				x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name")
+				x, err := db.GetDB().GetByEq("Node.nameid", notif.Receiverid, "Node.name")
 				if err != nil {
 					return err
 				}

@@ -105,7 +105,7 @@ func TestSignup_Success(t *testing.T) {
 	}
 
 	// Verify PendingUser exists in DB
-	val, err := db.GetDB().GetFieldByEq("PendingUser.email", "signupuser@test.co", "PendingUser.username")
+	val, err := db.GetDB().GetByEq("PendingUser.email", "signupuser@test.co", "PendingUser.username")
 	if err != nil {
 		t.Fatalf("failed to query PendingUser: %v", err)
 	}
@@ -151,7 +151,7 @@ func TestSignupValidate_Success(t *testing.T) {
 	requireStatus(t, rr, http.StatusOK)
 
 	// 2. Read email_token from DB
-	tokenVal, err := db.GetDB().GetFieldByEq("PendingUser.email", signupEmail, "PendingUser.email_token")
+	tokenVal, err := db.GetDB().GetByEq("PendingUser.email", signupEmail, "PendingUser.email_token")
 	if err != nil {
 		t.Fatalf("failed to query email_token: %v", err)
 	}
@@ -179,7 +179,7 @@ func TestSignupValidate_Success(t *testing.T) {
 	requireJWTCookie(t, rr)
 
 	// 6. Verify User was created in DB with correct lang
-	langVal, err := db.GetDB().GetFieldByEq("User.username", signupUsername, "User.lang")
+	langVal, err := db.GetDB().GetByEq("User.username", signupUsername, "User.lang")
 	if err != nil {
 		t.Fatalf("failed to query User.lang: %v", err)
 	}

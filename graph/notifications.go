@@ -127,7 +127,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 	var type_ model.TensionType
 	var isClosed bool
 	if notif.HasEvent(model.TensionEventCreated) {
-		if t, err := db.GetDB().GetFieldById(notif.Tid, "Tension.type_ Tension.receiverid Tension.status"); err != nil {
+		if t, err := db.GetDB().GetByUid(notif.Tid, "Tension.type_ Tension.receiverid Tension.status"); err != nil {
 			return err
 		} else if t != nil {
 			tension := t.(model.JsonAtom)
@@ -210,7 +210,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 				return err
 			}
 			var org_name string
-			if x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name"); err != nil {
+			if x, err := db.GetDB().GetByEq("Node.nameid", notif.Receiverid, "Node.name"); err != nil {
 				return err
 			} else {
 				org_name = x.(string)
@@ -318,7 +318,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 		// The contract is created inside the tension or the node to be moved.
 		// But we also need to notify users in the target circle.
 		targetid := *notif.Contract.Event.New
-		x, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", targetid, "Node.source", "Blob.tension", "uid")
+		x, err := db.GetDB().GetByEq("Node.nameid", targetid, "Node.source", "Blob.tension", "uid")
 		if err != nil {
 			return err
 		}
@@ -334,7 +334,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 	// +
 	// Add Candidates
 	for _, c := range notif.Contract.Candidates {
-		if x, _ := db.GetDB().GetFieldByEq("User.username", c.Username, "User.name"); x != nil {
+		if x, _ := db.GetDB().GetByEq("User.username", c.Username, "User.name"); x != nil {
 			n := x.(string)
 			c.Name = &n
 		}
@@ -548,7 +548,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 		if err != nil {
 			return users, err
 		}
-		res, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", auth.UserSelection)
+		res, err := db.GetDB().GetByEq("Node.nameid", nameid, "Node.first_link", auth.UserSelection)
 		if err != nil {
 			return users, err
 		}
@@ -564,7 +564,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 
 	if withAssignees {
 		// Get Assignees
-		res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", auth.UserSelection)
+		res, err := db.GetDB().GetByUid(tid, "Tension.assignees", auth.UserSelection)
 		if err != nil {
 			return users, err
 		}
@@ -583,7 +583,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 
 	if withSubscribers {
 		// Get Subscribers
-		res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", auth.UserSelection)
+		res, err := db.GetDB().GetByUid(tid, "Tension.subscribers", auth.UserSelection)
 		if err != nil {
 			return users, err
 		}
@@ -654,7 +654,7 @@ func UpdateWithMentionnedUser(msg string, receiverid string, users map[string]mo
 			if ex, _ := db.GetDB().Exists("Node.nameid", codec.MemberIdCodec(rootnameid, u), &filter); !ex {
 				continue
 			}
-			res, err := db.GetDB().GetFieldByEq("User.username", u, auth.UserSelection)
+			res, err := db.GetDB().GetByEq("User.username", u, auth.UserSelection)
 			if err != nil {
 				return err
 			}
@@ -692,7 +692,7 @@ func PushMentionedTension(notif model.EventNotif) error {
 	}
 
 	for _, tid := range FindTensions(msg) {
-		rid, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.rootnameid")
+		rid, err := db.GetDB().GetByUid(tid, "Tension.receiver", "Node.rootnameid")
 		if err != nil {
 			return err
 		}

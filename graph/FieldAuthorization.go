@@ -111,7 +111,7 @@ func unique(ctx context.Context, obj any, next graphql.Resolver, f *string, e []
 			// *f is present in the inut
 			// pass
 		} else if ctx.Value("id") != nil {
-			s, err = db.GetDB().GetFieldById(ctx.Value("id").(string), filterName)
+			s, err = db.GetDB().GetByUid(ctx.Value("id").(string), filterName)
 			if err != nil || s == nil {
 				return nil, LogErr("Internal error", err)
 			}
@@ -222,7 +222,7 @@ func tensionTypeCheck(ctx context.Context, obj any, next graphql.Resolver, f *st
 		if v := obj.(model.JsonAtom)["receiverid"]; v != nil {
 			receiverid = v.(string)
 		} else if ctx.Value("id") != nil {
-			x, err := db.GetDB().GetFieldById(ctx.Value("id").(string), "Tension.receiverid")
+			x, err := db.GetDB().GetByUid(ctx.Value("id").(string), "Tension.receiverid")
 			if err != nil || x == nil {
 				return nil, LogErr("Internal error", err)
 			}
@@ -397,7 +397,7 @@ func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField stri
 		}
 		// Request the database to get the field
 		// @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())
-		username_, err := db.GetDB().GetSubFieldById(id.(string), "Post."+userField, "User.username")
+		username_, err := db.GetDB().GetByUid(id.(string), "Post."+userField, "User.username")
 		if err != nil {
 			return false, err
 		}

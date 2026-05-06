@@ -73,48 +73,6 @@ var dqlQueries map[string]string = map[string]string{
 	"getID": `{
         all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
     }`,
-	"getFieldById": `{
-        all(func: uid("{{.id}}")) {
-            {{.fieldName}}
-        }
-    }`,
-	"getFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) {{.filter}} {
-            {{.fieldName}}
-        }
-    }`,
-	"getSubFieldById": `{
-        all(func: uid("{{.id}}")) {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}}
-            }
-        }
-    }`,
-	"getSubFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) {{.filter}} {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}}
-            }
-        }
-    }`,
-	"getSubSubFieldById": `{
-        all(func: uid({{.id}})) {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}} {
-                    {{.subFieldNameTarget}}
-                }
-            }
-        }
-    }`,
-	"getSubSubFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}} {
-                    {{.subFieldNameTarget}}
-                }
-            }
-        }
-    }`,
 	"getShortestPath": `{
         A as var(func: eq(Node.nameid, "{{.from}}"))
         B as var(func: eq(Node.nameid, "{{.to}}"))

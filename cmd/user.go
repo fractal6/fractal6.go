@@ -95,7 +95,7 @@ func AddUser(args []string) {
 
 func DelUser(args []string) {
 	username := args[0]
-	u, err := db.GetDB().GetFieldByEq("User.username", username, "uid")
+	u, err := db.GetDB().GetByEq("User.username", username, "uid")
 	if err != nil {
 		panic(err)
 	} else if u == nil {
@@ -107,7 +107,7 @@ func DelUser(args []string) {
 	var canLogin model.Boolean = false
 	name := "Deleted user"
 	ghost := model.UserCreds{Username: "ghost", Email: "ghost@fractale.co", Name: &name, CanLogin: &canLogin}
-	g, err := db.GetDB().GetFieldByEq("User.username", "ghost", "uid")
+	g, err := db.GetDB().GetByEq("User.username", "ghost", "uid")
 	if err != nil {
 		panic(err)
 	} else if g == nil {
@@ -120,7 +120,7 @@ func DelUser(args []string) {
 		fmt.Println("ghost created")
 	}
 
-	g, err = db.GetDB().GetFieldByEq("User.username", "ghost", "uid")
+	g, err = db.GetDB().GetByEq("User.username", "ghost", "uid")
 	if err != nil {
 		panic(err)
 	}

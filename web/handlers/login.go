@@ -68,7 +68,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Try to get PendingUser
-	pending_, err := db.GetDB().GetFieldByEq("PendingUser.email", creds.Email, "uid PendingUser.updatedAt")
+	pending_, err := db.GetDB().GetByEq("PendingUser.email", creds.Email, "uid PendingUser.updatedAt")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -234,7 +234,7 @@ func SignupValidate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Add welcome user notification
-		anchorTid, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", "f6", "Node.source", "Blob.tension", "uid")
+		anchorTid, err := db.GetDB().GetByEq("Node.nameid", "f6", "Node.source", "Blob.tension", "uid")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return

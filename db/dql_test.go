@@ -36,9 +36,6 @@ var dummyVars = map[string]string{
 	"id":                  "0x1",
 	"fieldName":           "Node.name",
 	"fieldid":             "Node.nameid",
-	"fieldNameSource":     "Node.parent",
-	"fieldNameTarget":     "Node.name",
-	"subFieldNameTarget":  "Node.nameid",
 	"value":               "test",
 	"filter":              "",
 	"f1":                  "Node.nameid",
@@ -161,13 +158,13 @@ func TestDecodeDqlResp_NilResponse(t *testing.T) {
 
 // --- Unit tests for decode helpers ---
 
-func TestDecodeField(t *testing.T) {
+func TestDecodeAt_Depth1(t *testing.T) {
 	t.Parallel()
 
 	t.Run("single_field", func(t *testing.T) {
 		t.Parallel()
 		results := []map[string]any{{"name": "Test Org", "about": "desc"}}
-		val, err := DecodeField(results, "Node.name")
+		val, err := DecodeAt(results, "Node.name")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -179,7 +176,7 @@ func TestDecodeField(t *testing.T) {
 	t.Run("uid_field", func(t *testing.T) {
 		t.Parallel()
 		results := []map[string]any{{"id": "0x1"}}
-		val, err := DecodeField(results, "uid")
+		val, err := DecodeAt(results, "uid")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -191,7 +188,7 @@ func TestDecodeField(t *testing.T) {
 	t.Run("multi_field_returns_map", func(t *testing.T) {
 		t.Parallel()
 		results := []map[string]any{{"name": "Test", "about": "desc"}}
-		val, err := DecodeField(results, "Node.name Node.about")
+		val, err := DecodeAt(results, "Node.name Node.about")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -206,7 +203,7 @@ func TestDecodeField(t *testing.T) {
 
 	t.Run("empty_results", func(t *testing.T) {
 		t.Parallel()
-		val, err := DecodeField(nil, "Node.name")
+		val, err := DecodeAt(nil, "Node.name")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -218,14 +215,14 @@ func TestDecodeField(t *testing.T) {
 	t.Run("multiple_results_error", func(t *testing.T) {
 		t.Parallel()
 		results := []map[string]any{{"name": "a"}, {"name": "b"}}
-		_, err := DecodeField(results, "Node.name")
+		_, err := DecodeAt(results, "Node.name")
 		if err == nil {
 			t.Error("expected error for multiple results, got nil")
 		}
 	})
 }
 
-func TestDecodeSubField(t *testing.T) {
+func TestDecodeAt_Depth2(t *testing.T) {
 	t.Parallel()
 
 	t.Run("scalar_single_field", func(t *testing.T) {
@@ -233,7 +230,7 @@ func TestDecodeSubField(t *testing.T) {
 		results := []map[string]any{{
 			"createdBy": map[string]any{"username": "testuser"},
 		}}
-		val, err := DecodeSubField(results, "Post.createdBy", "User.username")
+		val, err := DecodeAt(results, "Post.createdBy", "User.username")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -247,7 +244,7 @@ func TestDecodeSubField(t *testing.T) {
 		results := []map[string]any{{
 			"createdBy": map[string]any{"username": "testuser", "name": "Test User"},
 		}}
-		val, err := DecodeSubField(results, "Post.createdBy", "User.username User.name")
+		val, err := DecodeAt(results, "Post.createdBy", "User.username User.name")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -268,7 +265,7 @@ func TestDecodeSubField(t *testing.T) {
 				map[string]any{"username": "user2"},
 			},
 		}}
-		val, err := DecodeSubField(results, "Tension.assignees", "User.username")
+		val, err := DecodeAt(results, "Tension.assignees", "User.username")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -284,37 +281,17 @@ func TestDecodeSubField(t *testing.T) {
 	t.Run("nil_sub_field", func(t *testing.T) {
 		t.Parallel()
 		results := []map[string]any{{"parent": nil}}
-		val, err := DecodeSubField(results, "Node.parent", "Node.nameid")
+		val, err := DecodeAt(results, "Node.parent", "Node.nameid")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		if val != nil {
 			t.Errorf("expected nil, got %v", val)
-		}
-	})
-
-	t.Run("empty_results", func(t *testing.T) {
-		t.Parallel()
-		val, err := DecodeSubField(nil, "Node.parent", "Node.nameid")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if val != nil {
-			t.Errorf("expected nil, got %v", val)
-		}
-	})
-
-	t.Run("multiple_results_error", func(t *testing.T) {
-		t.Parallel()
-		results := []map[string]any{{"a": "1"}, {"a": "2"}}
-		_, err := DecodeSubField(results, "X.a", "Y.b")
-		if err == nil {
-			t.Error("expected error for multiple results, got nil")
 		}
 	})
 }
 
-func TestDecodeSubSubField(t *testing.T) {
+func TestDecodeAt_Depth3(t *testing.T) {
 	t.Parallel()
 
 	t.Run("single_field", func(t *testing.T) {
@@ -324,7 +301,7 @@ func TestDecodeSubSubField(t *testing.T) {
 				"tension": map[string]any{"id": "0x42"},
 			},
 		}}
-		val, err := DecodeSubSubField(results, "Node.source", "Blob.tension", "uid")
+		val, err := DecodeAt(results, "Node.source", "Blob.tension", "uid")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -340,7 +317,7 @@ func TestDecodeSubSubField(t *testing.T) {
 				"tension": map[string]any{"id": "0x42", "title": "Hello"},
 			},
 		}}
-		val, err := DecodeSubSubField(results, "Node.source", "Blob.tension", "uid Tension.title")
+		val, err := DecodeAt(results, "Node.source", "Blob.tension", "uid Tension.title")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -353,35 +330,12 @@ func TestDecodeSubSubField(t *testing.T) {
 		}
 	})
 
-	t.Run("nil_source", func(t *testing.T) {
-		t.Parallel()
-		results := []map[string]any{{"source": nil}}
-		val, err := DecodeSubSubField(results, "Node.source", "Blob.tension", "uid")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if val != nil {
-			t.Errorf("expected nil, got %v", val)
-		}
-	})
-
 	t.Run("nil_intermediate", func(t *testing.T) {
 		t.Parallel()
 		results := []map[string]any{{
 			"source": map[string]any{"tension": nil},
 		}}
-		val, err := DecodeSubSubField(results, "Node.source", "Blob.tension", "uid")
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if val != nil {
-			t.Errorf("expected nil, got %v", val)
-		}
-	})
-
-	t.Run("empty_results", func(t *testing.T) {
-		t.Parallel()
-		val, err := DecodeSubSubField(nil, "A.b", "C.d", "uid")
+		val, err := DecodeAt(results, "Node.source", "Blob.tension", "uid")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

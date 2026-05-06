@@ -201,9 +201,9 @@ func decodeUpload(t *testing.T, rr *httptest.ResponseRecorder) uploadResp {
 // verify object-level state (rollback, cleanup) on MinIO.
 func storageKeyOf(t *testing.T, fileID string) string {
 	t.Helper()
-	v, err := db.GetDB().GetFieldById(fileID, "File.storageKey")
+	v, err := db.GetDB().GetByUid(fileID, "File.storageKey")
 	if err != nil {
-		t.Fatalf("GetFieldById(File.storageKey): %v", err)
+		t.Fatalf("GetByUid(File.storageKey): %v", err)
 	}
 	s, _ := v.(string)
 	if s == "" {
@@ -718,7 +718,7 @@ func TestUploadRejectsCrossTension(t *testing.T) {
 // with newlines/quotes must be pre-escaped via tools.QuoteString.
 func withCommentMessage(t *testing.T, cid, newMsg string, fn func()) {
 	t.Helper()
-	prev, err := db.GetDB().GetFieldById(cid, "Post.message")
+	prev, err := db.GetDB().GetByUid(cid, "Post.message")
 	if err != nil {
 		t.Fatalf("read message of %s: %v", cid, err)
 	}
@@ -747,7 +747,7 @@ func TestInlineScreenshot_UpdateComment(t *testing.T) {
 		if !resp.Embedded {
 			t.Fatal("expected embedded=true")
 		}
-		got, err := db.GetDB().GetFieldById(cid, "Post.message")
+		got, err := db.GetDB().GetByUid(cid, "Post.message")
 		if err != nil {
 			t.Fatalf("read message: %v", err)
 		}
@@ -811,7 +811,7 @@ func TestRegularAttachmentNotEmbedded(t *testing.T) {
 	// Use a filename guaranteed not to appear in the seeded message.
 	filename := fmt.Sprintf("attachment-%d.bin", time.Now().UnixNano())
 
-	prev, _ := db.GetDB().GetFieldById(cid, "Post.message")
+	prev, _ := db.GetDB().GetByUid(cid, "Post.message")
 	rr := uploadCommentFile(t, tid, cid, filename, "application/octet-stream", []byte("hi"), jwt)
 	requireStatus(t, rr, http.StatusOK)
 	resp := decodeUpload(t, rr)
@@ -820,7 +820,7 @@ func TestRegularAttachmentNotEmbedded(t *testing.T) {
 	if resp.Embedded {
 		t.Error("expected embedded=false for non-referenced attachment")
 	}
-	now, _ := db.GetDB().GetFieldById(cid, "Post.message")
+	now, _ := db.GetDB().GetByUid(cid, "Post.message")
 	if prevStr, _ := prev.(string); prevStr != "" {
 		if nowStr, _ := now.(string); nowStr != prevStr {
 			t.Errorf("comment message must not change for non-embedded upload\nbefore: %q\nafter:  %q", prevStr, nowStr)
@@ -843,7 +843,7 @@ func TestCodeBlockSkipsRewrite(t *testing.T) {
 		if resp.Embedded {
 			t.Error("expected embedded=false: filename mentioned only in fenced block")
 		}
-		got, _ := db.GetDB().GetFieldById(cid, "Post.message")
+		got, _ := db.GetDB().GetByUid(cid, "Post.message")
 		if s, _ := got.(string); s != body {
 			t.Errorf("message must remain unchanged when match is in code block\ngot:  %q\nwant: %q", s, body)
 		}
@@ -890,7 +890,7 @@ func TestParallelUploadsToSameComment(t *testing.T) {
 		}
 		// At least one of the two original filenames must have been rewritten —
 		// the loser of the race may still be present, but not both.
-		got, _ := db.GetDB().GetFieldById(cid, "Post.message")
+		got, _ := db.GetDB().GetByUid(cid, "Post.message")
 		s, _ := got.(string)
 		if strings.Contains(s, fnA) && strings.Contains(s, fnB) {
 			t.Errorf("both originals still present in message — neither write applied: %q", s)

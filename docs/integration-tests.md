@@ -126,7 +126,7 @@ DQL queries go through gRPC and skip the Dgraph GraphQL auth layer. No JWT keys 
 
 #### `db/` — DQL Query & Mutation Tests
 - `integration_test.go` - TestMain: verify seed data exists
-- `integration_query_test.go` - Read-only tests (CountHas, Exists, GetFieldByEq, IsChild, GetChildren, HasCoordos, GetUserRoles, QueryDql, Meta). All tests use `t.Parallel()` and related scenarios are grouped as subtests (e.g. `TestExists_Integration/found`, `TestExists_Integration/not_found`).
+- `integration_query_test.go` - Read-only tests (CountHas, Exists, GetByEq, IsChild, GetChildren, HasCoordos, GetUserRoles, QueryDql, Meta). All tests use `t.Parallel()` and related scenarios are grouped as subtests (e.g. `TestExists_Integration/found`, `TestExists_Integration/not_found`).
 - `integration_mutation_test.go` - Write tests (SetFieldByEq, UpgradeMember, Gamma, markAllAsRead, upsertActivity). Mutation tests restore original values after modifying data.
 
 #### `web/handlers/` — HTTP Handler Tests

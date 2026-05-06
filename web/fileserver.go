@@ -121,7 +121,7 @@ func FileServer(r chi.Router, publicUri string, location string, cacheControl st
 			// 4. use default language.
 			if _, uctx, err := auth.GetUserContext(r.Context()); err == nil {
 				// Lang may not be updated
-				if l, err := db.GetDB().GetFieldByEq("User.username", uctx.Username, "User.lang"); err != nil {
+				if l, err := db.GetDB().GetByEq("User.username", uctx.Username, "User.lang"); err != nil {
 					lang = string(uctx.Lang)
 				} else {
 					lang = l.(string)

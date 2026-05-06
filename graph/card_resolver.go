@@ -277,7 +277,7 @@ func addProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) (an
 	ExtractInputs(ctx, &inputs)
 	isDraft := make([]bool, len(inputs))
 	for i, input := range inputs {
-		x, err := db.GetDB().GetSubFieldById(*input.Pc.ID, "ProjectColumn.project", "uid")
+		x, err := db.GetDB().GetByUid(*input.Pc.ID, "ProjectColumn.project", "uid")
 		if err != nil {
 			return nil, err
 		}

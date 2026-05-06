@@ -121,7 +121,7 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 		// Unarchive
 		// --
 		// Check that parent node is not archived
-		parentIsArchived, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.parent", "Node.isArchived")
+		parentIsArchived, err := db.GetDB().GetByEq("Node.nameid", nameid, "Node.parent", "Node.isArchived")
 		if err != nil {
 			return ok, err
 		}
@@ -251,7 +251,7 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 	}
 
 	// Get the current first link
-	firstLink, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", "User.username")
+	firstLink, err := db.GetDB().GetByEq("Node.nameid", nameid, "Node.first_link", "User.username")
 	if err != nil {
 		return false, err
 	}
@@ -456,7 +456,7 @@ func MaybeAddPendingNode(username string, tension *model.Tension) (bool, error) 
 		return ok, err
 	}
 	nid := codec.MemberIdCodec(rootid, username)
-	n, err := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.role_type Node.first_link{User.username}")
+	n, err := db.GetDB().GetByEq("Node.nameid", nid, "Node.role_type Node.first_link{User.username}")
 	if err != nil {
 		return ok, err
 	}

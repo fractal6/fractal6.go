@@ -35,7 +35,7 @@ import (
 // getProjectUID returns the Dgraph UID for the root-project in sec-org.
 func getProjectUID(t *testing.T) string {
 	t.Helper()
-	data, err := db.GetDB().GetFieldByEq("Project.nameid", "root-project", "uid")
+	data, err := db.GetDB().GetByEq("Project.nameid", "root-project", "uid")
 	if err != nil {
 		t.Fatalf("failed to look up root-project: %v", err)
 	}
