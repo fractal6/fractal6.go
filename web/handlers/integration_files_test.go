@@ -264,8 +264,9 @@ func TestFileUpload_AsAuthor_Succeeds(t *testing.T) {
 	}
 
 	key := storageKeyOf(t, resp.ID)
-	if !strings.HasPrefix(key, "comments/"+cid+"/") {
-		t.Errorf("storageKey = %q, want prefix comments/%s/", key, cid)
+	wantPrefix := "orgas/test-org/tensions/" + tid + "/" + cid + "/"
+	if !strings.HasPrefix(key, wantPrefix) {
+		t.Errorf("storageKey = %q, want prefix %s", key, wantPrefix)
 	}
 	if !objectExists(t, key) {
 		t.Errorf("expected object %q to exist in MinIO", key)

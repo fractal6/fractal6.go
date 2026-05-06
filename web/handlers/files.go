@@ -49,6 +49,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
+	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/web/auth"
@@ -328,8 +329,14 @@ func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Cl
 	}
 	oldMessage := c.Message
 
+	rootnameid, err := codec.Nid2rootid(tension.Receiver.Nameid)
+	if err != nil {
+		http.Error(w, "bad receiver nameid: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	// Put bytes first, then DB. Rollback the object on DB failure.
-	storageKey := commentKeyPrefix(anchor.Cid) + randomID() + "-" + safeName
+	storageKey := commentKeyPrefix(rootnameid, anchor.Tid, anchor.Cid) + randomID() + "-" + safeName
 	if err := cli.Put(r.Context(), storageKey, file, header.Size, contentType); err != nil {
 		http.Error(w, "upload failed: "+err.Error(), http.StatusBadGateway)
 		return
@@ -667,8 +674,10 @@ func safeFilename(name string) string {
 
 // commentKeyPrefix / userKeyPrefix / orgaKeyPrefix are the per-anchor
 // namespacing conventions. See docs/file-attachments.md.
-func commentKeyPrefix(cid string) string { return "comments/" + cid + "/" }
-func userKeyPrefix(username string) string { return "users/" + username + "/" }
+func commentKeyPrefix(rootnameid, tid, cid string) string {
+	return "orgas/" + rootnameid + "/tensions/" + tid + "/" + cid + "/"
+}
+func userKeyPrefix(username string) string  { return "users/" + username + "/" }
 func orgaKeyPrefix(rootnameid string) string { return "orgas/" + rootnameid + "/" }
 
 // randomID returns a 16-hex-char random string (~64 bits of entropy) used as

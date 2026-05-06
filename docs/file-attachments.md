@@ -145,9 +145,14 @@ A single bucket holds all file kinds, namespaced by key prefix:
 
 | Prefix | Purpose |
 |---|---|
-| `comments/<cid>/<rand>-<safe-name>` | comment attachments |
-| `users/<username>/<rand>-<safe-name>` | user avatars |
+| `orgas/<rootnameid>/tensions/<tid>/<cid>/<rand>-<safe-name>` | comment attachments |
 | `orgas/<rootnameid>/<rand>-<safe-name>` | org (root Node) avatars |
+| `users/<username>/<rand>-<safe-name>` | user avatars |
+
+Comment attachments live under their owning org so per-org bucket policies
+(lifecycle, KMS, export, isolation) can be expressed as a key-prefix filter.
+Avatar keys for an org never collide with its tension subtree because avatars'
+second segment is always `<rand16hex>-<name>`, never the literal `tensions`.
 
 `<rand>` is 16 hex chars (~64 bits) to prevent key guessing and collisions.
 `<safe-name>` is the original filename with control chars + path separators
@@ -244,7 +249,7 @@ keys; a previous version used the raw keys and silently returned empty values.
 - **Comment delete** triggers `db.GetDB().CleanupCommentFiles(cid, storage.Global())`
   before the DQL `deleteComment` runs. Per-file failures are logged but do not
   block the delete; orphan objects can be GC'd by listing keys under
-  `comments/<cid>/`. When `storage.Global()` is `nil` (no `[storage]` block),
+  `orgas/<rootnameid>/tensions/<tid>/<cid>/`. When `storage.Global()` is `nil` (no `[storage]` block),
   the call is a no-op and the DQL still drops the `File` nodes.
 - **No revocation**: a presigned URL captured by a user remains valid until
   TTL expires. Rotating credentials invalidates *all* outstanding URLs (last

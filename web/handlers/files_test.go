@@ -50,9 +50,10 @@ func TestRandomIDFormat(t *testing.T) {
 }
 
 func TestCommentKeyPrefix(t *testing.T) {
-	got := commentKeyPrefix("0xabc123")
-	if got != "comments/0xabc123/" {
-		t.Errorf("commentKeyPrefix = %q, want %q", got, "comments/0xabc123/")
+	got := commentKeyPrefix("test-org", "0xtid", "0xabc123")
+	want := "orgas/test-org/tensions/0xtid/0xabc123/"
+	if got != want {
+		t.Errorf("commentKeyPrefix = %q, want %q", got, want)
 	}
 }
 
