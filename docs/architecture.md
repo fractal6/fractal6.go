@@ -25,7 +25,7 @@ fractal6.go/
 └── main.go
 ```
 
-The most-edited files: `graph/tension_op.go` (event pipeline), `graph/resolver.go` (directive/hook wiring), `db/dql.go` (DQL templates), `graph/FieldAuthorization.go` (`@x_*` rules), `graph/tension_auth.go` (EMAP).
+The most-edited files: `graph/tension_op.go` (event pipeline), `graph/resolver.go` (directive/hook wiring), `db/dql.go` (DQL templates), `graph/xw_directive.go` (`@x_*` / `@w_*` rules + transforms), `graph/tension_auth.go` (EMAP).
 
 ## GraphQL schema
 
@@ -50,22 +50,15 @@ Source SDL → auth-rule injection → Dgraph schema (push) → fetch Dgraph-gen
 
 The schema relies on directives processed at three levels (schema parsing, codegen, runtime).
 
-**Output directives** (read-side) — handled in `graph/resolver.go` and `graph/contract_resolver.go`:
+Each directive family lives in its own file under `graph/` and is wired from `graph/resolver.go::Init()`:
 
-| Directive | Purpose |
-|-----------|---------|
-| `@hidden` | Field is never readable |
-| `@private` | Only the owning user can read |
-| `@meta(f, k)` | Computed field via DQL query |
-| `@isContractValidator` | Boolean: can current user validate this contract? |
-
-**Input authorization** (`@x_*`) — `graph/FieldAuthorization.go`:
-
-`@x_add` / `@x_alter` / `@x_set` / `@x_remove` / `@x_patch` / `@x_ro` / `@x_patch_ro`. Rules (`r:` parameter): `isOwner`, `unique`, `oneByOne`, `hasEvent`, `tensionTypeCheck`, `ref`, `minLen`, `maxLen`.
-
-**Input transformations** (`@w_*`) — `graph/FieldTransform.go`:
-
-`@w_add` / `@w_alter` / `@w_meta_patch`. Actions (`a:` parameter): `lower`, `now`.
+| Family | File | Directives |
+|---|---|---|
+| Output / visibility | `graph/auth_directive.go` | `@hidden`, `@private`, `@x_ro` (read-only marker) |
+| Computed fields | `graph/meta_directive.go` | `@meta(f, k)` |
+| Input authorization (`@x_*`) | `graph/xw_directive.go` | `@x_add` / `@x_alter` / `@x_set` / `@x_remove` / `@x_patch` / `@x_patch_ro`; rules (`r:`): `isOwner`, `unique`, `oneByOne`, `hasEvent`, `tensionTypeCheck`, `ref`, `minLen`, `maxLen`, `json` |
+| Input transformations (`@w_*`) | `graph/xw_directive.go` | `@w_add` / `@w_alter` / `@w_meta_patch`; actions (`a:`): `lower`, `now` |
+| Contract-specific | `graph/contract_resolver.go` | `@isContractValidator` |
 
 **Type-level hooks** (`@hook_`) — auto-generates pre/post mutation hooks for the type, registered in `graph/resolver.go`.
 
@@ -216,7 +209,7 @@ Event categories: `EventNotif` (tension events), `ContractNotif` (contract votin
 | Understand the SDL and its directives | `schema/graphql/fractal6.graphql` + `schema/graphql/directives.graphql` |
 | Trace a mutation | `graph/resolver.go:Init` (hooks) → `graph/{domain}_resolver.go` → `graph/dgraph_resolver.go` (bridge) → `db/gql.go` |
 | Add or modify a tension event | `graph/tension_op.go` (`EventsMap` + action functions) |
-| Modify field-level auth | `graph/FieldAuthorization.go` |
+| Modify field-level auth | `graph/xw_directive.go` |
 | Add a DQL-backed computed field | declare with `@meta` in SDL → add template to `dqlQueries` in `db/dql.go` |
 | Add an HTTP route | `web/handlers/` + register in `web/router.go` |
 | Handle file attachments | `docs/file-attachments.md` |

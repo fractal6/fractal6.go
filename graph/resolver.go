@@ -27,17 +27,12 @@ package graph
 
 import (
 	"context"
-	"fmt"
-	"reflect"
-	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
 	gen "fractale/fractal6.go/graph/generated"
-	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/internal/tools"
-	"fractale/fractal6.go/web/auth"
 )
 
 //
@@ -254,159 +249,16 @@ func ExtractFilter[T any](ctx context.Context, filter *T) {
 	*filter = StructMap[T](a)
 }
 
-/*
-*
-* Field Directives Logics
-*
- */
-
+// nothing is the no-op directive used as the default for hooks that don't
+// need any pre/post processing. Kept here because it's the shared default
+// referenced from Init().
+//
 // Reminder: Api to access to input query:
 //  rc := graphql.GetResolverContext(ctx)
 //  rqc := graphql.GetRequestContext(ctx)
 //  cfc := graphql.CollectFieldsCtx(ctx, nil)
 //  fc := graphql.GetFieldContext(ctx)
 //  pc := graphql.GetPathContext(ctx) // .*.Field to get the field name
-
 func nothing(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	return next(ctx)
-}
-
-func hidden(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-	rc := graphql.GetResolverContext(ctx)
-	fieldName := rc.Field.Name
-	return nil, fmt.Errorf("'%s' field is hidden", fieldName)
-}
-
-func private(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-	ctx, uctx, err := auth.GetUserContext(ctx)
-	if err != nil {
-		return nil, LogErr("Access denied", err)
-	}
-
-	rc := graphql.GetResolverContext(ctx)
-	fieldName := rc.Field.Name
-
-	// @DEBUG: not workng; ContextWith do not propagage value here, why, gqlgen !
-	//         Probably because directive for returned value are not in the same context as of before ?
-	// @AFTER_DEBUG: if uid is given, or other @id...
-	if username, ok := ctx.Value("username").(string); ok && username == uctx.Username {
-		return next(ctx)
-	}
-
-	switch v := obj.(type) {
-	case *model.User:
-		// @debug: username field required in graph
-		if v.Username == uctx.Username {
-			return next(ctx)
-		}
-	default:
-		return nil, fmt.Errorf("Private directive not implemented for this field: %s", fieldName)
-	}
-
-	return nil, fmt.Errorf("'%s' field is private", fieldName)
-}
-
-func meta_patch(ctx context.Context, obj any, next graphql.Resolver, f string, k *string) (any, error) {
-	uctx := auth.GetUserContextOrEmpty(ctx)
-	// @FIX this hack ! Redis push ?
-	var ok bool
-	var v string
-	// Set function
-	key := uctx.Username + "meta_patch_f"
-	err := cache.SetEX(ctx, key, f, time.Second*5).Err()
-	if err != nil {
-		return nil, err
-	}
-	if k != nil {
-		// Set attribute name
-		if v, ok = ctx.Value(*k).(string); !ok {
-			o := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k))
-			if !o.IsValid() {
-				rc := graphql.GetResolverContext(ctx)
-				fieldName := rc.Field.Name
-				return nil, fmt.Errorf("'%s' field on '%s' seems not valid or unknown", *k, fieldName)
-			}
-			v = o.String()
-		}
-		if v == "" {
-			rc := graphql.GetResolverContext(ctx)
-			fieldName := rc.Field.Name
-			err := fmt.Errorf("'%s' field is needed to query '%s'", *k, fieldName)
-			return nil, err
-		}
-
-		key = uctx.Username + "meta_patch_k"
-		err := cache.SetEX(ctx, key, *k, time.Second*5).Err()
-		if err != nil {
-			return nil, err
-		}
-
-		// Set attribute value
-		key = uctx.Username + "meta_patch_v"
-		err = cache.SetEX(ctx, key, v, time.Second*5).Err()
-		if err != nil {
-			return nil, err
-		}
-	}
-	return next(ctx)
-}
-
-//
-// Input directives
-//
-
-func setContextWithID(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-	var err error
-	for _, n := range []string{"id", "nameid", "rootnameid", "username"} {
-		ctx, _, err = setContextWith(ctx, obj, n)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return next(ctx)
-}
-
-func setUpdateContextInfo(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-	hasSet := obj.(model.JsonAtom)["set"] != nil
-	hasRemove := obj.(model.JsonAtom)["remove"] != nil
-	ctx = context.WithValue(ctx, "hasSet", hasSet)
-	ctx = context.WithValue(ctx, "hasRemove", hasRemove)
-	ctx, _, err := setContextWith(ctx, obj, "id")
-	if err != nil {
-		return nil, err
-	}
-	return next(ctx)
-}
-
-//
-// Input Field directives
-//
-
-func readOnly(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
-	rc := graphql.GetResolverContext(ctx)
-	pc := graphql.GetPathContext(ctx)
-	queryName := rc.Field.Name
-	fieldName := *pc.Field
-	return nil, LogErr("Forbiden", fmt.Errorf("Read only field on %s:%s", queryName, fieldName))
-}
-
-func FieldAuthorization(ctx context.Context, obj any, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (any, error) {
-	// If the directives exists withtout a rule, it pass through.
-	if r == nil {
-		return next(ctx)
-	}
-
-	// @TODO: Seperate function for Set and Remove + test if the input comply with the directives
-
-	if fun := FieldAuthorizationFunc[*r]; fun != nil {
-		return fun(ctx, obj, next, f, e, n)
-	}
-	return nil, LogErr("directive error", fmt.Errorf("unknown rule '%s'", *r))
-}
-
-func FieldTransform(ctx context.Context, obj any, next graphql.Resolver, a string) (any, error) {
-	if fun := FieldTransformFunc[a]; fun != nil {
-		return fun(ctx, next)
-	}
-	return nil, LogErr("directive error", fmt.Errorf("unknown function '%s'", a))
 }
