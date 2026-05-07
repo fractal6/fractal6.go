@@ -132,7 +132,7 @@ func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, e
 	ok, _, err := TensionEventHook(uctx, id, history, nil)
 	if !ok || err != nil {
 		// Delete the tension just added
-		e := db.GetDB().DeepDelete("tension", id)
+		e := db.GetDB().DeleteTensionDeep(id)
 		if e != nil {
 			panic(e)
 		}

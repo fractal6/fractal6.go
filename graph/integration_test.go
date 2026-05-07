@@ -36,8 +36,8 @@ import (
 
 // testStorageCli is the MinIO-backed client used by the file-attachment
 // portion of TestRemoveComment_DeletesAttachedFiles. Initialised in TestMain
-// and registered as the storage package global so graph.RemoveComment's
-// CleanupCommentFiles call resolves to the same backing.
+// and registered as the storage package global so the cascade-delete async
+// GC (deleteStorageKeysAsync) resolves to the same backing.
 var testStorageCli *storage.Client
 
 func TestMain(m *testing.M) {

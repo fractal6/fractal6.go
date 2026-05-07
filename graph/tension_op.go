@@ -21,14 +21,12 @@
 package graph
 
 import (
-	"context"
 	"fmt"
 	"time"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/internal/storage"
 	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
@@ -744,39 +742,10 @@ func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
 		return false, LogErr("Access denied", fmt.Errorf("Only the author of the comment can delete it."))
 	}
 
-	// Delete comment. The template's `all` block returns the storage keys of
-	// the comment's files in the same round-trip, so the GC below skips a
-	// second DQL query.
-	resp, err := db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
-	if err != nil {
+	if err := db.GetDB().DeleteCommentDeep(tid, cid); err != nil {
 		return false, err
 	}
-
-	// Fire-and-forget S3 cleanup. storage.Global() is nil when [storage] is
-	// unset; orphan objects can be swept out-of-band.
-	if cli := storage.Global(); cli != nil && len(resp) > 0 {
-		keys := make([]string, 0, len(resp))
-		for _, m := range resp {
-			if k, ok := m["storageKey"].(string); ok && k != "" {
-				keys = append(keys, k)
-			}
-		}
-		if len(keys) > 0 {
-			go deleteStorageKeys(cli, keys)
-		}
-	}
-
 	return true, nil
-}
-
-func deleteStorageKeys(cli *storage.Client, keys []string) {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	for _, k := range keys {
-		if delErr := cli.Delete(ctx, k); delErr != nil {
-			fmt.Printf("RemoveComment: failed to delete %s: %v\n", k, delErr)
-		}
-	}
 }
 
 //

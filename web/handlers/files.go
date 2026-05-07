@@ -31,7 +31,6 @@
 package handlers
 
 import (
-	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -394,7 +393,7 @@ func handleUserAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage
 		http.Error(w, "upload failed: "+err.Error(), http.StatusBadGateway)
 		return
 	}
-	fid, oldKey, err := db.GetDB().ReplaceUserAvatar(
+	fid, err := db.GetDB().ReplaceUserAvatar(
 		uctx.Username, safeName, contentType, storageKey,
 		header.Size, time.Now().UTC().Format(time.RFC3339),
 	)
@@ -402,9 +401,6 @@ func handleUserAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage
 		_ = cli.Delete(r.Context(), storageKey)
 		http.Error(w, "persist failed: "+err.Error(), http.StatusInternalServerError)
 		return
-	}
-	if oldKey != "" {
-		go asyncDelete(cli, oldKey)
 	}
 	writeJSON(w, map[string]any{
 		"id":          fid,
@@ -425,7 +421,7 @@ func handleNodeAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage
 		http.Error(w, "upload failed: "+err.Error(), http.StatusBadGateway)
 		return
 	}
-	fid, oldKey, err := db.GetDB().ReplaceNodeAvatar(
+	fid, err := db.GetDB().ReplaceNodeAvatar(
 		anchor.Rootnameid, uctx.Username, safeName, contentType, storageKey,
 		header.Size, time.Now().UTC().Format(time.RFC3339),
 	)
@@ -434,9 +430,6 @@ func handleNodeAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage
 		http.Error(w, "persist failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if oldKey != "" {
-		go asyncDelete(cli, oldKey)
-	}
 	writeJSON(w, map[string]any{
 		"id":          fid,
 		"url":         "/file/" + fid,
@@ -444,14 +437,6 @@ func handleNodeAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage
 		"contentType": contentType,
 		"size":        header.Size,
 	})
-}
-
-func asyncDelete(cli *storage.Client, key string) {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	if err := cli.Delete(ctx, key); err != nil {
-		fmt.Printf("asyncDelete: %s: %v\n", key, err)
-	}
 }
 
 // --- delete ---

@@ -183,9 +183,9 @@ func (dg Dgraph) EmbedCommentMessage(cid, fid, newMessage string) error {
 }
 
 // ReplaceUserAvatar inserts a new avatar File for username, drops the previous
-// one if any, and returns the previous storageKey (empty if no prior avatar)
-// so the caller can fire-and-forget S3 GC.
-func (dg Dgraph) ReplaceUserAvatar(username, filename, contentType, storageKey string, size int64, nowRFC3339 string) (string, string, error) {
+// one if any, and fires async S3 GC of the previous object (no-op when storage
+// is unset). Returns the new fid.
+func (dg Dgraph) ReplaceUserAvatar(username, filename, contentType, storageKey string, size int64, nowRFC3339 string) (string, error) {
 	q := dqlMutations["replaceUserAvatar"]
 	res, err := dg.UpsertDql(q, map[string]string{
 		"username":    username,
@@ -196,17 +196,20 @@ func (dg Dgraph) ReplaceUserAvatar(username, filename, contentType, storageKey s
 		"now":         nowRFC3339,
 	})
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 	fid, ok := res.Uids["f"]
 	if !ok || fid == "" {
-		return "", "", fmt.Errorf("replaceUserAvatar: no uid returned")
+		return "", fmt.Errorf("replaceUserAvatar: no uid returned")
 	}
-	return fid, oldKeyFromResp(res), nil
+	if oldKey := oldKeyFromResp(res); oldKey != "" {
+		deleteStorageKeysAsync([]string{oldKey})
+	}
+	return fid, nil
 }
 
 // ReplaceNodeAvatar mirrors ReplaceUserAvatar for Node (org) avatars.
-func (dg Dgraph) ReplaceNodeAvatar(nameid, username, filename, contentType, storageKey string, size int64, nowRFC3339 string) (string, string, error) {
+func (dg Dgraph) ReplaceNodeAvatar(nameid, username, filename, contentType, storageKey string, size int64, nowRFC3339 string) (string, error) {
 	q := dqlMutations["replaceNodeAvatar"]
 	res, err := dg.UpsertDql(q, map[string]string{
 		"nameid":      nameid,
@@ -218,13 +221,16 @@ func (dg Dgraph) ReplaceNodeAvatar(nameid, username, filename, contentType, stor
 		"now":         nowRFC3339,
 	})
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 	fid, ok := res.Uids["f"]
 	if !ok || fid == "" {
-		return "", "", fmt.Errorf("replaceNodeAvatar: no uid returned")
+		return "", fmt.Errorf("replaceNodeAvatar: no uid returned")
 	}
-	return fid, oldKeyFromResp(res), nil
+	if oldKey := oldKeyFromResp(res); oldKey != "" {
+		deleteStorageKeysAsync([]string{oldKey})
+	}
+	return fid, nil
 }
 
 // DeleteFile removes a File node by uid and drops the anchor's reverse edge.
@@ -234,53 +240,11 @@ func (dg Dgraph) DeleteFile(fileid string) error {
 	return err
 }
 
-// DeleteUser runs the deleteUser cascade and fires async S3 cleanup of the
-// removed user's avatar (if any). The Dgraph mutation always runs; per-key
-// S3 failures are logged in the goroutine and do not surface as errors.
-func (dg Dgraph) DeleteUser(username, ghostid string) error {
-	q := dqlMutations["deleteUser"]
-	res, err := dg.UpsertDql(q, map[string]string{
-		"username": username,
-		"ghostid":  ghostid,
-	})
-	if err != nil {
-		return err
-	}
-	if keys := extractStorageKeys(res); len(keys) > 0 {
-		deleteStorageKeysAsync(keys)
-	}
-	return nil
-}
-
-// GetCommentFileKeys returns (uid, storageKey) pairs for every file attached
-// to a comment. Used by the comment-delete cleanup path.
-func (dg Dgraph) GetCommentFileKeys(cid string) ([]struct{ UID, StorageKey string }, error) {
-	res, err := dg.Meta("getCommentFiles", map[string]string{"id": cid})
-	if err != nil {
-		return nil, err
-	}
-	if len(res) == 0 {
-		return nil, nil
-	}
-	files, _ := res[0]["files"].([]any)
-	out := make([]struct{ UID, StorageKey string }, 0, len(files))
-	for _, f := range files {
-		m, ok := f.(map[string]any)
-		if !ok {
-			continue
-		}
-		out = append(out, struct{ UID, StorageKey string }{
-			UID:        asString(m["id"]),
-			StorageKey: asString(m["storageKey"]),
-		})
-	}
-	return out, nil
-}
-
 // deleteStorageKeysAsync fires a goroutine to drop the named S3 objects via
 // storage.Global(). No-op when storage isn't configured. Callers use this
-// after a cascade delete (tension, user) committed the Dgraph rows but still
-// owns the underlying bytes.
+// after a cascade delete (comment, tension, user) committed the Dgraph rows
+// but still owns the underlying bytes. The 2-min budget covers the worst-case
+// tension cascade where a single delete can fan out to dozens of files.
 func deleteStorageKeysAsync(keys []string) {
 	if len(keys) == 0 {
 		return
@@ -290,7 +254,7 @@ func deleteStorageKeysAsync(keys []string) {
 		return
 	}
 	go func(c *storage.Client, ks []string) {
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 		defer cancel()
 		for _, k := range ks {
 			if k == "" {
@@ -301,39 +265,6 @@ func deleteStorageKeysAsync(keys []string) {
 			}
 		}
 	}(cli, keys)
-}
-
-// CleanupCommentFiles removes every S3 object attached to the given comment.
-// Called by the comment-delete event path before the deleteComment template
-// drops the File nodes from Dgraph. Per-file failures are logged but do NOT
-// abort: leaving an orphan object is preferable to blocking the delete (the
-// bucket can be swept out-of-band).
-//
-// cli may be nil when [storage] is unset — comment deletion still proceeds and
-// the DQL template drops the File nodes; operators can sweep the bucket
-// out-of-band if storage is reattached later.
-//
-// Lives in the db package (not web/handlers) so graph/ can call it without
-// creating an import cycle (handlers already imports graph).
-func (dg Dgraph) CleanupCommentFiles(cid string, cli *storage.Client) error {
-	files, err := dg.GetCommentFileKeys(cid)
-	if err != nil {
-		return err
-	}
-	if len(files) == 0 || cli == nil {
-		return nil
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	for _, f := range files {
-		if f.StorageKey == "" {
-			continue
-		}
-		if delErr := cli.Delete(ctx, f.StorageKey); delErr != nil {
-			fmt.Printf("CleanupCommentFiles: failed to delete %s: %v\n", f.StorageKey, delErr)
-		}
-	}
-	return nil
 }
 
 // --- small helpers (kept private to this file) ---

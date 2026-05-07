@@ -48,8 +48,9 @@ import (
 )
 
 // testStorageCli is the MinIO-backed storage client used by /file/* tests.
-// Set in TestMain and registered as the storage package global so that
-// graph.RemoveComment's CleanupCommentFiles can use the same client.
+// Set in TestMain and registered as the storage package global so the
+// cascade-delete async GC (deleteStorageKeysAsync) resolves to the same
+// backing.
 var testStorageCli *storage.Client
 
 // testRouter is the shared chi router used by all integration tests.

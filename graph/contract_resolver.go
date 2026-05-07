@@ -131,7 +131,7 @@ func addContractHook(ctx context.Context, obj any, next graphql.Resolver) (any, 
 	ok, contract, err := contractEventHook(uctx, cid, tid, &event, nil)
 	if !ok || err != nil {
 		// Delete the contract just added
-		e := db.GetDB().DeepDelete("contract", id)
+		e := db.GetDB().DeleteContractDeep(id)
 		if e != nil {
 			panic(e)
 		}
@@ -281,7 +281,7 @@ func deleteContractHook(ctx context.Context, obj any, next graphql.Resolver) (an
 	}
 
 	// Deep delete
-	err = db.GetDB().DeepDelete("contract", ids[0])
+	err = db.GetDB().DeleteContractDeep(ids[0])
 	if err != nil {
 		return nil, LogErr("Delete contract error", err)
 	}

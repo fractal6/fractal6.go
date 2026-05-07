@@ -532,40 +532,6 @@ func TestFileDelete_AsNonAuthor_404(t *testing.T) {
 	requireStatus(t, rr, http.StatusNotFound)
 }
 
-// --- Comment-delete cleanup hook ---
-
-func TestCommentDelete_GCsAttachments(t *testing.T) {
-	// Create a fresh comment authored by testuser (so RemoveComment will accept
-	// the call) and attach a file. Then remove the comment via a direct DQL
-	// mutation simulation through graph.RemoveComment is in another package;
-	// instead exercise db.CleanupCommentFiles directly with the same wiring.
-	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
-	tid := resolveTensionByTitle(t, "Test tension")
-	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
-	resp := decodeUpload(t, uploadCommentFile(t, tid, cid, "gc.png", "image/png", pngBytes(), jwt))
-	key := storageKeyOf(t, resp.ID)
-
-	// Sanity.
-	if !objectExists(t, key) {
-		t.Fatalf("precondition: object %q should exist before cleanup", key)
-	}
-
-	// Run the same cleanup the comment-delete event path runs. We do NOT
-	// actually drop the seeded comment (other tests rely on it) — purge the
-	// File ourselves afterwards. CleanupCommentFiles is a no-op on the DB
-	// side; it only removes S3 objects.
-	if err := db.GetDB().CleanupCommentFiles(cid, testStorageCli); err != nil {
-		t.Fatalf("CleanupCommentFiles: %v", err)
-	}
-	if objectExists(t, key) {
-		t.Errorf("expected object %q to be removed by CleanupCommentFiles", key)
-	}
-
-	// File node still exists in Dgraph (CleanupCommentFiles is S3-only).
-	// Delete it so the seeded comment is back to a clean state.
-	_ = db.GetDB().DeleteFile(resp.ID)
-}
-
 // --- Avatar tests ---
 
 func TestAvatarUserReplaceFlow(t *testing.T) {

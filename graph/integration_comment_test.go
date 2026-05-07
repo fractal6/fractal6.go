@@ -156,10 +156,9 @@ func TestRemoveComment_NonOwnerCannotDelete(t *testing.T) {
 }
 
 // TestRemoveComment_DeletesAttachedFiles is the end-to-end test for the
-// comment-delete S3 GC hook in graph/tension_op.go. It exercises the actual
-// resolver path (RemoveComment → CleanupCommentFiles → storage.Delete) rather
-// than calling CleanupCommentFiles directly the way the web/handlers test
-// does, so a regression that breaks the wiring between RemoveComment and
+// comment-delete S3 GC hook. It exercises the actual resolver path
+// (RemoveComment → DeleteCommentDeep → deleteStorageKeysAsync → storage.Delete)
+// so a regression that breaks the wiring between RemoveComment and
 // storage.Global() will be caught here.
 func TestRemoveComment_DeletesAttachedFiles(t *testing.T) {
 	if testStorageCli == nil {

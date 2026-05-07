@@ -15,7 +15,7 @@ proxy that re-authorises against the file's anchor on every read.
 | DB helpers (`GetFileAuth`, `AddCommentFile`, `Replace*Avatar`, …) | `db/files.go` |
 | HTTP handlers (`/file/*`) + markdown rewrite | `web/handlers/files.go` |
 | Route wiring | `cmd/server.go` |
-| Comment-delete GC | `graph/tension_op.go::RemoveComment` |
+| Cascade-delete wrappers (`Delete{Comment,Tension,Contract,User}Deep`) | `db/dql_mutations.go` |
 | Storage config | `[storage]` block in `config.toml` |
 
 ## Anchors
@@ -79,10 +79,10 @@ return **503** instead of panicking. This also lets tests inject a fake.
 
 The same client is also registered as a process-wide handle via
 `storage.SetGlobal(cli)` in `cmd/server.go`, so non-handler callers (the
-comment-delete GC in `graph.RemoveComment`) can read it via `storage.Global()`
-without growing a parameter chain. `storage.Global()` returns `nil` when storage
-is unset; callers MUST nil-check (this is the fast path through
-`db.CleanupCommentFiles(cid, nil)`).
+cascade-delete wrappers in `db/dql_mutations.go`) can read it via
+`storage.Global()` without growing a parameter chain. `storage.Global()`
+returns `nil` when storage is unset; the async GC then short-circuits and
+the DQL templates still drop the `File` nodes from Dgraph.
 
 `POST /file/upload` returns:
 
@@ -236,8 +236,7 @@ sets up systemd, and (optionally) bootstraps the bucket and access keys.
 doesn't generate a reverse predicate. `getCommentMessage` therefore walks
 forward from `tid` and filters its `Tension.comments` edge by `cid` rather
 than via a reverse-edge query. `getFileAuth_v2` sidesteps the issue entirely
-by reading `File.tension` (denormalised at insert time). `getCommentFiles`
-walks forward from comment to its files via `Comment.files` and is unaffected.
+by reading `File.tension` (denormalised at insert time).
 
 Note: `db.Meta()` runs every response through `tools.CleanDqlMap`, which strips
 `Type.` prefixes (`File.storageKey` → `storageKey`, `Post.createdBy` →
@@ -246,11 +245,14 @@ keys; a previous version used the raw keys and silently returned empty values.
 
 ## Operational notes
 
-- **Comment delete** triggers `db.GetDB().CleanupCommentFiles(cid, storage.Global())`
-  before the DQL `deleteComment` runs. Per-file failures are logged but do not
-  block the delete; orphan objects can be GC'd by listing keys under
-  `orgas/<rootnameid>/tensions/<tid>/<cid>/`. When `storage.Global()` is `nil` (no `[storage]` block),
-  the call is a no-op and the DQL still drops the `File` nodes.
+- **Cascade-delete S3 GC** is shared by `DeleteCommentDeep`, `DeleteTensionDeep`,
+  and `DeleteUser` (all in `db/dql_mutations.go`). Each template projects an
+  `all` block of `File.storageKey` rows; the wrapper feeds them through
+  `collectStorageKeys` + `deleteStorageKeysAsync` (a 2-min, fire-and-forget
+  goroutine using `storage.Global()`). When `storage.Global()` is `nil`
+  (no `[storage]` block), the GC is a no-op and the DQL still drops the
+  `File` nodes — orphan objects can be swept out-of-band by listing keys
+  under `orgas/<rootnameid>/tensions/<tid>/<cid>/` (or the relevant prefix).
 - **No revocation**: a presigned URL captured by a user remains valid until
   TTL expires. Rotating credentials invalidates *all* outstanding URLs (last
   resort).

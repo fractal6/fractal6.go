@@ -560,72 +560,6 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
-	// Deletion - Used by DeepDelete
-	//
-	// Cascades to File nodes attached to comments (both tension and contract
-	// comments). The `file_keys` block lets the caller fire-and-forget the S3
-	// objects without a second round-trip.
-	"deleteTension": `{
-        id as var(func: uid({{.id}})) {
-          rid_emitter as Tension.emitter
-          rid_receiver as Tension.receiver
-          comments as Tension.comments {
-            reactions as Comment.reactions
-            files as Comment.files
-          }
-          b as Tension.blobs {
-              bn as Blob.node {
-                  m as NodeFragment.mandate
-              }
-          }
-          c as Tension.contracts {
-              e as Contract.event
-              votes as Contract.participants
-              comments2 as Contract.comments {
-                reactions2 as Comment.reactions
-                files2 as Comment.files
-              }
-          }
-          events as Tension.history
-          mentions as Tension.mentions
-        }
-        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,c,e,votes,comments2,reactions2,files,files2)) {
-            all_ids as uid
-        }
-        file_keys(func: uid(files,files2)) {
-            File.storageKey
-        }
-    }`,
-	"deleteContract": `{
-        id as var(func: uid({{.id}})) {
-          rid as Contract.tension
-          candidates as Contract.candidates
-          user_pending as Contract.pending_candidates
-          a as Contract.event
-          votes as Contract.participants {
-            nodes as Vote.node {
-                Node.parent {
-                    Node.children @filter(eq(Node.type_, "Role")) {
-                        members as Node.first_link
-                    }
-                }
-            }
-          }
-          c as Contract.comments {
-            r as Comment.reactions
-          }
-        }
-
-        var(func:uid(members)) @cascade {
-            desync_events as User.events {
-              UserEvent.event @filter(uid({{.id}}))
-            }
-        }
-
-        all(func: uid(id,a,votes,c,r)) {
-            all_ids as uid
-        }
-    }`,
 	"getUserActivity": `{
         all(func: eq(Activity.ownerid, "u#{{.username}}"), orderdesc: Activity.date, first: 366)
         {{if .from}}@filter(between(Activity.date, "{{.from}}", "{{.to}}")){{end}}
@@ -695,17 +629,6 @@ var dqlQueries map[string]string = map[string]string{
         all(func: uid(cmatch)) {
             Post.message
             Post.createdBy { User.username }
-        }
-    }`,
-	// getCommentFiles: list a comment's File nodes with their storage keys.
-	// Used by the comment-delete cleanup path to GC objects from S3 before the
-	// File nodes are removed from Dgraph.
-	"getCommentFiles": `{
-        all(func: uid({{.id}})) {
-            Comment.files {
-                uid
-                File.storageKey
-            }
         }
     }`,
 }

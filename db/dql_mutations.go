@@ -323,6 +323,106 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                `,
 		}},
 	},
+	// deleteTension cascades a tension and everything it owns: comments
+	// (with reactions + files), blobs (with NodeFragment + Mandate),
+	// contracts (with events, votes, comments, reactions, files), history
+	// events, and mention edges. Reverse edges Node.tensions_out and
+	// Node.tensions_in are dropped manually; @hasInverse is a GraphQL-side
+	// concept Dgraph won't auto-clean from a DQL delete.
+	//
+	// The `all` block surfaces File.storageKey for every comment attachment
+	// (tension- and contract-level) so callers can fire-and-forget S3 GC
+	// without a second round-trip.
+	//
+	// Known limitation: cascaded contract uids dangle in their reverse edges
+	// (User.contracts, PendingUser.contracts, Node.contracts) — fixing this
+	// requires walking the contracts before delete.
+	"deleteTension": {
+		Q: `query {
+            id as var(func: uid({{.id}})) {
+              rid_emitter as Tension.emitter
+              rid_receiver as Tension.receiver
+              comments as Tension.comments {
+                reactions as Comment.reactions
+                files as Comment.files
+              }
+              b as Tension.blobs {
+                  bn as Blob.node {
+                      m as NodeFragment.mandate
+                  }
+              }
+              c as Tension.contracts {
+                  e as Contract.event
+                  votes as Contract.participants
+                  comments2 as Contract.comments {
+                    reactions2 as Comment.reactions
+                    files2 as Comment.files
+                  }
+              }
+              events as Tension.history
+              mentions as Tension.mentions
+            }
+            var(func: uid(id,comments,reactions,events,mentions,b,bn,m,c,e,votes,comments2,reactions2,files,files2)) {
+                all_ids as uid
+            }
+            all(func: uid(files,files2)) {
+                File.storageKey
+            }
+        }`,
+		M: []X{{
+			D: `uid(rid_emitter) <Node.tensions_out> uid(id) .
+                uid(rid_receiver) <Node.tensions_in> uid(id) .
+                uid(all_ids) * * .
+                `,
+		}},
+	},
+	// deleteContract cascades a contract and its participants/comments/
+	// reactions, plus User.events rows whose `event` edge points back at
+	// the contract (the desync_events case). Reverse edges from Tension,
+	// User, PendingUser, Node are dropped manually — same @hasInverse
+	// caveat as deleteTension. No storage keys today.
+	"deleteContract": {
+		Q: `query {
+            id as var(func: uid({{.id}})) {
+              rid as Contract.tension
+              candidates as Contract.candidates
+              user_pending as Contract.pending_candidates
+              a as Contract.event
+              votes as Contract.participants {
+                nodes as Vote.node {
+                    Node.parent {
+                        Node.children @filter(eq(Node.type_, "Role")) {
+                            members as Node.first_link
+                        }
+                    }
+                }
+              }
+              c as Contract.comments {
+                r as Comment.reactions
+              }
+            }
+
+            var(func:uid(members)) @cascade {
+                desync_events as User.events {
+                  UserEvent.event @filter(uid({{.id}}))
+                }
+            }
+
+            var(func: uid(id,a,votes,c,r)) {
+                all_ids as uid
+            }
+        }`,
+		M: []X{{
+			D: `uid(rid) <Tension.contracts> uid(id) .
+                uid(candidates) <User.contracts> uid(id) .
+                uid(user_pending) <PendingUser.contracts> uid(id) .
+                uid(nodes) <Node.contracts> uid(votes) .
+                uid(members) <User.events> uid(desync_events) .
+                uid(desync_events) * * .
+                uid(all_ids) * * .
+                `,
+		}},
+	},
 	"deleteComment": {
 		// The `all` block returns the storage keys of the files attached to
 		// the comment so the caller can GC the S3 objects without a second
@@ -536,7 +636,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             project_created as var(func: has(Project.createdBy)) @cascade {
                 Project.createdBy @filter(eq(User.username, "{{.username}}"))
             }
-            file_keys(func: uid(avatar)) {
+            all(func: uid(avatar)) {
                 File.storageKey
             }
         }`,
@@ -667,4 +767,72 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 uid(vuid) <Vote.voteid> "" .`,
 		}},
 	},
+}
+
+// collectStorageKeys pulls "storageKey" strings out of a Meta() response.
+// Templates project them under an `all` block as `File.storageKey`;
+// CleanDqlMap strips the type prefix so the cleaned key is just "storageKey".
+func collectStorageKeys(resp []map[string]any) []string {
+	if len(resp) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(resp))
+	for _, m := range resp {
+		if k, ok := m["storageKey"].(string); ok && k != "" {
+			out = append(out, k)
+		}
+	}
+	return out
+}
+
+// DeleteCommentDeep removes a comment (see "deleteComment" template) and
+// fires async S3 cleanup for every attached file. Per-key S3 failures are
+// logged in the goroutine. Auth is the caller's responsibility.
+func (dg Dgraph) DeleteCommentDeep(tid, cid string) error {
+	resp, err := dg.Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
+	if err != nil {
+		return err
+	}
+	if keys := collectStorageKeys(resp); len(keys) > 0 {
+		deleteStorageKeysAsync(keys)
+	}
+	return nil
+}
+
+// DeleteTensionDeep cascades a tension delete (see "deleteTension" template)
+// and fires async S3 cleanup for every comment attachment carried by the
+// tension or its contracts. Per-key S3 failures are logged in the goroutine.
+func (dg Dgraph) DeleteTensionDeep(id string) error {
+	resp, err := dg.Meta("deleteTension", map[string]string{"id": id})
+	if err != nil {
+		return err
+	}
+	if keys := collectStorageKeys(resp); len(keys) > 0 {
+		deleteStorageKeysAsync(keys)
+	}
+	return nil
+}
+
+// DeleteContractDeep cascades a contract delete (see "deleteContract").
+// No S3 GC: contract comments don't carry files in the current schema.
+func (dg Dgraph) DeleteContractDeep(id string) error {
+	_, err := dg.Meta("deleteContract", map[string]string{"id": id})
+	return err
+}
+
+// DeleteUser runs the deleteUser cascade and fires async S3 cleanup of the
+// removed user's avatar (if any). The Dgraph mutation always runs; per-key
+// S3 failures are logged in the goroutine and do not surface as errors.
+func (dg Dgraph) DeleteUser(username, ghostid string) error {
+	resp, err := dg.Meta("deleteUser", map[string]string{
+		"username": username,
+		"ghostid":  ghostid,
+	})
+	if err != nil {
+		return err
+	}
+	if keys := collectStorageKeys(resp); len(keys) > 0 {
+		deleteStorageKeysAsync(keys)
+	}
+	return nil
 }
