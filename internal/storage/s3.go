@@ -50,7 +50,7 @@ import (
 type Config struct {
 	Endpoint        string // e.g. "garage.fractale.co" or "127.0.0.1:3900"
 	Region          string // e.g. "garage" (Garage default) or "us-east-1"
-	Bucket          string // e.g. "fractale-attachments"
+	Bucket          string // e.g. "fractale-storage"
 	AccessKey       string
 	SecretKey       string
 	UseSSL          bool
@@ -161,7 +161,7 @@ func (c *Client) Exists(ctx context.Context, key string) (bool, error) {
 
 // PresignGet returns a short-lived URL that the browser can hit directly.
 // ttl SHOULD be a few minutes — long enough to render an image, short enough
-// that a leaked URL has limited blast radius. See docs/file-attachments.md.
+// that a leaked URL has limited blast radius. See docs/file-storage.md.
 //
 // contentDisposition, when non-empty, is forwarded as the S3
 // `response-content-disposition` parameter so the storage backend stamps it

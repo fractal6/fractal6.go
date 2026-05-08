@@ -169,7 +169,7 @@ POST /q/projects/sub
 POST /q/tensions/{light,int,ext,all}
 POST /q/tensions/count
 
-# File attachments / avatars (see file-attachments.md)
+# File attachments / avatars (see file-storage.md)
 POST   /file/upload                    Multipart; one of (tid+cid)|userid|orgaid
 GET    /file/{id}                      Per-anchor auth → 302 to presigned S3 URL
 DELETE /file/{id}                      Uploader-only
@@ -212,5 +212,5 @@ Event categories: `EventNotif` (tension events), `ContractNotif` (contract votin
 | Modify field-level auth | `graph/xw_directive.go` |
 | Add a DQL-backed computed field | declare with `@meta` in SDL → add template to `dqlQueries` in `db/dql.go` |
 | Add an HTTP route | `web/handlers/` + register in `web/router.go` |
-| Handle file attachments | `docs/file-attachments.md` |
+| Handle file attachments | `docs/file-storage.md` |
 | Run integration tests | `docs/integration-tests.md` |

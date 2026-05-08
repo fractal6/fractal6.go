@@ -204,7 +204,7 @@ func RunServer() {
 		})
 	})
 
-	// File attachments (S3-backed). See docs/file-attachments.md.
+	// File attachments (S3-backed). See docs/file-storage.md.
 	// /file/<id>            : auth-checked 302 to a presigned URL (read)
 	// POST /file/upload     : multipart upload, comment-author only
 	// DELETE /file/<id>     : comment-author only

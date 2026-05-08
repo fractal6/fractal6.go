@@ -27,7 +27,7 @@
 //
 // Bytes never travel through Fractale: every read goes through GET /file/<id>,
 // which re-authorises against the populated anchor and 302-redirects to a
-// short-lived presigned URL. See docs/file-attachments.md.
+// short-lived presigned URL. See docs/file-storage.md.
 package handlers
 
 import (
@@ -658,7 +658,7 @@ func safeFilename(name string) string {
 }
 
 // commentKeyPrefix / userKeyPrefix / orgaKeyPrefix are the per-anchor
-// namespacing conventions. See docs/file-attachments.md.
+// namespacing conventions. See docs/file-storage.md.
 func commentKeyPrefix(rootnameid, tid, cid string) string {
 	return "orgas/" + rootnameid + "/tensions/" + tid + "/" + cid + "/"
 }

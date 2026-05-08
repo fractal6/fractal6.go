@@ -1,4 +1,4 @@
-# File Attachments
+# File Storage
 
 S3-compatible object storage (Garage in production, MinIO compatible) for the
 three asset kinds Fractale persists outside Dgraph: comment attachments,
@@ -61,7 +61,7 @@ storage.PresignGet(key, ttl)    # short-lived presigned URL
 Bytes never travel through Fractale; the storage backend serves them directly
 from the presigned URL. The TTL (default 10 min, see `presign_ttl_sec`) bounds
 the leak window of any captured URL — see the design discussion in
-`docs/file-attachments.md` (this file) for why this is the recommended posture
+`docs/file-storage.md` (this file) for why this is the recommended posture
 over either pure proxying or returning presigned URLs to the client directly.
 
 ## REST surface
@@ -212,7 +212,7 @@ check before issuing a presigned URL).
 [storage]
 endpoint           = "garage.fractale.co"   # host[:port], no scheme
 region             = "garage"               # Garage default
-bucket             = "fractale-attachments"
+bucket             = "fractale-storage"
 access_key         = "..."
 secret_key         = "..."
 use_ssl            = true                   # Garage on a separate host → require TLS

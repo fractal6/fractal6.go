@@ -41,3 +41,22 @@ max_public_orgas = -1    # Maximum public organnization per user, -1 for unlimit
 max_private_orgas = -1   # Maximum private organnization per user, -1 for unlimited
 max_orga_reg = -1        # Maximum organnization per regular user, -1 for unlimited
 max_orga_pro = -1        # Maximum organnization per pro user, -1 for unlimited
+
+[storage]
+# S3-compatible object store for file assets — comment attachments, user avatars,
+# org avatars (Garage in production, MinIO compatible). Leave endpoint empty to
+# disable upload features. See docs/file-storage.md.
+#
+# A single bucket holds all file kinds, namespaced by key prefix:
+#   orgas/<rootnameid>/tensions/<tid>/<cid>/<rand>-<safe-name>  comment attachments
+#   orgas/<rootnameid>/<rand>-<safe-name>                       org avatars
+#   users/<username>/<rand>-<safe-name>                         user avatars
+endpoint           = ""                  # e.g. "garage.YOUR_DOMAIN" (host[:port], no scheme)
+region             = "garage"            # Garage default; MinIO commonly uses "us-east-1"
+bucket             = "fractale-storage"
+access_key         = "..."
+secret_key         = "..."
+use_ssl            = true                # require HTTPS when storage is on another host
+public_url_prefix  = ""                  # optional; e.g. "https://files.YOUR_DOMAIN" to rewrite presigned host
+max_upload_bytes   = 10485760            # 10 MiB
+presign_ttl_sec    = 600                 # presigned URL TTL, seconds (10 min)

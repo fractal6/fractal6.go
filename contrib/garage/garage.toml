@@ -1,0 +1,25 @@
+# Single-node Garage config for local development.
+# Mounted into garage-dev at /etc/garage.toml by docker-compose.dev.yml.
+# Production deployments render their own garage.toml via the Ansible role at
+# contrib/ansible/roles/garage/. Do not reuse these tokens outside dev.
+
+metadata_dir = "/var/lib/garage/meta"
+data_dir     = "/var/lib/garage/data"
+db_engine    = "lmdb"
+
+replication_factor = 1
+consistency_mode   = "consistent"
+
+rpc_bind_addr   = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"
+rpc_secret      = "0000000000000000000000000000000000000000000000000000000000000000"
+
+[s3_api]
+api_bind_addr = "[::]:3900"
+s3_region     = "garage"
+root_domain   = ".s3.garage.local"
+
+[admin]
+api_bind_addr = "[::]:3903"
+admin_token   = "dev-admin-token"
+metrics_token = "dev-metrics-token"

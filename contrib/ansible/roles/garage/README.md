@@ -2,7 +2,7 @@
 
 Deploys [Garage](https://garagehq.deuxfleurs.fr/) as a single-node S3-compatible
 object store on a Debian/Ubuntu host. Designed to back the Fractale file
-attachment feature (see `docs/file-attachments.md` in the fractal6.go repo).
+attachment feature (see `docs/file-storage.md` in the fractal6.go repo).
 
 > **Status**: standalone role, intended to be folded into the global Fractale
 > Ansible inventory by a follow-up integration. Variables are namespaced
@@ -29,7 +29,7 @@ or recreate a bucket that already exists.
 | `garage_rpc_secret` | — (required) | 32-byte hex secret. Generate with `openssl rand -hex 32`. Vault it. |
 | `garage_admin_token` | — (required) | Token for the admin API. Vault it. |
 | `garage_metrics_token` | — (required) | Token for the /metrics endpoint. Vault it. |
-| `garage_bucket_name` | `fractale-attachments` | Bucket created at bootstrap (if `garage_bootstrap_bucket: true`). |
+| `garage_bucket_name` | `fractale-storage` | Bucket created at bootstrap (if `garage_bootstrap_bucket: true`). |
 
 ## Common variables
 

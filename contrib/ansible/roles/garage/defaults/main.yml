@@ -95,6 +95,6 @@ garage_metrics_token:  ""
 # Idempotent: skips steps that have already been done.
 garage_bootstrap_cluster: true
 garage_bootstrap_bucket:  true
-garage_bucket_name:       "fractale-attachments"
+garage_bucket_name:       "fractale-storage"
 garage_bucket_zone:       "dc1"
 garage_bucket_capacity:   "100G"   # advisory layout capacity for this node

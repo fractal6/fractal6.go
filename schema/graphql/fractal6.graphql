@@ -402,7 +402,7 @@ type Comment implements Post @auth(
 # Anchor-polymorphic: exactly one of `comment`, `user`, `node` is set per file.
 # `tension` is a denormalised auth-scope shortcut that is always co-set with
 # `comment` (it's never a navigable graph edge from Tension — there is no
-# Tension.files inverse). See docs/file-attachments.md.
+# Tension.files inverse). See docs/file-storage.md.
 type File @auth(
   add: <<is-root>>,
   update: <<is-root>>,
