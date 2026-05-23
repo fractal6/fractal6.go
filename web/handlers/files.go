@@ -35,6 +35,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -377,7 +378,7 @@ func embedIfReferenced(cid, fid, filename, message string) bool {
 		return false
 	}
 	if err := db.GetDB().EmbedCommentMessage(cid, fid, newMsg); err != nil {
-		fmt.Printf("embedCommentMessage: %v\n", err)
+		log.Printf("Warning: embedCommentMessage: %v", err)
 		return false
 	}
 	return true
@@ -508,8 +509,11 @@ func rewriteMessageForFile(msg, filename, fid string) (string, bool) {
 		if urlInOriginal != filename {
 			continue
 		}
-		// Bare token only: no path separators, no scheme.
-		if strings.ContainsAny(urlInOriginal, "/") || strings.Contains(urlInOriginal, "://") {
+		// Bare filename only: reject anything carrying a path separator ("/")
+		// or a scheme delimiter (":"). The ":" guard is what does the work
+		// here — safeFilename already strips "/", but it does NOT strip ":",
+		// so a filename like "weird:name.png" would otherwise sneak through.
+		if strings.ContainsAny(urlInOriginal, "/:") {
 			continue
 		}
 		newMsg := msg[:urlStart] + "/file/" + fid + msg[urlEnd:]

@@ -99,6 +99,32 @@ Use `url` directly — for both `<a href="...">` attachments and markdown
 `![alt](/file/0x...)`. The URL is stable for the lifetime of the file; presign
 expiry is invisible to clients (re-issued on every request).
 
+## Upload validation
+
+The upload handler does not trust client-supplied metadata:
+
+- **Server-side MIME sniff.** The client-supplied `Content-Type` header is
+  discarded. The handler reads the first 512 bytes and feeds them to
+  `http.DetectContentType`; the result is what gets persisted to
+  `File.contentType` and what `/file/<id>` later serves. Uploading an HTML
+  document labelled `image/png` will land as `text/html` — frontends should
+  not be surprised.
+- **Inline vs attachment is an allowlist, not the sniffed type.** Only an
+  explicit set of types render in-page (`image/png|jpeg|gif|webp|avif|bmp|x-icon`,
+  `video/mp4|webm|ogg`, `audio/mpeg|ogg|wav`, `application/pdf`, `text/plain`).
+  Everything else — notably **`image/svg+xml` and `text/html`** — is forced
+  to `Content-Disposition: attachment` to neutralise the SVG-with-`<script>`
+  and HTML-masquerade-as-image XSS vectors. The allowlist lives in
+  `inlineSafeContentTypes` in `web/handlers/files.go`.
+- **`X-Content-Type-Options: nosniff`** is set on every GET response, so
+  browsers don't second-guess the Content-Type the storage backend echoes
+  back. Defence in depth on top of the allowlist.
+- **Size cap.** `storage.max_upload_bytes` (default **10 MiB**) is enforced
+  via `http.MaxBytesReader` *and* `ParseMultipartForm`. Going over → 400
+  with `"upload too large or malformed: ..."`. To raise (e.g. 100 MiB), set
+  `max_upload_bytes = 104857600` in `config.toml` — and bump the matching
+  body limit on any reverse proxy in front (`client_max_body_size` for nginx).
+
 ## Inline screenshot pasting
 
 Frontend convention: when the user pastes a screenshot during compose, the
@@ -196,13 +222,9 @@ type Node { ...
 }
 ```
 
-Mutations are root-only — clients **never** create/edit/delete `File` via
-GraphQL. All writes go through the REST endpoints, which run the auth checks
-and persist via internal DQL.
+Mutations are root-only — clients **never** create/edit/delete `File` via GraphQL. All writes go through the REST endpoints, which run the auth checks and persist via internal DQL.
 
-`queryFile` / `getFile` are intentionally left open for query: the `storageKey`
-field is useless without going through `/file/<id>` (which performs the auth
-check before issuing a presigned URL).
+`queryFile` / `getFile` are intentionally left open for query: the `storageKey` field is useless without going through `/file/<id>` (which performs the auth check before issuing a presigned URL).
 
 ## Configuration
 
@@ -221,14 +243,59 @@ max_upload_bytes   = 10485760               # 10 MiB
 presign_ttl_sec    = 600                    # 10 min
 ```
 
-Leave `endpoint` empty in dev environments to disable upload features cleanly
-(handlers return 503 instead of crashing).
+Leave `endpoint` empty in dev environments to disable upload features cleanly (handlers return 503 instead of crashing).
 
 ## Deployment
 
-For self-hosted Garage on a separate VM, see the standalone Ansible role at
-`contrib/ansible/roles/garage/`. It installs the binary, renders the TOML config,
-sets up systemd, and (optionally) bootstraps the bucket and access keys.
+For self-hosted Garage on a separate VM, see the standalone Ansible role at `contrib/ansible/roles/garage/`. 
+It installs the binary, renders the TOML config, sets up systemd, and (optionally) bootstraps the bucket and access keys.
+
+## Inspecting Garage
+
+Three complementary ways to poke a running instance. The dev fixtures below are the access key / secret / admin token baked into `docker-compose.dev.yml` and `contrib/garage/garage.toml` — do not reuse outside dev.
+
+### 1. `garage` CLI (admin/control plane)
+
+Same binary as the server, run inside the container. Talks to the admin API on `3903` with the `admin_token`. Covers cluster status, buckets, keys, layout
+— **not** object listing or fetching.
+
+```sh
+docker compose -f docker-compose.dev.yml exec garage-dev /garage status
+docker compose -f docker-compose.dev.yml exec garage-dev /garage bucket list
+docker compose -f docker-compose.dev.yml exec garage-dev /garage bucket info fractale-storage
+docker compose -f docker-compose.dev.yml exec garage-dev /garage key list
+docker compose -f docker-compose.dev.yml exec garage-dev /garage key info GKdeadbeefdeadbeefdeadbeefdeadbeef --show-secret
+```
+
+### 2. MinIO Client `mc` (S3 data plane)
+
+Best tool for browsing/listing/fetching actual objects — i.e. for verifying that an upload landed at the expected key prefix.
+
+```sh
+mc alias set garage-dev http://127.0.0.1:3900 \
+  GKdeadbeefdeadbeefdeadbeefdeadbeef \
+  deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef \
+  --api S3v4
+
+mc ls   garage-dev/fractale-storage
+mc tree garage-dev/fractale-storage
+mc ls   --recursive garage-dev/fractale-storage/orgas/
+mc cp   ./local.png garage-dev/fractale-storage/scratch/test.png
+mc rm   garage-dev/fractale-storage/scratch/test.png
+```
+
+Equivalent with the `aws` CLI:
+
+```sh
+AWS_ACCESS_KEY_ID=GKdeadbeefdeadbeefdeadbeefdeadbeef \
+AWS_SECRET_ACCESS_KEY=deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef \
+aws --endpoint-url http://127.0.0.1:3900 s3 ls s3://fractale-storage/ --recursive
+```
+
+### 3. Web UI
+
+Garage has no first-party web UI. The community option is [`khairul169/garage-webui`](https://github.com/khairul169/garage-webui),
+which speaks Garage's admin API — admin-plane only (buckets, keys, layout), no object browsing. For object browsing through a GUI, point Cyberduck or similar at `http://127.0.0.1:3900` with an S3 profile and the dev credentials.
 
 ## DQL note: no reverse edge on `Tension.comments`
 
@@ -253,12 +320,6 @@ keys; a previous version used the raw keys and silently returned empty values.
   (no `[storage]` block), the GC is a no-op and the DQL still drops the
   `File` nodes — orphan objects can be swept out-of-band by listing keys
   under `orgas/<rootnameid>/tensions/<tid>/<cid>/` (or the relevant prefix).
-- **No revocation**: a presigned URL captured by a user remains valid until
-  TTL expires. Rotating credentials invalidates *all* outstanding URLs (last
-  resort).
-- **No audit of byte access**: the storage backend sees only the presigned
-  request, not the originating user identity. If audit is needed, switch to
-  proxy-streaming in `FileGet` (replace the `http.Redirect` with `cli.GetObject`
-  + `io.Copy`).
-- **Filename safety**: see `safeFilename` in `web/handlers/files.go` for the
-  exact sanitisation rules.
+- **No revocation**: a presigned URL captured by a user remains valid until TTL expires. Rotating credentials invalidates *all* outstanding URLs (last resort).
+- **No audit of byte access**: the storage backend sees only the presigned request, not the originating user identity. If audit is needed, switch to proxy-streaming in `FileGet` (replace the `http.Redirect` with `cli.GetObject` `io.Copy`).
+- **Filename safety**: see `safeFilename` in `web/handlers/files.go` for the exact sanitisation rules.

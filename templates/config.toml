@@ -44,7 +44,7 @@ max_orga_pro = -1        # Maximum organnization per pro user, -1 for unlimited
 
 [storage]
 # S3-compatible object store for file assets — comment attachments, user avatars,
-# org avatars (Garage in production, MinIO compatible). Leave endpoint empty to
+# org avatars (Garage in production, MinIO compatible).  Leave endpoint empty to
 # disable upload features. See docs/file-storage.md.
 #
 # A single bucket holds all file kinds, namespaced by key prefix:

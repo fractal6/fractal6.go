@@ -23,6 +23,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/dgraph-io/dgo/v200/protos/api"
@@ -261,7 +262,7 @@ func deleteStorageKeysAsync(keys []string) {
 				continue
 			}
 			if err := c.Delete(ctx, k); err != nil {
-				fmt.Printf("deleteStorageKeysAsync: %s: %v\n", k, err)
+				log.Printf("Warning: deleteStorageKeysAsync: %s: %v", k, err)
 			}
 		}
 	}(cli, keys)
