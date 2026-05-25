@@ -59,4 +59,17 @@ secret_key         = "..."
 use_ssl            = true                # require HTTPS when storage is on another host
 public_url_prefix  = ""                  # optional; e.g. "https://files.YOUR_DOMAIN" to rewrite presigned host
 max_upload_bytes   = 10485760            # 10 MiB
-presign_ttl_sec    = 600                 # presigned URL TTL, seconds (10 min)
+presign_ttl_sec    = 7200                # presigned URL TTL, seconds (2 hours)
+
+[notify]
+# Cross-process upload gate + Postal attachment caps. See docs/file-storage.md.
+# The api server pre-registers expected inline-paste uploads on the gate; the
+# notifier daemon waits until they land (or the timeout fires) before reading
+# Comment.files for the outgoing email.
+upload_gate_baseline_sec  = 2            # min wait even when gate is unset (catches plain attachments)
+upload_gate_timeout_sec   = 30           # hard ceiling on Wait
+# Postal attachment caps. Files exceeding per-file are dropped from the
+# Postal payload but still surface as click-through links in the footer.
+attachment_per_file_bytes = 10485760     # 10 MiB
+attachment_total_bytes    = 104857600    # 100 MiB (raise Postal's transport size limit if you raise this)
+attachment_max_count      = 20           # hard cap on files attached to one email

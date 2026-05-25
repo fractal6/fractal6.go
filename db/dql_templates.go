@@ -399,6 +399,43 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
+	// getLastCommentFiles projects the file attachments anchored on the
+	// most-recent comment from {{.username}} on tension {{.tid}}. Returned
+	// as a nested structure (no @normalize) so the notifier can iterate the
+	// File rows and partition them into inline-CID vs plain attachments.
+	"getLastCommentFiles": `{
+        all(func: uid({{.tid}})) {
+            Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
+                Post.createdBy @filter(eq(User.username, "{{.username}}")) { User.username }
+                Comment.files {
+                    uid
+                    File.storageKey
+                    File.filename
+                    File.contentType
+                    File.size
+                    File.embedded
+                }
+            }
+        }
+    }`,
+	// Same projection as getLastCommentFiles, but walking Contract.comments
+	// instead of Tension.comments. Contract emails use this to inline files
+	// uploaded on the contract's most recent comment.
+	"getLastContractCommentFiles": `{
+        all(func: uid({{.cid}})) {
+            Contract.comments(first:1, orderdesc: Post.createdAt) @cascade {
+                Post.createdBy @filter(eq(User.username, "{{.username}}")) { User.username }
+                Comment.files {
+                    uid
+                    File.storageKey
+                    File.filename
+                    File.contentType
+                    File.size
+                    File.embedded
+                }
+            }
+        }
+    }`,
 	"getLastContractComment": `{
         all(func: uid({{.cid}})) @normalize {
             Contract.tension {

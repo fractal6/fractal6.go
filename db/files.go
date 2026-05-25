@@ -118,6 +118,66 @@ func (dg Dgraph) GetFileAuth(fileid string) (*FileAuth, error) {
 	return fa, nil
 }
 
+// CommentFile is the projection consumed by the email notifier to build
+// the Postal `attachments` payload — see web/email/main.go. Fields mirror
+// the File subset returned by getLastCommentFiles.
+type CommentFile struct {
+	ID          string
+	StorageKey  string
+	Filename    string
+	ContentType string
+	Size        int
+	Embedded    bool
+}
+
+// GetLastCommentFiles returns the File rows attached to the most-recent
+// comment authored by `username` on tension `tid`. Returns nil with no error
+// when the comment has no files (or doesn't exist) — the notifier treats
+// that as "send the email with zero attachments".
+func (dg Dgraph) GetLastCommentFiles(tid, username string) ([]CommentFile, error) {
+	return decodeLastCommentFiles(dg, "getLastCommentFiles", map[string]string{"tid": tid, "username": username})
+}
+
+// GetLastContractCommentFiles is the contract-email counterpart of
+// GetLastCommentFiles: walks Contract.comments instead of Tension.comments.
+func (dg Dgraph) GetLastContractCommentFiles(cid, username string) ([]CommentFile, error) {
+	return decodeLastCommentFiles(dg, "getLastContractCommentFiles", map[string]string{"cid": cid, "username": username})
+}
+
+func decodeLastCommentFiles(dg Dgraph, query string, args map[string]string) ([]CommentFile, error) {
+	res, err := dg.Meta(query, args)
+	if err != nil {
+		return nil, err
+	}
+	if len(res) == 0 {
+		return nil, nil
+	}
+	c, ok := firstChild(res[0], "comments")
+	if !ok {
+		return nil, nil
+	}
+	rawFiles, ok := c["files"].([]any)
+	if !ok {
+		return nil, nil
+	}
+	out := make([]CommentFile, 0, len(rawFiles))
+	for _, rf := range rawFiles {
+		m, ok := rf.(map[string]any)
+		if !ok {
+			continue
+		}
+		out = append(out, CommentFile{
+			ID:          asString(m["id"]),
+			StorageKey:  asString(m["storageKey"]),
+			Filename:    asString(m["filename"]),
+			ContentType: asString(m["contentType"]),
+			Size:        asInt(m["size"]),
+			Embedded:    asBool(m["embedded"]),
+		})
+	}
+	return out, nil
+}
+
 // CommentForUpload aggregates the upload-time facts about the parent comment:
 // its message (used for the inline-screenshot rewrite) and its author (used
 // for the author-only attach rule). The comment is required to belong to
@@ -287,6 +347,13 @@ func asInt(v any) int {
 		return int(n)
 	}
 	return 0
+}
+
+func asBool(v any) bool {
+	if b, ok := v.(bool); ok {
+		return b
+	}
+	return false
 }
 
 // firstChild unwraps Dgraph's [{...}] nesting for single-cardinality edges.

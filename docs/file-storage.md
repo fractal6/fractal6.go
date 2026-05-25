@@ -310,6 +310,84 @@ Note: `db.Meta()` runs every response through `tools.CleanDqlMap`, which strips
 `createdBy`, `uid` → `id`). The decoders in `db/files.go` look up the cleaned
 keys; a previous version used the raw keys and silently returned empty values.
 
+## Email notifications: inline CID + plain attachments
+
+Tension and contract notification emails ship the comment's attached files in
+the Postal `attachments` array, so recipients see them locally instead of via
+the auth-gated `/file/<id>` proxy (which a mail client's anonymous fetch
+can't satisfy for Private/Secret orgs).
+
+| Bucket | Criteria | Wire-up |
+|---|---|---|
+| **A — Inline (CID)** | `File.embedded == true` AND ContentType ∈ {`image/png`, `image/jpeg`, `image/gif`, `image/webp`} AND size under per-file cap | `attachments[]` entry with `content_id = <fid>@<DOMAIN>`; the HTML body's `<img src="/file/<id>">` is rewritten to `<img src="cid:<fid>@<DOMAIN>">` |
+| **B — Plain attachment** | everything else on the comment (non-embedded, oversized inline, non-image, SVG) | `attachments[]` entry without `content_id` (paperclip in the mail UI); also appears in a `Attachments:` footer block as `<a href="https://<DOMAIN>/file/<id>">name (size)</a>` |
+
+Both buckets share the per-email caps:
+
+| `config.toml` | Default | Behaviour at cap |
+|---|---|---|
+| `notify.attachment_per_file_bytes` | 10 MiB | file dropped from Postal payload; inline → absolute-URL `<img>`; plain → footer link only |
+| `notify.attachment_total_bytes`    | 100 MiB | next file dropped (Bucket B first, then A); spillover stays as footer links |
+| `notify.attachment_max_count`      | 20      | hard cap on number of files attached to one email |
+
+Files that didn't make it into the inline-CID set are absolutised
+(`<img src="https://<DOMAIN>/file/<id>">`) — Public-org images may still load
+in the recipient's client; Private/Secret-org images will 404. The HTML is
+re-sanitised with bluemonday after the rewrites; `cid:` is in the URL-scheme
+allowlist (`web/email/main.go`).
+
+Where it lives:
+- `web/email/attachments.go` — partition, fetch, rewrite, footer
+- `web/email/main.go` — `SendEventNotificationEmail` / `SendContractNotificationEmail` integration
+- `db/dql_templates.go::getLastCommentFiles` / `getLastContractCommentFiles` — file projection
+- `db/files.go::GetLastCommentFiles` / `GetLastContractCommentFiles` — Go decoders
+- `internal/storage/s3.go::GetObject` — byte fetch (base64-encoded into the Postal payload)
+
+### Upload gate (cross-process)
+
+The notifier daemon is a separate cobra subcommand (`cmd/notifier.go`) from the
+api server. The frontend `POST /file/upload`s **after** the GraphQL mutation
+that creates the carrier comment, so a notification can fire while uploads
+are still in flight — at which point `Comment.files` is empty and inline
+pastes still hold their bare paste filenames. The gate holds the notifier
+until expected uploads arrive.
+
+- **Register** — api server, in `addTensionHook` / `updateTensionHook` after
+  validating the input but before `PublishTensionEvent`. Counts plausible
+  `![](paste.png)` references via `tools.CountInlineImageCandidates`, then
+  `INCRBY upload-gate:<tid> n` + `EXPIRE 300s` (so a crashed registration
+  can't pin the gate forever).
+- **Signal** — api server, in `embedIfReferenced` when the upload's filename
+  matched an inline reference. `DECR` guarded by `EXISTS` so late signals
+  on a fresh tid don't drive a new counter negative.
+- **Wait** — notifier, in `PushEventNotifications` just before
+  `getLastComment` for events containing `Created` / `CommentPushed`. Sleeps
+  `upload_gate_baseline_sec` first (default 2s, gives plain attachments a
+  chance to land in `Comment.files`), then polls every 500 ms until the
+  counter drains, the key TTL expires, or `upload_gate_timeout_sec` (default
+  30s) elapses.
+
+Keyed by tid, not cid: tid is in the resolver's input hop, and accidental
+sharing across concurrent comments on one tension only makes Wait return
+slightly later — never sooner.
+
+Plain (non-inline) attachments do NOT signal. They're best-effort: the
+baseline wait + `Comment.files` re-fetch picks them up if they landed
+during the window.
+
+**Failure mode is documented: no-op-on-failure.** If the gate's Redis is
+misconfigured (e.g. the api server and notifier targeting different
+instances), Register/Signal are no-ops and Wait times out — the email
+ships with broken inline `<img>` exactly as it did before this feature
+was added.
+
+**Known caveat (out of scope, separate PR).** `cmd/notifier.go:37` hardcodes
+`localhost:6379` ignoring `$REDIS_ADDR`, while `web/sessions/main.go:51`
+honours it. In deployments where the two processes don't share a local
+Redis, the gate operates on different instances and Register/Signal/Wait
+all miss. The notifier still ships emails; pasted images degrade to the
+absolute-URL fallback (which 404s for Private/Secret orgs).
+
 ## Operational notes
 
 - **Cascade-delete S3 GC** is shared by `DeleteCommentDeep`, `DeleteTensionDeep`,

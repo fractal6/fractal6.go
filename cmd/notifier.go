@@ -30,6 +30,7 @@ import (
 
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/notify"
 	"fractale/fractal6.go/web/middleware"
 	//. "fractale/fractal6.go/internal/tools"
 )
@@ -49,6 +50,10 @@ func RunNotifier() {
 	if _, err := cache.Ping(ctx).Result(); err != nil {
 		log.Fatal("redis error: ", err)
 	}
+	// Register the cross-process upload gate so graph.PushEventNotifications
+	// can Wait on inline-paste uploads (api process Registers/Signals).
+	// Best-effort across redis instances — see docs/file-storage.md.
+	notify.SetGlobalClient(cache)
 
 	// Init Suscribe channel
 	// Queuing limit, and concurency see:

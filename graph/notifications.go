@@ -25,10 +25,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/notify"
 	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/web/email"
@@ -41,6 +43,25 @@ import (
  */
 
 var ctx context.Context = context.Background()
+
+// waitForUploads blocks until the per-tension upload gate has drained (all
+// pre-registered inline pastes have been signalled), the configured timeout
+// elapses, or the gate's baseline window passes when nothing was registered.
+// The point is to give the upload handler a chance to rewrite Comment.message
+// from `![](paste.png)` to `![](/file/<id>)` and persist File rows before the
+// notifier reads them.
+func waitForUploads(ctx context.Context, tid string) {
+	g := notify.Global()
+	if g == nil {
+		return
+	}
+	baseline := time.Duration(ViperPositiveInt("notify.upload_gate_baseline_sec", 2)) * time.Second
+	timeout := time.Duration(ViperPositiveInt("notify.upload_gate_timeout_sec", 30)) * time.Second
+	if _, err := g.Wait(ctx, tid, baseline, timeout); err != nil {
+		LogErr("upload-gate wait", err)
+	}
+}
+
 
 //
 // Publisher functions (Redis)
@@ -172,6 +193,12 @@ func PushEventNotifications(notif model.EventNotif) error {
 		}
 	}
 	// +
+	// Wait for any in-flight inline-paste uploads to land before reading
+	// the comment payload — otherwise the emailed message still holds
+	// `![](paste-N.png)` tokens and Comment.files is empty.
+	if notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated) {
+		waitForUploads(ctx, notif.Tid)
+	}
 	// Add mentions and **set tension data**
 	if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid": notif.Tid, "username": notif.Uctx.Username}); err != nil {
 		return err

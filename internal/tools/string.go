@@ -99,6 +99,49 @@ func FindUsernames(msg string) []string {
 	return match
 }
 
+// inlineImageRe matches a markdown image token `![alt](url)` and captures the
+// URL portion. Mirrors markdownImageRe in web/handlers/files.go; kept in
+// sync intentionally — both must agree on what counts as an inline paste
+// reference, otherwise the upload-gate Register count will diverge from
+// embedIfReferenced's Signal count and emails will stall waiting for an
+// upload that will never arrive.
+var inlineImageRe = re.MustCompile(`!\[[^\]]*\]\(([^)\s]+)\)`)
+
+// CountInlineImageCandidates returns the number of `![alt](url)` references
+// in `msg` whose URL is a plausible inline-paste filename — no scheme, no
+// path separator, and not data:/cid:. Code regions are stripped via
+// RemoveCodeBlocks so filenames mentioned in fenced/inline code do not
+// count.
+//
+// Used by the tension resolver hooks (graph/tension_resolver.go) to
+// pre-Register the per-tension upload gate BEFORE PublishTensionEvent fires,
+// so the notifier daemon can wait for the matching /file/upload calls to
+// arrive before reading Comment.files.
+func CountInlineImageCandidates(msg string) int {
+	if msg == "" {
+		return 0
+	}
+	stripped := RemoveCodeBlocks(msg)
+	matches := inlineImageRe.FindAllStringSubmatch(stripped, -1)
+	n := 0
+	for _, m := range matches {
+		if len(m) < 2 {
+			continue
+		}
+		u := m[1]
+		if u == "" {
+			continue
+		}
+		// Reject any URL that carries a path separator or a scheme delimiter:
+		// only bare paste filenames qualify, matching rewriteMessageForFile.
+		if strings.ContainsAny(u, "/:") {
+			continue
+		}
+		n++
+	}
+	return n
+}
+
 func FindTensions(msg string) []string {
 	r := re.MustCompile(`(^|\s|[^\w\[])(0x[0-9a-f]+)\b`)
 	all := r.FindAllStringSubmatch(msg, -1)

@@ -145,6 +145,26 @@ func (c *Client) Delete(ctx context.Context, key string) error {
 	return c.mc.RemoveObject(ctx, c.cfg.Bucket, key, minio.RemoveObjectOptions{})
 }
 
+// GetObject opens an object for reading and returns its body along with the
+// reported size. Caller MUST Close the reader to release the connection.
+//
+// Used by the email notifier (web/email) to inline file bytes as RFC 2392
+// `cid:` attachments — bytes that would otherwise be served behind the
+// auth-gated /file/<id> proxy, which a mail client's anonymous fetch can't
+// satisfy for Private/Secret orgs. The size is taken from StatObject so the
+// caller can budget against the per-email attachment cap.
+func (c *Client) GetObject(ctx context.Context, key string) (io.ReadCloser, int64, error) {
+	stat, err := c.mc.StatObject(ctx, c.cfg.Bucket, key, minio.StatObjectOptions{})
+	if err != nil {
+		return nil, 0, err
+	}
+	obj, err := c.mc.GetObject(ctx, c.cfg.Bucket, key, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, 0, err
+	}
+	return obj, stat.Size, nil
+}
+
 // Exists reports whether an object exists at key. Used by integration tests to
 // verify upload rollback and comment-delete cleanup; not used in request paths.
 func (c *Client) Exists(ctx context.Context, key string) (bool, error) {

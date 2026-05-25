@@ -13,10 +13,18 @@ The rendering follows a two-step process:
 
 ## Configuration
 
-Defined in `web/email/main.go`:
+Defined in `web/email/main.go`. The parser overrides the default inline
+parser set to drop `RawHTMLParser` — bare `<tension>` and similar
+angle-bracket tokens stay literal (escaped) instead of being silently
+swallowed as raw HTML:
 
 ```go
 var md goldmark.Markdown = goldmark.New(
+    goldmark.WithParser(parser.NewParser(
+        parser.WithBlockParsers(parser.DefaultBlockParsers()...),
+        parser.WithInlineParsers(inlineParsersNoRawHTML...),
+        parser.WithParagraphTransformers(parser.DefaultParagraphTransformers()...),
+    )),
     goldmark.WithExtensions(
         extension.GFM,
         &detailsExtension{},
@@ -43,6 +51,13 @@ var md goldmark.Markdown = goldmark.New(
 A custom `bluemonday.UGCPolicy()` extended with:
 - `<details>` element (with `open` attribute allowed)
 - `<summary>` element
+- inline `style` attribute on `<div>`, `<span>`, `<details>` — needed by the
+  details extension's wrapper div
+- URL-scheme allowlist set to `http`, `https`, `mailto`, `cid` — `cid:` is
+  required so the inline-image attachment rewriter can substitute
+  `<img src="/file/<id>">` with `<img src="cid:<fid>@<DOMAIN>">` without
+  bluemonday dropping the src attribute. `javascript:` and other schemes
+  are denied.
 
 ## Usage Locations
 
@@ -55,11 +70,22 @@ All in `web/email/main.go`:
 ## File-attachment URLs in emails
 
 Markdown bodies may contain `![](/file/<id>)` references (see
-`docs/file-storage.md`). The renderer leaves these as relative URLs in the
-email HTML: recipients clicking through must be authenticated, and inline
-preview in mail clients will fail to load the image. This is intentional —
-attachments inherit the parent comment's tension visibility and the mail
-client has no auth context.
+`docs/file-storage.md`). For email rendering, these are rewritten in
+`web/email/attachments.go` AFTER the goldmark conversion and BEFORE the
+bluemonday sanitisation:
+
+- **Inline-image files** (`File.embedded=true` AND a safe image type, within
+  the per-email caps) get `<img src="cid:<fid>@<DOMAIN>">` and ride out as
+  RFC 2392 inline attachments in the Postal payload — they render in-body
+  in the recipient's mail UI regardless of org visibility.
+- **Everything else** (non-image, non-embedded, oversized, cap overflow)
+  falls back to `<img src="https://<DOMAIN>/file/<id>">`. Public-org images
+  may render anonymously; Private/Secret-org ones 404 in the mail client —
+  which is when the recipient should click through and authenticate.
+
+Plain (non-image) attachments don't appear in the body at all; they ship
+as standard Postal attachments and also as a footer link list. See
+`docs/file-storage.md` "Email notifications" for caps and gate semantics.
 
 ## Details/Summary Extension
 

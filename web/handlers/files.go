@@ -31,6 +31,7 @@
 package handlers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -45,13 +46,14 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/notify"
 	"fractale/fractal6.go/internal/storage"
+	"fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 
@@ -185,7 +187,7 @@ func FileGetHandler(cli *storage.Client) http.HandlerFunc {
 			return
 		}
 
-		ttl := time.Duration(viperPositiveInt("storage.presign_ttl_sec", 600)) * time.Second
+		ttl := time.Duration(tools.ViperPositiveInt("storage.presign_ttl_sec", 600)) * time.Second
 		dispo := contentDispositionFor(fa.ContentType, fa.Filename)
 
 		presigned, err := cli.PresignGet(r.Context(), fa.StorageKey, ttl, dispo)
@@ -241,7 +243,7 @@ func FileUploadHandler(cli *storage.Client) http.HandlerFunc {
 			return
 		}
 
-		maxBytes := viperPositiveInt("storage.max_upload_bytes", 10*1024*1024)
+		maxBytes := tools.ViperPositiveInt("storage.max_upload_bytes", 10*1024*1024)
 		r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 
 		if err := r.ParseMultipartForm(int64(maxBytes)); err != nil {
@@ -354,7 +356,9 @@ func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Cl
 
 	// Inline-screenshot rewrite: if `safeName` appears as a bare ![](filename)
 	// token in the comment, swap it for /file/<fid> and flip File.embedded=true.
-	embedded := embedIfReferenced(anchor.Cid, fid, safeName, oldMessage)
+	// Successful rewrites decrement the per-tension upload gate so the notifier
+	// daemon stops waiting on this paste.
+	embedded := embedIfReferenced(r.Context(), anchor.Tid, anchor.Cid, fid, safeName, oldMessage)
 
 	writeJSON(w, map[string]any{
 		"id":          fid,
@@ -372,7 +376,12 @@ func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Cl
 // drop the first's URL substitution. The File rows themselves are unaffected
 // (they're independent), and the UI is lenient about embedded=true files
 // whose URL is no longer in the message (renders them as plain attachments).
-func embedIfReferenced(cid, fid, filename, message string) bool {
+//
+// On a successful inline rewrite we Signal the per-tension upload gate so the
+// notifier daemon can release its Wait once every expected paste has landed.
+// Plain (non-inline) attachments don't signal — they're handled best-effort
+// via the gate's baseline wait + Comment.files re-fetch on the notifier side.
+func embedIfReferenced(ctx context.Context, tid, cid, fid, filename, message string) bool {
 	newMsg, matched := rewriteMessageForFile(message, filename, fid)
 	if !matched {
 		return false
@@ -380,6 +389,9 @@ func embedIfReferenced(cid, fid, filename, message string) bool {
 	if err := db.GetDB().EmbedCommentMessage(cid, fid, newMsg); err != nil {
 		log.Printf("Warning: embedCommentMessage: %v", err)
 		return false
+	}
+	if err := notify.Global().Signal(ctx, tid); err != nil {
+		log.Printf("Warning: upload-gate signal (tid=%s): %v", tid, err)
 	}
 	return true
 }
@@ -487,6 +499,8 @@ func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 
 // markdownImageRe matches `![alt](url)`. The url group captures everything up
 // to the first whitespace or closing paren — that's the entire URL token.
+// Mirror of inlineImageRe in internal/tools/string.go; both regexes MUST stay
+// in sync so the upload-gate Register count matches Signal count.
 var markdownImageRe = regexp.MustCompile(`!\[[^\]]*\]\(([^)\s]+)\)`)
 
 // rewriteMessageForFile substitutes the first ![alt](filename) whose URL is
@@ -677,10 +691,3 @@ func randomID() string {
 	return hex.EncodeToString(b[:])
 }
 
-func viperPositiveInt(key string, fallback int) int {
-	v := viper.GetInt(key)
-	if v <= 0 {
-		return fallback
-	}
-	return v
-}

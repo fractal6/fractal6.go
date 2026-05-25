@@ -22,7 +22,9 @@ package email
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -38,6 +40,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/internal/tools"
 )
 
@@ -68,11 +71,15 @@ var md goldmark.Markdown = goldmark.New(
 
 // sanitizer extends bluemonday's UGCPolicy with <details>/<summary> support
 // and allows the inline-styled wrapper div used by the details extension.
+// `cid:` is added to the URL scheme allowlist so the inline-image rewriter
+// (rewriteImgToCID) can swap `<img src="/file/<id>">` to `<img src="cid:...">`
+// without bluemonday stripping the src attribute.
 var sanitizer = func() *bluemonday.Policy {
 	p := bluemonday.UGCPolicy()
 	p.AllowElements("details", "summary")
 	p.AllowAttrs("open").OnElements("details")
 	p.AllowAttrs("style").OnElements("div", "span", "details")
+	p.AllowURLSchemes("cid", "http", "https", "mailto")
 	return p
 }()
 
@@ -294,12 +301,25 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	var err error
 	var url_redirect string
 	var subject string
-	var body string
 	var author string
 	var payload string
 	var recv string = strings.ReplaceAll(notif.Receiverid, "#", "/")
 	var title string = notif.Title
 	var message string = notif.Msg
+
+	// Fetch attachments only when this email actually renders a comment
+	// body (Created or CommentPushed). State-change events like Closed /
+	// UserJoined never render `notif.Msg`, so attaching the latest comment-
+	// by-actor's files to those would be a spurious side-channel — visible
+	// in the recipient's mail UI even though no inline rewrite or footer
+	// reference exists in the body.
+	var attachments []postalAttachment
+	inlineByID := make(map[string]bool)
+	var footerFiles []emailFile
+	if notif.HasEvent(model.TensionEventCreated) || notif.HasEvent(model.TensionEventCommentPushed) {
+		commentFiles, _ := db.GetDB().GetLastCommentFiles(notif.Tid, notif.Uctx.Username)
+		attachments, inlineByID, footerFiles = buildAttachments(context.Background(), storage.Global(), fromDBFiles(commentFiles))
+	}
 	// Recipient email
 	var email string = ui.User.Email
 	if email == "" {
@@ -343,12 +363,17 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		if message == "" {
 			payload = "<i>No message provided.</i><br><br>"
 		} else {
-			// Convert markdown to Html
+			// Convert markdown to Html, then rewrite /file/<id> img tags to
+			// cid:<id>@DOMAIN for inline attachments and absolute URLs for
+			// the rest. Sanitisation runs AFTER both rewrites so bluemonday
+			// validates the final shape (cid scheme is allowlisted above).
 			var buf bytes.Buffer
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			payload = sanitizer.Sanitize(buf.String())
+			rendered := rewriteImgToCID(buf.String(), inlineByID)
+			rendered = absolutiseFileImg(rendered)
+			payload = sanitizer.Sanitize(rendered)
 		}
 
 	} else { // Tension updated
@@ -430,12 +455,15 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
 		// Add eventual comment
 		if notif.HasEvent(model.TensionEventCommentPushed) && message != "" {
-			// Convert markdown to Html
+			// Convert markdown to Html, then CID-rewrite + absolutise as for
+			// the "Created" path above.
 			var buf bytes.Buffer
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			comment = sanitizer.Sanitize(buf.String())
+			rendered := rewriteImgToCID(buf.String(), inlineByID)
+			rendered = absolutiseFileImg(rendered)
+			comment = sanitizer.Sanitize(rendered)
 		}
 
 		if comment != "" {
@@ -448,6 +476,14 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			}
 			payload += auto_msg + "<br>"
 		}
+	}
+
+	// Append the plain-attachment footer (Bucket B) so the recipient sees a
+	// click-through list even when their mail client hides Postal
+	// attachments behind a paperclip. Bucket A files (inline CID) are
+	// already visible in-body and intentionally NOT listed here.
+	if footer := renderAttachmentFooter(footerFiles); footer != "" {
+		payload += footer
 	}
 
 	// Add footer
@@ -477,22 +513,32 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     </html>`, payload)
 	plainContent, _ := tools.HTMLToMarkdown(content)
 
-	body = fmt.Sprintf(`{
-        "from": "%s <notifications@`+DOMAIN+`>",
-        "to": ["%s"],
-        "subject": "%s",
-        "html_body": "%s",
-        "plain_body": "%s",
-        "headers": {
-            "In-Reply-To": "<tension/%s@`+DOMAIN+`>",
-            "References": "<tension/%s@`+DOMAIN+`>"
-        }
-    }`, author, email, tools.CleanString(subject, true), tools.CleanString(content, true), tools.QuoteString(plainContent), notif.Tid, notif.Tid)
+	// Postal request body — built via encoding/json now that `attachments`
+	// carries variable-length base64 payloads. Hand-rolled %q-escaping
+	// across megabyte-sized attachment blobs is too fragile.
+	bodyPayload := map[string]any{
+		"from":       fmt.Sprintf("%s <notifications@"+DOMAIN+">", author),
+		"to":         []string{email},
+		"subject":    subject,
+		"html_body":  content,
+		"plain_body": plainContent,
+		"headers": map[string]string{
+			"In-Reply-To": fmt.Sprintf("<tension/%s@"+DOMAIN+">", notif.Tid),
+			"References":  fmt.Sprintf("<tension/%s@"+DOMAIN+">", notif.Tid),
+		},
+	}
+	if len(attachments) > 0 {
+		bodyPayload["attachments"] = attachments
+	}
 	// @TODO; "List-Unsubscribe": "<%s>"
 	// see https://github.com/postalserver/postal/issues/2788
 	// Other fields: http://apiv1.postalserver.io/controllers/send/message
+	body, err := json.Marshal(bodyPayload)
+	if err != nil {
+		return err
+	}
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
+	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
@@ -516,11 +562,21 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	var err error
 	var url_redirect string
 	var subject string
-	var body string
 	var rcpt_name string
 	var author string
 	var payload string
 	var recv string = strings.ReplaceAll(notif.Receiverid, "#", "/")
+
+	// Contract emails carry the latest comment authored by the actor (if
+	// any). Files attached to that comment ride out as Postal attachments
+	// the same way tension emails do.
+	var attachments []postalAttachment
+	inlineByID := make(map[string]bool)
+	var footerFiles []emailFile
+	if notif.Contract != nil {
+		cfiles, _ := db.GetDB().GetLastContractCommentFiles(notif.Contract.ID, notif.Uctx.Username)
+		attachments, inlineByID, footerFiles = buildAttachments(context.Background(), storage.Global(), fromDBFiles(cfiles))
+	}
 	// Recipient email
 	var email string = ui.User.Email
 	if email == "" {
@@ -623,14 +679,21 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 
 	// Add eventual comment
 	if notif.Msg != "" {
-		// Convert markdown to Html
+		// Convert markdown to Html; rewrite /file/<id> img tags for inline
+		// CID attachments / absolute URLs the same way tension emails do.
 		var buf bytes.Buffer
 		if err = md.Convert([]byte(notif.Msg), &buf); err != nil {
 			return err
 		}
-		payload += sanitizer.Sanitize(buf.String())
+		rendered := rewriteImgToCID(buf.String(), inlineByID)
+		rendered = absolutiseFileImg(rendered)
+		payload += sanitizer.Sanitize(rendered)
 	} else {
 		payload += "<br><br>"
+	}
+
+	if footer := renderAttachmentFooter(footerFiles); footer != "" {
+		payload += footer
 	}
 
 	payload += fmt.Sprintf(`—
@@ -648,19 +711,26 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     </html>`, payload)
 	plainContent, _ := tools.HTMLToMarkdown(content)
 
-	body = fmt.Sprintf(`{
-        "from": "%s <notifications@`+DOMAIN+`>",
-        "to": ["%s"],
-        "subject": "%s",
-        "html_body": "%s",
-        "plain_body": "%s",
-        "headers": {
-            "In-Reply-To": "<contract/%s@`+DOMAIN+`>",
-            "References": "<contract/%s@`+DOMAIN+`>"
-        }
-    }`, author, email, subject, tools.CleanString(content, true), tools.QuoteString(plainContent), notif.Contract.ID, notif.Contract.ID)
+	bodyPayload := map[string]any{
+		"from":       fmt.Sprintf("%s <notifications@"+DOMAIN+">", author),
+		"to":         []string{email},
+		"subject":    subject,
+		"html_body":  content,
+		"plain_body": plainContent,
+		"headers": map[string]string{
+			"In-Reply-To": fmt.Sprintf("<contract/%s@"+DOMAIN+">", notif.Contract.ID),
+			"References":  fmt.Sprintf("<contract/%s@"+DOMAIN+">", notif.Contract.ID),
+		},
+	}
+	if len(attachments) > 0 {
+		bodyPayload["attachments"] = attachments
+	}
+	body, err := json.Marshal(bodyPayload)
+	if err != nil {
+		return err
+	}
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
+	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 

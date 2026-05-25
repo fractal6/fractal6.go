@@ -191,12 +191,18 @@ The `/q/*` routes follow a two-phase shape: a cheap DQL call collects `{nameid �
 
 ```
 API server  ──PublishTensionEvent──▶  Redis pub/sub  ──▶  notifier daemon
-                                                           ├── build subscriber list
-                                                           ├── create UserEvent records
-                                                           └── send emails (Postal)
+   │ Register(tid, n)                                       │ Wait(tid)
+   └────────── upload-gate (Redis key per tid) ─────────────┘
+                                                            ├── build subscriber list
+                                                            ├── create UserEvent records
+                                                            └── send emails (Postal)
+                                                                ├── inline CID for pasted images
+                                                                └── plain attachments + footer links
 ```
 
 Event categories: `EventNotif` (tension events), `ContractNotif` (contract voting), `NotifNotif` (generic). Subscribers are resolved from: tension subscribers, assignees, receiver coordinators, emitter coordinators (created tensions only), contract candidates.
+
+The upload gate (`internal/notify/uploadgate.go`) coordinates the api server and the notifier daemon when a comment includes inline-paste screenshots: the api Registers expected uploads before publishing, the upload handler Signals as files land, and the notifier Waits before reading `Comment.files` for the outgoing email. See `docs/file-storage.md` "Email notifications" for the full flow, attachment caps, and the documented `cmd/notifier.go` REDIS_ADDR caveat.
 
 ## Configuration
 
