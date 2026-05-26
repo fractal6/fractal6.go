@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.8.12] - 2026-05-01
+
+### 🚀 Features
+
+- *(project-template)* Wire queries, REST routes, and DRY artefact fetchers
+
+### 💼 Other
+
+- *(fileserver)* Set path-aware Cache-Control to prevent stale SPA on revisit
+- *(auth)* Return 400 instead of panic on passwords over bcrypt's 72-byte cap
+- *(fileserver)* Apply Cache-Control to SPA fallback to prevent stale shells
+- Wire reload_mode from ./public/reload_mode into QueryBuildInfo
+- Add ProjectTemplate support
+
+
 ## [0.8.11] - 2026-04-28
 
 ### New features
