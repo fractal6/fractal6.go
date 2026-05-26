@@ -394,6 +394,7 @@ var dqlQueries map[string]string = map[string]string{
                 receiverid: Node.nameid
             }
             Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
+                id: uid
                 message: Post.message
                 Post.createdBy @filter(eq(User.username, "{{.username}}"))
             }

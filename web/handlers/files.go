@@ -34,6 +34,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -337,20 +338,15 @@ func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Cl
 		return
 	}
 
-	// Put bytes first, then DB. Rollback the object on DB failure.
-	storageKey := commentKeyPrefix(rootnameid, anchor.Tid, anchor.Cid) + randomID() + "-" + safeName
-	if err := cli.Put(r.Context(), storageKey, file, header.Size, contentType); err != nil {
-		http.Error(w, "upload failed: "+err.Error(), http.StatusBadGateway)
-		return
-	}
-
-	fid, err := db.GetDB().AddCommentFile(
-		anchor.Tid, anchor.Cid, uctx.Username, safeName, contentType, storageKey,
-		header.Size, time.Now().UTC().Format(time.RFC3339),
-	)
+	fid, err := writeCommentAttachment(r.Context(), cli,
+		rootnameid, anchor.Tid, anchor.Cid, uctx.Username,
+		safeName, contentType, file, header.Size)
 	if err != nil {
-		_ = cli.Delete(r.Context(), storageKey)
-		http.Error(w, "persist failed: "+err.Error(), http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+		if errors.Is(err, errStoragePut) {
+			status = http.StatusBadGateway
+		}
+		http.Error(w, err.Error(), status)
 		return
 	}
 
@@ -370,6 +366,41 @@ func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Cl
 	})
 }
 
+// errStoragePut / errPersistFile are sentinels wrapped around the underlying
+// driver error so callers can pick an HTTP status (502 vs 500) via errors.Is
+// without string-sniffing err.Error().
+var (
+	errStoragePut  = errors.New("upload failed")
+	errPersistFile = errors.New("persist failed")
+)
+
+// writeCommentAttachment puts bytes to S3 and inserts the File row anchored
+// on (tid, cid). Auth and the optional message-rewrite are the caller's
+// responsibility — this is the post-auth core shared by /file/upload and the
+// inbound-email path. Returns the new fid.
+//
+// Rollback policy: an S3 success followed by a DB failure removes the
+// orphaned object before returning.
+func writeCommentAttachment(
+	ctx context.Context, cli *storage.Client,
+	rootnameid, tid, cid, username, safeName, contentType string,
+	body io.Reader, size int64,
+) (string, error) {
+	storageKey := commentKeyPrefix(rootnameid, tid, cid) + randomID() + "-" + safeName
+	if err := cli.Put(ctx, storageKey, body, size, contentType); err != nil {
+		return "", fmt.Errorf("%w: %v", errStoragePut, err)
+	}
+	fid, err := db.GetDB().AddCommentFile(
+		tid, cid, username, safeName, contentType, storageKey,
+		size, time.Now().UTC().Format(time.RFC3339),
+	)
+	if err != nil {
+		_ = cli.Delete(ctx, storageKey)
+		return "", fmt.Errorf("%w: %v", errPersistFile, err)
+	}
+	return fid, nil
+}
+
 // embedIfReferenced rewrites the comment message in place when the uploaded
 // filename is referenced as an inline `![alt](filename)` token. Last-writer-
 // wins on Comment.message: if two uploads race, the second overwrite can
@@ -386,7 +417,7 @@ func embedIfReferenced(ctx context.Context, tid, cid, fid, filename, message str
 	if !matched {
 		return false
 	}
-	if err := db.GetDB().EmbedCommentMessage(cid, fid, newMsg); err != nil {
+	if err := db.GetDB().EmbedCommentMessage(cid, newMsg, []string{fid}); err != nil {
 		log.Printf("Warning: embedCommentMessage: %v", err)
 		return false
 	}

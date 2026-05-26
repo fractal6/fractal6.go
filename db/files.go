@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/dgraph-io/dgo/v200/protos/api"
@@ -230,15 +231,27 @@ func (dg Dgraph) AddCommentFile(tid, cid, username, filename, contentType, stora
 	return uid, nil
 }
 
-// EmbedCommentMessage rewrites Comment.message and flips File.embedded=true.
+// EmbedCommentMessage rewrites Comment.message and flips File.embedded=true on
+// each fid in `fids` in a single upsert. Pass an empty list to rewrite the
+// message only — the inbound-email path uses that when every cid: ref was a
+// quoted-back reference (already-persisted file) or an orphan (dropped).
 // Concurrent uploads to the same comment race on Comment.message (last-write-
 // wins); File rows are independent and both persist regardless.
-func (dg Dgraph) EmbedCommentMessage(cid, fid, newMessage string) error {
+func (dg Dgraph) EmbedCommentMessage(cid, newMessage string, fids []string) error {
 	q := dqlMutations["embedCommentMessage"]
+	var triples strings.Builder
+	for _, fid := range fids {
+		if fid == "" {
+			continue
+		}
+		triples.WriteString("<")
+		triples.WriteString(fid)
+		triples.WriteString(`> <File.embedded> "true" .` + "\n")
+	}
 	_, err := dg.UpsertDql(q, map[string]string{
-		"cid":        cid,
-		"fid":        fid,
-		"newMessage": escapeNQuad(newMessage),
+		"cid":             cid,
+		"newMessage":      escapeNQuad(newMessage),
+		"embeddedTriples": triples.String(),
 	})
 	return err
 }

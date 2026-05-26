@@ -73,3 +73,8 @@ upload_gate_timeout_sec   = 30           # hard ceiling on Wait
 attachment_per_file_bytes = 10485760     # 10 MiB
 attachment_total_bytes    = 104857600    # 100 MiB (raise Postal's transport size limit if you raise this)
 attachment_max_count      = 20           # hard cap on files attached to one email
+# Inbound email replies (POST /notifications, tension branch). Postal ships
+# attachments as base64 in the webhook payload; processInboundAttachments
+# falls back to storage.max_upload_bytes / attachment_max_count when unset.
+inbound_attachment_per_file_bytes = 10485760   # 10 MiB
+inbound_attachment_max_count      = 20

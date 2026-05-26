@@ -21,7 +21,11 @@
 package handlers
 
 import (
+	"bytes"
+	"context"
+	"encoding/base64"
 	"io"
+	"log"
 	"net/http"
 	"net/mail"
 	"strings"
@@ -32,6 +36,7 @@ import (
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/storage"
 	. "fractale/fractal6.go/internal/tools"
 )
 
@@ -45,23 +50,36 @@ var (
 	postalWebhookPK  string
 	matrixPostalRoom string
 	matrixToken      string
+	serverDomain     string
 )
 
 func init() {
 	postalWebhookPK = viper.GetString("mailer.dkim_key")
 	matrixPostalRoom = viper.GetString("mailer.matrix_postal_room")
 	matrixToken = viper.GetString("mailer.matrix_token")
+	serverDomain = viper.GetString("server.domain")
 }
 
 type EmailForm struct {
-	From       string `json:"mail_from"`
-	To         string `json:"rcpt_to"`
-	Title      string `json:"subject"`
-	Msg        string `json:"plain_body"`
-	HtmlMsg    string `json:"html_body"`
-	References string `json:"references"`
-	// AttachmentQuantity int  `json:"attachment_quantity"`
-	// Attachments []string    `json:"attachments"`
+	From               string              `json:"mail_from"`
+	To                 string              `json:"rcpt_to"`
+	Title              string              `json:"subject"`
+	Msg                string              `json:"plain_body"`
+	HtmlMsg            string              `json:"html_body"`
+	References         string              `json:"references"`
+	AttachmentQuantity int                 `json:"attachment_quantity"`
+	Attachments        []InboundAttachment `json:"attachments"`
+}
+
+// InboundAttachment is the shape Postal ships in the webhook payload. See
+// postalserver/postal app/senders/http_sender.rb — there's no Content-ID or
+// Content-Disposition, so cid-to-attachment matching is best-effort
+// (filename heuristic + document-order). See web/handlers/cid.go.
+type InboundAttachment struct {
+	Filename    string `json:"filename"`
+	ContentType string `json:"content_type"`
+	Size        int    `json:"size"`
+	Data        string `json:"data"` // base64
 }
 
 // Handle user email responses. Receiving email response from email notifications.
@@ -142,6 +160,26 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 				}},
 			},
 		})
+
+		// Attachments — best-effort; never abort the comment on failure.
+		// Reads the freshly-inserted comment's uid + tension rootnameid in
+		// the same hop so processInboundAttachments has what it needs to
+		// route into the comment-anchor storage layout.
+		if len(form.Attachments) > 0 {
+			if m, err := db.GetDB().Meta("getLastComment", map[string]string{
+				"tid": isTid, "username": uctx.Username,
+			}); err == nil && len(m) > 0 {
+				cid, _ := m[0]["id"].(string)
+				rootnameid, _ := m[0]["rootnameid"].(string)
+				if cid != "" && rootnameid != "" {
+					processInboundAttachments(
+						r.Context(), uctx, isTid, cid, rootnameid, msg, form.Attachments,
+					)
+				}
+			} else if err != nil {
+				log.Printf("Warning: inbound attachments getLastComment: %v", err)
+			}
+		}
 
 		// Publish Notification
 		// --
@@ -315,6 +353,97 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 	if err := graph.PublishTensionEvent(notif); err != nil {
 		http.Error(w, "PublishTensionEvent: "+err.Error(), 500)
 		return
+	}
+}
+
+// processInboundAttachments writes the Postal-shipped attachment list under
+// the freshly-inserted comment, rewrites cid: references in the message in a
+// single follow-up upsert, and flips File.embedded on the inline-matched
+// fids. Best-effort: any failure (storage unset, bad base64, oversize, S3
+// error, DB error) is logged and skipped for that attachment; the comment
+// itself stays committed.
+//
+// Order: parse cid refs → run resolveCIDs over (refs, atts) → write each
+// attachment to S3+DB → for inline-matched ones, append a cidRewrite
+// resolution carrying the new fid → finally EmbedCommentMessage rewrites
+// Comment.message + flips embedded=true on every inline-matched fid in one
+// upsert. Sequential within this handler, so no upload-gate plumbing.
+func processInboundAttachments(
+	ctx context.Context, uctx *model.UserCtx,
+	tid, cid, rootnameid, msg string, atts []InboundAttachment,
+) {
+	cli := storage.Global()
+	if cli == nil {
+		return
+	}
+
+	maxCount := ViperPositiveInt("notify.inbound_attachment_max_count", 20)
+	perFileBytes := int64(ViperPositiveInt(
+		"notify.inbound_attachment_per_file_bytes",
+		ViperPositiveInt("storage.max_upload_bytes", 10*1024*1024),
+	))
+	if maxCount > 0 && len(atts) > maxCount {
+		atts = atts[:maxCount]
+	}
+
+	refs := extractCIDRefs(msg)
+	pair, resolutions, orphans := resolveCIDs(refs, atts, serverDomain)
+	for _, refIdx := range orphans {
+		resolutions = append(resolutions, cidResolution{refIdx: refIdx, kind: cidDrop})
+	}
+
+	// Invert pair (refIdx->attIdx) into (attIdx->refIdx) for the attachment
+	// walk below — we still iterate atts in document order to give the
+	// caller predictable storage-key ordering.
+	attRefIdx := make(map[int]int, len(pair))
+	for refIdx, attIdx := range pair {
+		attRefIdx[attIdx] = refIdx
+	}
+
+	embedFids := make([]string, 0, len(pair))
+	for i, att := range atts {
+		raw, err := base64.StdEncoding.DecodeString(att.Data)
+		// Release the (potentially large) base64 string immediately —
+		// the loop holds `atts` across iterations, so the next 10 MiB
+		// payload can be decoded without doubling peak heap.
+		atts[i].Data = ""
+		if err != nil {
+			log.Printf("Warning: inbound attachment %q: bad base64: %v", att.Filename, err)
+			continue
+		}
+		if perFileBytes > 0 && int64(len(raw)) > perFileBytes {
+			log.Printf("Warning: inbound attachment %q dropped: %d bytes > %d cap", att.Filename, len(raw), perFileBytes)
+			continue
+		}
+		// Sniff content-type from the bytes — never trust client labels.
+		sniffN := 512
+		if len(raw) < sniffN {
+			sniffN = len(raw)
+		}
+		ctype := http.DetectContentType(raw[:sniffN])
+		safeName := safeFilename(att.Filename)
+
+		fid, err := writeCommentAttachment(ctx, cli,
+			rootnameid, tid, cid, uctx.Username,
+			safeName, ctype, bytes.NewReader(raw), int64(len(raw)))
+		if err != nil {
+			log.Printf("Warning: inbound attachment %q: %v", att.Filename, err)
+			continue
+		}
+
+		if refIdx, inline := attRefIdx[i]; inline {
+			resolutions = append(resolutions, cidResolution{
+				refIdx: refIdx, kind: cidRewrite, fid: fid,
+			})
+			embedFids = append(embedFids, fid)
+		}
+	}
+
+	newMsg := applyCIDResolutions(msg, refs, resolutions)
+	if newMsg != msg || len(embedFids) > 0 {
+		if err := db.GetDB().EmbedCommentMessage(cid, newMsg, embedFids); err != nil {
+			log.Printf("Warning: inbound EmbedCommentMessage: %v", err)
+		}
 	}
 }
 

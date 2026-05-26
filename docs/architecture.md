@@ -175,7 +175,7 @@ GET    /file/{id}                      Per-anchor auth → 302 to presigned S3 U
 DELETE /file/{id}                      Uploader-only
 
 # Webhooks
-POST /notifications  /mailing  /postal_webhook
+POST /notifications  /mailing  /postal_webhook       # /notifications also persists inbound attachments — see file-storage.md "Inbound email replies"
 
 # Dev / static
 GET  /playground  /ping  /assets/*  /*
@@ -203,6 +203,8 @@ API server  ──PublishTensionEvent──▶  Redis pub/sub  ──▶  notifi
 Event categories: `EventNotif` (tension events), `ContractNotif` (contract voting), `NotifNotif` (generic). Subscribers are resolved from: tension subscribers, assignees, receiver coordinators, emitter coordinators (created tensions only), contract candidates.
 
 The upload gate (`internal/notify/uploadgate.go`) coordinates the api server and the notifier daemon when a comment includes inline-paste screenshots: the api Registers expected uploads before publishing, the upload handler Signals as files land, and the notifier Waits before reading `Comment.files` for the outgoing email. See `docs/file-storage.md` "Email notifications" for the full flow, attachment caps, and the documented `cmd/notifier.go` REDIS_ADDR caveat.
+
+The reverse direction — email replies carrying attachments — is handled in `web/handlers/mailer.go::Notifications` (tension branch); `processInboundAttachments` resolves quoted-back `cid:` references, matches inbound parts to refs, and persists everything through the same comment-anchor pipeline as `/file/upload`. See `docs/file-storage.md` "Inbound email replies".
 
 ## Configuration
 

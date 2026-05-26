@@ -477,22 +477,24 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 				`,
 		}},
 	},
-	// embedCommentMessage rewrites Comment.message to point at the freshly
-	// uploaded file and flips File.embedded=true. Last-writer-wins: if two
-	// uploads race against the same comment, the second overwrite of
-	// Comment.message can drop the first's rewrite. Acceptable trade-off — the
-	// File rows themselves are independent and both stay queryable; the UI is
+	// embedCommentMessage rewrites Comment.message and flips File.embedded=true
+	// on zero-or-more fids in a single upsert. Last-writer-wins on
+	// Comment.message: if two uploads race against the same comment, the second
+	// overwrite can drop the first's rewrite. Acceptable trade-off — the File
+	// rows themselves are independent and both stay queryable; the UI is
 	// already lenient about embedded=true files whose URL no longer appears in
 	// the message (rendered as a regular attachment).
 	//
-	// Inputs (all required): cid, fid, newMessage.
+	// Inputs (all required): cid, newMessage, embeddedTriples. The caller
+	// (db.EmbedCommentMessage) builds embeddedTriples from the fid list — empty
+	// string when no fids need flipping, just the message swap fires then.
 	"embedCommentMessage": {
 		Q: `query {
             var(func: uid({{.cid}})) { c as uid }
         }`,
 		M: []X{{
 			S: `uid(c) <Post.message> "{{.newMessage}}" .
-                <{{.fid}}> <File.embedded> "true" .
+                {{.embeddedTriples}}
                 `,
 		}},
 	},

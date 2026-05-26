@@ -388,6 +388,60 @@ Redis, the gate operates on different instances and Register/Signal/Wait
 all miss. The notifier still ships emails; pasted images degrade to the
 absolute-URL fallback (which 404s for Private/Secret orgs).
 
+### Inbound email replies
+
+`POST /notifications` (`web/handlers/mailer.go::Notifications`) is the
+Postal-driven webhook that turns an email reply into a new `Comment` on the
+referenced tension. Postal ships any attached files in the same payload as
+
+```json
+{ "filename": "...", "content_type": "...", "size": ..., "data": "<base64>" }
+```
+
+with **no Content-ID and no Content-Disposition**. `processInboundAttachments`
+persists those bytes under the comment's S3 prefix
+(`orgas/<root>/tensions/<tid>/<cid>/`) and rewrites the message so it lines
+up with the outbound flow.
+
+Three matching paths, in order:
+
+| Case | Match | Action |
+|---|---|---|
+| **Quoted-back** | `cid:<fid>@<server.domain>` (the original outbound CID surviving the reply quote) | rewrite to `/file/<fid>`; do not consume an attachment |
+| **Filename heuristic** | inbound `Filename` equals the cid token, its local-part, or `<local-part>.<ext>` | write the file, rewrite the ref to `/file/<newFid>`, flip `embedded=true` |
+| **Document-order fallback** | unmatched cid refs paired with remaining attachments in order | as above |
+
+Unmatched cid refs are dropped from the message. Attachments that don't
+resolve to a cid ref are persisted anyway and surface as plain paperclips
+(non-`embedded`). All decisions roll up into a single `EmbedCommentMessage`
+upsert that rewrites `Comment.message` and flips `embedded=true` on the
+inline-matched fids in one shot.
+
+**No upload gate** here — writes are sequential inside the handler, so
+`PublishTensionEvent` runs only after every file is committed and the
+notifier daemon's `getLastCommentFiles` projection sees them on the first
+read.
+
+**Best-effort, never aborts the comment.** Storage unset, bad base64,
+oversize, S3 or DB failure — each attachment is logged-and-skipped; the
+comment itself stays committed.
+
+**Trust on `From:` for authorship.** Unchanged from the text-only flow:
+Postal's webhook signature gates the request; `GetUctx("email", From)`
+resolves to the account. A spoofed `From:` that resolves to a real user is
+the same risk surface the comment write already carries.
+
+Caps (`templates/config.toml`):
+
+| Key | Default | Effect |
+|---|---|---|
+| `notify.inbound_attachment_per_file_bytes` | falls back to `storage.max_upload_bytes` (10 MiB) | oversize attachments dropped before the S3 PUT |
+| `notify.inbound_attachment_max_count` | 20 | extras past this index silently truncated |
+
+**Contract replies are not yet supported.** The `isCid != ""` branch in
+`Notifications` still writes a text-only comment; attachments on a contract
+reply are ignored. Follow-up PR.
+
 ## Operational notes
 
 - **Cascade-delete S3 GC** is shared by `DeleteCommentDeep`, `DeleteTensionDeep`,

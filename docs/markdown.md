@@ -87,6 +87,14 @@ Plain (non-image) attachments don't appear in the body at all; they ship
 as standard Postal attachments and also as a footer link list. See
 `docs/file-storage.md` "Email notifications" for caps and gate semantics.
 
+**Reply direction (inbound).** When a user replies by email, any `cid:<token>`
+references reaching `POST /notifications` are resolved against the inbound
+attachment list (filename heuristic + document-order fallback) and rewritten
+to `/file/<fid>` before the comment is persisted; quoted-back
+`cid:<fid>@<DOMAIN>` references from the original notification short-circuit
+to the same form without re-uploading the file. Unresolved refs are dropped
+from the message. See `docs/file-storage.md` "Inbound email replies".
+
 ## Details/Summary Extension
 
 Custom goldmark extension (`web/email/goldmark_details.go`) — parses `<details>` / `<summary>` blocks where the body is regular markdown. The `open` attribute is supported. The sanitizer above is configured to let these elements through.
