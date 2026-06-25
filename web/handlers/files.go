@@ -487,6 +487,7 @@ func handleNodeAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage
 
 // FileDeleteHandler returns the DELETE /file/<id> handler. Uploader-only
 // across all anchor kinds; same 404-instead-of-403 policy as FileGet.
+// DB-first: db.DeleteFile drops the row then GCs the object async.
 func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_, uctx, err := auth.GetUserContext(r.Context())
@@ -514,10 +515,6 @@ func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 			return
 		}
 
-		if err := cli.Delete(r.Context(), fa.StorageKey); err != nil {
-			http.Error(w, "storage delete failed: "+err.Error(), http.StatusBadGateway)
-			return
-		}
 		if err := db.GetDB().DeleteFile(fileid); err != nil {
 			http.Error(w, "db delete failed: "+err.Error(), http.StatusInternalServerError)
 			return

@@ -307,11 +307,17 @@ func (dg Dgraph) ReplaceNodeAvatar(nameid, username, filename, contentType, stor
 	return fid, nil
 }
 
-// DeleteFile removes a File node by uid and drops the anchor's reverse edge.
-// Idempotent.
+// DeleteFile drops a File node by uid (+ its anchor reverse edge) and fires
+// async S3 GC of the object. DB-first, like DeleteCommentDeep. Idempotent.
 func (dg Dgraph) DeleteFile(fileid string) error {
-	_, err := dg.Meta("deleteFile", map[string]string{"id": fileid})
-	return err
+	resp, err := dg.Meta("deleteFile", map[string]string{"id": fileid})
+	if err != nil {
+		return err
+	}
+	if keys := collectStorageKeys(resp); len(keys) > 0 {
+		deleteStorageKeysAsync(keys)
+	}
+	return nil
 }
 
 // deleteStorageKeysAsync fires a goroutine to drop the named S3 objects via

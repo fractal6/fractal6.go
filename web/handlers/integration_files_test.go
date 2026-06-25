@@ -508,13 +508,19 @@ func TestFileDelete_AsAuthor_204_AndObjectGone(t *testing.T) {
 	rr := doRequest("DELETE", "/file/"+resp.ID, nil, jwt)
 	requireStatus(t, rr, http.StatusNoContent)
 
-	// Subsequent GET → 404 (DB row dropped).
+	// Subsequent GET → 404 (DB row dropped synchronously).
 	if g := getFile(t, resp.ID, jwt); g.Code != http.StatusNotFound {
 		t.Errorf("GET after DELETE: status %d, want 404", g.Code)
 	}
-	// Object gone from MinIO.
-	if objectExists(t, key) {
-		t.Errorf("expected object %q to be removed from MinIO", key)
+	// Object gone from MinIO. The S3 GC is fired async by db.DeleteFile, so
+	// poll briefly rather than asserting synchronously.
+	deadline := time.Now().Add(5 * time.Second)
+	for objectExists(t, key) {
+		if time.Now().After(deadline) {
+			t.Errorf("expected object %q to be removed from MinIO", key)
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
 	}
 }
 

@@ -589,6 +589,9 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 File.user    { userParent as uid }
                 File.node    { nodeParent as uid }
             }
+            all(func: uid(f)) {
+                File.storageKey
+            }
         }`,
 		M: []X{{
 			D: `uid(commentParent) <Comment.files> uid(f) .

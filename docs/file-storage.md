@@ -70,7 +70,7 @@ over either pure proxying or returning presigned URLs to the client directly.
 |---|---|---|---|
 | `GET` | `/file/<id>` | per-anchor (table above) | 302 to presigned URL; **404** on miss *or* unauthorised (no existence leak) |
 | `POST` | `/file/upload` | per-anchor (table above) | multipart; pass exactly one anchor: (`tid`+`cid`) \| `userid` \| `orgaid`. `file` part required. |
-| `DELETE` | `/file/<id>` | uploader-only | 404 on miss/not-yours; S3 first, then DB on success |
+| `DELETE` | `/file/<id>` | uploader-only | 404 on miss/not-yours; DB row dropped first, then async S3 GC |
 
 Handlers are constructed via `FileGetHandler(cli)` / `FileUploadHandler(cli)` /
 `FileDeleteHandler(cli)` taking an injected `*storage.Client`. When the
@@ -452,6 +452,7 @@ reply are ignored. Follow-up PR.
   (no `[storage]` block), the GC is a no-op and the DQL still drops the
   `File` nodes — orphan objects can be swept out-of-band by listing keys
   under `orgas/<rootnameid>/tensions/<tid>/<cid>/` (or the relevant prefix).
+- **Crash-orphan leak (known, unhandled)**: if the process dies between S3 `Put` and the DB row insert (upload) the bytes orphan with no GC. Deemed marginal — bounded leak, no broken links/auth impact. No backstop; sweep via key listing if it ever matters.
 - **No revocation**: a presigned URL captured by a user remains valid until TTL expires. Rotating credentials invalidates *all* outstanding URLs (last resort).
 - **No audit of byte access**: the storage backend sees only the presigned request, not the originating user identity. If audit is needed, switch to proxy-streaming in `FileGet` (replace the `http.Redirect` with `cli.GetObject` `io.Copy`).
 - **Filename safety**: see `safeFilename` in `web/handlers/files.go` for the exact sanitisation rules.
