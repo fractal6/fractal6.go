@@ -23,7 +23,11 @@
 
 package handlers
 
-import "testing"
+import (
+	"testing"
+
+	"fractale/fractal6.go/internal/tools"
+)
 
 func TestRewriteMessageForFile_HappyPath(t *testing.T) {
 	got, ok := rewriteMessageForFile("here it is: ![alt](paste-1.png) end", "paste-1.png", "0xfid")
@@ -123,7 +127,7 @@ func TestRewriteMessageForFile_EmptyInputs(t *testing.T) {
 
 func TestMaskCodeRegions_UnclosedFenceMasksThroughEOF(t *testing.T) {
 	in := "before\n```\n![](paste.png)"
-	out := maskCodeRegions(in)
+	out := tools.MaskCodeRegions(in)
 	// Anything after the opening fence should be spaces (newlines preserved).
 	if out[:len("before\n")] != "before\n" {
 		t.Errorf("prefix wrongly masked: %q", out)

@@ -71,14 +71,14 @@ type FileAuth struct {
 	NodeVisibility model.NodeVisibility
 }
 
-// GetFileAuth runs getFileAuth_v2 and flattens the response. Returns
+// GetFileAuth runs getFileAuth and flattens the response. Returns
 // (nil, nil) when no file matches; the caller surfaces 404 in that case.
 //
 // db.Meta runs the response through tools.CleanDqlMap which strips "Type."
 // prefixes from keys, so we look up "comment" not "File.comment", "username"
 // not "User.username", etc.
 func (dg Dgraph) GetFileAuth(fileid string) (*FileAuth, error) {
-	res, err := dg.Meta("getFileAuth_v2", map[string]string{"id": fileid})
+	res, err := dg.Meta("getFileAuth", map[string]string{"id": fileid})
 	if err != nil {
 		return nil, err
 	}

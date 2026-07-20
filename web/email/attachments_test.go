@@ -47,9 +47,9 @@ func TestPartition_InlineVsPlain(t *testing.T) {
 	}
 }
 
-func TestRewriteImgToCID_BasicSubstitution(t *testing.T) {
+func TestRewriteFileImgs_BasicSubstitution(t *testing.T) {
 	in := `<p><img src="/file/0xabc" alt="paste"></p>`
-	out := rewriteImgToCID(in, map[string]bool{"0xabc": true})
+	out := rewriteFileImgs(in, map[string]bool{"0xabc": true})
 	want := "cid:0xabc@test.example"
 	if !strings.Contains(out, want) {
 		t.Errorf("output missing %q\ngot: %s", want, out)
@@ -59,20 +59,20 @@ func TestRewriteImgToCID_BasicSubstitution(t *testing.T) {
 	}
 }
 
-func TestRewriteImgToCID_LeavesUnknownIDs(t *testing.T) {
+func TestRewriteFileImgs_AbsolutisesUnknownIDs(t *testing.T) {
 	in := `<img src="/file/known"><img src="/file/unknown">`
-	out := rewriteImgToCID(in, map[string]bool{"known": true})
+	out := rewriteFileImgs(in, map[string]bool{"known": true})
 	if !strings.Contains(out, "cid:known@test.example") {
 		t.Errorf("missing CID rewrite for known: %s", out)
 	}
-	if !strings.Contains(out, `/file/unknown`) {
-		t.Errorf("unknown id should keep /file URL: %s", out)
+	if !strings.Contains(out, `https://test.example/file/unknown`) {
+		t.Errorf("unknown id should get the absolute fallback: %s", out)
 	}
 }
 
-func TestAbsolutiseFileImg_LeftoverGetsAbsolute(t *testing.T) {
+func TestRewriteFileImgs_LeftoverGetsAbsolute(t *testing.T) {
 	in := `<img src="/file/0xabc">`
-	out := absolutiseFileImg(in)
+	out := rewriteFileImgs(in, nil)
 	want := `https://test.example/file/0xabc`
 	if !strings.Contains(out, want) {
 		t.Errorf("absolutise didn't apply\ngot: %s", out)

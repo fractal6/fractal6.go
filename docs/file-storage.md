@@ -358,8 +358,9 @@ until expected uploads arrive.
   `INCRBY upload-gate:<tid> n` + `EXPIRE 300s` (so a crashed registration
   can't pin the gate forever).
 - **Signal** — api server, in `embedIfReferenced` when the upload's filename
-  matched an inline reference. `DECR` guarded by `EXISTS` so late signals
-  on a fresh tid don't drive a new counter negative.
+  matched an inline reference. Atomic `DECR`-if-`EXISTS` (Lua script) so
+  concurrent or late signals can't drive the counter negative and mask a
+  fresh Register on the same tid.
 - **Wait** — notifier, in `PushEventNotifications` just before
   `getLastComment` for events containing `Created` / `CommentPushed`. Sleeps
   `upload_gate_baseline_sec` first (default 2s, gives plain attachments a

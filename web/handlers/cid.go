@@ -31,6 +31,8 @@ package handlers
 import (
 	"regexp"
 	"strings"
+
+	"fractale/fractal6.go/internal/tools"
 )
 
 // cidRef records a `![alt](cid:<token>)` occurrence inside a markdown message.
@@ -77,7 +79,7 @@ func extractCIDRefs(msg string) []cidRef {
 	if msg == "" {
 		return nil
 	}
-	masked := maskCodeRegions(msg)
+	masked := tools.MaskCodeRegions(msg)
 	matches := cidImgRe.FindAllStringSubmatchIndex(masked, -1)
 	if len(matches) == 0 {
 		return nil

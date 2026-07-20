@@ -253,41 +253,23 @@ func cidForFile(fid string) string {
 // that doesn't contain a quote or '/' so future fid formats keep working.
 var fileImgRe = regexp.MustCompile(`<img\s+([^>]*?)src=(?:"|&#34;|')/file/([^"'/&]+)("|&#34;|')([^>]*)>`)
 
-// rewriteImgToCID swaps `<img src="/file/<id>">` for `<img src="cid:<id>@DOMAIN">`
-// for every file uid in inlineByID. The other attributes on the tag are
-// preserved verbatim. Files not in the set keep their `/file/<id>` URL
-// (rendered absolute later by the caller) — that's the documented degradation
-// path when an inline image couldn't be attached.
-func rewriteImgToCID(html string, inlineByID map[string]bool) string {
-	if len(inlineByID) == 0 {
-		return html
-	}
+// rewriteFileImgs rewrites every markdown-rendered `<img src="/file/<id>">`
+// in a single pass: uids in inlineByID get `<img src="cid:<id>@DOMAIN">`
+// (they ride out as inline attachments); the rest fall back to the absolute
+// `https://<DOMAIN>/file/<id>` — the documented degradation path when an
+// inline image couldn't be attached (Public-org images may load for the
+// recipient even if Private-org ones 404). Other tag attributes are
+// preserved verbatim.
+func rewriteFileImgs(html string, inlineByID map[string]bool) string {
 	return fileImgRe.ReplaceAllStringFunc(html, func(match string) string {
 		sub := fileImgRe.FindStringSubmatch(match)
 		if len(sub) < 5 {
 			return match
 		}
 		fid := sub[2]
-		if !inlineByID[fid] {
-			return match
+		if inlineByID[fid] {
+			return fmt.Sprintf(`<img %ssrc="cid:%s"%s>`, sub[1], cidForFile(fid), sub[4])
 		}
-		// Reuse opening quote style for the rewrite; defaults to ".
-		return fmt.Sprintf(`<img %ssrc="cid:%s"%s>`, sub[1], cidForFile(fid), sub[4])
-	})
-}
-
-// absolutiseFileImg rewrites every remaining `<img src="/file/<id>">` to
-// `<img src="https://<DOMAIN>/file/<id>">`. Best-effort fallback for files
-// that didn't make it into the inlineByID set — Public-org images may load
-// for the recipient even if Private-org ones 404. Called AFTER rewriteImgToCID
-// so we never absolutise an already-CID-rewritten tag.
-func absolutiseFileImg(html string) string {
-	return fileImgRe.ReplaceAllStringFunc(html, func(match string) string {
-		sub := fileImgRe.FindStringSubmatch(match)
-		if len(sub) < 5 {
-			return match
-		}
-		fid := sub[2]
 		return fmt.Sprintf(`<img %ssrc="https://%s/file/%s"%s>`, sub[1], DOMAIN, fid, sub[4])
 	})
 }

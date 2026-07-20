@@ -42,7 +42,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"regexp"
 	"strings"
 	"time"
 
@@ -525,12 +524,6 @@ func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 
 // --- markdown rewrite ---
 
-// markdownImageRe matches `![alt](url)`. The url group captures everything up
-// to the first whitespace or closing paren — that's the entire URL token.
-// Mirror of inlineImageRe in internal/tools/string.go; both regexes MUST stay
-// in sync so the upload-gate Register count matches Signal count.
-var markdownImageRe = regexp.MustCompile(`!\[[^\]]*\]\(([^)\s]+)\)`)
-
 // rewriteMessageForFile substitutes the first ![alt](filename) whose URL is
 // the bare token `filename` (no slashes, no scheme) with `![alt](/file/<fid>)`.
 // Code regions (fenced ``` and ~~~ blocks, inline backticks) are masked
@@ -542,9 +535,9 @@ func rewriteMessageForFile(msg, filename, fid string) (string, bool) {
 	if msg == "" || filename == "" || fid == "" {
 		return msg, false
 	}
-	masked := maskCodeRegions(msg)
+	masked := tools.MaskCodeRegions(msg)
 
-	matches := markdownImageRe.FindAllStringSubmatchIndex(masked, -1)
+	matches := tools.InlineImageRe.FindAllStringSubmatchIndex(masked, -1)
 	for _, m := range matches {
 		urlStart, urlEnd := m[2], m[3]
 		urlInOriginal := msg[urlStart:urlEnd]
@@ -562,104 +555,6 @@ func rewriteMessageForFile(msg, filename, fid string) (string, bool) {
 		return newMsg, true
 	}
 	return msg, false
-}
-
-// maskCodeRegions replaces fenced (``` and ~~~) blocks and inline backtick
-// spans with same-length runs of spaces, so regex matches against the masked
-// string have offsets that line up with the original. Filenames mentioned
-// inside code are thereby invisible to the matcher.
-//
-// Triple-fence detection is line-anchored. Inline backticks span until the
-// next backtick on the same line; mismatched ticks degrade to no-mask
-// (acceptable: the user gets best-effort behaviour, not a security gate).
-func maskCodeRegions(s string) string {
-	out := []byte(s)
-	n := len(out)
-
-	// Fenced blocks first.
-	mask := func(from, to int) {
-		for i := from; i < to && i < n; i++ {
-			if out[i] != '\n' {
-				out[i] = ' '
-			}
-		}
-	}
-	for _, fence := range []string{"```", "~~~"} {
-		i := 0
-		for {
-			start := indexAfterNewline(out, i, fence)
-			if start < 0 {
-				break
-			}
-			// Find end of opening fence line.
-			lineEnd := indexByte(out, start, '\n')
-			if lineEnd < 0 {
-				lineEnd = n
-			}
-			// Find matching closing fence at start of a line.
-			end := indexAfterNewline(out, lineEnd+1, fence)
-			if end < 0 {
-				// Unclosed fence: mask through EOF.
-				mask(start, n)
-				break
-			}
-			closeLineEnd := indexByte(out, end, '\n')
-			if closeLineEnd < 0 {
-				closeLineEnd = n
-			}
-			mask(start, closeLineEnd)
-			i = closeLineEnd
-		}
-	}
-
-	// Inline backticks (single-line spans).
-	for i := 0; i < n; i++ {
-		if out[i] != '`' {
-			continue
-		}
-		// Find closing backtick on the same line.
-		end := -1
-		for j := i + 1; j < n; j++ {
-			if out[j] == '\n' {
-				break
-			}
-			if out[j] == '`' {
-				end = j
-				break
-			}
-		}
-		if end < 0 {
-			continue
-		}
-		mask(i, end+1)
-		i = end
-	}
-	return string(out)
-}
-
-// indexByte returns the index of the first occurrence of c at or after start;
-// -1 if none.
-func indexByte(b []byte, start int, c byte) int {
-	for i := start; i < len(b); i++ {
-		if b[i] == c {
-			return i
-		}
-	}
-	return -1
-}
-
-// indexAfterNewline returns the index of `needle` if it appears at the start
-// of a line (or at the start of the buffer) at or after start; -1 if none.
-func indexAfterNewline(b []byte, start int, needle string) int {
-	for i := start; i+len(needle) <= len(b); i++ {
-		if string(b[i:i+len(needle)]) != needle {
-			continue
-		}
-		if i == 0 || b[i-1] == '\n' {
-			return i
-		}
-	}
-	return -1
 }
 
 // --- helpers ---

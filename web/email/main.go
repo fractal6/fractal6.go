@@ -72,7 +72,7 @@ var md goldmark.Markdown = goldmark.New(
 // sanitizer extends bluemonday's UGCPolicy with <details>/<summary> support
 // and allows the inline-styled wrapper div used by the details extension.
 // `cid:` is added to the URL scheme allowlist so the inline-image rewriter
-// (rewriteImgToCID) can swap `<img src="/file/<id>">` to `<img src="cid:...">`
+// (rewriteFileImgs) can swap `<img src="/file/<id>">` to `<img src="cid:...">`
 // without bluemonday stripping the src attribute.
 var sanitizer = func() *bluemonday.Policy {
 	p := bluemonday.UGCPolicy()
@@ -365,14 +365,13 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		} else {
 			// Convert markdown to Html, then rewrite /file/<id> img tags to
 			// cid:<id>@DOMAIN for inline attachments and absolute URLs for
-			// the rest. Sanitisation runs AFTER both rewrites so bluemonday
+			// the rest. Sanitisation runs AFTER the rewrite so bluemonday
 			// validates the final shape (cid scheme is allowlisted above).
 			var buf bytes.Buffer
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			rendered := rewriteImgToCID(buf.String(), inlineByID)
-			rendered = absolutiseFileImg(rendered)
+			rendered := rewriteFileImgs(buf.String(), inlineByID)
 			payload = sanitizer.Sanitize(rendered)
 		}
 
@@ -455,14 +454,13 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
 		// Add eventual comment
 		if notif.HasEvent(model.TensionEventCommentPushed) && message != "" {
-			// Convert markdown to Html, then CID-rewrite + absolutise as for
+			// Convert markdown to Html, then rewrite /file/<id> img tags as for
 			// the "Created" path above.
 			var buf bytes.Buffer
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			rendered := rewriteImgToCID(buf.String(), inlineByID)
-			rendered = absolutiseFileImg(rendered)
+			rendered := rewriteFileImgs(buf.String(), inlineByID)
 			comment = sanitizer.Sanitize(rendered)
 		}
 
@@ -685,8 +683,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		if err = md.Convert([]byte(notif.Msg), &buf); err != nil {
 			return err
 		}
-		rendered := rewriteImgToCID(buf.String(), inlineByID)
-		rendered = absolutiseFileImg(rendered)
+		rendered := rewriteFileImgs(buf.String(), inlineByID)
 		payload += sanitizer.Sanitize(rendered)
 	} else {
 		payload += "<br><br>"

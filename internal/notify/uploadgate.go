@@ -90,6 +90,18 @@ func (g *Gate) Register(ctx context.Context, tid string, n int) error {
 	return err
 }
 
+// signalScript decrements the counter only when the key exists, atomically.
+// A plain Exists+Decr pair races with itself: two concurrent signals both
+// pass the Exists check and drive the counter negative (masking a fresh
+// Register on the same tid), and a Decr landing just after TTL expiry
+// recreates the key with no expiry.
+var signalScript = redis.NewScript(`
+if redis.call("EXISTS", KEYS[1]) == 1 then
+	return redis.call("DECR", KEYS[1])
+end
+return nil
+`)
+
 // Signal decrements the pending counter for tid. No-op when the key is
 // already gone (TTL expired or never registered) so Signals from late
 // uploads can't drive the counter negative in a way that would mask a fresh
@@ -98,12 +110,7 @@ func (g *Gate) Signal(ctx context.Context, tid string) error {
 	if g == nil || g.rdb == nil || tid == "" {
 		return nil
 	}
-	key := keyPrefix + tid
-	ex, err := g.rdb.Exists(ctx, key).Result()
-	if err != nil || ex == 0 {
-		return err
-	}
-	return g.rdb.Decr(ctx, key).Err()
+	return signalScript.Run(ctx, g.rdb, []string{keyPrefix + tid}).Err()
 }
 
 // Wait blocks until the gate for tid reaches zero (or is absent), the

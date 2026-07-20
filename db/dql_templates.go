@@ -629,14 +629,14 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
-	// getFileAuth_v2 fetches everything the /file/<id> proxy needs in a single
+	// getFileAuth fetches everything the /file/<id> proxy needs in a single
 	// hop. File is anchor-polymorphic: exactly one of comment/user/node is set.
 	// File.tension is denormalised alongside File.comment for the comment branch
 	// so we can fetch the tension receiver (nameid + visibility) without walking
 	// back through Tension.comments. {{.id}} is the File uid.
 	//
 	// All three branches are projected; Go side picks the populated one.
-	"getFileAuth_v2": `{
+	"getFileAuth": `{
         all(func: uid({{.id}})) {
             File.storageKey
             File.filename
