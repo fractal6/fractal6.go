@@ -29,6 +29,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/spf13/viper"
@@ -137,7 +138,7 @@ func SendMaintainerEmail(subject, body string) error {
 
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
+	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -186,7 +187,7 @@ func SendVerificationEmail(email, token string) error {
 
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
+	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -229,7 +230,7 @@ func SendResetEmail(email, token string) error {
 
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
+	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -282,7 +283,7 @@ func SendOwnerGrantedEmail(username, nameid, orgName string) error {
 
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
+	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -318,7 +319,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	var footerFiles []emailFile
 	if notif.HasEvent(model.TensionEventCreated) || notif.HasEvent(model.TensionEventCommentPushed) {
 		commentFiles, _ := db.GetDB().GetLastCommentFiles(notif.Tid, notif.Uctx.Username)
-		attachments, inlineByID, footerFiles = buildAttachments(context.Background(), storage.Global(), fromDBFiles(commentFiles))
+		// Bound the S3 fetches so a hung storage backend can't stall the daemon.
+		actx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		attachments, inlineByID, footerFiles = buildAttachments(actx, storage.Global(), fromDBFiles(commentFiles))
+		cancel()
 	}
 	// Recipient email
 	var email string = ui.User.Email
@@ -542,7 +546,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
+	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -573,7 +577,9 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	var footerFiles []emailFile
 	if notif.Contract != nil {
 		cfiles, _ := db.GetDB().GetLastContractCommentFiles(notif.Contract.ID, notif.Uctx.Username)
-		attachments, inlineByID, footerFiles = buildAttachments(context.Background(), storage.Global(), fromDBFiles(cfiles))
+		actx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		attachments, inlineByID, footerFiles = buildAttachments(actx, storage.Global(), fromDBFiles(cfiles))
+		cancel()
 	}
 	// Recipient email
 	var email string = ui.User.Email
@@ -733,7 +739,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
+	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err

@@ -30,7 +30,6 @@ import (
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/internal/notify"
 	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/web/email"
@@ -44,21 +43,31 @@ import (
 
 var ctx context.Context = context.Background()
 
-// waitForUploads blocks until the per-tension upload gate has drained (all
-// pre-registered inline pastes have been signalled), the configured timeout
-// elapses, or the gate's baseline window passes when nothing was registered.
-// The point is to give the upload handler a chance to rewrite Comment.message
-// from `![](paste.png)` to `![](/file/<id>)` and persist File rows before the
-// notifier reads them.
-func waitForUploads(ctx context.Context, tid string) {
-	g := notify.Global()
-	if g == nil {
-		return
-	}
-	baseline := time.Duration(ViperPositiveInt("notify.upload_gate_baseline_sec", 2)) * time.Second
-	timeout := time.Duration(ViperPositiveInt("notify.upload_gate_timeout_sec", 30)) * time.Second
-	if _, err := g.Wait(ctx, tid, baseline, timeout); err != nil {
-		LogErr("upload-gate wait", err)
+// getLastCommentSettled fetches the author's most recent comment on the
+// tension, re-fetching until no bare inline-paste tokens (`![](paste.png)`)
+// remain in the message — i.e. until in-flight /file/upload calls have
+// rewritten them to /file/<id> — or the attempt budget runs out. The message
+// itself is the ground truth, so no cross-process coordination is needed.
+// One baseline sleep precedes the first fetch so plain (non-inline)
+// attachments, which leave no token, also get a chance to land.
+func getLastCommentSettled(tid, username string) ([]map[string]any, error) {
+	interval := time.Duration(ViperPositiveInt("notify.upload_poll_interval_sec", 5)) * time.Second
+	attempts := ViperPositiveInt("notify.upload_poll_attempts", 10)
+	args := map[string]string{"tid": tid, "username": username}
+	time.Sleep(interval)
+	for i := 0; ; i++ {
+		m, err := db.GetDB().Meta("getLastComment", args)
+		if err != nil {
+			return nil, err
+		}
+		var msg string
+		if len(m) > 0 {
+			msg, _ = m[0]["message"].(string)
+		}
+		if i >= attempts || CountInlineImageCandidates(msg) == 0 {
+			return m, nil
+		}
+		time.Sleep(interval)
 	}
 }
 
@@ -192,15 +201,17 @@ func PushEventNotifications(notif model.EventNotif) error {
 			return err
 		}
 	}
-	// +
-	// Wait for any in-flight inline-paste uploads to land before reading
-	// the comment payload — otherwise the emailed message still holds
-	// `![](paste-N.png)` tokens and Comment.files is empty.
+	// Add mentions and **set tension data**. For events carrying a comment
+	// body, read it through the settle poll: in-flight /file/upload calls get
+	// a chance to rewrite bare `![](paste-N.png)` tokens into /file/<id>
+	// before the message (and Comment.files) is snapshotted for the email.
+	var m []map[string]any
 	if notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated) {
-		waitForUploads(ctx, notif.Tid)
+		m, err = getLastCommentSettled(notif.Tid, notif.Uctx.Username)
+	} else {
+		m, err = db.GetDB().Meta("getLastComment", map[string]string{"tid": notif.Tid, "username": notif.Uctx.Username})
 	}
-	// Add mentions and **set tension data**
-	if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid": notif.Tid, "username": notif.Uctx.Username}); err != nil {
+	if err != nil {
 		return err
 	} else if len(m) > 0 {
 		notif.Rootnameid = m[0]["rootnameid"].(string)

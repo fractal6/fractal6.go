@@ -62,12 +62,13 @@ max_upload_bytes   = 10485760            # 10 MiB
 presign_ttl_sec    = 7200                # presigned URL TTL, seconds (2 hours)
 
 [notify]
-# Cross-process upload gate + Postal attachment caps. See docs/file-storage.md.
-# The api server pre-registers expected inline-paste uploads on the gate; the
-# notifier daemon waits until they land (or the timeout fires) before reading
-# Comment.files for the outgoing email.
-upload_gate_baseline_sec  = 2            # min wait even when gate is unset (catches plain attachments)
-upload_gate_timeout_sec   = 30           # hard ceiling on Wait
+# Notifier-side settle poll + Postal attachment caps. See docs/file-storage.md.
+# Before emailing a comment, the notifier re-fetches it until no bare inline
+# `![](paste.png)` tokens remain (uploads rewrite them to /file/<id>) or the
+# attempt budget runs out; the first sleep also gives plain attachments a
+# chance to land in Comment.files.
+upload_poll_interval_sec  = 5            # delay between comment re-fetches
+upload_poll_attempts      = 10           # give up after ~interval*attempts and send degraded
 # Postal attachment caps. Files exceeding per-file are dropped from the
 # Postal payload but still surface as click-through links in the footer.
 attachment_per_file_bytes = 10485760     # 10 MiB

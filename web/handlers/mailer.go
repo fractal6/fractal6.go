@@ -367,7 +367,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 // attachment to S3+DB → for inline-matched ones, append a cidRewrite
 // resolution carrying the new fid → finally EmbedCommentMessage rewrites
 // Comment.message + flips embedded=true on every inline-matched fid in one
-// upsert. Sequential within this handler, so no upload-gate plumbing.
+// upsert. Sequential within this handler, so no settle coordination needed.
 func processInboundAttachments(
 	ctx context.Context, uctx *model.UserCtx,
 	tid, cid, rootnameid, msg string, atts []InboundAttachment,

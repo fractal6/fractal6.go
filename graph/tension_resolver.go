@@ -28,7 +28,6 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/internal/notify"
 	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
@@ -36,31 +35,6 @@ import (
 ////////////////////////////////////////////////
 // Tension Resolver
 ////////////////////////////////////////////////
-
-// firstCommentMessage returns the Message text of the first comment in the
-// input slice — that's the comment created alongside the mutation that the
-// upload gate counts inline pastes against. Empty slice / nil messages
-// return "".
-func firstCommentMessage(comments []*model.CommentRef) string {
-	if len(comments) == 0 || comments[0] == nil || comments[0].Message == nil {
-		return ""
-	}
-	return *comments[0].Message
-}
-
-// registerInlineUploads counts the bare `![](paste-N.png)` references in
-// `message` and pre-registers them on the tension's upload gate so the
-// notifier waits for the matching /file/upload calls before reading
-// Comment.files. No-op when count is zero or notify.Global() is unset.
-func registerInlineUploads(ctx context.Context, tid, message string) {
-	n := CountInlineImageCandidates(message)
-	if n == 0 {
-		return
-	}
-	if err := notify.Global().Register(ctx, tid, n); err != nil {
-		LogErr("upload-gate register", err)
-	}
-}
 
 func tensionInputHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	data, err := setUpdateContextInfo(ctx, obj, next) // for @hasEvent+@isOwner
@@ -168,7 +142,6 @@ func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, e
 	}
 	if ok {
 		GoSyncSearchMessage(id)
-		registerInlineUploads(ctx, id, firstCommentMessage(input.Comments))
 		PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: id, History: history})
 		return data, err
 	}
@@ -213,11 +186,6 @@ func updateTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any
 			now := Now()
 			input.Set.History = nil
 			input.Set.UpdatedAt = &now
-			// Pre-register the upload gate from the soon-to-be-persisted
-			// comment payload. Doing it on the input (before next) means we
-			// don't race with the upload handler if the client fires uploads
-			// the moment the GraphQL mutation returns.
-			registerInlineUploads(ctx, ids[0], firstCommentMessage(input.Set.Comments))
 			// Execute query
 			data, err := next(ctx)
 			if err != nil {

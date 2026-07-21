@@ -191,8 +191,8 @@ The `/q/*` routes follow a two-phase shape: a cheap DQL call collects `{nameid �
 
 ```
 API server  ──PublishTensionEvent──▶  Redis pub/sub  ──▶  notifier daemon
-   │ Register(tid, n)                                       │ Wait(tid)
-   └────────── upload-gate (Redis key per tid) ─────────────┘
+                                                            │ settle poll: re-fetch comment until
+                                                            │ no bare ![](paste) tokens remain
                                                             ├── build subscriber list
                                                             ├── create UserEvent records
                                                             └── send emails (Postal)
@@ -202,7 +202,7 @@ API server  ──PublishTensionEvent──▶  Redis pub/sub  ──▶  notifi
 
 Event categories: `EventNotif` (tension events), `ContractNotif` (contract voting), `NotifNotif` (generic). Subscribers are resolved from: tension subscribers, assignees, receiver coordinators, emitter coordinators (created tensions only), contract candidates.
 
-The upload gate (`internal/notify/uploadgate.go`) coordinates the api server and the notifier daemon when a comment includes inline-paste screenshots: the api Registers expected uploads before publishing, the upload handler Signals as files land, and the notifier Waits before reading `Comment.files` for the outgoing email. See `docs/file-storage.md` "Email notifications" for the full flow, attachment caps, and the documented `cmd/notifier.go` REDIS_ADDR caveat.
+When a comment includes inline-paste screenshots, the notification can fire while `/file/upload` calls are still in flight. The notifier handles it alone: `getLastCommentSettled` (`graph/notifications.go`) re-fetches the comment until no bare `![](paste.png)` tokens remain in the message — the token rewrite to `/file/<id>` is the ground truth — or the attempt budget runs out. No cross-process coordination. See `docs/file-storage.md` "Email notifications" for the full flow and attachment caps.
 
 The reverse direction — email replies carrying attachments — is handled in `web/handlers/mailer.go::Notifications` (tension branch); `processInboundAttachments` resolves quoted-back `cid:` references, matches inbound parts to refs, and persists everything through the same comment-anchor pipeline as `/file/upload`. See `docs/file-storage.md` "Inbound email replies".
 

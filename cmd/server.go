@@ -32,13 +32,11 @@ import (
 	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
-	"fractale/fractal6.go/internal/notify"
 	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/web"
 	"fractale/fractal6.go/web/auth"
 	handle6 "fractale/fractal6.go/web/handlers"
 	middle6 "fractale/fractal6.go/web/middleware"
-	"fractale/fractal6.go/web/sessions"
 )
 
 var (
@@ -222,13 +220,6 @@ func RunServer() {
 		storageCli = nil
 	}
 	storage.SetGlobal(storageCli)
-	// Cross-process upload gate. The api server pre-registers expected
-	// inline-paste uploads at GraphQL-mutation time; the upload handler
-	// signals on rewrite; the notifier daemon waits before sending email.
-	// Best-effort: when the gate's redis is misconfigured, Register/Signal
-	// are no-ops and Wait times out — emails ship with broken <img> just
-	// like today. See docs/file-storage.md.
-	notify.SetGlobalClient(sessions.GetCache())
 	r.Group(func(r chi.Router) {
 		r.Route("/file", func(r chi.Router) {
 			r.Post("/upload", handle6.FileUploadHandler(storageCli))

@@ -51,7 +51,6 @@ import (
 	"fractale/fractal6.go/graph"
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/internal/notify"
 	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
@@ -353,7 +352,7 @@ func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Cl
 	// token in the comment, swap it for /file/<fid> and flip File.embedded=true.
 	// Successful rewrites decrement the per-tension upload gate so the notifier
 	// daemon stops waiting on this paste.
-	embedded := embedIfReferenced(r.Context(), anchor.Tid, anchor.Cid, fid, safeName, oldMessage)
+	embedded := embedIfReferenced(anchor.Cid, fid, safeName, oldMessage)
 
 	writeJSON(w, map[string]any{
 		"id":          fid,
@@ -407,11 +406,10 @@ func writeCommentAttachment(
 // (they're independent), and the UI is lenient about embedded=true files
 // whose URL is no longer in the message (renders them as plain attachments).
 //
-// On a successful inline rewrite we Signal the per-tension upload gate so the
-// notifier daemon can release its Wait once every expected paste has landed.
-// Plain (non-inline) attachments don't signal — they're handled best-effort
-// via the gate's baseline wait + Comment.files re-fetch on the notifier side.
-func embedIfReferenced(ctx context.Context, tid, cid, fid, filename, message string) bool {
+// The rewrite is also what the notifier's settle poll waits on: the emailed
+// message is read only once no bare `![](filename)` tokens remain. See
+// getLastCommentSettled in graph/notifications.go.
+func embedIfReferenced(cid, fid, filename, message string) bool {
 	newMsg, matched := rewriteMessageForFile(message, filename, fid)
 	if !matched {
 		return false
@@ -419,9 +417,6 @@ func embedIfReferenced(ctx context.Context, tid, cid, fid, filename, message str
 	if err := db.GetDB().EmbedCommentMessage(cid, newMsg, []string{fid}); err != nil {
 		log.Printf("Warning: embedCommentMessage: %v", err)
 		return false
-	}
-	if err := notify.Global().Signal(ctx, tid); err != nil {
-		log.Printf("Warning: upload-gate signal (tid=%s): %v", tid, err)
 	}
 	return true
 }

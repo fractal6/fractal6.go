@@ -343,51 +343,33 @@ Where it lives:
 - `db/files.go::GetLastCommentFiles` / `GetLastContractCommentFiles` — Go decoders
 - `internal/storage/s3.go::GetObject` — byte fetch (base64-encoded into the Postal payload)
 
-### Upload gate (cross-process)
+### Upload settle poll
 
 The notifier daemon is a separate cobra subcommand (`cmd/notifier.go`) from the
 api server. The frontend `POST /file/upload`s **after** the GraphQL mutation
 that creates the carrier comment, so a notification can fire while uploads
 are still in flight — at which point `Comment.files` is empty and inline
-pastes still hold their bare paste filenames. The gate holds the notifier
-until expected uploads arrive.
+pastes still hold their bare paste filenames.
 
-- **Register** — api server, in `addTensionHook` / `updateTensionHook` after
-  validating the input but before `PublishTensionEvent`. Counts plausible
-  `![](paste.png)` references via `tools.CountInlineImageCandidates`, then
-  `INCRBY upload-gate:<tid> n` + `EXPIRE 300s` (so a crashed registration
-  can't pin the gate forever).
-- **Signal** — api server, in `embedIfReferenced` when the upload's filename
-  matched an inline reference. Atomic `DECR`-if-`EXISTS` (Lua script) so
-  concurrent or late signals can't drive the counter negative and mask a
-  fresh Register on the same tid.
-- **Wait** — notifier, in `PushEventNotifications` just before
-  `getLastComment` for events containing `Created` / `CommentPushed`. Sleeps
-  `upload_gate_baseline_sec` first (default 2s, gives plain attachments a
-  chance to land in `Comment.files`), then polls every 500 ms until the
-  counter drains, the key TTL expires, or `upload_gate_timeout_sec` (default
-  30s) elapses.
+The message itself is the ground truth: a successful inline upload rewrites
+`![](paste.png)` to `![](/file/<id>)` (`embedIfReferenced`). So before
+reading the comment for events containing `Created` / `CommentPushed`,
+`PushEventNotifications` polls (`getLastCommentSettled` in
+`graph/notifications.go`):
 
-Keyed by tid, not cid: tid is in the resolver's input hop, and accidental
-sharing across concurrent comments on one tension only makes Wait return
-slightly later — never sooner.
+1. Sleep `notify.upload_poll_interval_sec` (default 5s). This first sleep is
+   also the window for plain (non-inline) attachments, which leave no token
+   and therefore can't be detected by the poll.
+2. Fetch the author's last comment and count remaining bare tokens via
+   `tools.CountInlineImageCandidates`.
+3. None left → proceed. Some remain → sleep and re-fetch, up to
+   `notify.upload_poll_attempts` (default 10, ~55s worst case), then send
+   as-is.
 
-Plain (non-inline) attachments do NOT signal. They're best-effort: the
-baseline wait + `Comment.files` re-fetch picks them up if they landed
-during the window.
-
-**Failure mode is documented: no-op-on-failure.** If the gate's Redis is
-misconfigured (e.g. the api server and notifier targeting different
-instances), Register/Signal are no-ops and Wait times out — the email
-ships with broken inline `<img>` exactly as it did before this feature
-was added.
-
-**Known caveat (out of scope, separate PR).** `cmd/notifier.go:37` hardcodes
-`localhost:6379` ignoring `$REDIS_ADDR`, while `web/sessions/main.go:51`
-honours it. In deployments where the two processes don't share a local
-Redis, the gate operates on different instances and Register/Signal/Wait
-all miss. The notifier still ships emails; pasted images degrade to the
-absolute-URL fallback (which 404s for Private/Secret orgs).
+No cross-process coordination: the api process plays no role in the wait.
+Degradation past the budget has the same shape as a slow upload without any
+poll — broken inline `<img>` / missing attachment in the email — while the
+web comment renders correctly once the upload lands.
 
 ### Inbound email replies
 
