@@ -186,8 +186,7 @@ func (em EventMap) checkTensionRestriction(uctx *model.UserCtx, tension *model.T
 		return ok, err
 	}
 
-	// Each member of the list is a OR RestrictValue,
-	// the list is an AND of the RestrictValue.
+	// Each member of the list is a OR RestrictValue, the list is an AND of the RestrictValue.
 	for _, restrict := range em.Restrict {
 		if restrict == NoRestriction {
 			continue

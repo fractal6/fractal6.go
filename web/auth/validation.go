@@ -229,8 +229,7 @@ func GetAuthUserFromCtx(uctx model.UserCtx) (*model.UserCtx, error) {
 	return userCtx, nil
 }
 
-// ValidateNewuser check that an user doesn't exist,
-// from a db.grpc request.
+// ValidateNewuser check that an user doesn't exist, from a db.grpc request.
 func ValidateNewUser(creds model.UserCreds) error {
 	username := creds.Username
 	email := creds.Email
@@ -292,8 +291,7 @@ func ValidateNewUser(creds model.UserCreds) error {
 	return nil
 }
 
-// CreateNewUser Upsert an user,
-// using db.graphql request.
+// CreateNewUser Upsert an user, using db.graphql request.
 func CreateNewUser(creds model.UserCreds) (*model.UserCtx, error) {
 	now := tools.Now()
 	// Rights

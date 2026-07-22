@@ -116,6 +116,10 @@ const projectAuthFields = `Project.collaborators { User.username }
 //  2. Permission flags (peerCanEditProject / guestCanEditProject)
 //  3. Coordinator on any linked node
 func CheckProjectAuth(uctx *model.UserCtx, projectid string) (bool, error) {
+	if projectid == "" {
+		// Zero-value loc (resource deleted/not found); uid("") is a Dgraph parse error.
+		return false, fmt.Errorf("project not found")
+	}
 	r, err := db.GetDB().GetByUid(projectid, projectAuthFields)
 	if err != nil {
 		return false, LogErr("Internal error", err)
@@ -174,8 +178,7 @@ func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bo
 		return ok, LogErr("Internal error", err)
 	}
 
-	// If the node has no Coordo roles,
-	// check auhority in parent circles.
+	// If the node has no Coordo roles, check authority in parent circles.
 	if !ok && !db.GetDB().HasCoordos(nameid) {
 		ok, err = CheckUpperAuth(uctx, nameid, *mode)
 	}

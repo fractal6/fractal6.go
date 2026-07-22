@@ -230,8 +230,7 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 	var nameid string
 	parentid := tension.Receiver.Nameid
 
-	// unsafe is used to allow Guest user to be unlinked,
-	// as the nameid include a "@" char.
+	// unsafe allows Guest user to be unlinked, as the nameid includes a "@" char.
 	if unsafe {
 		nameid = *node.Nameid
 		rootnameid, err = codec.Nid2rootid(nameid)
@@ -392,8 +391,7 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
 // Internals
 //
 
-// MakeNewRootTension build the tension that manage a root node.
-// Authors will be suscribed.
+// MakeNewRootTension build the tension that manage a root node. Authors will be suscribed.
 func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *string, mandate *model.MandateRef) model.AddTensionInput {
 	now := Now()
 	createdBy := *node.CreatedBy

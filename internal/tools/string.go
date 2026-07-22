@@ -213,8 +213,7 @@ func MaskCodeRegions(s string) string {
 	return string(out)
 }
 
-// indexByte returns the index of the first occurrence of c at or after start;
-// -1 if none.
+// indexByte returns the index of the first occurrence of c at or after start; -1 if none.
 func indexByte(b []byte, start int, c byte) int {
 	for i := start; i < len(b); i++ {
 		if b[i] == c {
