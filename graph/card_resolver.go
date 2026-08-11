@@ -345,6 +345,9 @@ func deleteProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 	if len(filter.ID) == 0 {
 		return nil, fmt.Errorf("Query requires id filters.")
 	}
+	if err := db.ValidateUids(filter.ID...); err != nil {
+		return nil, err
+	}
 	// Prior to remove, get information about that object for post-processing
 	oldCards := []ProjectCardLoc{}
 	for _, uid := range filter.ID {
@@ -432,8 +435,17 @@ func updateProjectCardHook(ctx context.Context, obj any, next graphql.Resolver) 
 	newCol := ProjectColumnDesc{}
 	if input.Set != nil && len(input.Filter.ID) == 1 {
 		id := input.Filter.ID[0]
+		if err := db.ValidateUids(id); err != nil {
+			return nil, err
+		}
 		isMoved = input.Set.Pos != nil && input.Set.Pc != nil
 		if isMoved {
+			if input.Set.Pc.ID == nil {
+				return nil, fmt.Errorf("pc id required")
+			}
+			if err := db.ValidateUids(*input.Set.Pc.ID); err != nil {
+				return nil, err
+			}
 			// Single DQL request returns both old card loc and new col descriptor.
 			oldCard, newCol, err = fetchCardAndNewCol(id, *input.Set.Pc.ID)
 		} else {

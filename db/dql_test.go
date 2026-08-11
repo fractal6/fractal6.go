@@ -344,3 +344,22 @@ func TestDecodeAt_Depth3(t *testing.T) {
 		}
 	})
 }
+
+// TestValidateUids verifies that only well-formed Dgraph uids (0x hex) pass,
+// so client-supplied ids never reach a DQL uid(...) root as garbage.
+func TestValidateUids(t *testing.T) {
+	t.Parallel()
+	for _, id := range []string{"0x1", "0xdeadbeef", "0xABC123"} {
+		if err := ValidateUids(id); err != nil {
+			t.Errorf("ValidateUids(%q) = %v, want nil", id, err)
+		}
+	}
+	for _, id := range []string{"", "abc", "0x", "0xzz", "1234", `0x1") { uid } q(func: uid(0x2`} {
+		if err := ValidateUids(id); err == nil {
+			t.Errorf("ValidateUids(%q) = nil, want error", id)
+		}
+	}
+	if err := ValidateUids("0x1", "bad"); err == nil {
+		t.Errorf("ValidateUids variadic should reject any bad id")
+	}
+}

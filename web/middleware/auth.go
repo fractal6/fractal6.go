@@ -38,7 +38,7 @@ func init() {
 	CREDENTIAL_PROM = viper.GetString("server.prometheus_credentials")
 }
 
-func CheckBearer(next http.Handler) http.Handler {
+func CheckBearerProm(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		val := r.Header.Get("Authorization")
 		if val == CREDENTIAL_PROM || val == "Bearer "+CREDENTIAL_PROM {

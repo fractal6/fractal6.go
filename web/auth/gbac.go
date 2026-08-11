@@ -116,8 +116,9 @@ const projectAuthFields = `Project.collaborators { User.username }
 //  2. Permission flags (peerCanEditProject / guestCanEditProject)
 //  3. Coordinator on any linked node
 func CheckProjectAuth(uctx *model.UserCtx, projectid string) (bool, error) {
-	if projectid == "" {
-		// Zero-value loc (resource deleted/not found); uid("") is a Dgraph parse error.
+	if db.ValidateUids(projectid) != nil {
+		// Zero-value loc (resource deleted/not found) or raw client id;
+		// reject before it reaches uid(...) as a Dgraph parse error.
 		return false, fmt.Errorf("project not found")
 	}
 	r, err := db.GetDB().GetByUid(projectid, projectAuthFields)

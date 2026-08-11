@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -353,12 +354,28 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
 	return result, nil
 }
 
+var uidRe = regexp.MustCompile(`^0x[0-9a-fA-F]+$`)
+
+// ValidateUids rejects ids that are not well-formed Dgraph uids, so
+// client-supplied ids never reach a DQL uid(...) root (parse error / injection).
+func ValidateUids(ids ...string) error {
+	for _, id := range ids {
+		if !uidRe.MatchString(id) {
+			return fmt.Errorf("invalid id: %q", id)
+		}
+	}
+	return nil
+}
+
 // GetByUid fetches a value at `path` under the node with the given uid.
 // Path elements use "Type.field" notation; the leaf may be a space-separated
 // multi-field selection (e.g. "uid Tension.title"), in which case the parent
 // map is returned in lieu of a scalar. Cardinality-many edges fan out the
 // result into a slice.
 func (dg Dgraph) GetByUid(uid string, path ...string) (any, error) {
+	if err := ValidateUids(uid); err != nil {
+		return nil, err
+	}
 	return dg.runPathQuery(fmt.Sprintf(`uid("%s")`, uid), "", path)
 }
 

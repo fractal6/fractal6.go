@@ -61,6 +61,9 @@ func updateProjectDraftHook(ctx context.Context, obj any, next graphql.Resolver)
 	if len(input.Filter.ID) == 0 {
 		return nil, fmt.Errorf("Query requires id filters.")
 	}
+	if err := db.ValidateUids(input.Filter.ID...); err != nil {
+		return nil, err
+	}
 
 	for _, id := range input.Filter.ID {
 		draft, err := First(db.Gamma[model.ProjectDraft](QueryDraft, map[string]string{"id": id}))

@@ -114,7 +114,7 @@ func RunServer() {
 			}
 		}()
 		secured := r.Group(nil)
-		secured.Use(middle6.CheckBearer)
+		secured.Use(middle6.CheckBearerProm)
 		// secured.Handle("/metrics", promhttp.Handler()) // inclue Go collection metrics
 		secured.Handle("/metrics", handle6.InstruHandler())
 	}
