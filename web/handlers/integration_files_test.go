@@ -538,6 +538,40 @@ func TestFileDelete_AsNonAuthor_404(t *testing.T) {
 	requireStatus(t, rr, http.StatusNotFound)
 }
 
+func TestFileDelete_MultiUidInjection_404(t *testing.T) {
+	// Regression: DQL uid() accepts comma-separated lists, so a fileid like
+	// "0xMINE,0xVICTIM" used to pass the uploader check on res[0] (mine) while
+	// deleteFile bound BOTH uids and wiped the victim too. Both FileDelete
+	// and FileGet must reject the list up front.
+	authorJWT := loginAs(testutil.TestUser, testutil.TestPassword)
+	tid := resolveTensionByTitle(t, "Test tension")
+	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
+
+	mine := decodeUpload(t, uploadCommentFile(t, tid, cid, "mine.png", "image/png", pngBytes(), authorJWT))
+	defer purgeFile(t, mine.ID, storageKeyOf(t, mine.ID))
+	victim := decodeUpload(t, uploadCommentFile(t, tid, cid, "victim.png", "image/png", pngBytes(), authorJWT))
+	defer purgeFile(t, victim.ID, storageKeyOf(t, victim.ID))
+
+	rr := doRequest("DELETE", "/file/"+mine.ID+","+victim.ID, nil, authorJWT)
+	requireStatus(t, rr, http.StatusNotFound)
+
+	// Victim (and attacker file) must both still be there.
+	if g := getFile(t, victim.ID, authorJWT); g.Code != http.StatusFound {
+		t.Errorf("GET victim after injection attempt: status %d, want 302", g.Code)
+	}
+	if g := getFile(t, mine.ID, authorJWT); g.Code != http.StatusFound {
+		t.Errorf("GET mine after injection attempt: status %d, want 302", g.Code)
+	}
+}
+
+func TestFileGet_MalformedId_404(t *testing.T) {
+	for _, id := range []string{"abc", "0xzz", "0x1,0x2"} {
+		if g := getFile(t, id, nil); g.Code != http.StatusNotFound {
+			t.Errorf("GET /file/%q: status %d, want 404", id, g.Code)
+		}
+	}
+}
+
 // --- Avatar tests ---
 
 func TestAvatarUserReplaceFlow(t *testing.T) {

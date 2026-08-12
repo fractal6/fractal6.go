@@ -115,6 +115,13 @@ func resolveAnchor(r *http.Request) (uploadAnchor, int, error) {
 	if commentSet && (tid == "" || cid == "") {
 		return uploadAnchor{}, http.StatusBadRequest, fmt.Errorf("tid and cid must be provided together")
 	}
+	// Reject malformed uids before they reach a DQL uid() root (injection guard;
+	// uid() accepts comma-separated lists, so "0x1,0x2" must not pass).
+	if commentSet {
+		if err := db.ValidateUids(tid, cid); err != nil {
+			return uploadAnchor{}, http.StatusBadRequest, err
+		}
+	}
 
 	count := 0
 	if commentSet {
@@ -154,6 +161,11 @@ func FileGetHandler(cli *storage.Client) http.HandlerFunc {
 		fileid := chi.URLParam(r, "id")
 		if fileid == "" {
 			http.Error(w, "missing file id", http.StatusBadRequest)
+			return
+		}
+		// Malformed uid == no such file (also blocks DQL uid() injection).
+		if db.ValidateUids(fileid) != nil {
+			http.NotFound(w, r)
 			return
 		}
 
@@ -492,6 +504,13 @@ func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 		fileid := chi.URLParam(r, "id")
 		if fileid == "" {
 			http.Error(w, "missing file id", http.StatusBadRequest)
+			return
+		}
+		// Malformed uid == no such file (also blocks DQL uid() injection; without
+		// this, "0xMINE,0xVICTIM" passes the uploader check on res[0] and the
+		// deleteFile template then wipes every listed uid).
+		if db.ValidateUids(fileid) != nil {
+			http.NotFound(w, r)
 			return
 		}
 		if cli == nil {

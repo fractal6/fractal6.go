@@ -6,8 +6,12 @@
 package handlers
 
 import (
+	"net/http"
+	"net/url"
 	"strings"
 	"testing"
+
+	"fractale/fractal6.go/db"
 )
 
 func TestSafeFilename(t *testing.T) {
@@ -29,6 +33,42 @@ func TestSafeFilename(t *testing.T) {
 		if got != c.want {
 			t.Errorf("safeFilename(%q) = %q, want %q", c.in, got, c.want)
 		}
+	}
+}
+
+func TestResolveAnchor_UidValidation(t *testing.T) {
+	// Malformed tid/cid must be rejected with 400 before reaching a DQL uid()
+	// root. Comma lists are the dangerous case: uid() accepts them, so
+	// "0x1,0x2" would otherwise widen the query to every listed node.
+	cases := []struct {
+		name, tid, cid string
+		wantStatus     int
+		wantKind       db.FileKind
+	}{
+		{"valid", "0x1", "0x2", 0, db.KindComment},
+		{"comma-list tid", "0x1,0x2", "0x3", http.StatusBadRequest, ""},
+		{"comma-list cid", "0x1", "0x2,0x3", http.StatusBadRequest, ""},
+		{"non-hex tid", "abc", "0x2", http.StatusBadRequest, ""},
+		{"quote breakout", `0x1"){q(func:uid(0x2`, "0x3", http.StatusBadRequest, ""},
+		{"tid without cid", "0x1", "", http.StatusBadRequest, ""},
+		{"cid without tid", "", "0x1", http.StatusBadRequest, ""},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			req, err := http.NewRequest("POST", "/", strings.NewReader(
+				"tid="+url.QueryEscape(c.tid)+"&cid="+url.QueryEscape(c.cid)))
+			if err != nil {
+				t.Fatal(err)
+			}
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			anchor, status, err := resolveAnchor(req)
+			if status != c.wantStatus {
+				t.Errorf("status = %d, want %d (err=%v)", status, c.wantStatus, err)
+			}
+			if anchor.Kind != c.wantKind {
+				t.Errorf("kind = %q, want %q", anchor.Kind, c.wantKind)
+			}
+		})
 	}
 }
 
