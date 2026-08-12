@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -94,8 +95,7 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]any, error
 		res, err = dg.QueryDql(f, maps)
 	} else if _, ok := dqlMutations[f]; ok { // Mutation Case
 		// Send request
-		// @codefactor: unify api...
-		res, err = dg.MutateWithQueryDql3(dqlMutations[f], maps)
+		res, err = dg.UpsertDql(dqlMutations[f], maps)
 	} else {
 		err = fmt.Errorf("Unknown DQL query")
 	}
@@ -110,14 +110,10 @@ func (dg Dgraph) Meta(f string, maps map[string]string) ([]map[string]any, error
 func (dg Dgraph) Gamma(q QueryMut, maps map[string]string) ([]map[string]any, error) {
 	// Send Custom DQL request
 	// Returns: array
-	var res *api.Response
-	var err error
-
-	res, err = dg.MutateWithQueryDql3(q, maps)
+	res, err := dg.UpsertDql(q, maps)
 	if res == nil {
 		return nil, err
 	}
-
 	return decodeDqlResp(res)
 }
 
@@ -358,95 +354,79 @@ func (dg Dgraph) GetIDs(fieldName string, value string, filterName, filterValue 
 	return result, nil
 }
 
-// Returns a field from id
-func (dg Dgraph) GetFieldById(id string, fieldName string) (any, error) {
-	results, err := dg.Meta("getFieldById", map[string]string{
-		"id":        id,
-		"fieldName": fieldName,
-	})
-	if err != nil {
-		return nil, err
+var uidRe = regexp.MustCompile(`^0x[0-9a-fA-F]+$`)
+
+// ValidateUids rejects ids that are not well-formed Dgraph uids, so
+// client-supplied ids never reach a DQL uid(...) root (parse error / injection).
+func ValidateUids(ids ...string) error {
+	for _, id := range ids {
+		if !uidRe.MatchString(id) {
+			return fmt.Errorf("invalid id: %q", id)
+		}
 	}
-	return DecodeField(results, fieldName)
+	return nil
 }
 
-// Returns a field from objid. Optional filter pair (filterField, filterValue) adds @filter(eq(...)).
-func (dg Dgraph) GetFieldByEq(fieldid string, objid string, fieldName string, filter ...string) (any, error) {
-	maps := map[string]string{
-		"fieldid":   fieldid,
-		"value":     objid,
-		"fieldName": fieldName,
-		"filter":    "",
-	}
-	if len(filter) == 2 {
-		maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, filter[0], filter[1])
-	}
-	results, err := dg.Meta("getFieldByEq", maps)
-	if err != nil {
+// GetByUid fetches a value at `path` under the node with the given uid.
+// Path elements use "Type.field" notation; the leaf may be a space-separated
+// multi-field selection (e.g. "uid Tension.title"), in which case the parent
+// map is returned in lieu of a scalar. Cardinality-many edges fan out the
+// result into a slice.
+func (dg Dgraph) GetByUid(uid string, path ...string) (any, error) {
+	if err := ValidateUids(uid); err != nil {
 		return nil, err
 	}
-	return DecodeField(results, fieldName)
+	return dg.runPathQuery(fmt.Sprintf(`uid("%s")`, uid), "", path)
 }
 
-// Returns a subfield from uid
-func (dg Dgraph) GetSubFieldById(id string, fieldNameSource string, fieldNameTarget string) (any, error) {
-	results, err := dg.Meta("getSubFieldById", map[string]string{
-		"id":              id,
-		"fieldNameSource": fieldNameSource,
-		"fieldNameTarget": fieldNameTarget,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
+// GetByEq fetches a value at `path` under nodes matching predicate=value.
+func (dg Dgraph) GetByEq(predicate, value string, path ...string) (any, error) {
+	return dg.runPathQuery(fmt.Sprintf(`eq(%s, "%s")`, predicate, value), "", path)
 }
 
-// Returns a subfield from Eq. Optional filter pair (filterField, filterValue) adds @filter(eq(...)).
-func (dg Dgraph) GetSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, filter ...string) (any, error) {
-	maps := map[string]string{
-		"fieldid":         fieldid,
-		"value":           value,
-		"fieldNameSource": fieldNameSource,
-		"fieldNameTarget": fieldNameTarget,
-		"filter":          "",
-	}
-	if len(filter) == 2 {
-		maps["filter"] = fmt.Sprintf(`@filter(eq(%s, "%s"))`, filter[0], filter[1])
-	}
-	results, err := dg.Meta("getSubFieldByEq", maps)
-	if err != nil {
-		return nil, err
-	}
-	return DecodeSubField(results, fieldNameSource, fieldNameTarget)
+// GetByEqFiltered is GetByEq with an extra @filter(eq(filterPred, filterValue)).
+func (dg Dgraph) GetByEqFiltered(predicate, value, filterPred, filterValue string, path ...string) (any, error) {
+	filter := fmt.Sprintf(`@filter(eq(%s, "%s"))`, filterPred, filterValue)
+	return dg.runPathQuery(fmt.Sprintf(`eq(%s, "%s")`, predicate, value), filter, path)
 }
 
-// Returns a subsubfield from uid
-func (dg Dgraph) GetSubSubFieldById(id string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (any, error) {
-	results, err := dg.Meta("getSubSubFieldById", map[string]string{
-		"id":                 id,
-		"fieldNameSource":    fieldNameSource,
-		"fieldNameTarget":    fieldNameTarget,
-		"subFieldNameTarget": subFieldNameTarget,
-	})
+func (dg Dgraph) runPathQuery(root, filter string, path []string) (any, error) {
+	if len(path) == 0 {
+		return nil, fmt.Errorf("path query: empty path")
+	}
+	res, err := dg.runDqlTxn(buildPathQuery(root, filter, path), nil)
 	if err != nil {
 		return nil, err
 	}
-	return DecodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
+	cleaned, err := decodeDqlResp(res)
+	if err != nil {
+		return nil, err
+	}
+	return DecodeAt(cleaned, path...)
 }
 
-// Returns a subsubfield from Eq
-func (dg Dgraph) GetSubSubFieldByEq(fieldid string, value string, fieldNameSource string, fieldNameTarget string, subFieldNameTarget string) (any, error) {
-	results, err := dg.Meta("getSubSubFieldByEq", map[string]string{
-		"fieldid":            fieldid,
-		"value":              value,
-		"fieldNameSource":    fieldNameSource,
-		"fieldNameTarget":    fieldNameTarget,
-		"subFieldNameTarget": subFieldNameTarget,
-	})
-	if err != nil {
-		return nil, err
+// buildPathQuery renders `{ all(func: <root>) <filter>? { p0 { p1 { ... } } } }`.
+func buildPathQuery(root, filter string, path []string) string {
+	var b strings.Builder
+	b.WriteString("{ all(func: ")
+	b.WriteString(root)
+	b.WriteString(") ")
+	if filter != "" {
+		b.WriteString(filter)
+		b.WriteByte(' ')
 	}
-	return DecodeSubSubField(results, fieldNameSource, fieldNameTarget, subFieldNameTarget)
+	b.WriteString("{ ")
+	for i, p := range path {
+		b.WriteString(p)
+		if i < len(path)-1 {
+			b.WriteString(" { ")
+		}
+	}
+	for range path {
+		b.WriteString(" }")
+	}
+	b.WriteString(" }")
+	return b.String()
 }
 
 func (dg Dgraph) GetShortestPath(from string, to string) (float64, error) {
@@ -961,49 +941,6 @@ func (dg Dgraph) UpgradeMember(nameid string, roleType model.RoleType) error {
 	return err
 }
 
-// Deletions
-
-// DeepDelete delete edges recursively for type {t} and id {id}.
-// Reverse edges need to be deleted manually since they are defined in graphql and not in DQL.
-// Note: If reverse are forgotten, empty redisual nodes will accumulates.
-func (dg Dgraph) DeepDelete(t string, id string) error {
-	var reverse string
-	var query string
-
-	switch t {
-	case "tension":
-		reverse = `
-            uid(rid_emitter) <Node.tensions_out> uid(id) .
-            uid(rid_receiver) <Node.tensions_in> uid(id) .
-        `
-	case "contract":
-		reverse = `
-            uid(rid) <Tension.contracts> uid(id) .
-            uid(candidates) <User.contracts> uid(id) .
-            uid(user_pending) <PendingUser.contracts> uid(id) .
-            uid(nodes) <Node.contracts> uid(votes) .
-            uid(members) <User.events> uid(desync_events) .
-            uid(desync_events) * * .
-        `
-	default:
-		return fmt.Errorf("delete query not implemented for this type %s", t)
-	}
-
-	maps := map[string]string{"id": id}
-	query = dg.getDqlQuery("delete"+strings.ToUpper(t[:1])+t[1:], maps)
-	mu := fmt.Sprintf(`
-        %s
-        uid(all_ids) * * .
-    `, reverse)
-
-	mutation := &api.Mutation{
-		DelNquads: []byte(mu),
-	}
-
-	err := dg.MutateWithQueryDql(query, mutation)
-	return err
-}
-
 //
 // Generic DQL helpers
 //
@@ -1035,6 +972,35 @@ func unmarshalCountResp(res *api.Response) int {
 		return v
 	}
 	return -1
+}
+
+// DecodeDqlBlock decodes a named result block of a DQL response directly into
+// []T using T's json tags — no CleanDqlMap pass, no re-marshal. Use when the
+// result has a fixed shape and you want to skip the generic-map path taken by
+// Meta/Gamma. block defaults to "all" when empty. Returns (nil, nil) when the
+// response is empty or the block is absent.
+//
+// Typical T uses Dgraph-native keys, e.g. `json:"File.storageKey"`.
+func DecodeDqlBlock[T any](res *api.Response, block string) ([]T, error) {
+	if res == nil || len(res.Json) == 0 {
+		return nil, nil
+	}
+	if block == "" {
+		block = "all"
+	}
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(res.Json, &raw); err != nil {
+		return nil, err
+	}
+	blk, ok := raw[block]
+	if !ok || len(blk) == 0 {
+		return nil, nil
+	}
+	var out []T
+	if err := json.Unmarshal(blk, &out); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // decodeDqlResp decodes an api.Response into cleaned DQL result maps.

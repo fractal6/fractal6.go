@@ -55,7 +55,7 @@ func TestCreateOrga_Success(t *testing.T) {
 	}
 
 	// Verify org Node exists in DB
-	val, err := db.GetDB().GetFieldByEq("Node.nameid", orgNameid, "Node.name")
+	val, err := db.GetDB().GetByEq("Node.nameid", orgNameid, "Node.name")
 	if err != nil {
 		t.Fatalf("failed to query org node: %v", err)
 	}
@@ -100,7 +100,7 @@ func TestSetUserCanJoin_Success(t *testing.T) {
 	requireStatus(t, rr, http.StatusOK)
 
 	// Verify in DB
-	val, err := db.GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.userCanJoin")
+	val, err := db.GetDB().GetByEq("Node.nameid", "test-org", "Node.userCanJoin")
 	if err != nil {
 		t.Fatalf("failed to query Node.userCanJoin: %v", err)
 	}
@@ -128,7 +128,7 @@ func TestSetGuestCanCreateTension_Success(t *testing.T) {
 	requireStatus(t, rr, http.StatusOK)
 
 	// Verify in DB
-	val, err := db.GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.guestCanCreateTension")
+	val, err := db.GetDB().GetByEq("Node.nameid", "test-org", "Node.guestCanCreateTension")
 	if err != nil {
 		t.Fatalf("failed to query Node.guestCanCreateTension: %v", err)
 	}
@@ -156,7 +156,7 @@ func TestSetIsTemplateTensionOnly_Success(t *testing.T) {
 	requireStatus(t, rr, http.StatusOK)
 
 	// Verify in DB
-	val, err := db.GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.isTemplateTensionOnly")
+	val, err := db.GetDB().GetByEq("Node.nameid", "test-org", "Node.isTemplateTensionOnly")
 	if err != nil {
 		t.Fatalf("failed to query Node.isTemplateTensionOnly: %v", err)
 	}
@@ -188,7 +188,7 @@ func TestSetLexicon_Success(t *testing.T) {
 	}
 
 	// Verify in DB
-	val, err := db.GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.lexicon")
+	val, err := db.GetDB().GetByEq("Node.nameid", "test-org", "Node.lexicon")
 	if err != nil {
 		t.Fatalf("failed to query Node.lexicon: %v", err)
 	}

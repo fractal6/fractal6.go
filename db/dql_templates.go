@@ -59,61 +59,19 @@ var dqlQueries map[string]string = map[string]string{
         }
 
         all(func: uid(h_in, h_out), first:25, orderdesc: Post.createdAt) @filter(NOT eq(Event.event_type, "BlobCreated")) @cascade {
-            Post.createdAt
-            Post.createdBy { User.username }
-            Event.event_type
-            Event.tension {
-                uid
-                Tension.title
-                Tension.receiver { Node.name Node.nameid }
+            createdAt: Post.createdAt
+            createdBy: Post.createdBy { username: User.username }
+            event_type: Event.event_type
+            tension: Event.tension {
+                id: uid
+                title: Tension.title
+                receiver: Tension.receiver { name: Node.name nameid: Node.nameid }
             }
         }
     }`,
 	// Get literal value
 	"getID": `{
         all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
-    }`,
-	"getFieldById": `{
-        all(func: uid("{{.id}}")) {
-            {{.fieldName}}
-        }
-    }`,
-	"getFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) {{.filter}} {
-            {{.fieldName}}
-        }
-    }`,
-	"getSubFieldById": `{
-        all(func: uid("{{.id}}")) {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}}
-            }
-        }
-    }`,
-	"getSubFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) {{.filter}} {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}}
-            }
-        }
-    }`,
-	"getSubSubFieldById": `{
-        all(func: uid({{.id}})) {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}} {
-                    {{.subFieldNameTarget}}
-                }
-            }
-        }
-    }`,
-	"getSubSubFieldByEq": `{
-        all(func: eq({{.fieldid}}, "{{.value}}")) {
-            {{.fieldNameSource}} {
-                {{.fieldNameTarget}} {
-                    {{.subFieldNameTarget}}
-                }
-            }
-        }
     }`,
 	"getShortestPath": `{
         A as var(func: eq(Node.nameid, "{{.from}}"))
@@ -436,8 +394,46 @@ var dqlQueries map[string]string = map[string]string{
                 receiverid: Node.nameid
             }
             Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
+                id: uid
                 message: Post.message
                 Post.createdBy @filter(eq(User.username, "{{.username}}"))
+            }
+        }
+    }`,
+	// getLastCommentFiles projects the file attachments anchored on the
+	// most-recent comment from {{.username}} on tension {{.tid}}. Returned
+	// as a nested structure (no @normalize) so the notifier can iterate the
+	// File rows and partition them into inline-CID vs plain attachments.
+	"getLastCommentFiles": `{
+        all(func: uid({{.tid}})) {
+            Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
+                Post.createdBy @filter(eq(User.username, "{{.username}}")) { User.username }
+                Comment.files {
+                    uid
+                    File.storageKey
+                    File.filename
+                    File.contentType
+                    File.size
+                    File.embedded
+                }
+            }
+        }
+    }`,
+	// Same projection as getLastCommentFiles, but walking Contract.comments
+	// instead of Tension.comments. Contract emails use this to inline files
+	// uploaded on the contract's most recent comment.
+	"getLastContractCommentFiles": `{
+        all(func: uid({{.cid}})) {
+            Contract.comments(first:1, orderdesc: Post.createdAt) @cascade {
+                Post.createdBy @filter(eq(User.username, "{{.username}}")) { User.username }
+                Comment.files {
+                    uid
+                    File.storageKey
+                    File.filename
+                    File.contentType
+                    File.size
+                    File.embedded
+                }
             }
         }
     }`,
@@ -602,63 +598,6 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
-	// Deletion - Used by DeepDelete
-	"deleteTension": `{
-        id as var(func: uid({{.id}})) {
-          rid_emitter as Tension.emitter
-          rid_receiver as Tension.receiver
-          comments as Tension.comments {
-            reactions as Comment.reactions
-          }
-          b as Tension.blobs {
-              bn as Blob.node {
-                  m as NodeFragment.mandate
-              }
-          }
-          c as Tension.contracts {
-              e as Contract.event
-              votes as Contract.participants
-              comments2 as Contract.comments {
-                reactions2 as Comment.reactions
-              }
-          }
-          events as Tension.history
-          mentions as Tension.mentions
-        }
-        all(func: uid(id,comments,reactions,events,mentions,b,bn,m,c,e,votes,comments2,reactions2)) {
-            all_ids as uid
-        }
-    }`,
-	"deleteContract": `{
-        id as var(func: uid({{.id}})) {
-          rid as Contract.tension
-          candidates as Contract.candidates
-          user_pending as Contract.pending_candidates
-          a as Contract.event
-          votes as Contract.participants {
-            nodes as Vote.node {
-                Node.parent {
-                    Node.children @filter(eq(Node.type_, "Role")) {
-                        members as Node.first_link
-                    }
-                }
-            }
-          }
-          c as Contract.comments {
-            r as Comment.reactions
-          }
-        }
-
-        var(func:uid(members)) @cascade {
-            desync_events as User.events {
-              UserEvent.event @filter(uid({{.id}}))
-            }
-        }
-
-        all(func: uid(id,a,votes,c,r)) {
-            all_ids as uid
-        }
-    }`,
 	"getUserActivity": `{
         all(func: eq(Activity.ownerid, "u#{{.username}}"), orderdesc: Activity.date, first: 366)
         {{if .from}}@filter(between(Activity.date, "{{.from}}", "{{.to}}")){{end}}
@@ -688,6 +627,46 @@ var dqlQueries map[string]string = map[string]string{
             Tension.comments(first:1, orderasc: Post.createdAt) {
                 message: Post.message
             }
+        }
+    }`,
+	// getFileAuth fetches everything the /file/<id> proxy needs in a single
+	// hop. File is anchor-polymorphic: exactly one of comment/user/node is set.
+	// File.tension is denormalised alongside File.comment for the comment branch
+	// so we can fetch the tension receiver (nameid + visibility) without walking
+	// back through Tension.comments. {{.id}} is the File uid.
+	//
+	// All three branches are projected; Go side picks the populated one.
+	"getFileAuth": `{
+        all(func: uid({{.id}})) {
+            File.storageKey
+            File.filename
+            File.contentType
+            File.size
+            File.createdBy { User.username }
+            File.comment { Post.createdBy { User.username } }
+            File.tension {
+                Tension.receiver {
+                    Node.nameid
+                    Node.visibility
+                }
+            }
+            File.user { User.username }
+            File.node { Node.nameid Node.visibility }
+        }
+    }`,
+	// getCommentMessage: read Comment.message + author, but only if `cid`
+	// belongs to `tid`. Used by the upload handler for the inline-screenshot
+	// rewrite *and* the comment-author check. Empty `all` response means cid
+	// doesn't belong to tid (or doesn't exist).
+	"getCommentMessage": `{
+        var(func: uid({{.tid}})) {
+            Tension.comments @filter(uid({{.cid}})) {
+                cmatch as uid
+            }
+        }
+        all(func: uid(cmatch)) {
+            Post.message
+            Post.createdBy { User.username }
         }
     }`,
 }

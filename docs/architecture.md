@@ -25,7 +25,7 @@ fractal6.go/
 └── main.go
 ```
 
-The most-edited files: `graph/tension_op.go` (event pipeline), `graph/resolver.go` (directive/hook wiring), `db/dql.go` (DQL templates), `graph/FieldAuthorization.go` (`@x_*` rules), `graph/tension_auth.go` (EMAP).
+The most-edited files: `graph/tension_op.go` (event pipeline), `graph/resolver.go` (directive/hook wiring), `db/dql.go` (DQL templates), `graph/xw_directive.go` (`@x_*` / `@w_*` rules + transforms), `graph/tension_auth.go` (EMAP).
 
 ## GraphQL schema
 
@@ -36,6 +36,7 @@ Defined in `schema/graphql/fractal6.graphql`. Core types:
 | `Node` | Circle or Role in the org tree |
 | `Tension` | Issue/communication between nodes |
 | `Comment` / `Event` / `Blob` | All `Post` implementations attached to a Tension |
+| `File` | S3-backed asset metadata (comment attachments, user/org avatars); bytes served via `/file/<id>` |
 | `Contract` / `Vote` | Voting mechanism for events that need peer validation |
 | `User` | Platform user with roles, subscriptions, events |
 | `Label` / `RoleExt` / `TensionTemplate` / `ProjectTemplate` | Reusable artefacts scoped to circles |
@@ -49,30 +50,25 @@ Source SDL → auth-rule injection → Dgraph schema (push) → fetch Dgraph-gen
 
 The schema relies on directives processed at three levels (schema parsing, codegen, runtime).
 
-**Output directives** (read-side) — handled in `graph/resolver.go` and `graph/contract_resolver.go`:
+Each directive family lives in its own file under `graph/` and is wired from `graph/resolver.go::Init()`:
 
-| Directive | Purpose |
-|-----------|---------|
-| `@hidden` | Field is never readable |
-| `@private` | Only the owning user can read |
-| `@meta(f, k)` | Computed field via DQL query |
-| `@isContractValidator` | Boolean: can current user validate this contract? |
-
-**Input authorization** (`@x_*`) — `graph/FieldAuthorization.go`:
-
-`@x_add` / `@x_alter` / `@x_set` / `@x_remove` / `@x_patch` / `@x_ro` / `@x_patch_ro`. Rules (`r:` parameter): `isOwner`, `unique`, `oneByOne`, `hasEvent`, `tensionTypeCheck`, `ref`, `minLen`, `maxLen`.
-
-**Input transformations** (`@w_*`) — `graph/FieldTransform.go`:
-
-`@w_add` / `@w_alter` / `@w_meta_patch`. Actions (`a:` parameter): `lower`, `now`.
+| Family | File | Directives |
+|---|---|---|
+| Output / visibility | `graph/auth_directive.go` | `@hidden`, `@private`, `@x_ro` (read-only marker) |
+| Computed fields | `graph/meta_directive.go` | `@meta(f, k)` |
+| Input authorization (`@x_*`) | `graph/xw_directive.go` | `@x_add` / `@x_alter` / `@x_set` / `@x_remove` / `@x_patch` / `@x_patch_ro`; rules (`r:`): `isOwner`, `unique`, `oneByOne`, `hasEvent`, `tensionTypeCheck`, `ref`, `minLen`, `maxLen`, `json` |
+| Input transformations (`@w_*`) | `graph/xw_directive.go` | `@w_add` / `@w_alter` / `@w_meta_patch`; actions (`a:`): `lower`, `now` |
+| Contract-specific | `graph/contract_resolver.go` | `@isContractValidator` |
 
 **Type-level hooks** (`@hook_`) — auto-generates pre/post mutation hooks for the type, registered in `graph/resolver.go`.
 
 ### `@meta` computed fields
 
-`@meta(f: String!, k: [String!])` declares a field whose value comes from a DQL query template. `f` is the template name (looked up in the `dqlQueries` map in `db/dql.go`); `k` is the list of parent fields used as template parameters. Field arguments (e.g. `query: String`) are also passed to the template.
+`@meta(f: String!, k: [String!])` declares a field whose value comes from a DQL query template. `f` is the template name (looked up in `dqlQueries` in `db/dql_templates.go`); `k` is the list of parent fields used as template parameters. Field arguments (e.g. `query: String`) are also passed to the template.
 
-Examples in the schema: `Node.events_history`, `User.event_count`, `User.activity`, `Node.activity`. Implementation lives in `meta()` (`graph/resolver.go`); the DQL execution happens in `(dg Dgraph).Meta()` (`db/dql.go`).
+Examples in the schema: `Node.events_history`, `User.event_count`, `User.activity`, `Node.activity`. Implementation lives in `graph/meta_directive.go`: each `f` name is registered in `metaRegistry` against its target Go type via `metaSlice[T]` / `metaScalar[T]`, which decode the DQL response directly into `[]*T` / `*T` in one JSON pass.
+
+Adding a new `@meta` field: declare it in the SDL, add the DQL template (aliasing predicates so the JSON keys match the target type's `json:"..."` tags), then add one line to `metaRegistry`.
 
 ## Authorization
 
@@ -173,8 +169,13 @@ POST /q/projects/sub
 POST /q/tensions/{light,int,ext,all}
 POST /q/tensions/count
 
+# File attachments / avatars (see file-storage.md)
+POST   /file/upload                    Multipart; one of (tid+cid)|userid|orgaid
+GET    /file/{id}                      Per-anchor auth → 302 to presigned S3 URL
+DELETE /file/{id}                      Uploader-only
+
 # Webhooks
-POST /notifications  /mailing  /postal_webhook
+POST /notifications  /mailing  /postal_webhook       # /notifications also persists inbound attachments — see file-storage.md "Inbound email replies"
 
 # Dev / static
 GET  /playground  /ping  /assets/*  /*
@@ -190,12 +191,20 @@ The `/q/*` routes follow a two-phase shape: a cheap DQL call collects `{nameid �
 
 ```
 API server  ──PublishTensionEvent──▶  Redis pub/sub  ──▶  notifier daemon
-                                                           ├── build subscriber list
-                                                           ├── create UserEvent records
-                                                           └── send emails (Postal)
+                                                            │ settle poll: re-fetch comment until
+                                                            │ no bare ![](paste) tokens remain
+                                                            ├── build subscriber list
+                                                            ├── create UserEvent records
+                                                            └── send emails (Postal)
+                                                                ├── inline CID for pasted images
+                                                                └── plain attachments + footer links
 ```
 
 Event categories: `EventNotif` (tension events), `ContractNotif` (contract voting), `NotifNotif` (generic). Subscribers are resolved from: tension subscribers, assignees, receiver coordinators, emitter coordinators (created tensions only), contract candidates.
+
+When a comment includes inline-paste screenshots, the notification can fire while `/file/upload` calls are still in flight. The notifier handles it alone: `getLastCommentSettled` (`graph/notifications.go`) re-fetches the comment until no bare `![](paste.png)` tokens remain in the message — the token rewrite to `/file/<id>` is the ground truth — or the attempt budget runs out. No cross-process coordination. See `docs/file-storage.md` "Email notifications" for the full flow and attachment caps.
+
+The reverse direction — email replies carrying attachments — is handled in `web/handlers/mailer.go::Notifications` (tension branch); `processInboundAttachments` resolves quoted-back `cid:` references, matches inbound parts to refs, and persists everything through the same comment-anchor pipeline as `/file/upload`. See `docs/file-storage.md` "Inbound email replies".
 
 ## Configuration
 
@@ -208,7 +217,8 @@ Event categories: `EventNotif` (tension events), `ContractNotif` (contract votin
 | Understand the SDL and its directives | `schema/graphql/fractal6.graphql` + `schema/graphql/directives.graphql` |
 | Trace a mutation | `graph/resolver.go:Init` (hooks) → `graph/{domain}_resolver.go` → `graph/dgraph_resolver.go` (bridge) → `db/gql.go` |
 | Add or modify a tension event | `graph/tension_op.go` (`EventsMap` + action functions) |
-| Modify field-level auth | `graph/FieldAuthorization.go` |
+| Modify field-level auth | `graph/xw_directive.go` |
 | Add a DQL-backed computed field | declare with `@meta` in SDL → add template to `dqlQueries` in `db/dql.go` |
 | Add an HTTP route | `web/handlers/` + register in `web/router.go` |
+| Handle file attachments | `docs/file-storage.md` |
 | Run integration tests | `docs/integration-tests.md` |

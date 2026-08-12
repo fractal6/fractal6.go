@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/codec"
@@ -41,6 +42,35 @@ import (
  */
 
 var ctx context.Context = context.Background()
+
+// getLastCommentSettled fetches the author's most recent comment on the
+// tension, re-fetching until no bare inline-paste tokens (`![](paste.png)`)
+// remain in the message — i.e. until in-flight /file/upload calls have
+// rewritten them to /file/<id> — or the attempt budget runs out. The message
+// itself is the ground truth, so no cross-process coordination is needed.
+// One baseline sleep precedes the first fetch so plain (non-inline)
+// attachments, which leave no token, also get a chance to land.
+func getLastCommentSettled(tid, username string) ([]map[string]any, error) {
+	interval := time.Duration(ViperPositiveInt("notify.upload_poll_interval_sec", 5)) * time.Second
+	attempts := ViperPositiveInt("notify.upload_poll_attempts", 10)
+	args := map[string]string{"tid": tid, "username": username}
+	time.Sleep(interval)
+	for i := 0; ; i++ {
+		m, err := db.GetDB().Meta("getLastComment", args)
+		if err != nil {
+			return nil, err
+		}
+		var msg string
+		if len(m) > 0 {
+			msg, _ = m[0]["message"].(string)
+		}
+		if i >= attempts || CountInlineImageCandidates(msg) == 0 {
+			return m, nil
+		}
+		time.Sleep(interval)
+	}
+}
+
 
 //
 // Publisher functions (Redis)
@@ -127,7 +157,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 	var type_ model.TensionType
 	var isClosed bool
 	if notif.HasEvent(model.TensionEventCreated) {
-		if t, err := db.GetDB().GetFieldById(notif.Tid, "Tension.type_ Tension.receiverid Tension.status"); err != nil {
+		if t, err := db.GetDB().GetByUid(notif.Tid, "Tension.type_ Tension.receiverid Tension.status"); err != nil {
 			return err
 		} else if t != nil {
 			tension := t.(model.JsonAtom)
@@ -171,9 +201,17 @@ func PushEventNotifications(notif model.EventNotif) error {
 			return err
 		}
 	}
-	// +
-	// Add mentions and **set tension data**
-	if m, err := db.GetDB().Meta("getLastComment", map[string]string{"tid": notif.Tid, "username": notif.Uctx.Username}); err != nil {
+	// Add mentions and **set tension data**. For events carrying a comment
+	// body, read it through the settle poll: in-flight /file/upload calls get
+	// a chance to rewrite bare `![](paste-N.png)` tokens into /file/<id>
+	// before the message (and Comment.files) is snapshotted for the email.
+	var m []map[string]any
+	if notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated) {
+		m, err = getLastCommentSettled(notif.Tid, notif.Uctx.Username)
+	} else {
+		m, err = db.GetDB().Meta("getLastComment", map[string]string{"tid": notif.Tid, "username": notif.Uctx.Username})
+	}
+	if err != nil {
 		return err
 	} else if len(m) > 0 {
 		notif.Rootnameid = m[0]["rootnameid"].(string)
@@ -210,7 +248,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 				return err
 			}
 			var org_name string
-			if x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name"); err != nil {
+			if x, err := db.GetDB().GetByEq("Node.nameid", notif.Receiverid, "Node.name"); err != nil {
 				return err
 			} else {
 				org_name = x.(string)
@@ -318,7 +356,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 		// The contract is created inside the tension or the node to be moved.
 		// But we also need to notify users in the target circle.
 		targetid := *notif.Contract.Event.New
-		x, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", targetid, "Node.source", "Blob.tension", "uid")
+		x, err := db.GetDB().GetByEq("Node.nameid", targetid, "Node.source", "Blob.tension", "uid")
 		if err != nil {
 			return err
 		}
@@ -334,7 +372,7 @@ func PushContractNotifications(notif model.ContractNotif) error {
 	// +
 	// Add Candidates
 	for _, c := range notif.Contract.Candidates {
-		if x, _ := db.GetDB().GetFieldByEq("User.username", c.Username, "User.name"); x != nil {
+		if x, _ := db.GetDB().GetByEq("User.username", c.Username, "User.name"); x != nil {
 			n := x.(string)
 			c.Name = &n
 		}
@@ -548,7 +586,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 		if err != nil {
 			return users, err
 		}
-		res, err := db.GetDB().GetSubFieldByEq("Node.nameid", nameid, "Node.first_link", auth.UserSelection)
+		res, err := db.GetDB().GetByEq("Node.nameid", nameid, "Node.first_link", auth.UserSelection)
 		if err != nil {
 			return users, err
 		}
@@ -564,7 +602,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 
 	if withAssignees {
 		// Get Assignees
-		res, err := db.GetDB().GetSubFieldById(tid, "Tension.assignees", auth.UserSelection)
+		res, err := db.GetDB().GetByUid(tid, "Tension.assignees", auth.UserSelection)
 		if err != nil {
 			return users, err
 		}
@@ -583,7 +621,7 @@ func GetUsersToNotify(tid string, withAssignees, withSubscribers, withPeers bool
 
 	if withSubscribers {
 		// Get Subscribers
-		res, err := db.GetDB().GetSubFieldById(tid, "Tension.subscribers", auth.UserSelection)
+		res, err := db.GetDB().GetByUid(tid, "Tension.subscribers", auth.UserSelection)
 		if err != nil {
 			return users, err
 		}
@@ -654,7 +692,7 @@ func UpdateWithMentionnedUser(msg string, receiverid string, users map[string]mo
 			if ex, _ := db.GetDB().Exists("Node.nameid", codec.MemberIdCodec(rootnameid, u), &filter); !ex {
 				continue
 			}
-			res, err := db.GetDB().GetFieldByEq("User.username", u, auth.UserSelection)
+			res, err := db.GetDB().GetByEq("User.username", u, auth.UserSelection)
 			if err != nil {
 				return err
 			}
@@ -692,7 +730,7 @@ func PushMentionedTension(notif model.EventNotif) error {
 	}
 
 	for _, tid := range FindTensions(msg) {
-		rid, err := db.GetDB().GetSubFieldById(tid, "Tension.receiver", "Node.rootnameid")
+		rid, err := db.GetDB().GetByUid(tid, "Tension.receiver", "Node.rootnameid")
 		if err != nil {
 			return err
 		}

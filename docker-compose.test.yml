@@ -5,6 +5,8 @@
 #   docker compose -f docker-compose.test.yml up -d --wait
 #   docker compose -f docker-compose.test.yml down -v --remove-orphans
 
+name: fractal6go-test
+
 services:
   zero-test:
     image: dgraph/dgraph:v22.0.2
@@ -52,3 +54,21 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  # S3-compatible object store for /file/* integration tests. MinIO is API-compatible
+  # with Garage (the production backend), so internal/storage/s3.go behaves identically.
+  minio-test:
+    image: minio/minio:latest
+    command: server /data --console-address ":9101"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9100:9000"
+      - "9101:9101"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s

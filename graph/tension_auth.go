@@ -186,8 +186,7 @@ func (em EventMap) checkTensionRestriction(uctx *model.UserCtx, tension *model.T
 		return ok, err
 	}
 
-	// Each member of the list is a OR RestrictValue,
-	// the list is an AND of the RestrictValue.
+	// Each member of the list is a OR RestrictValue, the list is an AND of the RestrictValue.
 	for _, restrict := range em.Restrict {
 		if restrict == NoRestriction {
 			continue
@@ -255,7 +254,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 		// Check guest right or membership
 		if auth.UserIsGuest(uctx, tension.Receiver.Nameid) >= 0 {
 			rid, _ := codec.Nid2rootid(tension.Receiver.Nameid)
-			r, err := db.GetDB().GetFieldByEq("Node.nameid", rid, "Node.guestCanCreateTension")
+			r, err := db.GetDB().GetByEq("Node.nameid", rid, "Node.guestCanCreateTension")
 			if err != nil {
 				return false, err
 			}
@@ -287,7 +286,7 @@ func (em EventMap) checkTensionAuth(uctx *model.UserCtx, tension *model.Tension,
 		// isAssigneeCheck: Check if the user is an assignee of the curent tension
 		// @debug: use checkAssignee function, but how to pass the context ?
 		var assignees []any
-		res, err := db.GetDB().GetSubFieldById(tension.ID, "Tension.assignees", "User.username")
+		res, err := db.GetDB().GetByUid(tension.ID, "Tension.assignees", "User.username")
 		if err != nil {
 			return false, err
 		}
@@ -401,7 +400,7 @@ func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
 	}
 
 	// Fetch tension target/Dual
-	tid2, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", nameidNew, "Node.source", "Blob.tension", "uid")
+	tid2, _ := db.GetDB().GetByEq("Node.nameid", nameidNew, "Node.source", "Blob.tension", "uid")
 	if tid2 == nil {
 		return false, nil, fmt.Errorf("tension source not found.")
 	}

@@ -51,6 +51,18 @@ func TimeDelta(d1, d2 string) time.Duration {
 	return date1.Sub(date2)
 }
 
+// ViperPositiveInt reads `key` from viper and returns it when > 0; falls back
+// to `fallback` for missing/zero/negative values. Centralises the
+// "config-with-sane-default" pattern used across the codebase (storage TTLs,
+// upload size caps, attachment caps, gate timings…).
+func ViperPositiveInt(key string, fallback int) int {
+	v := viper.GetInt(key)
+	if v <= 0 {
+		return fallback
+	}
+	return v
+}
+
 // InitViper Read the config file
 func InitViper() {
 	viper.AddConfigPath("./")

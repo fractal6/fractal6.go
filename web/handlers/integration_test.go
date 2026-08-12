@@ -24,6 +24,7 @@ package handlers_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -38,12 +39,19 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/internal/testutil"
 	"fractale/fractal6.go/web/auth"
 	"fractale/fractal6.go/web/email"
 	. "fractale/fractal6.go/web/handlers"
 	middle6 "fractale/fractal6.go/web/middleware"
 )
+
+// testStorageCli is the MinIO-backed storage client used by /file/* tests.
+// Set in TestMain and registered as the storage package global so the
+// cascade-delete async GC (deleteStorageKeysAsync) resolves to the same
+// backing.
+var testStorageCli *storage.Client
 
 // testRouter is the shared chi router used by all integration tests.
 var testRouter chi.Router
@@ -71,7 +79,33 @@ func TestMain(m *testing.M) {
 	// 4. Override email URL to use mock server
 	email.SetTestConfig(mockEmailServer.URL, "test-secret")
 
-	// 5. Build the test router
+	// 5. Storage client (MinIO from docker-compose.test.yml). Bucket is
+	// bootstrapped by cmd/testsetup; here we just construct the client and
+	// register it as the package global so non-handler callers (e.g.
+	// graph.RemoveComment) reuse the same backing.
+	cli, err := storage.New(storage.Config{
+		Endpoint:  testutil.MinioAddr,
+		Region:    "us-east-1",
+		Bucket:    testutil.TestBucket,
+		AccessKey: testutil.MinioAccessKey,
+		SecretKey: testutil.MinioSecretKey,
+		UseSSL:    false,
+	})
+	if err != nil {
+		log.Fatalf("storage.New: %v", err)
+	}
+	// Sanity-check connectivity so a misconfigured MinIO surfaces with a clear
+	// message rather than dozens of test failures.
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	if err := cli.EnsureBucket(ctx); err != nil {
+		cancel()
+		log.Fatalf("MinIO not ready (%v) — run 'make test-integration-up' first", err)
+	}
+	cancel()
+	testStorageCli = cli
+	storage.SetGlobal(cli)
+
+	// 6. Build the test router (uses testStorageCli for /file/* routes)
 	testRouter = buildTestRouter()
 
 	os.Exit(m.Run())
@@ -126,6 +160,13 @@ func buildTestRouter() chi.Router {
 			r.Post("/all", TensionsHandler("all"))
 			r.Post("/count", TensionsCount)
 		})
+	})
+
+	// File attachments — same wiring as cmd/server.go.
+	r.Route("/file", func(r chi.Router) {
+		r.Post("/upload", FileUploadHandler(testStorageCli))
+		r.Get("/{id}", FileGetHandler(testStorageCli))
+		r.Delete("/{id}", FileDeleteHandler(testStorageCli))
 	})
 
 	// Auth routes

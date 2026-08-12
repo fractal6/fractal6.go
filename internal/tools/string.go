@@ -99,6 +99,144 @@ func FindUsernames(msg string) []string {
 	return match
 }
 
+// InlineImageRe matches a markdown image token `![alt](url)` and captures
+// the URL portion. This is THE inline-paste matcher for the whole codebase:
+// the upload gate's Register count (here) and embedIfReferenced's rewrite +
+// Signal (web/handlers/files.go) both go through it, so the counts can never
+// diverge.
+var InlineImageRe = re.MustCompile(`!\[[^\]]*\]\(([^)\s]+)\)`)
+
+// CountInlineImageCandidates returns the number of `![alt](url)` references
+// in `msg` whose URL is a plausible inline-paste filename — no scheme, no
+// path separator, and not data:/cid:. Code regions are masked via
+// MaskCodeRegions so filenames mentioned in fenced/inline code do not count.
+//
+// Used by the tension resolver hooks (graph/tension_resolver.go) to
+// pre-Register the per-tension upload gate BEFORE PublishTensionEvent fires,
+// so the notifier daemon can wait for the matching /file/upload calls to
+// arrive before reading Comment.files.
+func CountInlineImageCandidates(msg string) int {
+	if msg == "" {
+		return 0
+	}
+	masked := MaskCodeRegions(msg)
+	matches := InlineImageRe.FindAllStringSubmatch(masked, -1)
+	n := 0
+	for _, m := range matches {
+		if len(m) < 2 {
+			continue
+		}
+		u := m[1]
+		if u == "" {
+			continue
+		}
+		// Reject any URL that carries a path separator or a scheme delimiter:
+		// only bare paste filenames qualify, matching rewriteMessageForFile.
+		if strings.ContainsAny(u, "/:") {
+			continue
+		}
+		n++
+	}
+	return n
+}
+
+// MaskCodeRegions replaces fenced (``` and ~~~) blocks and inline backtick
+// spans with same-length runs of spaces, so regex matches against the masked
+// string have offsets that line up with the original. Filenames mentioned
+// inside code are thereby invisible to matchers.
+//
+// Triple-fence detection is line-anchored. Inline backticks span until the
+// next backtick on the same line; mismatched ticks degrade to no-mask
+// (acceptable: the user gets best-effort behaviour, not a security gate).
+func MaskCodeRegions(s string) string {
+	out := []byte(s)
+	n := len(out)
+
+	// Fenced blocks first.
+	mask := func(from, to int) {
+		for i := from; i < to && i < n; i++ {
+			if out[i] != '\n' {
+				out[i] = ' '
+			}
+		}
+	}
+	for _, fence := range []string{"```", "~~~"} {
+		i := 0
+		for {
+			start := indexAfterNewline(out, i, fence)
+			if start < 0 {
+				break
+			}
+			// Find end of opening fence line.
+			lineEnd := indexByte(out, start, '\n')
+			if lineEnd < 0 {
+				lineEnd = n
+			}
+			// Find matching closing fence at start of a line.
+			end := indexAfterNewline(out, lineEnd+1, fence)
+			if end < 0 {
+				// Unclosed fence: mask through EOF.
+				mask(start, n)
+				break
+			}
+			closeLineEnd := indexByte(out, end, '\n')
+			if closeLineEnd < 0 {
+				closeLineEnd = n
+			}
+			mask(start, closeLineEnd)
+			i = closeLineEnd
+		}
+	}
+
+	// Inline backticks (single-line spans).
+	for i := 0; i < n; i++ {
+		if out[i] != '`' {
+			continue
+		}
+		// Find closing backtick on the same line.
+		end := -1
+		for j := i + 1; j < n; j++ {
+			if out[j] == '\n' {
+				break
+			}
+			if out[j] == '`' {
+				end = j
+				break
+			}
+		}
+		if end < 0 {
+			continue
+		}
+		mask(i, end+1)
+		i = end
+	}
+	return string(out)
+}
+
+// indexByte returns the index of the first occurrence of c at or after start; -1 if none.
+func indexByte(b []byte, start int, c byte) int {
+	for i := start; i < len(b); i++ {
+		if b[i] == c {
+			return i
+		}
+	}
+	return -1
+}
+
+// indexAfterNewline returns the index of `needle` if it appears at the start
+// of a line (or at the start of the buffer) at or after start; -1 if none.
+func indexAfterNewline(b []byte, start int, needle string) int {
+	for i := start; i+len(needle) <= len(b); i++ {
+		if string(b[i:i+len(needle)]) != needle {
+			continue
+		}
+		if i == 0 || b[i-1] == '\n' {
+			return i
+		}
+	}
+	return -1
+}
+
 func FindTensions(msg string) []string {
 	r := re.MustCompile(`(^|\s|[^\w\[])(0x[0-9a-f]+)\b`)
 	all := r.FindAllStringSubmatch(msg, -1)
@@ -115,12 +253,15 @@ func FindTensions(msg string) []string {
 // be real reply text when the client didn't break the line. The line must
 // end with ":" (typical header terminator), with optional content between
 // the keyword and the colon (e.g. DE "schrieb Alice <a@b>:").
-var reEmailQuoteHeader = re.MustCompile(`(?im)^(.*?)(?:` +
+var reEmailQuoteHeader = re.MustCompile(`(?im)^(.*?)(?:(?:` +
 	`On\s[^\n]{1,300}?wrote` + // EN: "On Mon, 27 Mar 2026, Alice wrote:"
 	`|Le\s[^\n]{1,300}?a\s+[eé]crit` + // FR: "Le lun. ... a écrit :"
 	`|Am\s[^\n]{1,300}?schrieb` + // DE: "Am 27.03.2026 schrieb Alice:"
 	`|El\s[^\n]{1,300}?escribi[oó]` + // ES: "El lun., 27 mar. ... escribió:"
-	`)[^\n]*:\s*$`)
+	`)[^\n]*:` +
+	// Outlook divider: "-----Original Message-----" and localized variants.
+	`|-{2,}\s*(?:Original Message|Message d'origine|Urspr[uü]ngliche Nachricht|Mensaje original)\s*-{2,}` +
+	`)\s*$`)
 
 // reEmailSignature matches the standard "-- " signature delimiter.
 var reEmailSignature = re.MustCompile(`^--\s*$`)
@@ -249,12 +390,23 @@ func stripEmailQuote(msg string) string {
 		}
 	}
 
-	// Case 2: quote at the end — everything after the last header is blank/">".
+	// Case 2: quote at the end — everything after the last header is blank/">",
+	// or fully unquoted (client stripped ">" markers). If any ">" line exists
+	// below, unmarked text is real reply text and the message is kept.
+	// ponytail: unquoted bottom-posted replies under a header get eaten; no marker to tell them apart.
 	last := hits[len(hits)-1]
+	anyQuoteMark := false
+	allQuoted := true
 	for i := last.line + 1; i < len(lines); i++ {
-		if !isQuoteOrBlank(lines[i]) {
-			return msg
+		t := strings.TrimSpace(lines[i])
+		if strings.HasPrefix(t, ">") {
+			anyQuoteMark = true
+		} else if t != "" {
+			allQuoted = false
 		}
+	}
+	if !allQuoted && anyQuoteMark {
+		return msg
 	}
 	kept := truncateAtQuoteHeader(lines, last.line, last.prefix)
 	return keepOrFallback(strings.Join(kept, "\n"), msg)

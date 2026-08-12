@@ -198,7 +198,7 @@ func SetUserCanJoin(w http.ResponseWriter, r *http.Request) {
 
 	// Maybe Update the circle visibility if userCanJoin is set to True
 	if form.Val {
-		visibility, err := db.GetDB().GetFieldByEq("Node.nameid", nameid, "Node.visibility")
+		visibility, err := db.GetDB().GetByEq("Node.nameid", nameid, "Node.visibility")
 		visibilityPublic := string(model.NodeVisibilityPublic)
 		if err != nil {
 			http.Error(w, err.Error(), 500)

@@ -24,6 +24,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"strings"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 
@@ -31,13 +34,39 @@ import (
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/internal/tools"
+	"fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
 )
 
-var FieldAuthorizationFunc map[string]func(context.Context, any, graphql.Resolver, *string, []model.TensionEvent, *int) (any, error)
+//
+// Input directives — @x_* (authorization) and @w_* (transformation)
+//
+// Both families share the same shape: the directive entrypoint dispatches
+// to a named rule/action via a string key (`r:` for @x_*, `a:` for @w_*).
+// Adding a new rule/transform is a one-line addition to the registries.
+//
+// Wiring lives in graph/resolver.go::Init().
+//
+
+// xRule is the signature of every @x_* rule. It receives the directive's
+// optional `f` (field selector), `e` (event filter) and `n` (numeric param).
+type xRule func(context.Context, any, graphql.Resolver, *string, []model.TensionEvent, *int) (any, error)
+
+// wTransform is the signature of every @w_* action. The action runs the
+// resolver and post-processes the produced value.
+type wTransform func(context.Context, graphql.Resolver) (any, error)
+
+// FieldAuthorizationFunc is the registry of @x_* rules, indexed by the `r:`
+// argument in the SDL. Each entry is a pure check — auth context, ownership,
+// shape, length, etc.
+var FieldAuthorizationFunc map[string]xRule
+
+// FieldTransformFunc is the registry of @w_* actions, indexed by the `a:`
+// argument in the SDL.
+var FieldTransformFunc map[string]wTransform
 
 func init() {
-	FieldAuthorizationFunc = map[string]func(context.Context, any, graphql.Resolver, *string, []model.TensionEvent, *int) (any, error){
+	FieldAuthorizationFunc = map[string]xRule{
 		"isOwner":          isOwner,
 		"unique":           unique,
 		"oneByOne":         oneByOne,
@@ -48,7 +77,123 @@ func init() {
 		"maxLen":           maxLength,
 		"json":             validJSON,
 	}
+	FieldTransformFunc = map[string]wTransform{
+		"lower": lower,
+		"now":   now,
+	}
 }
+
+//
+// Directive entrypoints
+//
+
+// FieldAuthorization is the @x_* directive entrypoint. The directive may
+// appear without a rule (no-op pass-through) or carry a rule name to dispatch.
+func FieldAuthorization(ctx context.Context, obj any, next graphql.Resolver, r *string, f *string, e []model.TensionEvent, n *int) (any, error) {
+	// If the directives exists withtout a rule, it pass through.
+	if r == nil {
+		return next(ctx)
+	}
+
+	// @TODO: Seperate function for Set and Remove + test if the input comply with the directives
+
+	if fun := FieldAuthorizationFunc[*r]; fun != nil {
+		return fun(ctx, obj, next, f, e, n)
+	}
+	return nil, LogErr("directive error", fmt.Errorf("unknown rule '%s'", *r))
+}
+
+// FieldTransform is the @w_* directive entrypoint.
+func FieldTransform(ctx context.Context, obj any, next graphql.Resolver, a string) (any, error) {
+	if fun := FieldTransformFunc[a]; fun != nil {
+		return fun(ctx, next)
+	}
+	return nil, LogErr("directive error", fmt.Errorf("unknown function '%s'", a))
+}
+
+//
+// Hook input directives — populate context for downstream @x_*/@w_* rules.
+//
+
+// setContextWithID hoists the standard identifier fields from the mutation
+// input into the request context so subsequent directives (e.g. @isOwner,
+// @unique) can read them without re-walking the args tree.
+func setContextWithID(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
+	var err error
+	for _, n := range []string{"id", "nameid", "rootnameid", "username"} {
+		ctx, _, err = setContextWith(ctx, obj, n)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return next(ctx)
+}
+
+// setUpdateContextInfo flags whether the update payload uses set/remove and
+// stashes the target id, both required by @hasEvent and @isOwner.
+func setUpdateContextInfo(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
+	hasSet := obj.(model.JsonAtom)["set"] != nil
+	hasRemove := obj.(model.JsonAtom)["remove"] != nil
+	ctx = context.WithValue(ctx, "hasSet", hasSet)
+	ctx = context.WithValue(ctx, "hasRemove", hasRemove)
+	ctx, _, err := setContextWith(ctx, obj, "id")
+	if err != nil {
+		return nil, err
+	}
+	return next(ctx)
+}
+
+// meta_patch is the @w_meta_patch input-field directive: it stages function
+// name + (optional) parameter key/value into Redis so the matching update
+// hook can pick them up. See User.markAllAsRead for the canonical use.
+func meta_patch(ctx context.Context, obj any, next graphql.Resolver, f string, k *string) (any, error) {
+	uctx := auth.GetUserContextOrEmpty(ctx)
+	// @FIX this hack ! Redis push ?
+	var ok bool
+	var v string
+	// Set function
+	key := uctx.Username + "meta_patch_f"
+	err := cache.SetEX(ctx, key, f, time.Second*5).Err()
+	if err != nil {
+		return nil, err
+	}
+	if k != nil {
+		// Set attribute name
+		if v, ok = ctx.Value(*k).(string); !ok {
+			o := reflect.ValueOf(obj).Elem().FieldByName(ToGoNameFormat(*k))
+			if !o.IsValid() {
+				rc := graphql.GetResolverContext(ctx)
+				fieldName := rc.Field.Name
+				return nil, fmt.Errorf("'%s' field on '%s' seems not valid or unknown", *k, fieldName)
+			}
+			v = o.String()
+		}
+		if v == "" {
+			rc := graphql.GetResolverContext(ctx)
+			fieldName := rc.Field.Name
+			err := fmt.Errorf("'%s' field is needed to query '%s'", *k, fieldName)
+			return nil, err
+		}
+
+		key = uctx.Username + "meta_patch_k"
+		err := cache.SetEX(ctx, key, *k, time.Second*5).Err()
+		if err != nil {
+			return nil, err
+		}
+
+		// Set attribute value
+		key = uctx.Username + "meta_patch_v"
+		err = cache.SetEX(ctx, key, v, time.Second*5).Err()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return next(ctx)
+}
+
+//
+// @x_* rule implementations
+//
 
 // isOwner Check that object is own by the user.
 // If user(u) field is empty, assume a user object, else field should match the user(u) credential.
@@ -111,7 +256,7 @@ func unique(ctx context.Context, obj any, next graphql.Resolver, f *string, e []
 			// *f is present in the inut
 			// pass
 		} else if ctx.Value("id") != nil {
-			s, err = db.GetDB().GetFieldById(ctx.Value("id").(string), filterName)
+			s, err = db.GetDB().GetByUid(ctx.Value("id").(string), filterName)
 			if err != nil || s == nil {
 				return nil, LogErr("Internal error", err)
 			}
@@ -222,7 +367,7 @@ func tensionTypeCheck(ctx context.Context, obj any, next graphql.Resolver, f *st
 		if v := obj.(model.JsonAtom)["receiverid"]; v != nil {
 			receiverid = v.(string)
 		} else if ctx.Value("id") != nil {
-			x, err := db.GetDB().GetFieldById(ctx.Value("id").(string), "Tension.receiverid")
+			x, err := db.GetDB().GetByUid(ctx.Value("id").(string), "Tension.receiverid")
 			if err != nil || x == nil {
 				return nil, LogErr("Internal error", err)
 			}
@@ -296,7 +441,7 @@ func ref(ctx context.Context, obj any, next graphql.Resolver, f *string, e []mod
 	return nil, fmt.Errorf("ref: only referecence allowed for: %s", field)
 }
 
-// inputMinLength the that the size of the field is stricly lesser than the given value
+// minLength rejects values whose length is strictly less than n.
 func minLength(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	var l int
 	data, err := next(ctx)
@@ -354,7 +499,7 @@ func validJSON(ctx context.Context, obj any, next graphql.Resolver, f *string, e
 	return data, nil
 }
 
-// inputMaxLength the that the size of the field is stricly greater than the given value
+// maxLength rejects values whose length is strictly greater than n.
 func maxLength(ctx context.Context, obj any, next graphql.Resolver, f *string, e []model.TensionEvent, n *int) (any, error) {
 	var l int
 	data, err := next(ctx)
@@ -378,12 +523,82 @@ func maxLength(ctx context.Context, obj any, next graphql.Resolver, f *string, e
 	return data, err
 }
 
-////////////////////////////////////////////////
+//
+// @w_* transform implementations
+//
+
+// need https://github.com/golang/go/issues/51977
+//type StringEqFilter interface {
+//    model.StringExactFilter |
+//    model.StringHashFilter |
+//    model.StringHashFilterStringRegExpFilter |
+//    model.StringHashFilterStringTermFilter
+//    //SetEq(s string)
+//}
+
+func lower(ctx context.Context, next graphql.Resolver) (any, error) {
+	data, err := next(ctx)
+	switch d := data.(type) {
+	case *string:
+		v := strings.ToLower(*d)
+		return &v, err
+	case string:
+		v := strings.ToLower(d)
+		return v, err
+	case *model.StringExactFilter:
+		v := *d
+		if v.Eq != nil {
+			s := strings.ToLower(*v.Eq)
+			v.Eq = &s
+		}
+		return &v, err
+	case *model.StringHashFilter:
+		v := *d
+		if v.Eq != nil {
+			s := strings.ToLower(*v.Eq)
+			v.Eq = &s
+		}
+		return &v, err
+	case *model.StringHashFilterStringRegExpFilter:
+		v := *d
+		if v.Eq != nil {
+			s := strings.ToLower(*v.Eq)
+			v.Eq = &s
+		}
+		return &v, err
+	case *model.StringHashFilterStringTermFilter:
+		v := *d
+		if v.Eq != nil {
+			s := strings.ToLower(*v.Eq)
+			v.Eq = &s
+		}
+		return &v, err
+	}
+	field := *graphql.GetPathContext(ctx).Field
+	return nil, fmt.Errorf("Type unknwown for field %s", field)
+}
+
+func now(ctx context.Context, next graphql.Resolver) (any, error) {
+	data, err := next(ctx)
+	now := tools.Now()
+	switch data.(type) {
+	case *string:
+		return &now, err
+	case string:
+		return now, err
+	}
+	field := *graphql.GetPathContext(ctx).Field
+	return nil, fmt.Errorf("Type unknwown for field %s", field)
+}
+
+//
 // Auth utility functions
 // * (could be done in Dgraph Lambda ?)
-////////////////////////////////////////////////
+//
 
-// Check if an user owns the given object
+// CheckUserOwnership returns true when uctx owns the parent object via the
+// named user field. Falls back to a Dgraph lookup when the input only carries
+// the parent uid (id was previously stashed by setContextWithID).
 func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField string, userObj any) (bool, error) {
 	// Get user ID
 	var username string
@@ -397,7 +612,7 @@ func CheckUserOwnership(ctx context.Context, uctx *model.UserCtx, userField stri
 		}
 		// Request the database to get the field
 		// @DEBUG: in the dgraph graphql schema, @createdBy is in the Post interface: ToTypeName(reflect.TypeOf(nodeObj).String())
-		username_, err := db.GetDB().GetSubFieldById(id.(string), "Post."+userField, "User.username")
+		username_, err := db.GetDB().GetByUid(id.(string), "Post."+userField, "User.username")
 		if err != nil {
 			return false, err
 		}

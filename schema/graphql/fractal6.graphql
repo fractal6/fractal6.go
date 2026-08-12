@@ -142,6 +142,10 @@ type Node @auth(
   events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
   activity(from: String, to: String): [Activity!] @meta(f:"getNodeActivity", k:["rootnameid"])
 
+  # Org avatar (root nodes only by convention) — replace-on-upload via
+  # REST /file/upload?orgaid=… Visibility follows the node's @auth.
+  avatar: File @x_ro @hasInverse(field: node)
+
   # Dgraph directive
   cascade_directive: Boolean
 }
@@ -388,6 +392,38 @@ type Comment implements Post @auth(
 ) @hook_ {
   message: String! @search(by: [fulltext]) @x_alter
   reactions: [Reaction!] @hasInverse(field: comment)
+  # File attachments. Read-only via GraphQL; bytes are served by REST /file/<id>
+  # which re-checks the parent comment's tension visibility.
+  # Uploads/deletes go through REST /file (POST/DELETE) too — never via GraphQL.
+  files: [File!] @hasInverse(field: comment) @x_ro
+}
+
+# File metadata for assets stored in S3-compatible storage (Garage/MinIO).
+# Anchor-polymorphic: exactly one of `comment`, `user`, `node` is set per file.
+# `tension` is a denormalised auth-scope shortcut that is always co-set with
+# `comment` (it's never a navigable graph edge from Tension — there is no
+# Tension.files inverse). See docs/file-storage.md.
+type File @auth(
+  add: <<is-root>>,
+  update: <<is-root>>,
+  delete: <<is-root>>
+) {
+  id: ID!
+  createdBy: User!
+  createdAt: DateTime! @search
+  filename: String!
+  contentType: String!
+  size: Int!
+  storageKey: String! @id # S3 object key, e.g. "comments/<cid>/<uuid>-<safe-name>"
+
+  # Anchor — exactly one of the three groups below is set per file.
+  comment: Comment           # comment attachment
+  tension: Tension           # denormalised parent tension uid (always co-set with comment)
+  user: User                 # user avatar
+  node: Node                 # node (root org) avatar — not enforced root-only yet
+
+  # True if referenced inline in comment.message (![alt](/file/<id>)).
+  embedded: Boolean
 }
 
 type Reaction @auth(
@@ -517,6 +553,9 @@ type User @auth(
   # Aggregators
   event_count: EventCount @meta(f:"getEventCount", k:["username"])
   activity(from: String, to: String): [Activity!] @meta(f:"getUserActivity", k:["username"])
+
+  # Public profile avatar — replace-on-upload via REST /file/upload?userid=…
+  avatar: File @x_ro @hasInverse(field: user)
 }
 
 type PendingUser {

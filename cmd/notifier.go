@@ -45,10 +45,12 @@ var cache *redis.Client = redis.NewClient(&redis.Options{
 var ctx = context.Background()
 
 func RunNotifier() {
-	// Test connection
+	// Redis is fatal here: the daemon has nothing to consume without it.
 	if _, err := cache.Ping(ctx).Result(); err != nil {
 		log.Fatal("redis error: ", err)
 	}
+	// Storage must be initialised here too: email attachments read storage.Global().
+	checkServices(initStorage())
 
 	// Init Suscribe channel
 	// Queuing limit, and concurency see:

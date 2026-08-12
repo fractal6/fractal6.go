@@ -74,13 +74,13 @@ func MakeOwner(w http.ResponseWriter, r *http.Request) {
 	// Send a notification to the new owner.
 	var orgName string
 	var anchorTid string
-	if x, err := db.GetDB().GetFieldByEq("Node.nameid", form.Nameid, "Node.name"); err != nil {
+	if x, err := db.GetDB().GetByEq("Node.nameid", form.Nameid, "Node.name"); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	} else {
 		orgName = x.(string)
 	}
-	if x, err := db.GetDB().GetSubSubFieldByEq("Node.nameid", form.Nameid, "Node.source", "Blob.tension", "uid"); err != nil {
+	if x, err := db.GetDB().GetByEq("Node.nameid", form.Nameid, "Node.source", "Blob.tension", "uid"); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	} else {

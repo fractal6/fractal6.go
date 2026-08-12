@@ -59,6 +59,16 @@ func TestCheckProjectAuth_NonExistentProject(t *testing.T) {
 	_ = err
 }
 
+// TestCheckProjectAuth_EmptyProjectid verifies an empty projectid is rejected upfront.
+func TestCheckProjectAuth_EmptyProjectid(t *testing.T) {
+	uctx := &model.UserCtx{Username: testutil.TestUser}
+
+	ok, err := auth.CheckProjectAuth(uctx, "")
+	if err == nil || ok {
+		t.Errorf("expected error for empty projectid, got ok=%v err=%v", ok, err)
+	}
+}
+
 // TestHasCoordoAuth_NonExistentNode verifies that HasCoordoAuth returns an
 // error (not a panic) when called with a non-existent node nameid.
 func TestHasCoordoAuth_NonExistentNode(t *testing.T) {

@@ -79,7 +79,7 @@ func RunServer() {
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
 	cors := cors.New(cors.Options{
 		AllowedOrigins: allowedOrigins,
-		// AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		// AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		// ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
@@ -113,7 +113,7 @@ func RunServer() {
 			}
 		}()
 		secured := r.Group(nil)
-		secured.Use(middle6.CheckBearer)
+		secured.Use(middle6.CheckBearerProm)
 		// secured.Handle("/metrics", promhttp.Handler()) // inclue Go collection metrics
 		secured.Handle("/metrics", handle6.InstruHandler())
 	}
@@ -200,6 +200,23 @@ func RunServer() {
 				r.Post("/all", handle6.TensionsHandler("all"))
 				r.Post("/count", handle6.TensionsCount)
 			})
+		})
+	})
+
+	// File attachments (S3-backed). See docs/file-storage.md.
+	// /file/<id>            : auth-checked 302 to a presigned URL (read)
+	// POST /file/upload     : multipart upload, comment-author only
+	// DELETE /file/<id>     : comment-author only
+	//
+	// Storage is optional: handlers receive nil and respond 503 when [storage]
+	// is unset. See checkServices in cmd/health.go for the startup healthchecks.
+	storageCli := initStorage()
+	checkServices(storageCli)
+	r.Group(func(r chi.Router) {
+		r.Route("/file", func(r chi.Router) {
+			r.Post("/upload", handle6.FileUploadHandler(storageCli))
+			r.Get("/{id}", handle6.FileGetHandler(storageCli))
+			r.Delete("/{id}", handle6.FileDeleteHandler(storageCli))
 		})
 	})
 

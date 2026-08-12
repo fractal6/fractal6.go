@@ -28,8 +28,7 @@ import (
 // General
 //
 
-// JsonAtom is a general interface
-// for decoding unknonw structure
+// JsonAtom is a general interface for decoding unknown structure
 type JsonAtom = map[string]any
 
 //

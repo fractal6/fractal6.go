@@ -45,7 +45,7 @@ Major improvement opportunities identified across the fractal6.go codebase, orde
 
 **Recommendation:**
 - Add integration tests for the tension event pipeline (`TensionEventHook`, `ProcessEvent`)
-- Add unit tests for `FieldAuthorization.go` rule functions (`isOwner`, `unique`, `oneByOne`, etc.)
+- Extend unit coverage of `xw_directive.go` rule functions beyond the registry/dispatch checks already in `xw_directive_test.go` (`isOwner`, `unique`, `hasEvent`, `tensionTypeCheck` — all need a richer graphql/Dgraph fixture).
 - Add unit tests for `tension_auth.go` authorization hook checks
 - Add tests for DQL template rendering (ensure `{{.nameid}}` substitution works correctly)
 - Add tests for `codec/` encoding/decoding functions

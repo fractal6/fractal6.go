@@ -518,7 +518,7 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 			return ok, err
 		}
 		nid := codec.MemberIdCodec(rootid, *event.Old)
-		n, err := db.GetDB().GetFieldByEq("Node.nameid", nid, "Node.name Node.nameid Node.type_ Node.role_type")
+		n, err := db.GetDB().GetByEq("Node.nameid", nid, "Node.name Node.nameid Node.type_ Node.role_type")
 		if err != nil {
 			return ok, err
 		}
@@ -734,7 +734,7 @@ func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
 	cid := *event.Old
 
 	// Check that the user is the author of the comment
-	res, err := db.GetDB().GetSubFieldById(cid, "Post.createdBy", "User.username")
+	res, err := db.GetDB().GetByUid(cid, "Post.createdBy", "User.username")
 	if err != nil {
 		return false, err
 	}
@@ -742,9 +742,10 @@ func RemoveComment(uctx *model.UserCtx, tension *model.Tension, event *model.Eve
 		return false, LogErr("Access denied", fmt.Errorf("Only the author of the comment can delete it."))
 	}
 
-	// Delete comment
-	_, err = db.GetDB().Meta("deleteComment", map[string]string{"tid": tid, "cid": cid})
-	return true, err
+	if err := db.GetDB().DeleteCommentDeep(tid, cid); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 //

@@ -193,6 +193,7 @@ type Node {
   contracts(filter: VoteFilter, order: VoteOrder, first: Int, offset: Int): [Vote!]
   events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
   activity(from: String, to: String): [Activity!] @meta(f:"getNodeActivity", k:["rootnameid"])
+  avatar(filter: FileFilter): File
   cascade_directive: Boolean
 
   tensions_outAggregate(filter: TensionFilter): TensionAggregateResult
@@ -433,12 +434,29 @@ type Tension {
 type Comment {
   message: String!
   reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
+  files(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File!]
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
   updatedAt: DateTime
 
   reactionsAggregate(filter: ReactionFilter): ReactionAggregateResult
+  filesAggregate(filter: FileFilter): FileAggregateResult
+}
+
+type File {
+  id: ID!
+  createdBy(filter: UserFilter): User!
+  createdAt: DateTime!
+  filename: String!
+  contentType: String!
+  size: Int!
+  storageKey: String!
+  comment(filter: CommentFilter): Comment
+  tension(filter: TensionFilter): Tension
+  user(filter: UserFilter): User
+  node(filter: NodeFilter): Node
+  embedded: Boolean
 }
 
 type Reaction {
@@ -545,6 +563,7 @@ type User {
   markAllAsRead: String
   event_count(filter: EventCountFilter): EventCount @meta(f:"getEventCount", k:["username"])
   activity(from: String, to: String): [Activity!] @meta(f:"getUserActivity", k:["username"])
+  avatar(filter: FileFilter): File
 
   subscriptionsAggregate(filter: TensionFilter): TensionAggregateResult
   watchingAggregate(filter: NodeFilter): NodeAggregateResult
@@ -777,19 +796,19 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @id on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
 directive @cacheControl(maxAge: Int!) on QUERY
 
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @lambda on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
@@ -797,15 +816,15 @@ directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @id on FIELD_DEFINITION
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @cascade(fields: [String]) on FIELD
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 type ActivityAggregateResult {
   count: Int
@@ -912,6 +931,7 @@ input AddCommentInput {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   reactions: [ReactionRef!]
+  files: [FileRef!]
 }
 
 type AddCommentPayload {
@@ -978,6 +998,25 @@ input AddEventInput {
 
 type AddEventPayload {
   event(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event]
+  numUids: Int
+}
+
+input AddFileInput {
+  createdBy: UserRef!
+  createdAt: DateTime!
+  filename: String!
+  contentType: String!
+  size: Int!
+  storageKey: String!
+  comment: CommentRef
+  tension: TensionRef
+  user: UserRef
+  node: NodeRef
+  embedded: Boolean
+}
+
+type AddFilePayload {
+  file(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File]
   numUids: Int
 }
 
@@ -1067,6 +1106,7 @@ input AddNodeInput {
   contracts: [VoteRef!]
   events_history: [EventRef!]
   activity: [ActivityRef!]
+  avatar: FileRef
   cascade_directive: Boolean
 }
 
@@ -1325,6 +1365,7 @@ input AddUserInput {
   markAllAsRead: String
   event_count: EventCountRef
   activity: [ActivityRef!]
+  avatar: FileRef
 }
 
 type AddUserPayload {
@@ -1541,6 +1582,7 @@ enum CommentHasFilter {
   updatedAt
   message
   reactions
+  files
 }
 
 input CommentOrder {
@@ -1561,6 +1603,7 @@ input CommentPatch {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   reactions: [ReactionRef!] @x_patch_ro
+  files: [FileRef!] @x_ro
 }
 
 input CommentRef {
@@ -1570,6 +1613,7 @@ input CommentRef {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String
   reactions: [ReactionRef!]
+  files: [FileRef!] @x_ro
 }
 
 input ContainsFilter {
@@ -1756,6 +1800,12 @@ type DeleteEventFragmentPayload {
 
 type DeleteEventPayload {
   event(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event]
+  msg: String
+  numUids: Int
+}
+
+type DeleteFilePayload {
+  file(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File]
   msg: String
   numUids: Int
 }
@@ -2111,6 +2161,88 @@ input EventRef {
   new: String
 }
 
+type FileAggregateResult {
+  count: Int
+  createdAtMin: DateTime
+  createdAtMax: DateTime
+  filenameMin: String
+  filenameMax: String
+  contentTypeMin: String
+  contentTypeMax: String
+  sizeMin: Int
+  sizeMax: Int
+  sizeSum: Int
+  sizeAvg: Float
+  storageKeyMin: String
+  storageKeyMax: String
+}
+
+input FileFilter {
+  id: [ID!]
+  createdAt: DateTimeFilter
+  storageKey: StringHashFilter
+  has: [FileHasFilter]
+  and: [FileFilter]
+  or: [FileFilter]
+  not: FileFilter
+}
+
+enum FileHasFilter {
+  createdBy
+  createdAt
+  filename
+  contentType
+  size
+  storageKey
+  comment
+  tension
+  user
+  node
+  embedded
+}
+
+input FileOrder {
+  asc: FileOrderable
+  desc: FileOrderable
+  then: FileOrder
+}
+
+enum FileOrderable {
+  createdAt
+  filename
+  contentType
+  size
+  storageKey
+}
+
+input FilePatch {
+  createdBy: UserRef @x_patch_ro
+  createdAt: DateTime @x_patch_ro
+  filename: String @x_patch_ro
+  contentType: String @x_patch_ro
+  size: Int @x_patch_ro
+  comment: CommentRef @x_patch_ro
+  tension: TensionRef @x_patch_ro
+  user: UserRef @x_patch_ro
+  node: NodeRef @x_patch_ro
+  embedded: Boolean @x_patch_ro
+}
+
+input FileRef {
+  id: ID
+  createdBy: UserRef
+  createdAt: DateTime
+  filename: String
+  contentType: String
+  size: Int
+  storageKey: String
+  comment: CommentRef
+  tension: TensionRef
+  user: UserRef
+  node: NodeRef
+  embedded: Boolean
+}
+
 input FloatFilter {
   eq: Float
   in: [Float]
@@ -2367,6 +2499,9 @@ type Mutation {
   addComment(input: [AddCommentInput!]! @hook_addCommentInput): AddCommentPayload @hook_addComment
   updateComment(input: UpdateCommentInput! @hook_updateCommentInput): UpdateCommentPayload @hook_updateComment
   deleteComment(filter: CommentFilter! @hook_deleteCommentInput): DeleteCommentPayload @hook_deleteComment
+  addFile(input: [AddFileInput!]!, upsert: Boolean): AddFilePayload
+  updateFile(input: UpdateFileInput!): UpdateFilePayload
+  deleteFile(filter: FileFilter!): DeleteFilePayload
   addReaction(input: [AddReactionInput!]! @hook_addReactionInput, upsert: Boolean): AddReactionPayload @hook_addReaction
   updateReaction(input: UpdateReactionInput! @hook_updateReactionInput): UpdateReactionPayload @hook_updateReaction
   deleteReaction(filter: ReactionFilter! @hook_deleteReactionInput): DeleteReactionPayload @hook_deleteReaction
@@ -2583,6 +2718,7 @@ enum NodeHasFilter {
   contracts
   events_history
   activity
+  avatar
   cascade_directive
 }
 
@@ -2648,6 +2784,7 @@ input NodePatch {
   contracts: [VoteRef!] @x_patch_ro
   events_history: [EventRef!] @x_patch_ro
   activity: [ActivityRef!] @x_patch_ro
+  avatar: FileRef @x_ro
   cascade_directive: Boolean @x_patch_ro
 }
 
@@ -2692,6 +2829,7 @@ input NodeRef {
   contracts: [VoteRef!]
   events_history: [EventRef!]
   activity: [ActivityRef!]
+  avatar: FileRef @x_ro
   cascade_directive: Boolean
 }
 
@@ -3427,6 +3565,9 @@ type Query {
   getComment(id: ID!): Comment
   queryComment(filter: CommentFilter @hook_queryCommentInput, order: CommentOrder, first: Int, offset: Int): [Comment]
   aggregateComment(filter: CommentFilter): CommentAggregateResult
+  getFile(id: ID, storageKey: String): File
+  queryFile(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File]
+  aggregateFile(filter: FileFilter): FileAggregateResult
   getReaction(id: ID, reactionid: String): Reaction
   queryReaction(filter: ReactionFilter @hook_queryReactionInput, order: ReactionOrder, first: Int, offset: Int): [Reaction]
   aggregateReaction(filter: ReactionFilter): ReactionAggregateResult
@@ -3945,6 +4086,17 @@ type UpdateEventPayload {
   numUids: Int
 }
 
+input UpdateFileInput {
+  filter: FileFilter!
+  set: FilePatch
+  remove: FilePatch
+}
+
+type UpdateFilePayload {
+  file(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File]
+  numUids: Int
+}
+
 input UpdateLabelInput {
   filter: LabelFilter!
   set: LabelPatch
@@ -4296,6 +4448,7 @@ enum UserHasFilter {
   markAllAsRead
   event_count
   activity
+  avatar
 }
 
 input UserOrder {
@@ -4341,6 +4494,7 @@ input UserPatch {
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username")
   event_count: EventCountRef @x_patch_ro
   activity: [ActivityRef!] @x_patch_ro
+  avatar: FileRef @x_ro
 }
 
 input UserRef {
@@ -4370,6 +4524,7 @@ input UserRef {
   markAllAsRead: String @w_meta_patch(f:"markAllAsRead", k:"username")
   event_count: EventCountRef
   activity: [ActivityRef!]
+  avatar: FileRef @x_ro
 }
 
 type UserRightsAggregateResult {

@@ -1,0 +1,57 @@
+# Docker Compose for local development.
+# Single-node Garage S3-compatible store — same backend the production Ansible
+# role provisions (contrib/ansible/roles/garage/), so /file/* code paths
+# exercise the real implementation.
+#
+# `--single-node --default-bucket` (Garage v2.3+) auto-assigns the cluster
+# layout and creates the bucket + access key from the GARAGE_DEFAULT_* env
+# vars below. No bootstrap sidecar needed.
+#
+# Usage:
+#   docker compose -f docker-compose.dev.yml up -d --wait
+#   docker compose -f docker-compose.dev.yml down -v --remove-orphans
+#
+# config.toml [storage] for this instance:
+#   endpoint    = "127.0.0.1:3900"
+#   region      = "garage"
+#   bucket      = "fractale-storage"
+#   access_key  = "GKdeadbeefdeadbeefdeadbeefdeadbeef"
+#   secret_key  = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+#   use_ssl     = false
+
+name: fractal6go-dev
+
+services:
+  garage-dev:
+    image: dxflrs/garage:v2.3.0
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    ports:
+      - "3900:3900"   # S3 API
+      - "3903:3903"   # admin API
+    volumes:
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+    configs:
+      - source: garage-config
+        target: /etc/garage.toml
+    environment:
+      # Format constraints: access key = "GK" + 32 hex chars; secret = 64 hex chars.
+      # Garage validates both on startup. These are well-known dev fixtures —
+      # do NOT reuse outside docker-compose.dev.yml.
+      GARAGE_DEFAULT_ACCESS_KEY: "GKdeadbeefdeadbeefdeadbeefdeadbeef"
+      GARAGE_DEFAULT_SECRET_KEY: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+      GARAGE_DEFAULT_BUCKET: "fractale-storage"
+    healthcheck:
+      test: ["CMD-SHELL", "/garage status > /dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+configs:
+  garage-config:
+    file: ./contrib/garage/garage.toml
+
+volumes:
+  garage-meta:
+  garage-data:

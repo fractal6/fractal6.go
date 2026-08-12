@@ -139,89 +139,60 @@ func CleanAliasedMap(m map[string]any) map[string]any {
 	return out
 }
 
-// DecodeField extracts field(s) from a single-result cleaned DQL map slice.
-// With a single field, returns the field value. With multiple fields (space-separated),
-// returns the entire map.
-func DecodeField(results []map[string]any, fieldName string) (any, error) {
+// DecodeAt walks `path` from a single-result cleaned DQL map slice.
+// Each path step is a "Type.field" token; the "Type." prefix is stripped
+// internally. Intermediate edges may be cardinality-1 (map) or many ([]any),
+// in which case the walk fans out and the result is a slice. The leaf step
+// may be a space-separated list of fields ("uid Tension.title"); when so,
+// the parent map is returned in lieu of a scalar.
+//
+// Returns (nil, nil) for empty results, nil intermediates, or missing keys.
+// Returns an error when results contains more than one record (DQL contract:
+// these helpers expect a single anchor row).
+func DecodeAt(results []map[string]any, path ...string) (any, error) {
 	if len(results) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query: %s", fieldName)
+		return nil, fmt.Errorf("DecodeAt: got multiple results")
 	}
-	if len(results) != 1 {
+	if len(results) == 0 {
 		return nil, nil
 	}
-	if len(strings.Fields(fieldName)) > 1 {
-		return results[0], nil
+	if len(path) == 0 {
+		return nil, fmt.Errorf("DecodeAt: empty path")
 	}
-	return results[0][cleanDqlKey(fieldName)], nil
+	return walkPath(results[0], path)
 }
 
-// DecodeSubField extracts a sub-field from a single-result cleaned DQL map slice.
-// It handles both scalar (map[string]any) and list ([]any) sub-field values.
-// With multiple target fields (space-separated), returns the nested map(s) directly;
-// with a single field, extracts that field's value.
-func DecodeSubField(results []map[string]any, fieldNameSource, fieldNameTarget string) (any, error) {
-	if len(results) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query")
-	}
-	if len(results) != 1 {
+func walkPath(node any, path []string) (any, error) {
+	if node == nil {
 		return nil, nil
 	}
+	step := path[0]
+	isLeaf := len(path) == 1
+	multi := isLeaf && len(strings.Fields(step)) > 1
 
-	multiField := len(strings.Fields(fieldNameTarget)) > 1
-	cleanTarget := cleanDqlKey(fieldNameTarget)
-
-	switch x := results[0][cleanDqlKey(fieldNameSource)].(type) {
+	switch v := node.(type) {
 	case map[string]any:
-		if multiField {
-			return x, nil
+		if isLeaf && multi {
+			return v, nil
 		}
-		return x[cleanTarget], nil
+		next := v[cleanDqlKey(step)]
+		if isLeaf {
+			return next, nil
+		}
+		return walkPath(next, path[1:])
 	case []any:
-		y := make([]any, 0, len(x))
-		for _, v := range x {
-			atom, ok := v.(map[string]any)
-			if !ok {
-				return nil, fmt.Errorf("DecodeSubField: unexpected element type %T", v)
+		out := make([]any, 0, len(v))
+		for _, elem := range v {
+			r, err := walkPath(elem, path)
+			if err != nil {
+				return nil, err
 			}
-			if multiField {
-				y = append(y, atom)
-			} else {
-				y = append(y, atom[cleanTarget])
-			}
+			out = append(out, r)
 		}
-		return y, nil
-	case nil:
-		return nil, nil
+		return out, nil
 	default:
-		return nil, fmt.Errorf("DecodeSubField: unexpected type %T", x)
+		return nil, fmt.Errorf("DecodeAt: unexpected type %T", v)
 	}
-}
-
-// DecodeSubSubField extracts a nested sub-sub-field from a single-result cleaned DQL map slice.
-// Traverses fieldNameSource -> fieldNameTarget -> subFieldNameTarget.
-// With multiple sub-target fields (space-separated), returns the nested map;
-// with a single field, extracts the value.
-func DecodeSubSubField(results []map[string]any, fieldNameSource, fieldNameTarget, subFieldNameTarget string) (any, error) {
-	if len(results) > 1 {
-		return nil, fmt.Errorf("Got multiple in DQL query")
-	}
-	if len(results) != 1 {
-		return nil, nil
-	}
-
-	x, ok := results[0][cleanDqlKey(fieldNameSource)].(map[string]any)
-	if !ok || x == nil {
-		return nil, nil
-	}
-	y, ok := x[cleanDqlKey(fieldNameTarget)].(map[string]any)
-	if !ok || y == nil {
-		return nil, nil
-	}
-
-	if len(strings.Fields(subFieldNameTarget)) > 1 {
-		return y, nil
-	}
-	return y[cleanDqlKey(subFieldNameTarget)], nil
 }
 
 // Dedupe removes duplicate items from a slice, keeping the first occurrence.

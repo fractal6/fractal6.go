@@ -22,11 +22,15 @@ package email
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/spf13/viper"
@@ -38,6 +42,7 @@ import (
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/internal/tools"
 )
 
@@ -68,11 +73,15 @@ var md goldmark.Markdown = goldmark.New(
 
 // sanitizer extends bluemonday's UGCPolicy with <details>/<summary> support
 // and allows the inline-styled wrapper div used by the details extension.
+// `cid:` is added to the URL scheme allowlist so the inline-image rewriter
+// (rewriteFileImgs) can swap `<img src="/file/<id>">` to `<img src="cid:...">`
+// without bluemonday stripping the src attribute.
 var sanitizer = func() *bluemonday.Policy {
 	p := bluemonday.UGCPolicy()
 	p.AllowElements("details", "summary")
 	p.AllowAttrs("open").OnElements("details")
 	p.AllowAttrs("style").OnElements("div", "span", "details")
+	p.AllowURLSchemes("cid", "http", "https", "mailto")
 	return p
 }()
 
@@ -83,6 +92,12 @@ var (
 	DOMAIN          string
 )
 
+var mailerHTTPClient = func() *http.Client {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	return &http.Client{Transport: transport, Timeout: 60 * time.Second}
+}()
+
 func init() {
 	emailUrl = viper.GetString("mailer.email_api_url")
 	emailSecret = viper.GetString("mailer.email_api_key")
@@ -92,9 +107,7 @@ func init() {
 	if emailSecret == "" {
 		emailSecret = os.Getenv("EMAIL_API_KEY")
 	}
-	if emailUrl == "" || emailSecret == "" {
-		fmt.Println("EMAIL_API_URL/KEY not found. email notifications disabled.")
-	}
+	// Missing url/key is reported by the startup healthcheck (cmd/health.go).
 
 	DOMAIN = viper.GetString("server.domain")
 	maintainerEmail = viper.GetString("mailer.admin_email")
@@ -104,6 +117,36 @@ func init() {
 func SetTestConfig(url, secret string) {
 	emailUrl = url
 	emailSecret = secret
+}
+
+// IsConfigured reports whether the mailer API url and key are both set.
+func IsConfigured() bool { return emailUrl != "" && emailSecret != "" }
+
+// Ping checks the mailer API is reachable and the key accepted, by POSTing an
+// empty payload: no recipient means nothing is ever sent, but a bad key still
+// comes back as InvalidServerAPIKey. Postal answers 200 with a JSON status
+// field, hence the body check. Startup healthcheck, see cmd/health.go.
+func Ping(ctx context.Context) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, emailUrl, bytes.NewBufferString("{}"))
+	if err != nil {
+		return fmt.Errorf("email: bad api url %q: %w", emailUrl, err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Server-API-Key", emailSecret)
+
+	resp, err := mailerHTTPClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("email: %s unreachable: %w", emailUrl, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("email: %s: %s", emailUrl, resp.Status)
+	}
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+	if strings.Contains(string(body), "InvalidServerAPIKey") {
+		return fmt.Errorf("email: %s: api key rejected", emailUrl)
+	}
+	return nil
 }
 
 //
@@ -128,10 +171,7 @@ func SendMaintainerEmail(subject, body string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -177,10 +217,7 @@ func SendVerificationEmail(email, token string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -220,10 +257,7 @@ func SendResetEmail(email, token string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -238,7 +272,7 @@ func SendResetEmail(email, token string) error {
 
 func SendOwnerGrantedEmail(username, nameid, orgName string) error {
 	var email string
-	if x, err := db.GetDB().GetFieldByEq("User.username", username, "User.email"); err != nil {
+	if x, err := db.GetDB().GetByEq("User.username", username, "User.email"); err != nil {
 		return err
 	} else {
 		email = x.(string)
@@ -273,10 +307,7 @@ func SendOwnerGrantedEmail(username, nameid, orgName string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -294,16 +325,32 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	var err error
 	var url_redirect string
 	var subject string
-	var body string
 	var author string
 	var payload string
 	var recv string = strings.ReplaceAll(notif.Receiverid, "#", "/")
 	var title string = notif.Title
 	var message string = notif.Msg
+
+	// Fetch attachments only when this email actually renders a comment
+	// body (Created or CommentPushed). State-change events like Closed /
+	// UserJoined never render `notif.Msg`, so attaching the latest comment-
+	// by-actor's files to those would be a spurious side-channel — visible
+	// in the recipient's mail UI even though no inline rewrite or footer
+	// reference exists in the body.
+	var attachments []postalAttachment
+	inlineByID := make(map[string]bool)
+	var footerFiles []emailFile
+	if notif.HasEvent(model.TensionEventCreated) || notif.HasEvent(model.TensionEventCommentPushed) {
+		commentFiles, _ := db.GetDB().GetLastCommentFiles(notif.Tid, notif.Uctx.Username)
+		// Bound the S3 fetches so a hung storage backend can't stall the daemon.
+		actx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		attachments, inlineByID, footerFiles = buildAttachments(actx, storage.Global(), fromDBFiles(commentFiles))
+		cancel()
+	}
 	// Recipient email
 	var email string = ui.User.Email
 	if email == "" {
-		if x, err := db.GetDB().GetFieldByEq("User.username", ui.User.Username, "User.email"); err != nil {
+		if x, err := db.GetDB().GetByEq("User.username", ui.User.Username, "User.email"); err != nil {
 			return err
 		} else {
 			email = x.(string)
@@ -343,12 +390,16 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		if message == "" {
 			payload = "<i>No message provided.</i><br><br>"
 		} else {
-			// Convert markdown to Html
+			// Convert markdown to Html, then rewrite /file/<id> img tags to
+			// cid:<id>@DOMAIN for inline attachments and absolute URLs for
+			// the rest. Sanitisation runs AFTER the rewrite so bluemonday
+			// validates the final shape (cid scheme is allowlisted above).
 			var buf bytes.Buffer
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			payload = sanitizer.Sanitize(buf.String())
+			rendered := rewriteFileImgs(buf.String(), inlineByID)
+			payload = sanitizer.Sanitize(rendered)
 		}
 
 	} else { // Tension updated
@@ -366,7 +417,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		} else if notif.HasEvent(model.TensionEventUserJoined) {
 			u := notif.GetNewUser()
 			itsYou := u == ui.User.Username
-			if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
+			if x, _ := db.GetDB().GetByEq("User.username", u, "User.name"); x != nil {
 				u = fmt.Sprintf("%s (@%s)", x.(string), u)
 			}
 			if itsYou {
@@ -379,10 +430,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
 		} else if notif.HasEvent(model.TensionEventUserLeft) {
 			u := notif.GetExUser()
-			if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
+			if x, _ := db.GetDB().GetByEq("User.username", u, "User.name"); x != nil {
 				u = fmt.Sprintf("%s (@%s)", x.(string), u)
 			}
-			anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
+			anchorTid, _ := db.GetDB().GetByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
 			if anchorTid != nil && anchorTid.(string) == notif.Tid {
 				switch model.RoleType(notif.GetExRoleType()) {
 				case model.RoleTypeGuest:
@@ -398,7 +449,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		} else if notif.HasEvent(model.TensionEventMemberLinked) {
 			u := notif.GetNewUser()
 			itsYou := u == ui.User.Username
-			if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
+			if x, _ := db.GetDB().GetByEq("User.username", u, "User.name"); x != nil {
 				u = fmt.Sprintf("%s (@%s)", x.(string), u)
 			}
 			if itsYou {
@@ -409,10 +460,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		} else if notif.HasEvent(model.TensionEventMemberUnlinked) {
 			u := notif.GetExUser()
 			itsYou := u == ui.User.Username
-			if x, _ := db.GetDB().GetFieldByEq("User.username", u, "User.name"); x != nil {
+			if x, _ := db.GetDB().GetByEq("User.username", u, "User.name"); x != nil {
 				u = fmt.Sprintf("%s (@%s)", x.(string), u)
 			}
-			anchorTid, _ := db.GetDB().GetSubSubFieldByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
+			anchorTid, _ := db.GetDB().GetByEq("Node.nameid", notif.Receiverid, "Node.source", "Blob.tension", "uid")
 			if anchorTid != nil && anchorTid.(string) == notif.Tid {
 				if itsYou {
 					auto_msg = fmt.Sprintf(`You have been removed from this organisation in <a href="%s">%s</a>.<br>`, url_redirect, notif.Tid)
@@ -430,12 +481,14 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 
 		// Add eventual comment
 		if notif.HasEvent(model.TensionEventCommentPushed) && message != "" {
-			// Convert markdown to Html
+			// Convert markdown to Html, then rewrite /file/<id> img tags as for
+			// the "Created" path above.
 			var buf bytes.Buffer
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			comment = sanitizer.Sanitize(buf.String())
+			rendered := rewriteFileImgs(buf.String(), inlineByID)
+			comment = sanitizer.Sanitize(rendered)
 		}
 
 		if comment != "" {
@@ -448,6 +501,14 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			}
 			payload += auto_msg + "<br>"
 		}
+	}
+
+	// Append the plain-attachment footer (Bucket B) so the recipient sees a
+	// click-through list even when their mail client hides Postal
+	// attachments behind a paperclip. Bucket A files (inline CID) are
+	// already visible in-body and intentionally NOT listed here.
+	if footer := renderAttachmentFooter(footerFiles); footer != "" {
+		payload += footer
 	}
 
 	// Add footer
@@ -477,29 +538,36 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
     </html>`, payload)
 	plainContent, _ := tools.HTMLToMarkdown(content)
 
-	body = fmt.Sprintf(`{
-        "from": "%s <notifications@`+DOMAIN+`>",
-        "to": ["%s"],
-        "subject": "%s",
-        "html_body": "%s",
-        "plain_body": "%s",
-        "headers": {
-            "In-Reply-To": "<tension/%s@`+DOMAIN+`>",
-            "References": "<tension/%s@`+DOMAIN+`>"
-        }
-    }`, author, email, tools.CleanString(subject, true), tools.CleanString(content, true), tools.QuoteString(plainContent), notif.Tid, notif.Tid)
+	// Postal request body — built via encoding/json now that `attachments`
+	// carries variable-length base64 payloads. Hand-rolled %q-escaping
+	// across megabyte-sized attachment blobs is too fragile.
+	bodyPayload := map[string]any{
+		"from":       fmt.Sprintf("%s <notifications@"+DOMAIN+">", author),
+		"to":         []string{email},
+		"subject":    subject,
+		"html_body":  content,
+		"plain_body": plainContent,
+		"headers": map[string]string{
+			"In-Reply-To": fmt.Sprintf("<tension/%s@"+DOMAIN+">", notif.Tid),
+			"References":  fmt.Sprintf("<tension/%s@"+DOMAIN+">", notif.Tid),
+		},
+	}
+	if len(attachments) > 0 {
+		bodyPayload["attachments"] = attachments
+	}
 	// @TODO; "List-Unsubscribe": "<%s>"
 	// see https://github.com/postalserver/postal/issues/2788
 	// Other fields: http://apiv1.postalserver.io/controllers/send/message
+	body, err := json.Marshal(bodyPayload)
+	if err != nil {
+		return err
+	}
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
+	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -516,15 +584,27 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	var err error
 	var url_redirect string
 	var subject string
-	var body string
 	var rcpt_name string
 	var author string
 	var payload string
 	var recv string = strings.ReplaceAll(notif.Receiverid, "#", "/")
+
+	// Contract emails carry the latest comment authored by the actor (if
+	// any). Files attached to that comment ride out as Postal attachments
+	// the same way tension emails do.
+	var attachments []postalAttachment
+	inlineByID := make(map[string]bool)
+	var footerFiles []emailFile
+	if notif.Contract != nil {
+		cfiles, _ := db.GetDB().GetLastContractCommentFiles(notif.Contract.ID, notif.Uctx.Username)
+		actx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		attachments, inlineByID, footerFiles = buildAttachments(actx, storage.Global(), fromDBFiles(cfiles))
+		cancel()
+	}
 	// Recipient email
 	var email string = ui.User.Email
 	if email == "" {
-		if x, err := db.GetDB().GetFieldByEq("User.username", ui.User.Username, "User.email"); err != nil {
+		if x, err := db.GetDB().GetByEq("User.username", ui.User.Username, "User.email"); err != nil {
 			return err
 		} else {
 			email = x.(string)
@@ -550,7 +630,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	vars := []string{}
 	if ui.IsPending {
 		// Puid var is used to identify the pending users from client.
-		token, err := db.GetDB().GetFieldByEq("PendingUser.email", email, "PendingUser.token")
+		token, err := db.GetDB().GetByEq("PendingUser.email", email, "PendingUser.token")
 		if err != nil {
 			return err
 		}
@@ -568,7 +648,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		case model.ContractStatusOpen:
 			switch ui.Reason {
 			case model.ReasonIsInvited:
-				x, err := db.GetDB().GetFieldByEq("Node.nameid", notif.Receiverid, "Node.name")
+				x, err := db.GetDB().GetByEq("Node.nameid", notif.Receiverid, "Node.name")
 				if err != nil {
 					return err
 				}
@@ -623,14 +703,20 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 
 	// Add eventual comment
 	if notif.Msg != "" {
-		// Convert markdown to Html
+		// Convert markdown to Html; rewrite /file/<id> img tags for inline
+		// CID attachments / absolute URLs the same way tension emails do.
 		var buf bytes.Buffer
 		if err = md.Convert([]byte(notif.Msg), &buf); err != nil {
 			return err
 		}
-		payload += sanitizer.Sanitize(buf.String())
+		rendered := rewriteFileImgs(buf.String(), inlineByID)
+		payload += sanitizer.Sanitize(rendered)
 	} else {
 		payload += "<br><br>"
+	}
+
+	if footer := renderAttachmentFooter(footerFiles); footer != "" {
+		payload += footer
 	}
 
 	payload += fmt.Sprintf(`—
@@ -648,26 +734,30 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
     </html>`, payload)
 	plainContent, _ := tools.HTMLToMarkdown(content)
 
-	body = fmt.Sprintf(`{
-        "from": "%s <notifications@`+DOMAIN+`>",
-        "to": ["%s"],
-        "subject": "%s",
-        "html_body": "%s",
-        "plain_body": "%s",
-        "headers": {
-            "In-Reply-To": "<contract/%s@`+DOMAIN+`>",
-            "References": "<contract/%s@`+DOMAIN+`>"
-        }
-    }`, author, email, subject, tools.CleanString(content, true), tools.QuoteString(plainContent), notif.Contract.ID, notif.Contract.ID)
+	bodyPayload := map[string]any{
+		"from":       fmt.Sprintf("%s <notifications@"+DOMAIN+">", author),
+		"to":         []string{email},
+		"subject":    subject,
+		"html_body":  content,
+		"plain_body": plainContent,
+		"headers": map[string]string{
+			"In-Reply-To": fmt.Sprintf("<contract/%s@"+DOMAIN+">", notif.Contract.ID),
+			"References":  fmt.Sprintf("<contract/%s@"+DOMAIN+">", notif.Contract.ID),
+		},
+	}
+	if len(attachments) > 0 {
+		bodyPayload["attachments"] = attachments
+	}
+	body, err := json.Marshal(bodyPayload)
+	if err != nil {
+		return err
+	}
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
+	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}

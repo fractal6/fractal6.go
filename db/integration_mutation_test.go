@@ -39,13 +39,13 @@ func TestSetFieldByEq_Integration(t *testing.T) {
 	}
 
 	// Read it back
-	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.about")
+	val, err := GetDB().GetByEq("Node.nameid", "test-org", "Node.about")
 	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
+		t.Fatalf("GetByEq returned error: %v", err)
 	}
 	about, ok := val.(string)
 	if !ok {
-		t.Fatalf("GetFieldByEq returned type %T, want string", val)
+		t.Fatalf("GetByEq returned type %T, want string", val)
 	}
 	if about != newAbout {
 		t.Errorf("Node.about = %q, want %q", about, newAbout)
@@ -76,13 +76,13 @@ func TestUpgradeMember_Integration(t *testing.T) {
 	}
 
 	// Verify the change
-	val, err := GetDB().GetFieldByEq("Node.nameid", nameid, "Node.role_type")
+	val, err := GetDB().GetByEq("Node.nameid", nameid, "Node.role_type")
 	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
+		t.Fatalf("GetByEq returned error: %v", err)
 	}
 	roleType, ok := val.(string)
 	if !ok {
-		t.Fatalf("GetFieldByEq returned type %T, want string", val)
+		t.Fatalf("GetByEq returned type %T, want string", val)
 	}
 	if roleType != "Guest" {
 		t.Errorf("Node.role_type = %q, want %q", roleType, "Guest")
@@ -115,13 +115,13 @@ func TestGamma_Integration(t *testing.T) {
 	t.Logf("Gamma returned %d results", len(results))
 
 	// Verify the change
-	val, err := GetDB().GetFieldByEq("Node.nameid", "test-org", "Node.about")
+	val, err := GetDB().GetByEq("Node.nameid", "test-org", "Node.about")
 	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
+		t.Fatalf("GetByEq returned error: %v", err)
 	}
 	about, ok := val.(string)
 	if !ok {
-		t.Fatalf("GetFieldByEq returned type %T, want string", val)
+		t.Fatalf("GetByEq returned type %T, want string", val)
 	}
 	if about != newAbout {
 		t.Errorf("Node.about = %q, want %q", about, newAbout)
@@ -135,14 +135,14 @@ func TestProjectReparent_Integration(t *testing.T) {
 	// Simulate the reparenting logic: when a node matching parentnameid
 	// is removed from Project.nodes, parentnameid should be updated to a remaining node.
 
-	// Get the private-project's UID via GetFieldByEq with filter
-	pData, err := GetDB().GetFieldByEq(
+	// Get the private-project's UID via GetByEqFiltered
+	pData, err := GetDB().GetByEqFiltered(
 		"Project.nameid", "private-project",
-		"uid Project.parentnameid Project.rootnameid",
 		"Project.parentnameid", "sec-org#private-circle",
+		"uid Project.parentnameid Project.rootnameid",
 	)
 	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
+		t.Fatalf("GetByEqFiltered returned error: %v", err)
 	}
 	if pData == nil {
 		t.Fatal("private-project not found")
@@ -173,13 +173,13 @@ func TestProjectReparent_Integration(t *testing.T) {
 	}
 
 	// Verify the change
-	val, err := GetDB().GetFieldByEq(
+	val, err := GetDB().GetByEqFiltered(
 		"Project.nameid", "private-project",
-		"Project.parentnameid",
 		"Project.parentnameid", "sec-org",
+		"Project.parentnameid",
 	)
 	if err != nil {
-		t.Fatalf("GetFieldByEq returned error: %v", err)
+		t.Fatalf("GetByEqFiltered returned error: %v", err)
 	}
 	parentnameid, ok := val.(string)
 	if !ok {

@@ -76,6 +76,8 @@ Ports are offset by +100 to avoid collision with dev instances:
 | alpha HTTP | 8080 | 8180 |
 | alpha gRPC | 9080 | 9180 |
 | Redis | 6379 | 6479 |
+| MinIO S3 | 9000 | 9100 |
+| MinIO console | 9101 | 9101 |
 
 No volumes are mounted - data is ephemeral and destroyed on `docker compose down`.
 
@@ -124,7 +126,7 @@ DQL queries go through gRPC and skip the Dgraph GraphQL auth layer. No JWT keys 
 
 #### `db/` — DQL Query & Mutation Tests
 - `integration_test.go` - TestMain: verify seed data exists
-- `integration_query_test.go` - Read-only tests (CountHas, Exists, GetFieldByEq, IsChild, GetChildren, HasCoordos, GetUserRoles, QueryDql, Meta). All tests use `t.Parallel()` and related scenarios are grouped as subtests (e.g. `TestExists_Integration/found`, `TestExists_Integration/not_found`).
+- `integration_query_test.go` - Read-only tests (CountHas, Exists, GetByEq, IsChild, GetChildren, HasCoordos, GetUserRoles, QueryDql, Meta). All tests use `t.Parallel()` and related scenarios are grouped as subtests (e.g. `TestExists_Integration/found`, `TestExists_Integration/not_found`).
 - `integration_mutation_test.go` - Write tests (SetFieldByEq, UpgradeMember, Gamma, markAllAsRead, upsertActivity). Mutation tests restore original values after modifying data.
 
 #### `web/handlers/` — HTTP Handler Tests
@@ -134,10 +136,12 @@ Uses a real chi router with JWT middleware and tests handlers end-to-end.
 - `integration_test.go` - TestMain: verify seed data, start mock email server, build test router. Also provides shared helpers: `doRequest()`, `loginAs()`, `requireStatus()`, `requireJWTCookie()`.
 - `integration_auth_test.go` - Auth handler tests (Login, Logout, Signup, SignupValidate, TokenAck, UpdatePassword)
 - `integration_org_test.go` - Org handler tests (CreateOrga, SetUserCanJoin, SetGuestCanCreateTension)
+- `integration_files_test.go` - `/file/*` end-to-end tests across the three anchor kinds: comment attachments (auth + MIME-sniff + cross-tension rejection), user/org avatars (replace-on-upload + visibility GET), inline-screenshot rewrite (`embedded` flag + code-block masking + parallel uploads), DELETE 404 leak guard, comment-delete S3 GC. Uses MinIO from compose. Companion unit tests for the markdown-rewrite helper live in `files_rewrite_test.go` (no `integration` tag — runs under plain `go test`).
 
 **Dependencies mocked:**
 - Email API: A local `httptest.Server` accepts all POST requests (configured via `email.SetTestConfig`)
 - Redis: Uses the Docker Redis on port 6479 (configured via `REDIS_ADDR` env var)
+- S3: Uses the Docker MinIO on port 9100; the bucket (`fractale-test`) is bootstrapped by `cmd/testsetup` via `storage.EnsureBucket`. Test setup constants live in `internal/testutil/config.go`.
 
 ### Adding New Tests
 

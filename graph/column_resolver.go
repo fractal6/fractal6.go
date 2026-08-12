@@ -174,6 +174,9 @@ func deleteProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 	if len(filter.ID) == 0 {
 		return nil, fmt.Errorf("Query requires id filters.")
 	}
+	if err := db.ValidateUids(filter.ID...); err != nil {
+		return nil, err
+	}
 	// Prior to remove, get information about that object for post-processing
 	oldColumns := []ProjectColumnLoc{}
 	for _, uid := range filter.ID {
@@ -262,6 +265,9 @@ func updateProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 
 	// Extract data identifiers the value before moving
 	id := input.Filter.ID[0]
+	if err := db.ValidateUids(id); err != nil {
+		return nil, err
+	}
 	var projectid string
 	if input.Set.Pos != nil {
 		isMoved = true
@@ -271,7 +277,7 @@ func updateProjectColumnHook(ctx context.Context, obj any, next graphql.Resolver
 		}
 		projectid = oldColumn.Projectid
 	} else {
-		x, err := db.GetDB().GetSubFieldById(id, "ProjectColumn.project", "uid")
+		x, err := db.GetDB().GetByUid(id, "ProjectColumn.project", "uid")
 		if err != nil {
 			return nil, err
 		}

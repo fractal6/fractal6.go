@@ -41,3 +41,41 @@ max_public_orgas = -1    # Maximum public organnization per user, -1 for unlimit
 max_private_orgas = -1   # Maximum private organnization per user, -1 for unlimited
 max_orga_reg = -1        # Maximum organnization per regular user, -1 for unlimited
 max_orga_pro = -1        # Maximum organnization per pro user, -1 for unlimited
+
+[storage]
+# S3-compatible object store for file assets — comment attachments, user avatars,
+# org avatars (Garage in production, MinIO compatible).  Leave endpoint empty to
+# disable upload features. See docs/file-storage.md.
+#
+# A single bucket holds all file kinds, namespaced by key prefix:
+#   orgas/<rootnameid>/tensions/<tid>/<cid>/<rand>-<safe-name>  comment attachments
+#   orgas/<rootnameid>/<rand>-<safe-name>                       org avatars
+#   users/<username>/<rand>-<safe-name>                         user avatars
+endpoint           = ""                  # e.g. "garage.YOUR_DOMAIN" (host[:port], no scheme)
+region             = "garage"            # Garage default; MinIO commonly uses "us-east-1"
+bucket             = "fractale-storage"
+access_key         = "..."
+secret_key         = "..."
+use_ssl            = true                # require HTTPS when storage is on another host
+public_url_prefix  = ""                  # optional; e.g. "https://files.YOUR_DOMAIN" to rewrite presigned host
+max_upload_bytes   = 10485760            # 10 MiB
+presign_ttl_sec    = 7200                # presigned URL TTL, seconds (2 hours)
+
+[notify]
+# Notifier-side settle poll + Postal attachment caps. See docs/file-storage.md.
+# Before emailing a comment, the notifier re-fetches it until no bare inline
+# `![](paste.png)` tokens remain (uploads rewrite them to /file/<id>) or the
+# attempt budget runs out; the first sleep also gives plain attachments a
+# chance to land in Comment.files.
+upload_poll_interval_sec  = 5            # delay between comment re-fetches
+upload_poll_attempts      = 10           # give up after ~interval*attempts and send degraded
+# Postal attachment caps. Files exceeding per-file are dropped from the
+# Postal payload but still surface as click-through links in the footer.
+attachment_per_file_bytes = 10485760     # 10 MiB
+attachment_total_bytes    = 104857600    # 100 MiB (raise Postal's transport size limit if you raise this)
+attachment_max_count      = 20           # hard cap on files attached to one email
+# Inbound email replies (POST /notifications, tension branch). Postal ships
+# attachments as base64 in the webhook payload; processInboundAttachments
+# falls back to storage.max_upload_bytes / attachment_max_count when unset.
+inbound_attachment_per_file_bytes = 10485760   # 10 MiB
+inbound_attachment_max_count      = 20
