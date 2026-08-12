@@ -19,6 +19,8 @@
 #   secret_key  = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 #   use_ssl     = false
 
+name: fractal6go-dev
+
 services:
   garage-dev:
     image: dxflrs/garage:v2.3.0

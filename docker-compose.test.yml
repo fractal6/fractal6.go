@@ -5,6 +5,8 @@
 #   docker compose -f docker-compose.test.yml up -d --wait
 #   docker compose -f docker-compose.test.yml down -v --remove-orphans
 
+name: fractal6go-test
+
 services:
   zero-test:
     image: dgraph/dgraph:v22.0.2
