@@ -80,7 +80,7 @@ func RunServer() {
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
 	cors := cors.New(cors.Options{
 		AllowedOrigins: allowedOrigins,
-		// AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		// AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		// ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
