@@ -26,6 +26,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -91,6 +92,12 @@ var (
 	DOMAIN          string
 )
 
+var mailerHTTPClient = func() *http.Client {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	return &http.Client{Transport: transport, Timeout: 60 * time.Second}
+}()
+
 func init() {
 	emailUrl = viper.GetString("mailer.email_api_url")
 	emailSecret = viper.GetString("mailer.email_api_key")
@@ -100,9 +107,7 @@ func init() {
 	if emailSecret == "" {
 		emailSecret = os.Getenv("EMAIL_API_KEY")
 	}
-	if emailUrl == "" || emailSecret == "" {
-		fmt.Println("EMAIL_API_URL/KEY not found. email notifications disabled.")
-	}
+	// Missing url/key is reported by the startup healthcheck (cmd/health.go).
 
 	DOMAIN = viper.GetString("server.domain")
 	maintainerEmail = viper.GetString("mailer.admin_email")
@@ -112,6 +117,36 @@ func init() {
 func SetTestConfig(url, secret string) {
 	emailUrl = url
 	emailSecret = secret
+}
+
+// IsConfigured reports whether the mailer API url and key are both set.
+func IsConfigured() bool { return emailUrl != "" && emailSecret != "" }
+
+// Ping checks the mailer API is reachable and the key accepted, by POSTing an
+// empty payload: no recipient means nothing is ever sent, but a bad key still
+// comes back as InvalidServerAPIKey. Postal answers 200 with a JSON status
+// field, hence the body check. Startup healthcheck, see cmd/health.go.
+func Ping(ctx context.Context) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, emailUrl, bytes.NewBufferString("{}"))
+	if err != nil {
+		return fmt.Errorf("email: bad api url %q: %w", emailUrl, err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Server-API-Key", emailSecret)
+
+	resp, err := mailerHTTPClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("email: %s unreachable: %w", emailUrl, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("email: %s: %s", emailUrl, resp.Status)
+	}
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+	if strings.Contains(string(body), "InvalidServerAPIKey") {
+		return fmt.Errorf("email: %s: api key rejected", emailUrl)
+	}
+	return nil
 }
 
 //
@@ -136,10 +171,7 @@ func SendMaintainerEmail(subject, body string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -185,10 +217,7 @@ func SendVerificationEmail(email, token string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -228,10 +257,7 @@ func SendResetEmail(email, token string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -281,10 +307,7 @@ func SendOwnerGrantedEmail(username, nameid, orgName string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -544,10 +567,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -737,10 +757,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Server-API-Key", emailSecret)
 
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	client := &http.Client{Transport: customTransport, Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
+	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
 		return err
 	}

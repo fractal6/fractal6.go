@@ -28,7 +28,9 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"text/template"
@@ -184,6 +186,36 @@ func initDB() *Dgraph {
 		gqlAddr:  dgraphApiAddr,
 		grpcAddr: grpcAddr,
 	}
+}
+
+// Ping checks the Dgraph alpha is up: /health on the HTTP/GraphQL port, plus a
+// TCP dial on the gRPC port used for DQL. Startup healthcheck, see cmd/health.go.
+func (dg Dgraph) Ping(ctx context.Context) error {
+	u, err := url.Parse(dg.gqlAddr)
+	if err != nil {
+		return fmt.Errorf("dgraph: bad address %q: %w", dg.gqlAddr, err)
+	}
+	u.Path = "/health"
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("dgraph: %s unreachable: %w", u.Host, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("dgraph: %s /health: %s", u.Host, resp.Status)
+	}
+
+	var d net.Dialer
+	conn, err := d.DialContext(ctx, "tcp", dg.grpcAddr)
+	if err != nil {
+		return fmt.Errorf("dgraph: grpc %s unreachable: %w", dg.grpcAddr, err)
+	}
+	conn.Close()
+	return nil
 }
 
 func RawFormat(q string, maps map[string]string) string {

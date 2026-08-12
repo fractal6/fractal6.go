@@ -126,6 +126,19 @@ func New(cfg Config) (*Client, error) {
 // Bucket returns the configured bucket name (mainly for logging/diagnostics).
 func (c *Client) Bucket() string { return c.cfg.Bucket }
 
+// Ping checks the backend is reachable, the credentials are accepted and the
+// bucket exists. Used as a startup healthcheck when [storage] is configured.
+func (c *Client) Ping(ctx context.Context) error {
+	exists, err := c.mc.BucketExists(ctx, c.cfg.Bucket)
+	if err != nil {
+		return fmt.Errorf("storage: %s unreachable: %w", c.cfg.Endpoint, err)
+	}
+	if !exists {
+		return fmt.Errorf("storage: bucket %q not found on %s", c.cfg.Bucket, c.cfg.Endpoint)
+	}
+	return nil
+}
+
 // Put streams an object to the bucket. Size MUST be >= 0; pass -1 only for
 // truly unknown sizes (forces multipart, slower). ContentType is mandatory
 // because clients receive it via the presigned redirect (sets the Content-Type

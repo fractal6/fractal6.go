@@ -46,6 +46,7 @@ import (
 	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/internal/testutil"
 	"fractale/fractal6.go/internal/tools"
 )
@@ -270,6 +271,30 @@ func TestFileUpload_AsAuthor_Succeeds(t *testing.T) {
 	}
 	if !objectExists(t, key) {
 		t.Errorf("expected object %q to exist in MinIO", key)
+	}
+}
+
+// Startup healthcheck (cmd/server.go): ok against the live bucket, error on a
+// bucket that doesn't exist.
+func TestStoragePing(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := testStorageCli.Ping(ctx); err != nil {
+		t.Fatalf("Ping on live bucket: %v", err)
+	}
+
+	bad, err := storage.New(storage.Config{
+		Endpoint:  testutil.MinioAddr,
+		Region:    "us-east-1",
+		Bucket:    "no-such-bucket-xyz",
+		AccessKey: testutil.MinioAccessKey,
+		SecretKey: testutil.MinioSecretKey,
+	})
+	if err != nil {
+		t.Fatalf("storage.New: %v", err)
+	}
+	if err := bad.Ping(ctx); err == nil {
+		t.Error("Ping on missing bucket: got nil, want error")
 	}
 }
 

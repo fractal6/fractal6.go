@@ -23,9 +23,11 @@
 package db_test
 
 import (
+	"context"
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	. "fractale/fractal6.go/db"
 	"fractale/fractal6.go/internal/testutil"
@@ -42,4 +44,13 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(m.Run())
+}
+
+func TestDgraphPing(t *testing.T) {
+	t.Parallel()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := GetDB().Ping(ctx); err != nil {
+		t.Fatalf("Ping returned error: %v", err)
+	}
 }
