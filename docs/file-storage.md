@@ -124,6 +124,14 @@ The upload handler does not trust client-supplied metadata:
   with `"upload too large or malformed: ..."`. To raise (e.g. 100 MiB), set
   `max_upload_bytes = 104857600` in `config.toml` — and bump the matching
   body limit on any reverse proxy in front (`client_max_body_size` for nginx).
+- **Uid validation.** Every client-supplied id — the `tid`/`cid` form fields
+  and the `<id>` in `/file/<id>` — goes through `db.ValidateUids` before it
+  reaches a DQL `uid(...)` root: malformed id → 400 on upload, 404 on
+  GET/DELETE. DQL `uid()` accepts comma-separated lists, so an unvalidated
+  id lets a caller widen a query (or a delete) to nodes it never owned.
+  The inbound-email path applies the same rule to the tension/contract uid
+  parsed from the `References` header (`parseEmailReferences` in
+  `web/handlers/mailer.go`), which is sender-controlled.
 
 ## Inline screenshot pasting
 

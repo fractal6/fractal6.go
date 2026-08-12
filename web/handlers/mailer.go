@@ -24,6 +24,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -82,6 +83,37 @@ type InboundAttachment struct {
 	Data        string `json:"data"` // base64
 }
 
+// parseEmailReferences extracts the tension or contract uid an inbound reply
+// points at, from the References header set by our outbound mails
+// (`<tension/{uid}@domain>` / `<contract/{uid}@domain>`, see web/email/main.go).
+// Exactly one of (tid, cid) is returned; both empty means no reference matched.
+//
+// The header is sender-controlled, so ids are validated as well-formed uids
+// here — they end up in DQL uid() roots downstream (getTensionHook,
+// getLastComment, getContractHook).
+func parseEmailReferences(references string) (tid string, cid string, err error) {
+	for _, r := range strings.Split(references, " ") {
+		l := strings.TrimPrefix(r, "<")
+		at := strings.Index(l, "@")
+		if at < 0 {
+			continue
+		}
+		if strings.HasPrefix(l, "tension/") {
+			tid = l[len("tension/"):at]
+			break
+		}
+		if strings.HasPrefix(l, "contract/") {
+			cid = l[len("contract/"):at]
+			break
+		}
+	}
+	if (tid != "" && db.ValidateUids(tid) != nil) ||
+		(cid != "" && db.ValidateUids(cid) != nil) {
+		return "", "", fmt.Errorf("Unknown references")
+	}
+	return tid, cid, nil
+}
+
 // Handle user email responses. Receiving email response from email notifications.
 func Notifications(w http.ResponseWriter, r *http.Request) {
 	// Validate WebHook identity
@@ -107,19 +139,10 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 	msg = StripEmailQuote(msg)
 
 	// Determine where from and to where it goes
-	var isTid string
-	var isCid string
-	for _, r := range strings.Split(form.References, " ") {
-		l := strings.TrimPrefix(r, "<")
-		if strings.HasPrefix(l, "tension/") {
-			isTid = l[8:strings.Index(l, "@")]
-			break
-		}
-		if strings.HasPrefix(l, "contract/") {
-			isCid = l[9:strings.Index(l, "@")]
-			break
-		}
-
+	isTid, isCid, err := parseEmailReferences(form.References)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
 	}
 
 	// Get author
@@ -128,6 +151,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 400)
 		return
 	}
+
 	createdAt := Now()
 	createdBy := model.UserRef{Username: &uctx.Username}
 
