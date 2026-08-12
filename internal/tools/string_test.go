@@ -229,6 +229,36 @@ func TestStripEmailQuote(t *testing.T) {
 			expected: "Mi respuesta.",
 		},
 		{
+			name:     "quote header directly after reply without blank line",
+			input:    "My reply.\nOn Mon, 27 Mar 2026, Alice <alice@example.com> wrote:\n> quoted line\n> second line",
+			expected: "My reply.",
+		},
+		{
+			name:     "unquoted quote block after header stripped",
+			input:    "My reply.\nOn Mon, 27 Mar 2026, Alice <alice@example.com> wrote:\nquoted line\nsecond quoted",
+			expected: "My reply.",
+		},
+		{
+			name:     "unquoted quote block after header and blank line stripped",
+			input:    "My reply.\n\nOn Mon, 27 Mar 2026, Alice <alice@example.com> wrote:\n\nquoted line",
+			expected: "My reply.",
+		},
+		{
+			name:     "unmarked text below quoted lines kept (bottom-post)",
+			input:    "Before.\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> quoted\n\nAfter this line.",
+			expected: "Before.\n\nOn Mon, 27 Mar 2026, Alice wrote:\n> quoted\n\nAfter this line.",
+		},
+		{
+			name:     "outlook original message divider",
+			input:    "My reply.\n\n-----Original Message-----\nFrom: Alice <alice@example.com>\nSent: Monday, March 27, 2026\nSubject: Re: something\n\nOriginal text here.",
+			expected: "My reply.",
+		},
+		{
+			name:     "outlook french message d'origine divider",
+			input:    "Ma réponse.\n\n-----Message d'origine-----\nDe : Alice\nEnvoyé : lundi 27 mars 2026\n\nTexte original.",
+			expected: "Ma réponse.",
+		},
+		{
 			name:     "only View it on Fractale anchor (first line stripped)",
 			input:    "My reply.\n> [View it on Fractale](https://fractale.co/tension/x/y), reply to this email directly.",
 			expected: "My reply.",

@@ -253,12 +253,15 @@ func FindTensions(msg string) []string {
 // be real reply text when the client didn't break the line. The line must
 // end with ":" (typical header terminator), with optional content between
 // the keyword and the colon (e.g. DE "schrieb Alice <a@b>:").
-var reEmailQuoteHeader = re.MustCompile(`(?im)^(.*?)(?:` +
+var reEmailQuoteHeader = re.MustCompile(`(?im)^(.*?)(?:(?:` +
 	`On\s[^\n]{1,300}?wrote` + // EN: "On Mon, 27 Mar 2026, Alice wrote:"
 	`|Le\s[^\n]{1,300}?a\s+[eé]crit` + // FR: "Le lun. ... a écrit :"
 	`|Am\s[^\n]{1,300}?schrieb` + // DE: "Am 27.03.2026 schrieb Alice:"
 	`|El\s[^\n]{1,300}?escribi[oó]` + // ES: "El lun., 27 mar. ... escribió:"
-	`)[^\n]*:\s*$`)
+	`)[^\n]*:` +
+	// Outlook divider: "-----Original Message-----" and localized variants.
+	`|-{2,}\s*(?:Original Message|Message d'origine|Urspr[uü]ngliche Nachricht|Mensaje original)\s*-{2,}` +
+	`)\s*$`)
 
 // reEmailSignature matches the standard "-- " signature delimiter.
 var reEmailSignature = re.MustCompile(`^--\s*$`)
@@ -387,12 +390,23 @@ func stripEmailQuote(msg string) string {
 		}
 	}
 
-	// Case 2: quote at the end — everything after the last header is blank/">".
+	// Case 2: quote at the end — everything after the last header is blank/">",
+	// or fully unquoted (client stripped ">" markers). If any ">" line exists
+	// below, unmarked text is real reply text and the message is kept.
+	// ponytail: unquoted bottom-posted replies under a header get eaten; no marker to tell them apart.
 	last := hits[len(hits)-1]
+	anyQuoteMark := false
+	allQuoted := true
 	for i := last.line + 1; i < len(lines); i++ {
-		if !isQuoteOrBlank(lines[i]) {
-			return msg
+		t := strings.TrimSpace(lines[i])
+		if strings.HasPrefix(t, ">") {
+			anyQuoteMark = true
+		} else if t != "" {
+			allQuoted = false
 		}
+	}
+	if !allQuoted && anyQuoteMark {
+		return msg
 	}
 	kept := truncateAtQuoteHeader(lines, last.line, last.prefix)
 	return keepOrFallback(strings.Join(kept, "\n"), msg)
