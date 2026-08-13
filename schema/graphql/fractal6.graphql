@@ -371,7 +371,9 @@ type Tension implements Post @auth(
   labels: [Label!]       @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [Comment!]   @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
   blobs: [Blob!]         @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne") @hasInverse(field: tension)
+  governed_node: Node    @x_ro # the node behind the publish blob
   history: [Event!]      @x_alter @hasInverse(field: tension) # entry point
+
 
   # Relations
   mentions: [Event!]     @hasInverse(field: mentioned)
@@ -688,10 +690,6 @@ enum TensionAction {
   ArchivedRole
   ArchivedCircle
   ArchivedMd
-  # -- Extra
-  # * Poll ?
-  # * Annoucement ?
-  # * Articles ?
 }
 
 enum TensionEvent {

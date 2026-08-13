@@ -614,6 +614,7 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   labels: [Label!]
   comments: [Comment!]
   blobs: [Blob!] @hasInverse(field: tension)
+  governed_node: Node
   history: [Event!] @hasInverse(field: tension)
   mentions: [Event!] @hasInverse(field: mentioned)
   contracts: [Contract!] @hasInverse(field: tension)
@@ -932,10 +933,6 @@ enum TensionAction {
   ArchivedRole
   ArchivedCircle
   ArchivedMd
-
-
-
-
 }
 
 enum TensionEvent {

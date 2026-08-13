@@ -1392,6 +1392,7 @@ type ComplexityRoot struct {
 		CreatedBy                func(childComplexity int, filter *model.UserFilter) int
 		Emitter                  func(childComplexity int, filter *model.NodeFilter) int
 		Emitterid                func(childComplexity int) int
+		GovernedNode             func(childComplexity int, filter *model.NodeFilter) int
 		History                  func(childComplexity int, filter *model.EventFilter, order *model.EventOrder, first *int, offset *int) int
 		HistoryAggregate         func(childComplexity int, filter *model.EventFilter) int
 		ID                       func(childComplexity int) int
@@ -9536,6 +9537,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tension.Emitterid(childComplexity), true
 
+	case "Tension.governed_node":
+		if e.complexity.Tension.GovernedNode == nil {
+			break
+		}
+
+		args, err := ec.field_Tension_governed_node_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Tension.GovernedNode(childComplexity, args["filter"].(*model.NodeFilter)), true
+
 	case "Tension.history":
 		if e.complexity.Tension.History == nil {
 			break
@@ -12200,6 +12213,7 @@ type Tension {
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
   blobs(filter: BlobFilter, order: BlobOrder, first: Int, offset: Int): [Blob!]
+  governed_node(filter: NodeFilter): Node
   history(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   mentions(filter: EventFilter, order: EventOrder, first: Int, offset: Int): [Event!]
   contracts(filter: ContractFilter, order: ContractOrder, first: Int, offset: Int): [Contract!]
@@ -12497,10 +12511,6 @@ enum TensionAction {
   ArchivedRole
   ArchivedCircle
   ArchivedMd
-
-
-
-
 }
 
 enum TensionEvent {
@@ -12592,31 +12602,31 @@ directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @lambda on FIELD_DEFINITION
-
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @cascade(fields: [String]) on FIELD
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
+directive @lambda on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
 directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @cascade(fields: [String]) on FIELD
 
 type ActivityAggregateResult {
   count: Int
@@ -13088,6 +13098,7 @@ input AddTensionInput {
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
+  governed_node: NodeRef
   history: [EventRef!]
   mentions: [EventRef!]
   contracts: [ContractRef!] @x_add(r:"ref")
@@ -15627,6 +15638,7 @@ enum TensionHasFilter {
   labels
   comments
   blobs
+  governed_node
   history
   mentions
   contracts
@@ -15668,6 +15680,7 @@ input TensionPatch {
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
+  governed_node: NodeRef @x_ro
   history: [EventRef!]
   mentions: [EventRef!] @x_patch_ro
   contracts: [ContractRef!] @x_patch_ro
@@ -15694,6 +15707,7 @@ input TensionRef {
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
   blobs: [BlobRef!] @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne")
+  governed_node: NodeRef @x_ro
   history: [EventRef!]
   mentions: [EventRef!]
   contracts: [ContractRef!] @x_add(r:"ref")

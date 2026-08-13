@@ -480,6 +480,7 @@ type AddTensionInput struct {
 	Labels          []*LabelRef         `json:"labels,omitempty"`
 	Comments        []*CommentRef       `json:"comments,omitempty"`
 	Blobs           []*BlobRef          `json:"blobs,omitempty"`
+	GovernedNode    *NodeRef            `json:"governed_node,omitempty"`
 	History         []*EventRef         `json:"history,omitempty"`
 	Mentions        []*EventRef         `json:"mentions,omitempty"`
 	Contracts       []*ContractRef      `json:"contracts,omitempty"`
@@ -2641,6 +2642,7 @@ type Tension struct {
 	Labels                   []*Label                      `json:"labels,omitempty"`
 	Comments                 []*Comment                    `json:"comments,omitempty"`
 	Blobs                    []*Blob                       `json:"blobs,omitempty"`
+	GovernedNode             *Node                         `json:"governed_node,omitempty"`
 	History                  []*Event                      `json:"history,omitempty"`
 	Mentions                 []*Event                      `json:"mentions,omitempty"`
 	Contracts                []*Contract                   `json:"contracts,omitempty"`
@@ -2728,6 +2730,7 @@ type TensionPatch struct {
 	Labels          []*LabelRef         `json:"labels,omitempty"`
 	Comments        []*CommentRef       `json:"comments,omitempty"`
 	Blobs           []*BlobRef          `json:"blobs,omitempty"`
+	GovernedNode    *NodeRef            `json:"governed_node,omitempty"`
 	History         []*EventRef         `json:"history,omitempty"`
 	Mentions        []*EventRef         `json:"mentions,omitempty"`
 	Contracts       []*ContractRef      `json:"contracts,omitempty"`
@@ -2754,6 +2757,7 @@ type TensionRef struct {
 	Labels          []*LabelRef         `json:"labels,omitempty"`
 	Comments        []*CommentRef       `json:"comments,omitempty"`
 	Blobs           []*BlobRef          `json:"blobs,omitempty"`
+	GovernedNode    *NodeRef            `json:"governed_node,omitempty"`
 	History         []*EventRef         `json:"history,omitempty"`
 	Mentions        []*EventRef         `json:"mentions,omitempty"`
 	Contracts       []*ContractRef      `json:"contracts,omitempty"`
@@ -6847,6 +6851,7 @@ const (
 	TensionHasFilterLabels          TensionHasFilter = "labels"
 	TensionHasFilterComments        TensionHasFilter = "comments"
 	TensionHasFilterBlobs           TensionHasFilter = "blobs"
+	TensionHasFilterGovernedNode    TensionHasFilter = "governed_node"
 	TensionHasFilterHistory         TensionHasFilter = "history"
 	TensionHasFilterMentions        TensionHasFilter = "mentions"
 	TensionHasFilterContracts       TensionHasFilter = "contracts"
@@ -6872,6 +6877,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterLabels,
 	TensionHasFilterComments,
 	TensionHasFilterBlobs,
+	TensionHasFilterGovernedNode,
 	TensionHasFilterHistory,
 	TensionHasFilterMentions,
 	TensionHasFilterContracts,
@@ -6882,7 +6888,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjectStatuses, TensionHasFilterNComments:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterGovernedNode, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjectStatuses, TensionHasFilterNComments:
 		return true
 	}
 	return false
