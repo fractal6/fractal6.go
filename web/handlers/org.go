@@ -131,7 +131,7 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 	owner.Watchers = nil
 	nodeInput.Children = []*model.NodeRef{&owner}
 	// Gql mutation
-	_, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
+	nodeID, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -147,9 +147,13 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Links the source tension
+	// Link the source blob and backend-owned governed node.
 	bid := db.GetDB().GetLastBlobId(tid)
-	_, err = db.GetDB().Meta("setNodeSource", map[string]string{"nameid": nameid, "bid": *bid})
+	if bid == nil {
+		http.Error(w, "root tension blob not found", 500)
+		return
+	}
+	err = db.GetDB().LinkGovernedNode(tid, nodeID, *bid)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return

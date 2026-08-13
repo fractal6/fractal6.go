@@ -64,6 +64,8 @@ func tensionInputHook(ctx context.Context, obj any, next graphql.Resolver) (any,
 		blob_type_lvl := b2i[blob.Node.About != nil] + b2i[blob.Node.Mandate != nil]*2
 		var bt model.BlobType
 		switch blob_type_lvl {
+		case 0:
+			bt = model.BlobTypeOnNode
 		case 1:
 			bt = model.BlobTypeOnAbout
 		case 2:
@@ -109,6 +111,9 @@ func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, e
 		return nil, LogErr("field missing", fmt.Errorf("id field is required in tension payload"))
 	}
 	input := inputs[0]
+	if input.GovernedNode != nil {
+		return nil, LogErr("Forbiden", fmt.Errorf("governed_node is backend-owned"))
+	}
 
 	// History and notification Logics --
 	// In order to notify user on the given event, we need to know their ids to pass and link them

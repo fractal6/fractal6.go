@@ -22,6 +22,7 @@ package graph
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"fractale/fractal6.go/db"
@@ -230,6 +231,9 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 	if tension == nil {
 		return ok, contract, LogErr("Access denied", fmt.Errorf("tension not found."))
 	}
+	if event == nil || event.EventType == nil {
+		return false, contract, fmt.Errorf("event type is required")
+	}
 
 	em, hasEvent := EMAP[*event.EventType]
 	if !hasEvent { // Minimum level of authorization
@@ -295,6 +299,20 @@ func GetBlob(tension *model.Tension) *model.Blob {
 	return nil
 }
 
+// nodeUpdatingEvents are the events whose action writes the governed Node itself.
+// Other events (comment, label, assignee...) only touch the tension.
+var nodeUpdatingEvents = map[model.TensionEvent]bool{
+	model.TensionEventBlobPushed:     true,
+	model.TensionEventBlobArchived:   true,
+	model.TensionEventBlobUnarchived: true,
+	model.TensionEventAuthority:      true,
+	model.TensionEventVisibility:     true,
+	model.TensionEventMemberLinked:   true,
+	model.TensionEventMemberUnlinked: true,
+	model.TensionEventUserLeft:       true,
+	model.TensionEventMoved:          true,
+}
+
 func leaveTrace(uctx *model.UserCtx, tension *model.Tension, et model.TensionEvent) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -302,27 +320,15 @@ func leaveTrace(uctx *model.UserCtx, tension *model.Tension, et model.TensionEve
 		}
 	}()
 
-	var err error
-	var nameid string
-
-	blob := GetBlob(tension)
-	if blob != nil {
-		// Get Node and Nameid (from Codec)
-		node := blob.Node
-		if node != nil && node.Nameid != nil {
-			_, nameid, err = codec.NodeIdCodec(tension.Receiver.Nameid, *node.Nameid, *node.Type)
-		}
-
+	if tension.GovernedNode != nil && nodeUpdatingEvents[et] {
 		// Set the Update time into the affected node.
-		err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.updatedAt", Now())
-		if err != nil {
+		if err := db.GetDB().SetFieldByEq("Node.nameid", tension.GovernedNode.Nameid, "Node.updatedAt", Now()); err != nil {
 			fmt.Printf("error: leaveTrace node update: %v\n", err)
 		}
-		// Set the Update of its parent node (tension.receiver)
-		err = db.GetDB().SetFieldByEq("Node.nameid", tension.Receiver.Nameid, "Node.updatedAt", Now())
-		if err != nil {
-			fmt.Printf("error: leaveTrace receiver update: %v\n", err)
-		}
+	}
+	// Set the Update time of its parent node (tension.receiver)
+	if err := db.GetDB().SetFieldByEq("Node.nameid", tension.Receiver.Nameid, "Node.updatedAt", Now()); err != nil {
+		fmt.Printf("error: leaveTrace receiver update: %v\n", err)
 	}
 
 	// Track activity
@@ -368,98 +374,57 @@ func trackActivity(username, receiverNameid string, et model.TensionEvent) {
 // Event Actions
 //
 
-// Add or Update Node
+// Add or Update the governed Node
 // --
-// 1. switch on TensionCharac.DocType (not blob type) -> rule differ from doc type!
-// 2. swith on TensionCharac.ActionType to add update etc...
-// - update the tension action value AND the blob pushedFlag
+// 1. no governed Node yet -> create it from the blob fragment and link it to the tension
+// 2. governed Node linked  -> update that Node only (never create another one)
 // - copy the Blob data in the target Node.source (Uses GQL requests)
+// - update the blob pushedFlag
 func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
+	subject, err := resolveGovernanceSubject(tension, governancePublish)
+	if err != nil {
+		return false, err
+	}
+
 	var ok bool
-
-	blob := GetBlob(tension)
-	if blob == nil {
-		return false, fmt.Errorf("blob not found.")
-	}
-
-	// Extract tension blob characteristic
-	tensionCharac, err := codec.TensionCharac{}.New(*tension.Action)
-	if err != nil {
-		return false, fmt.Errorf("tensionCharac unknown.")
-	}
-
-	switch tensionCharac.ActionType {
-	case codec.NewAction:
-		// First time a blob is pushed.
-		switch tensionCharac.DocType {
-		case codec.NodeDoc:
-			ok, err = TryAddNode(uctx, tension, blob.Node, &blob.ID)
-		case codec.MdDoc:
-			ok, err = TryAddDoc(uctx, tension, blob.Md)
+	if subject.create {
+		var nid string
+		ok, nid, err = TryAddNode(uctx, tension, subject.fragment, &subject.blob.ID)
+		if err == nil && ok {
+			err = db.GetDB().LinkGovernedNode(tension.ID, nid, subject.blob.ID)
 		}
-	case codec.EditAction:
-		switch tensionCharac.DocType {
-		case codec.NodeDoc:
-			ok, err = TryUpdateNode(uctx, tension, blob.Node, &blob.ID)
-		case codec.MdDoc:
-			ok, err = TryUpdateDoc(uctx, tension, blob.Md)
-		}
-	case codec.ArchiveAction:
-		err = LogErr("Access denied", fmt.Errorf("Cannot publish archived document."))
+	} else {
+		ok, err = TryUpdateNode(tension, subject.fragment, subject.node, &subject.blob.ID)
 	}
-
-	if err != nil {
+	if err != nil || !ok {
 		return ok, err
 	}
-	if ok { // Update blob pushed flag
-		err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.EditAction(blob.Node.Type))
-	}
-
-	return ok, err
+	return ok, db.GetDB().SetPushedFlagBlob(subject.blob.ID, Now())
 }
 
-// Archived/Unarchive Node
-// - link or unlink role
-// - set archive event and flag
+// Archived/Unarchive the governed Node
+// - set Node.isArchived (lifecycle source of truth) and the blob archive/push flag
+// - unlink first-link on archive, once the archive is persisted
 func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	var ok bool
-
-	blob := GetBlob(tension)
-	if blob == nil {
-		return false, fmt.Errorf("blob not found.")
+	if event == nil || event.EventType == nil {
+		return false, fmt.Errorf("archive event type is required")
+	}
+	operation := governanceArchive
+	archived := true
+	switch *event.EventType {
+	case model.TensionEventBlobArchived:
+	case model.TensionEventBlobUnarchived:
+		operation = governanceUnarchive
+		archived = false
+	default:
+		return false, fmt.Errorf("bad tension event %q", *event.EventType)
 	}
 
-	// Extract tension blob characteristic
-	tensionCharac, err := codec.TensionCharac{}.New(*tension.Action)
+	subject, err := resolveGovernanceSubject(tension, operation)
 	if err != nil {
-		return false, fmt.Errorf("tensionCharac unknown.")
+		return false, err
 	}
-
-	switch tensionCharac.DocType {
-	case codec.NodeDoc:
-		ok, err = TryChangeArchiveNode(uctx, tension, blob.Node, *event.EventType)
-	case codec.MdDoc:
-		md := blob.Md
-		ok, err = TryChangeArchiveDoc(uctx, tension, md, *event.EventType)
-	}
-
-	if err != nil {
-		return ok, err
-	}
-	if ok { // Update blob archived flag
-		switch *event.EventType {
-		case model.TensionEventBlobArchived:
-			_, err = db.GetDB().Meta("setArchivedFlagBlob", map[string]string{
-				"bid": blob.ID, "flag": Now(), "tid": tension.ID, "action": string(tensionCharac.ArchiveAction(blob.Node.Type)),
-			})
-		case model.TensionEventBlobUnarchived:
-			err = db.GetDB().SetPushedFlagBlob(blob.ID, Now(), tension.ID, tensionCharac.EditAction(blob.Node.Type))
-		default:
-			err = fmt.Errorf("bad tension event '%s'.", string(*event.EventType))
-		}
-	}
-
-	return ok, err
+	return TryChangeArchiveNode(subject.fragment, subject.node, subject.blob.ID, archived)
 }
 
 // ChangeAuthory
@@ -467,32 +432,28 @@ func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model
 // - If Role : change role_type on the pointed node (on Node + Node.RoleExt)
 // - Don't touch the current blob as we do not use "authority" properties at the moment (just when adding node)
 func ChangeAuhtority(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	var ok bool
-
-	blob := GetBlob(tension)
-	if blob == nil {
-		return false, fmt.Errorf("blob not found.")
+	if event == nil || event.New == nil {
+		return false, fmt.Errorf("authority event value is required")
 	}
-
-	ok, err := TryChangeAuthority(uctx, tension, blob.Node, *event.New)
-
-	return ok, err
+	subject, err := resolveGovernanceSubject(tension, governanceUpdate)
+	if err != nil {
+		return false, err
+	}
+	return TryChangeAuthority(subject.fragment, subject.node, *event.New)
 }
 
 // ChangeVisibility
 // - Change the visiblity of the node
 // - Don't touch the current blob as we do not use "authority" properties at the moment (just when adding node)
 func ChangeVisibility(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	var ok bool
-
-	blob := GetBlob(tension)
-	if blob == nil {
-		return false, fmt.Errorf("blob not found.")
+	if event == nil || event.New == nil {
+		return false, fmt.Errorf("visibility event value is required")
 	}
-
-	ok, err := TryChangeVisibility(uctx, tension, blob.Node, *event.New)
-
-	return ok, err
+	subject, err := resolveGovernanceSubject(tension, governanceUpdate)
+	if err != nil {
+		return false, err
+	}
+	return TryChangeVisibility(subject.fragment, subject.node, *event.New)
 }
 
 // ChangeFirstLink
@@ -500,16 +461,33 @@ func ChangeVisibility(uctx *model.UserCtx, tension *model.Tension, event *model.
 // - Link/unlink user
 // - Only Guest can be link/unlink in unsafe mode
 func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	var ok bool
-	var unsafe bool = false
-
-	blob := GetBlob(tension)
-	if blob == nil {
-		return false, fmt.Errorf("blob not found.")
+	if event == nil || event.EventType == nil {
+		return false, fmt.Errorf("membership event type is required")
 	}
-	node := blob.Node
+	switch *event.EventType {
+	case model.TensionEventMemberLinked:
+		if event.New == nil {
+			return false, fmt.Errorf("linked member is required")
+		}
+	case model.TensionEventMemberUnlinked:
+		if event.Old == nil || event.New == nil {
+			return false, fmt.Errorf("unlinked member and role type are required")
+		}
+	default:
+		return false, fmt.Errorf("bad membership event %q", *event.EventType)
+	}
+	subject, err := resolveGovernanceSubject(tension, governanceUpdate)
+	if err != nil {
+		return false, err
+	}
+	var ok bool
+	var unsafe bool
+	node := subject.fragment
 
-	if node != nil && node.Type != nil && *node.Type == model.NodeTypeCircle {
+	if *node.Type == model.NodeTypeCircle {
+		if event.Old == nil {
+			return false, fmt.Errorf("previous circle member is required")
+		}
 		// A membership node wants to leave.
 		// Auth: only Guest user can be detached (Retired)
 		// --
@@ -523,6 +501,9 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 			return ok, err
 		}
 		nf := StructMap[model.NodeFragment](n)
+		if nf.RoleType == nil {
+			return false, fmt.Errorf("guest membership role not found")
+		}
 		if *nf.RoleType != model.RoleTypeGuest {
 			return false, LogErr("access denied", fmt.Errorf("You cannot detach this role (%s) like this.", string(*nf.RoleType)))
 		}
@@ -531,76 +512,62 @@ func ChangeFirstLink(uctx *model.UserCtx, tension *model.Tension, event *model.E
 		unsafe = true
 	}
 
-	ok, err := TryUpdateLink(uctx, tension, node, event, unsafe)
+	ok, err = TryUpdateLink(node, subject.node, event, unsafe)
 
 	return ok, err
 }
 
 func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	if event.Old == nil || event.New == nil {
+	if event == nil || event.Old == nil || event.New == nil {
 		return false, fmt.Errorf("old and new event data must be defined.")
+	}
+	subject, err := resolveGovernanceSubject(tension, governanceUpdate)
+	if err != nil {
+		return false, err
 	}
 	if *event.Old != tension.Receiver.Nameid {
 		return false, LogErr("access denied", fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid))
 	}
 
-	var err error
 	receiverid_old := *event.Old // == tension.Receiverid
 	receiverid_new := *event.New
+	nameid_old := subject.node.Nameid
+	parts := strings.Split(nameid_old, "#")
+	localNameid := parts[len(parts)-1]
+	_, nameid_new, err := codec.NodeIdCodec(receiverid_new, localNameid, subject.node.Type)
+	if err != nil {
+		return false, err
+	}
 
-	// Update node and blob
-	if tension.Blobs != nil && tension.Blobs[0].Node != nil {
-		node := tension.Blobs[0].Node
-		_, nameid_old, err := codec.NodeIdCodec(receiverid_old, *node.Nameid, *node.Type)
-		if err != nil {
+	if codec.IsRoot(nameid_old) {
+		return false, fmt.Errorf("You can't move the root node.")
+	}
+	if receiverid_new == nameid_new {
+		return false, fmt.Errorf("A node cannot be its own parent.")
+	}
+	isChild, err := db.GetDB().IsChild(nameid_old, receiverid_new)
+	if err != nil {
+		return false, err
+	}
+	if isChild {
+		return false, fmt.Errorf("You can't move a node in their children.")
+	}
+	if codec.IsRole(receiverid_new) {
+		return false, fmt.Errorf("You can't move a node in a Role.")
+	}
+
+	nodeInput := model.UpdateNodeInput{
+		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid_old}},
+		Set:    &model.NodePatch{Parent: &model.NodeRef{Nameid: &receiverid_new}},
+	}
+	if err = db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput); err != nil {
+		return false, err
+	}
+	if nameid_old != nameid_new {
+		if _, err = db.GetDB().Meta("patchNameid", map[string]string{"nameid_old": nameid_old, "nameid_new": nameid_new}); err != nil {
 			return false, err
 		}
-		_, nameid_new, err := codec.NodeIdCodec(receiverid_new, *node.Nameid, *node.Type)
-		if err != nil {
-			return false, err
-		}
-
-		// test root node
-		if codec.IsRoot(tension.Emitter.Nameid) {
-			return false, fmt.Errorf("You can't move the root node.")
-		}
-		// test self-loop
-		if receiverid_new == nameid_new {
-			return false, fmt.Errorf("A node cannot be its own parent.")
-		}
-		// test recursion
-		isChild, err := db.GetDB().IsChild(nameid_old, receiverid_new)
-		if err != nil {
-			return false, err
-		}
-		if isChild {
-			return false, fmt.Errorf("You can't move a node in their children.")
-		}
-		if codec.IsRole(receiverid_new) {
-			return false, fmt.Errorf("You can't move a node in a Role.")
-		}
-
-		// node input
-		nodeInput := model.UpdateNodeInput{
-			Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid_old}},
-			Set: &model.NodePatch{
-				Parent: &model.NodeRef{Nameid: &receiverid_new},
-			},
-		}
-
-		// update node
-		err = db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput)
-		if err != nil {
-			return false, err
-		}
-
-		// DQL mutation (extra node update)
-		if nameid_old != nameid_new { // node is a role
-			_, err = db.GetDB().Meta("patchNameid", map[string]string{"nameid_old": nameid_old, "nameid_new": nameid_new})
-			if err != nil {
-				return false, err
-			}
-		}
+		subject.node.Nameid = nameid_new
 	}
 
 	// tension input
@@ -663,19 +630,16 @@ func UserJoin(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 // - remove User role
 // - update user membership
 func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {
-	var ok bool
-
-	blob := GetBlob(tension)
-	if blob == nil {
-		return false, fmt.Errorf("blob not found.")
+	if event == nil || event.New == nil {
+		return false, fmt.Errorf("membership role type is required")
 	}
-	node := blob.Node
-
-	// No blob for membership oles
 	roleType := model.RoleType(*event.New)
 	if codec.IsMembershipRoleType(roleType) {
 		uctx.NoCache = true
 		membershipNode := auth.GetMembershipRole(uctx, tension.Emitter.Nameid)
+		if membershipNode == nil || membershipNode.RoleType == nil {
+			return false, fmt.Errorf("membership role not found")
+		}
 		if roleType != *membershipNode.RoleType {
 			return false, LogErr("access denied", fmt.Errorf("You must have the same membership as the one given in the event."))
 		}
@@ -683,11 +647,14 @@ func UserLeave(uctx *model.UserCtx, tension *model.Tension, event *model.EventRe
 		nf.FirstLink = &uctx.Username
 		nodeType := model.NodeTypeRole
 		nf.Type = &nodeType
-		node = &nf
+		return LeaveRole(uctx, &nf, nil)
 	}
 
-	ok, err := LeaveRole(uctx, tension, node)
-	return ok, err
+	subject, err := resolveGovernanceSubject(tension, governanceUpdate)
+	if err != nil {
+		return false, err
+	}
+	return LeaveRole(uctx, subject.fragment, subject.node)
 }
 
 func PinTension(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, b *model.BlobRef) (bool, error) {

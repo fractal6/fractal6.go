@@ -704,26 +704,44 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
             obj as var(func: uid({{.bid}}))
         }`,
 		M: []X{{
-			S: `uid(obj) <Blob.pushedFlag> "{{.flag}}" .
-                <{{.tid}}> <Tension.action> "{{.action}}" .`,
+			S: `uid(obj) <Blob.pushedFlag> "{{.flag}}" .`,
 			D: `uid(obj) <Blob.archivedFlag> * .`,
 		}},
 	},
-	"setArchivedFlagBlob": {
+	// Node.source and Tension.governed_node are written together; the op-resolver owns the state checks.
+	"linkGovernedNode": {
 		Q: `query {
-            obj as var(func: uid({{.bid}}))
+            tension as var(func: uid({{.tid}}))
+            node as var(func: uid({{.nid}}))
+            blob as var(func: uid({{.bid}}))
         }`,
 		M: []X{{
-			S: `uid(obj) <Blob.archivedFlag> "{{.flag}}" .
-                <{{.tid}}> <Tension.action> "{{.action}}" .`,
+			C: `@if(eq(len(tension), 1) AND eq(len(node), 1) AND eq(len(blob), 1))`,
+			S: `uid(node) <Node.source> uid(blob) .
+                uid(tension) <Tension.governed_node> uid(node) .`,
 		}},
 	},
-	"setNodeSource": {
+	"archiveGovernedNode": {
 		Q: `query {
-            node as var(func: eq(Node.nameid, "{{.nameid}}"))
+            node as var(func: uid({{.nid}}))
+            blob as var(func: uid({{.bid}}))
         }`,
 		M: []X{{
-			S: `uid(node) <Node.source> <{{.bid}}> .`,
+			C: `@if(eq(len(node), 1) AND eq(len(blob), 1))`,
+			S: `uid(node) <Node.isArchived> "true" .
+                uid(blob) <Blob.archivedFlag> "{{.flag}}" .`,
+		}},
+	},
+	"unarchiveGovernedNode": {
+		Q: `query {
+            node as var(func: uid({{.nid}}))
+            blob as var(func: uid({{.bid}}))
+        }`,
+		M: []X{{
+			C: `@if(eq(len(node), 1) AND eq(len(blob), 1))`,
+			S: `uid(node) <Node.isArchived> "false" .
+                uid(blob) <Blob.pushedFlag> "{{.flag}}" .`,
+			D: `uid(blob) <Blob.archivedFlag> * .`,
 		}},
 	},
 	"setChildrenRoleVisibility": {

@@ -63,6 +63,7 @@ func TestCreateOrga_Success(t *testing.T) {
 	if !ok || name != "Integration Test Org" {
 		t.Errorf("expected org name %q, got %v", "Integration Test Org", val)
 	}
+	requireGovernanceLink(t, orgNameid)
 }
 
 func TestCreateOrga_NoAuth(t *testing.T) {

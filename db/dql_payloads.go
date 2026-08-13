@@ -37,7 +37,6 @@ var userCtxPayload string = `{
 var tensionHookPayload string = `
   uid
   Post.createdBy { User.username }
-  Tension.action
   Tension.emitter {
     Node.nameid
     Node.role_type
@@ -48,6 +47,13 @@ var tensionHookPayload string = `
     Node.mode
     Node.visibility
     Node.userCanJoin
+  }
+  Tension.governed_node {
+    uid
+    Node.nameid
+    Node.type_
+    Node.isArchived
+    Node.first_link { User.username }
   }
 `
 

@@ -205,6 +205,112 @@ func TestProjectReparent_Integration(t *testing.T) {
 	_, _ = GetDB().Gamma(rmNode, map[string]string{})
 }
 
+func TestGovernedNodeMutations_Integration(t *testing.T) {
+	const key = "integration-governed-node"
+	cleanup := QueryMut{
+		Q: `query {
+			n as var(func: regexp(Node.nameid, /^` + key + `/))
+			t as var(func: regexp(Tension.receiverid, /^` + key + `/)) { b as Tension.blobs }
+		}`,
+		M: []X{{D: `uid(b) * * .
+			uid(t) * * .
+			uid(n) * * .`}},
+	}
+	_, _ = GetDB().Gamma(cleanup, nil)
+	t.Cleanup(func() { _, _ = GetDB().Gamma(cleanup, nil) })
+
+	// One tension owning the blob and the node it governs.
+	create := QueryMut{
+		Q: `query { all(func: eq(Node.nameid, "` + key + `")) { uid } }`,
+		M: []X{{S: `_:n <dgraph.type> "Node" .
+		_:n <Node.nameid> "` + key + `" .
+		_:n <Node.type_> "Role" .
+		_:n <Node.isArchived> "false" .
+		_:t <dgraph.type> "Tension" .
+		_:t <Tension.receiverid> "` + key + `" .
+		_:t <Tension.blobs> _:b .
+		_:b <dgraph.type> "Blob" .
+		_:b <Blob.tension> _:t .
+		_:b <Blob.blob_type> "OnNode" .
+		_:b <Blob.pushedFlag> "2026-01-01T00:00:00Z" .`}},
+	}
+	if _, err := GetDB().Gamma(create, nil); err != nil {
+		t.Fatalf("creating governed mutation fixtures: %v", err)
+	}
+
+	uidByEq := func(predicate, value string) string {
+		t.Helper()
+		v, err := GetDB().GetByEq(predicate, value, "uid")
+		if err != nil {
+			t.Fatalf("resolving %s=%s: %v", predicate, value, err)
+		}
+		uid, ok := v.(string)
+		if !ok {
+			t.Fatalf("%s=%s UID has type %T", predicate, value, v)
+		}
+		return uid
+	}
+	blobUID := func(receiverid string) string {
+		t.Helper()
+		v, err := GetDB().GetByEq("Tension.receiverid", receiverid, "Tension.blobs", "uid")
+		if err != nil {
+			t.Fatalf("resolving blob for %s: %v", receiverid, err)
+		}
+		values, ok := v.([]any)
+		if !ok || len(values) != 1 {
+			t.Fatalf("blob for %s has value %T(%v)", receiverid, v, v)
+		}
+		uid, ok := values[0].(string)
+		if !ok {
+			t.Fatalf("blob UID for %s has type %T", receiverid, values[0])
+		}
+		return uid
+	}
+	nid := uidByEq("Node.nameid", key)
+	tid := uidByEq("Tension.receiverid", key)
+	bid := blobUID(key)
+
+	if err := GetDB().LinkGovernedNode(tid, nid, bid); err != nil {
+		t.Fatalf("LinkGovernedNode: %v", err)
+	}
+	if source, _ := GetDB().GetByUid(nid, "Node.source", "uid"); source != bid {
+		t.Fatalf("link set source %v, want %s", source, bid)
+	}
+	if governed, _ := GetDB().GetByUid(tid, "Tension.governed_node", "uid"); governed != nid {
+		t.Fatalf("link set governed node %v, want %s", governed, nid)
+	}
+
+	if err := GetDB().SetGovernedNodeArchived(nid, bid, "2026-01-02T00:00:00Z", true); err != nil {
+		t.Fatalf("archive governed node: %v", err)
+	}
+	if state, _ := GetDB().GetByUid(nid, "Node.isArchived"); state != true {
+		t.Fatalf("archive left Node.isArchived at %v", state)
+	}
+	flags, err := GetDB().GetByUid(bid, "Blob.pushedFlag Blob.archivedFlag")
+	if err != nil {
+		t.Fatalf("reading archived blob flags: %v", err)
+	}
+	archivedFlags, ok := flags.(map[string]any)
+	if !ok || archivedFlags["pushedFlag"] == nil || archivedFlags["archivedFlag"] == nil {
+		t.Fatalf("archived blob flags disagree: %T(%v)", flags, flags)
+	}
+
+	if err := GetDB().SetGovernedNodeArchived(nid, bid, "2026-01-03T00:00:00Z", false); err != nil {
+		t.Fatalf("unarchive governed node: %v", err)
+	}
+	if state, _ := GetDB().GetByUid(nid, "Node.isArchived"); state != false {
+		t.Fatalf("unarchive left Node.isArchived at %v", state)
+	}
+	flags, err = GetDB().GetByUid(bid, "Blob.pushedFlag Blob.archivedFlag")
+	if err != nil {
+		t.Fatalf("reading unarchived blob flags: %v", err)
+	}
+	unarchivedFlags, ok := flags.(map[string]any)
+	if !ok || unarchivedFlags["pushedFlag"] == nil || unarchivedFlags["archivedFlag"] != nil {
+		t.Fatalf("unarchived blob flags disagree: %T(%v)", flags, flags)
+	}
+}
+
 func TestUpsertActivity_Integration(t *testing.T) {
 	today := time.Now().UTC().Format("2006-01-02")
 	todayISO := today + "T00:00:00Z"

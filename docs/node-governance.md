@@ -1,0 +1,20 @@
+# Node governance
+
+A governance tension governs at most one Node through the backend-owned `Tension.governed_node` relation. Its `receiver` remains the parent circle or addressee; it is never a substitute for the governed Node.
+
+## State and operations
+
+The latest Node blob is the proposed document. Governance state is derived rather than persisted separately:
+
+- **Draft:** the latest blob has a Node fragment and `governed_node` is null. The fragment's `type_` supplies the draft kind.
+- **Published:** `governed_node` is set and its `isArchived` is false. The Node's `type_` supplies the kind.
+- **Archived:** `governed_node.isArchived` is true.
+
+`BlobPushed` creates and links a draft Node on first publication, then updates only that linked Node. Linking writes `Node.source` and `Tension.governed_node` in a single upsert. A publication interrupted between Node creation and linking leaves an orphan Node; it is repaired by the same `Node.source -> Blob.tension` upgrade script used for the migration (`../db/script/upgrade/to-v0.9.0.sh`), not at runtime. Node governance accepts only the explicit `OnNode`, `OnAbout`, `OnMandate`, and `OnAboutAndMandate` blob kinds; Md and document blobs are rejected.
+
+`BlobArchived` and `BlobUnarchived` drive lifecycle transitions, writing `Node.isArchived` and the blob flags in one upsert. First-link cleanup remains non-blocking, but runs only after archive persistence succeeds. Authority, visibility, membership, and move events also target the governed relation. `Node.isArchived` is the lifecycle source of truth; blob flags describe the corresponding document revision.
+
+`Node.updatedAt` is bumped only by events that write the Node (publish, archive/unarchive, authority, visibility, membership, move); commenting or labelling a governance tension leaves it untouched. State and shape validation lives in the graph op-resolvers (`resolveGovernanceSubject` in `graph/tension_governance.go`): blob kind, fragment shape, kind agreement between fragment and Node, and legal lifecycle transitions. DQL mutations stay plain writes, relying on the GraphQL schema for edge consistency instead of re-checking it.
+
+Root and spreadsheet-imported governance tensions use the same linking operation for their already-created Nodes. REST tension lists (`/q/tensions/{int,ext,all}`) expose the compact governed Node and latest fragment kind so clients can derive the same state. The `light` list keeps its smaller contract.
+

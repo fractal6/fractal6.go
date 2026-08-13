@@ -124,6 +124,12 @@ func buildTestRouter() chi.Router {
 	r.Use(middle6.JwtDecode)
 	r.Use(middleware.Timeout(30 * time.Second))
 
+	// GraphQL API
+	r.Post("/api", GraphqlHandler(map[string]any{
+		"introspection":    false,
+		"complexity_limit": int64(1000),
+	}))
+
 	// Query routes
 	r.Route("/q", func(r chi.Router) {
 		top := db.GetDB().GetTopNodeVisibilities
@@ -179,6 +185,7 @@ func buildTestRouter() chi.Router {
 		r.Post("/updatepassword", UpdatePassword)
 		// Organisation
 		r.Post("/createorga", CreateOrga)
+		r.Post("/createorga/spreadsheet", ImportOrga)
 		r.Post("/setusercanjoin", SetUserCanJoin)
 		r.Post("/setguestcancreatetension", SetGuestCanCreateTension)
 		r.Post("/setlexicon", SetLexicon)

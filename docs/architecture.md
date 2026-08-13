@@ -97,6 +97,8 @@ updateTension → TensionEventHook → ProcessEvent (per event)
 
 Notable events and their authorization category live in the `EventsMap` table at the top of `tension_op.go`. The three `Project*` events (`ProjectAdded`, `ProjectRemoved`, `ProjectColumnMoved`) are emitted only from the `ProjectCard` hooks (`graph/card_resolver.go`) — auth is enforced upstream by `CheckProjectAuth`, and each hook writes the `Event` plus `Tension.updatedAt` in a single `updateTension` mutation. Their EMAP entries use `RejectInternalEvent` so any caller that reaches them via the standard `updateTension(history:…)` pipeline gets a clear error rather than the generic "Event not implemented" fallback.
 
+Node document events target the backend-owned governed relation and derive lifecycle state as described in [Node governance](node-governance.md).
+
 When an event needs peer validation, a `Contract` is created. Contract types: `AnyCoordoDual`, `AnyCandidates`, `AnyCoordoSource`, `AnyCoordoTarget`.
 
 ## Database layer

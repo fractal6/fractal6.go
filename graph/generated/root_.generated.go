@@ -1379,7 +1379,6 @@ type ComplexityRoot struct {
 	}
 
 	Tension struct {
-		Action                   func(childComplexity int) int
 		Assignees                func(childComplexity int, filter *model.UserFilter, order *model.UserOrder, first *int, offset *int) int
 		AssigneesAggregate       func(childComplexity int, filter *model.UserFilter) int
 		Blobs                    func(childComplexity int, filter *model.BlobFilter, order *model.BlobOrder, first *int, offset *int) int
@@ -9396,13 +9395,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.RoleExtAggregateResult.RootnameidMin(childComplexity), true
 
-	case "Tension.action":
-		if e.complexity.Tension.Action == nil {
-			break
-		}
-
-		return e.complexity.Tension.Action(childComplexity), true
-
 	case "Tension.assignees":
 		if e.complexity.Tension.Assignees == nil {
 			break
@@ -12208,7 +12200,6 @@ type Tension {
   title: String!
   type_: TensionType!
   status: TensionStatus!
-  action: TensionAction
   assignees(filter: UserFilter, order: UserOrder, first: Int, offset: Int): [User!]
   labels(filter: LabelFilter, order: LabelOrder, first: Int, offset: Int): [Label!]
   comments(filter: CommentFilter, order: CommentOrder, first: Int, offset: Int): [Comment!]
@@ -12498,21 +12489,6 @@ enum TensionType {
 
 }
 
-enum TensionAction {
-
-  NewRole
-  NewCircle
-  NewMd
-
-  EditRole
-  EditCircle
-  EditMd
-
-  ArchivedRole
-  ArchivedCircle
-  ArchivedMd
-}
-
 enum TensionEvent {
 
   Created
@@ -12598,13 +12574,9 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
@@ -12612,21 +12584,25 @@ directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @cacheControl(maxAge: Int!) on QUERY
 
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @lambda on FIELD_DEFINITION
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+directive @cascade(fields: [String]) on FIELD
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @cascade(fields: [String]) on FIELD
+directive @lambda on FIELD_DEFINITION
+
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 type ActivityAggregateResult {
   count: Int
@@ -13093,7 +13069,6 @@ input AddTensionInput {
   title: String!
   type_: TensionType! @x_alter(r:"tensionTypeCheck")
   status: TensionStatus!
-  action: TensionAction
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
@@ -15633,7 +15608,6 @@ enum TensionHasFilter {
   title
   type_
   status
-  action
   assignees
   labels
   comments
@@ -15675,7 +15649,6 @@ input TensionPatch {
   title: String @x_patch_ro
   type_: TensionType @x_alter(r:"tensionTypeCheck")
   status: TensionStatus @x_patch_ro
-  action: TensionAction @x_patch_ro
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
@@ -15702,7 +15675,6 @@ input TensionRef {
   title: String
   type_: TensionType @x_alter(r:"tensionTypeCheck")
   status: TensionStatus
-  action: TensionAction
   assignees: [UserRef!] @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [LabelRef!] @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
   comments: [CommentRef!] @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")

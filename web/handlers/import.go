@@ -247,7 +247,7 @@ func buildOrgFromTree(uctx *model.UserCtx, form model.OrgaForm, tree *ImportNode
 	nodeInput.Children = []*model.NodeRef{&owner}
 
 	// Create root node
-	_, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
+	rootNodeID, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
 	if err != nil {
 		return fmt.Errorf("creating root node: %w", err)
 	}
@@ -265,9 +265,9 @@ func buildOrgFromTree(uctx *model.UserCtx, form model.OrgaForm, tree *ImportNode
 	if bid == nil {
 		return fmt.Errorf("linking source: no blob found for tension %s", tid)
 	}
-	_, err = db.GetDB().Meta("setNodeSource", map[string]string{"nameid": nameid, "bid": *bid})
+	err = db.GetDB().LinkGovernedNode(tid, rootNodeID, *bid)
 	if err != nil {
-		return fmt.Errorf("linking source: %w", err)
+		return fmt.Errorf("linking root governance: %w", err)
 	}
 
 	// Add owner role to user
@@ -341,17 +341,15 @@ func createChildNode(username, rootnameid, parentid string, node *ImportNode, vi
 	}
 
 	// Create the node
-	_, err = db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
+	nodeID, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
 	if err != nil {
 		return fmt.Errorf("creating node %q: %w", node.Name, err)
 	}
 
 	// Create a governance tension for nodes with mandate data
 	if mandate != nil {
-		err = createNodeTension(username, rootnameid, parentid, nameid, node, mandate)
-		if err != nil {
-			// Non-fatal: node is created but tension failed
-			fmt.Printf("warning: failed to create tension for %q: %v\n", node.Name, err)
+		if err := createNodeTension(username, rootnameid, parentid, nameid, nodeID, node, mandate); err != nil {
+			return fmt.Errorf("creating governance tension for %q: %w", node.Name, err)
 		}
 	}
 
@@ -369,18 +367,11 @@ func createChildNode(username, rootnameid, parentid string, node *ImportNode, vi
 }
 
 // createNodeTension creates a governance tension for an imported node.
-func createNodeTension(username, rootnameid, parentid, nameid string, node *ImportNode, mandate *model.MandateRef) error {
+func createNodeTension(username, rootnameid, parentid, nameid, nodeID string, node *ImportNode, mandate *model.MandateRef) error {
 	now := Now()
 	createdBy := model.UserRef{Username: &username}
 	emitter := model.NodeRef{Nameid: &parentid}
 	receiver := model.NodeRef{Nameid: &parentid}
-
-	var action model.TensionAction
-	if node.Type == model.NodeTypeCircle {
-		action = model.TensionActionNewCircle
-	} else {
-		action = model.TensionActionNewRole
-	}
 
 	evt1 := model.TensionEventCreated
 	evt2 := model.TensionEventBlobCreated
@@ -391,12 +382,20 @@ func createNodeTension(username, rootnameid, parentid, nameid string, node *Impo
 
 	// Build NodeFragmentRef for the blob
 	nodeName := node.Name
+	localNameid := NameidEncoder(node.Name)
+	nodeType := node.Type
 	nodeFragRef := model.NodeFragmentRef{
+		Nameid:  &localNameid,
 		Name:    &nodeName,
+		Type:    &nodeType,
 		Mandate: mandate,
 	}
-	if node.Type == model.NodeTypeRole && node.RoleType != nil {
-		nodeFragRef.RoleType = node.RoleType
+	if node.Type == model.NodeTypeRole {
+		roleType := model.RoleTypePeer
+		if node.RoleType != nil {
+			roleType = *node.RoleType
+		}
+		nodeFragRef.RoleType = &roleType
 	}
 
 	blob := model.BlobRef{
@@ -417,7 +416,6 @@ func createNodeTension(username, rootnameid, parentid, nameid string, node *Impo
 		Receiver:   &receiver,
 		Emitterid:  parentid,
 		Receiverid: parentid,
-		Action:     &action,
 		History: []*model.EventRef{
 			{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt1},
 			{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt2},
@@ -435,11 +433,10 @@ func createNodeTension(username, rootnameid, parentid, nameid string, node *Impo
 
 	// Link source blob to node
 	bid := db.GetDB().GetLastBlobId(tid)
-	if bid != nil {
-		_, err = db.GetDB().Meta("setNodeSource", map[string]string{"nameid": nameid, "bid": *bid})
+	if bid == nil {
+		return fmt.Errorf("no blob found for imported governance tension %s", tid)
 	}
-
-	return err
+	return db.GetDB().LinkGovernedNode(tid, nodeID, *bid)
 }
 
 // createRoleExt creates a RoleExt template in the database and returns its ID.

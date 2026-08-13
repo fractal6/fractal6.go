@@ -32,8 +32,7 @@ import (
 )
 
 // tryAddNode add a new node if user has the correct right
-func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
-	emitterid := tension.Emitter.Nameid
+func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, string, error) {
 	parentid := tension.Receiver.Nameid
 
 	auth.InheritNodeCharacDefault(node, tension.Receiver)
@@ -41,63 +40,35 @@ func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFra
 	// Get References
 	_, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
-	ok, err := NodeCheck(uctx, node, nameid, tension.Action)
+	ok, err := NodeCheck(node, nameid)
 	if err != nil || !ok {
-		return ok, err
+		return ok, "", err
 	}
 
-	err = PushNode(uctx.Username, bid, node, emitterid, nameid, parentid)
-	if err == nil {
-		// Update tension title
-		err = db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(*node.Type, *node.Nameid == "", *node.Name))
-	}
-	return ok, err
+	nid, err := PushNode(uctx.Username, tension, bid, node, nameid, parentid)
+	return ok, nid, err
 }
 
-func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, error) {
-	emitterid := tension.Emitter.Nameid
-	parentid := tension.Receiver.Nameid
-
-	// Get References
-	_, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
-	if err != nil {
-		return false, err
-	}
-
-	ok, err := NodeCheck(uctx, node, nameid, tension.Action)
+func TryUpdateNode(tension *model.Tension, node *model.NodeFragment, governed *model.Node, bid *string) (bool, error) {
+	ok, err := NodeCheck(node, governed.Nameid)
 	if err != nil || !ok {
 		return ok, err
 	}
 
-	err = UpdateNode(uctx, bid, node, emitterid, nameid)
-	if err == nil {
-		// Update tension title
-		err = db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(*node.Type, *node.Nameid == "", *node.Name))
-	}
-	return ok, err
+	return ok, UpdateNode(tension, bid, node, governed)
 }
 
-func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, eventType model.TensionEvent) (bool, error) {
-	parentid := tension.Receiver.Nameid
-
-	// Get References
-	rootnameid, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
-	if err != nil {
-		return false, err
-	}
-
-	ok, err := NodeCheck(uctx, node, nameid, tension.Action)
+func TryChangeArchiveNode(node *model.NodeFragment, governed *model.Node, bid string, archived bool) (bool, error) {
+	nameid := governed.Nameid
+	ok, err := NodeCheck(node, nameid)
 	if err != nil || !ok {
 		return ok, err
 	}
 
-	var archiveFlag string
-
-	switch eventType {
-	case model.TensionEventBlobArchived:
+	if archived {
 		// Archive
 		// --
 		// Check that circle has no children
@@ -110,14 +81,7 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 				return ok, fmt.Errorf("Cannot archive circle with active children. Please archive children first.")
 			}
 		}
-		archiveFlag = strconv.FormatBool(true)
-
-		// Eventually Unlink first-link
-		if node.FirstLink != nil {
-			// Ignored error if node.FirstLink does not exist (likely to be ""...)
-			UnlinkUser(rootnameid, nameid, *node.FirstLink)
-		}
-	case model.TensionEventBlobUnarchived:
+	} else {
 		// Unarchive
 		// --
 		// Check that parent node is not archived
@@ -128,26 +92,24 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, node *mod
 		if parentIsArchived != nil && parentIsArchived.(bool) {
 			return ok, fmt.Errorf("Cannot unarchive node with archived parent. Please unarchive parent first.")
 		}
-		archiveFlag = strconv.FormatBool(false)
-	default:
-		return false, fmt.Errorf("bad tension event '%s'.", string(eventType))
 	}
 
-	// Set the archive flag
-	err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.isArchived", archiveFlag)
-	return ok, err
-}
-
-func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, value string) (bool, error) {
-	parentid := tension.Receiver.Nameid
-
-	// Get References
-	_, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
-	if err != nil {
+	if err = db.GetDB().SetGovernedNodeArchived(governed.ID, bid, Now(), archived); err != nil {
 		return false, err
 	}
 
-	ok, err := NodeCheck(uctx, node, nameid, tension.Action)
+	// Eventually unlink first-link, once the archive is persisted. Unlink errors do not block it.
+	if archived && governed.FirstLink != nil {
+		rootnameid, _ := codec.Nid2rootid(nameid) // NodeCheck already validated the nameid.
+		UnlinkUser(rootnameid, nameid, governed.FirstLink.Username)
+	}
+
+	return ok, err
+}
+
+func TryChangeAuthority(node *model.NodeFragment, governed *model.Node, value string) (bool, error) {
+	nameid := governed.Nameid
+	ok, err := NodeCheck(node, nameid)
 	if err != nil || !ok {
 		return ok, err
 	}
@@ -186,16 +148,9 @@ func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, node *model
 	return ok, err
 }
 
-func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, value string) (bool, error) {
-	parentid := tension.Receiver.Nameid
-
-	// Get References
-	_, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
-	if err != nil {
-		return false, err
-	}
-
-	ok, err := NodeCheck(uctx, node, nameid, tension.Action)
+func TryChangeVisibility(node *model.NodeFragment, governed *model.Node, value string) (bool, error) {
+	nameid := governed.Nameid
+	ok, err := NodeCheck(node, nameid)
 	if err != nil || !ok {
 		return ok, err
 	}
@@ -224,11 +179,10 @@ func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, node *mode
 	return ok, err
 }
 
-func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, event *model.EventRef, unsafe bool) (bool, error) {
+func TryUpdateLink(node *model.NodeFragment, governed *model.Node, event *model.EventRef, unsafe bool) (bool, error) {
 	var err error
 	var rootnameid string
 	var nameid string
-	parentid := tension.Receiver.Nameid
 
 	// unsafe allows Guest user to be unlinked, as the nameid includes a "@" char.
 	if unsafe {
@@ -238,12 +192,12 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 			return false, err
 		}
 	} else {
-		// Get References
-		rootnameid, nameid, err = codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+		nameid = governed.Nameid
+		rootnameid, err = codec.Nid2rootid(nameid)
 		if err != nil {
 			return false, err
 		}
-		ok, err := NodeCheck(uctx, node, nameid, tension.Action)
+		ok, err := NodeCheck(node, nameid)
 		if err != nil || !ok {
 			return false, err
 		}
@@ -283,9 +237,12 @@ func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, node *model.Node
 	return true, err
 }
 
-// NodeCheck validate and type checks.
-func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, action *model.TensionAction) (bool, error) {
-	var ok bool = false
+// NodeCheck validates the fragment fields written to a Node.
+func NodeCheck(node *model.NodeFragment, nameid string) (bool, error) {
+	if node == nil || node.Name == nil {
+		return false, fmt.Errorf("node fragment name is required")
+	}
+	var ok bool
 	var err error
 
 	// Validate nameid
@@ -306,22 +263,6 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
 		return ok, err
 	}
 
-	// Validate Tension action
-	if *action == model.TensionActionNewRole {
-		// RoleType Hook
-		nodeType := *node.Type
-		roleType := node.RoleType
-		switch nodeType {
-		case model.NodeTypeRole:
-			// Validate input
-			if roleType == nil {
-				err = fmt.Errorf("role must have a RoleType.")
-			}
-		case model.NodeTypeCircle:
-			// pass
-		}
-	}
-
 	// Validate special role-type from being created
 	if node.RoleType != nil && codec.IsMembershipRoleType(*node.RoleType) {
 		return false, fmt.Errorf("Membership roles are protected and cannot be created like this.")
@@ -334,7 +275,8 @@ func NodeCheck(uctx *model.UserCtx, node *model.NodeFragment, nameid string, act
 // PushNode add a new role or circle in an graph.
 // * It adds automatic fields such as createdBy, createdAt, etc
 // * It automatically add tension associated to potential children.
-func PushNode(username string, bid *string, node *model.NodeFragment, emitterid, nameid, parentid string) error {
+// The tension is the governance tension owning the node, or nil when no tension title follows the node.
+func PushNode(username string, tension *model.Tension, bid *string, node *model.NodeFragment, nameid, parentid string) (string, error) {
 	rootnameid, _ := codec.Nid2rootid(nameid)
 
 	// Map NodeFragment to Node Input
@@ -357,16 +299,19 @@ func PushNode(username string, bid *string, node *model.NodeFragment, emitterid,
 	}
 
 	// Push the nodes into the database
-	_, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
-	if err != nil {
-		return err
+	nid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
+	if err != nil || tension == nil {
+		return nid, err
 	}
 
-	return err
+	// Update tension title
+	err = db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(*node.Type, *node.Nameid == "", *node.Name))
+	return nid, err
 }
 
 // UpdateNode update a node from the given fragment
-func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emitterid, nameid string) error {
+func UpdateNode(tension *model.Tension, bid *string, node *model.NodeFragment, governed *model.Node) error {
+	nameid := governed.Nameid
 	// Map NodeFragment to Node Patch Input
 	// The NodeFraglent copy is only necesary for the @search feature.
 	// see https://discuss.dgraph.io/t/fulltext-search-across-multiple-fields/14354
@@ -384,7 +329,12 @@ func UpdateNode(uctx *model.UserCtx, bid *string, node *model.NodeFragment, emit
 	}
 	// Update the node in database
 	err := db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Update tension title
+	return db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(governed.Type, codec.IsRoot(nameid), *node.Name))
 }
 
 //
@@ -397,7 +347,6 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *strin
 	createdBy := *node.CreatedBy
 	emitter := model.NodeRef{Nameid: &rootnameid}
 	receiver := model.NodeRef{Nameid: &rootnameid}
-	action := model.TensionActionEditCircle
 	evt1 := model.TensionEventCreated
 	evt2 := model.TensionEventBlobCreated
 	evt3 := model.TensionEventBlobPushed
@@ -424,7 +373,6 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *strin
 		Receiver:   &receiver,
 		Emitterid:  rootnameid,
 		Receiverid: rootnameid,
-		Action:     &action,
 		History: []*model.EventRef{
 			{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt1},
 			{CreatedAt: &now, CreatedBy: &createdBy, EventType: &evt2},
@@ -469,7 +417,7 @@ func MaybeAddPendingNode(username string, tension *model.Tension) (bool, error) 
 			Type:     &t,
 		}
 		auth.InheritNodeCharacDefault(n, tension.Receiver)
-		err = PushNode(username, nil, n, "", nid, rootid)
+		_, err = PushNode(username, nil, nil, n, nid, rootid)
 		if err != nil {
 			return ok, err
 		}

@@ -16530,8 +16530,6 @@ func (ec *executionContext) fieldContext_AddTensionPayload_tension(ctx context.C
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -17273,8 +17271,6 @@ func (ec *executionContext) fieldContext_Blob_tension(ctx context.Context, field
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -19544,8 +19540,6 @@ func (ec *executionContext) fieldContext_Contract_tension(ctx context.Context, f
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -24941,8 +24935,6 @@ func (ec *executionContext) fieldContext_DeleteTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -25912,8 +25904,6 @@ func (ec *executionContext) fieldContext_Event_tension(ctx context.Context, fiel
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -26070,8 +26060,6 @@ func (ec *executionContext) fieldContext_Event_mentioned(ctx context.Context, fi
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -28321,8 +28309,6 @@ func (ec *executionContext) fieldContext_File_tension(ctx context.Context, field
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -29614,8 +29600,6 @@ func (ec *executionContext) fieldContext_Label_tensions(ctx context.Context, fie
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -37557,8 +37541,6 @@ func (ec *executionContext) fieldContext_Node_tensions_out(ctx context.Context, 
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -37674,8 +37656,6 @@ func (ec *executionContext) fieldContext_Node_tensions_in(ctx context.Context, f
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -38558,8 +38538,6 @@ func (ec *executionContext) fieldContext_Node_pinned(ctx context.Context, field 
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -42434,8 +42412,6 @@ func (ec *executionContext) fieldContext_Notif_tension_(ctx context.Context, fie
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -47918,8 +47894,6 @@ func (ec *executionContext) fieldContext_ProjectColumn_tensions(ctx context.Cont
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -54452,8 +54426,6 @@ func (ec *executionContext) fieldContext_Query_getTension(ctx context.Context, f
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -54569,8 +54541,6 @@ func (ec *executionContext) fieldContext_Query_queryTension(ctx context.Context,
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -60153,44 +60123,6 @@ func (ec *executionContext) fieldContext_Tension_status(_ context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type TensionStatus does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Tension_action(ctx context.Context, field graphql.CollectedField, obj *model.Tension) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Tension_action(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Action, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.TensionAction)
-	fc.Result = res
-	return ec.marshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Tension_action(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Tension",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type TensionAction does not have child fields")
 		},
 	}
 	return fc, nil
@@ -66928,8 +66860,6 @@ func (ec *executionContext) fieldContext_UpdateTensionPayload_tension(ctx contex
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -68284,8 +68214,6 @@ func (ec *executionContext) fieldContext_User_subscriptions(ctx context.Context,
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -68829,8 +68757,6 @@ func (ec *executionContext) fieldContext_User_tensions_created(ctx context.Conte
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -68966,8 +68892,6 @@ func (ec *executionContext) fieldContext_User_tensions_assigned(ctx context.Cont
 				return ec.fieldContext_Tension_type_(ctx, field)
 			case "status":
 				return ec.fieldContext_Tension_status(ctx, field)
-			case "action":
-				return ec.fieldContext_Tension_action(ctx, field)
 			case "assignees":
 				return ec.fieldContext_Tension_assignees(ctx, field)
 			case "labels":
@@ -76405,7 +76329,7 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "governed_node", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "assignees", "labels", "comments", "blobs", "governed_node", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -76571,13 +76495,6 @@ func (ec *executionContext) unmarshalInputAddTensionInput(ctx context.Context, o
 				return it, err
 			}
 			it.Status = data
-		case "action":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("action"))
-			data, err := ec.unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Action = data
 		case "assignees":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -90656,7 +90573,7 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "governed_node", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "assignees", "labels", "comments", "blobs", "governed_node", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -90933,30 +90850,6 @@ func (ec *executionContext) unmarshalInputTensionPatch(ctx context.Context, obj 
 				it.Status = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionStatus`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "action":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("action"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.TensionAction); ok {
-				it.Action = data
-			} else if tmp == nil {
-				it.Action = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionAction`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		case "assignees":
@@ -91289,7 +91182,7 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "action", "assignees", "labels", "comments", "blobs", "governed_node", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "emitter", "emitterid", "receiver", "receiverid", "title", "type_", "status", "assignees", "labels", "comments", "blobs", "governed_node", "history", "mentions", "contracts", "subscribers", "project_statuses", "n_comments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -91466,13 +91359,6 @@ func (ec *executionContext) unmarshalInputTensionRef(ctx context.Context, obj in
 				return it, err
 			}
 			it.Status = data
-		case "action":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("action"))
-			data, err := ec.unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Action = data
 		case "assignees":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
 			directive0 := func(ctx context.Context) (interface{}, error) {
@@ -103814,8 +103700,6 @@ func (ec *executionContext) _Tension(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "action":
-			out.Values[i] = ec._Tension_action(ctx, field, obj)
 		case "assignees":
 			out.Values[i] = ec._Tension_assignees(ctx, field, obj)
 		case "labels":
@@ -115899,22 +115783,6 @@ func (ec *executionContext) marshalOTension2ᚖfractaleᚋfractal6ᚗgoᚋgraph�
 		return graphql.Null
 	}
 	return ec._Tension(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx context.Context, v interface{}) (*model.TensionAction, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.TensionAction)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOTensionAction2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAction(ctx context.Context, sel ast.SelectionSet, v *model.TensionAction) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
 }
 
 func (ec *executionContext) marshalOTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx context.Context, sel ast.SelectionSet, v *model.TensionAggregateResult) graphql.Marshaler {

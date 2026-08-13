@@ -110,7 +110,12 @@ func TestDecodeDql_NestedStruct(t *testing.T) {
 	raw := map[string]any{
 		"uid":            "0x10",
 		"Post.createdBy": map[string]any{"User.username": "alice"},
-		"Tension.action": "NewRole",
+		"Tension.governed_node": map[string]any{
+			"uid":             "0x11",
+			"Node.nameid":     "org##role",
+			"Node.type_":      "Role",
+			"Node.isArchived": false,
+		},
 		"Tension.emitter": map[string]any{
 			"Node.nameid": "org",
 		},
@@ -126,6 +131,9 @@ func TestDecodeDql_NestedStruct(t *testing.T) {
 	}
 	if tension.ID != "0x10" {
 		t.Errorf("expected id=0x10, got %s", tension.ID)
+	}
+	if tension.GovernedNode == nil || tension.GovernedNode.Nameid != "org##role" {
+		t.Errorf("expected governed node org##role, got %v", tension.GovernedNode)
 	}
 }
 

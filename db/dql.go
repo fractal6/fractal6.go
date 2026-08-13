@@ -637,6 +637,28 @@ type ProjectFull struct {
 	Collaborators []*model.User `json:"collaborators,omitempty"`
 }
 
+const tensionListPayload = `uid
+        Post.createdAt
+        Post.createdBy { User.username }
+        Tension.receiver { Node.nameid Node.name Node.role_type }
+        Tension.emitter { Node.nameid Node.name Node.role_type }
+        Tension.title
+        Tension.status
+        Tension.type_
+        Tension.labels { uid Label.name Label.color }
+        Tension.governed_node { uid Node.nameid Node.type_ Node.isArchived }
+        Tension.blobs (orderdesc: Post.createdAt, first: 1) {
+            Blob.node { NodeFragment.type_ }
+        }
+        n_comments: count(Tension.comments)`
+
+const tensionLightPayload = `uid
+        Tension.title
+        Tension.status
+        Tension.type_
+        Tension.labels { uid Label.name Label.color }
+        Tension.receiver { Node.nameid Node.name Node.role_type }`
+
 func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, error) {
 	// Format Query
 	maps, err := FormatTensionIntExtMap(q)
@@ -661,25 +683,9 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 		panic("Unknow type (tension query)")
 	}
 
-	payload = `uid
-        Post.createdAt
-        Post.createdBy { User.username }
-        Tension.receiver { Node.nameid Node.name Node.role_type }
-        Tension.emitter { Node.nameid Node.name Node.role_type }
-        Tension.title
-        Tension.status
-        Tension.type_
-        Tension.action
-        Tension.labels { uid Label.name Label.color }
-        n_comments: count(Tension.comments)`
-
+	payload = tensionListPayload
 	if isLight {
-		payload = `uid
-            Tension.title
-            Tension.status
-            Tension.type_
-            Tension.labels { uid Label.name Label.color }
-			Tension.receiver { Node.nameid Node.name Node.role_type }`
+		payload = tensionLightPayload
 	}
 
 	if type_ == "all" {
@@ -923,9 +929,34 @@ func (dg Dgraph) SetFieldByEq(fieldid, objid, predicate, val string) error {
 	return err
 }
 
-// SetPushedFlagBlob sets the blob pushedFlag and the tension action
-func (dg Dgraph) SetPushedFlagBlob(bid, flag, tid string, action model.TensionAction) error {
-	_, err := dg.Meta("setPushedFlagBlob", map[string]string{"bid": bid, "flag": flag, "tid": tid, "action": string(action)})
+// SetPushedFlagBlob sets the blob pushed flag and clears its archive flag.
+func (dg Dgraph) SetPushedFlagBlob(bid, flag string) error {
+	if err := ValidateUids(bid); err != nil {
+		return err
+	}
+	_, err := dg.Meta("setPushedFlagBlob", map[string]string{"bid": bid, "flag": flag})
+	return err
+}
+
+// LinkGovernedNode atomically establishes Node.source and Tension.governed_node.
+func (dg Dgraph) LinkGovernedNode(tid, nid, bid string) error {
+	if err := ValidateUids(tid, nid, bid); err != nil {
+		return err
+	}
+	_, err := dg.Meta("linkGovernedNode", map[string]string{"tid": tid, "nid": nid, "bid": bid})
+	return err
+}
+
+// SetGovernedNodeArchived changes canonical Node lifecycle and blob flags in one transaction.
+func (dg Dgraph) SetGovernedNodeArchived(nid, bid, flag string, archived bool) error {
+	if err := ValidateUids(nid, bid); err != nil {
+		return err
+	}
+	mutation := "unarchiveGovernedNode"
+	if archived {
+		mutation = "archiveGovernedNode"
+	}
+	_, err := dg.Meta(mutation, map[string]string{"nid": nid, "bid": bid, "flag": flag})
 	return err
 }
 

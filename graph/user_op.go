@@ -58,11 +58,10 @@ func UnlinkUser(rootnameid, nameid, username string) error {
 	return err
 }
 
-func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment) (bool, error) {
+func LeaveRole(uctx *model.UserCtx, node *model.NodeFragment, governed *model.Node) (bool, error) {
 	var err error
 	var rootnameid string
 	var nameid string
-	parentid := tension.Receiver.Nameid
 
 	// Type check
 	if node.RoleType == nil {
@@ -106,8 +105,11 @@ func LeaveRole(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFrag
 			}
 		}
 	} else {
-		// Get References
-		rootnameid, nameid, err = codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+		if governed == nil {
+			return false, fmt.Errorf("leaving a governed role requires a governed node")
+		}
+		nameid = governed.Nameid
+		rootnameid, err = codec.Nid2rootid(nameid)
 		if err != nil {
 			return false, err
 		}

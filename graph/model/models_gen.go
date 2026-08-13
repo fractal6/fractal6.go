@@ -475,7 +475,6 @@ type AddTensionInput struct {
 	Title           string              `json:"title"`
 	Type            TensionType         `json:"type_"`
 	Status          TensionStatus       `json:"status"`
-	Action          *TensionAction      `json:"action,omitempty"`
 	Assignees       []*UserRef          `json:"assignees,omitempty"`
 	Labels          []*LabelRef         `json:"labels,omitempty"`
 	Comments        []*CommentRef       `json:"comments,omitempty"`
@@ -2637,7 +2636,6 @@ type Tension struct {
 	Title                    string                        `json:"title"`
 	Type                     TensionType                   `json:"type_"`
 	Status                   TensionStatus                 `json:"status"`
-	Action                   *TensionAction                `json:"action,omitempty"`
 	Assignees                []*User                       `json:"assignees,omitempty"`
 	Labels                   []*Label                      `json:"labels,omitempty"`
 	Comments                 []*Comment                    `json:"comments,omitempty"`
@@ -2725,7 +2723,6 @@ type TensionPatch struct {
 	Title           *string             `json:"title,omitempty"`
 	Type            *TensionType        `json:"type_,omitempty"`
 	Status          *TensionStatus      `json:"status,omitempty"`
-	Action          *TensionAction      `json:"action,omitempty"`
 	Assignees       []*UserRef          `json:"assignees,omitempty"`
 	Labels          []*LabelRef         `json:"labels,omitempty"`
 	Comments        []*CommentRef       `json:"comments,omitempty"`
@@ -2752,7 +2749,6 @@ type TensionRef struct {
 	Title           *string             `json:"title,omitempty"`
 	Type            *TensionType        `json:"type_,omitempty"`
 	Status          *TensionStatus      `json:"status,omitempty"`
-	Action          *TensionAction      `json:"action,omitempty"`
 	Assignees       []*UserRef          `json:"assignees,omitempty"`
 	Labels          []*LabelRef         `json:"labels,omitempty"`
 	Comments        []*CommentRef       `json:"comments,omitempty"`
@@ -6682,61 +6678,6 @@ func (e RoleType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type TensionAction string
-
-const (
-	TensionActionNewRole        TensionAction = "NewRole"
-	TensionActionNewCircle      TensionAction = "NewCircle"
-	TensionActionNewMd          TensionAction = "NewMd"
-	TensionActionEditRole       TensionAction = "EditRole"
-	TensionActionEditCircle     TensionAction = "EditCircle"
-	TensionActionEditMd         TensionAction = "EditMd"
-	TensionActionArchivedRole   TensionAction = "ArchivedRole"
-	TensionActionArchivedCircle TensionAction = "ArchivedCircle"
-	TensionActionArchivedMd     TensionAction = "ArchivedMd"
-)
-
-var AllTensionAction = []TensionAction{
-	TensionActionNewRole,
-	TensionActionNewCircle,
-	TensionActionNewMd,
-	TensionActionEditRole,
-	TensionActionEditCircle,
-	TensionActionEditMd,
-	TensionActionArchivedRole,
-	TensionActionArchivedCircle,
-	TensionActionArchivedMd,
-}
-
-func (e TensionAction) IsValid() bool {
-	switch e {
-	case TensionActionNewRole, TensionActionNewCircle, TensionActionNewMd, TensionActionEditRole, TensionActionEditCircle, TensionActionEditMd, TensionActionArchivedRole, TensionActionArchivedCircle, TensionActionArchivedMd:
-		return true
-	}
-	return false
-}
-
-func (e TensionAction) String() string {
-	return string(e)
-}
-
-func (e *TensionAction) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = TensionAction(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid TensionAction", str)
-	}
-	return nil
-}
-
-func (e TensionAction) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
 type TensionEvent string
 
 const (
@@ -6846,7 +6787,6 @@ const (
 	TensionHasFilterTitle           TensionHasFilter = "title"
 	TensionHasFilterType            TensionHasFilter = "type_"
 	TensionHasFilterStatus          TensionHasFilter = "status"
-	TensionHasFilterAction          TensionHasFilter = "action"
 	TensionHasFilterAssignees       TensionHasFilter = "assignees"
 	TensionHasFilterLabels          TensionHasFilter = "labels"
 	TensionHasFilterComments        TensionHasFilter = "comments"
@@ -6872,7 +6812,6 @@ var AllTensionHasFilter = []TensionHasFilter{
 	TensionHasFilterTitle,
 	TensionHasFilterType,
 	TensionHasFilterStatus,
-	TensionHasFilterAction,
 	TensionHasFilterAssignees,
 	TensionHasFilterLabels,
 	TensionHasFilterComments,
@@ -6888,7 +6827,7 @@ var AllTensionHasFilter = []TensionHasFilter{
 
 func (e TensionHasFilter) IsValid() bool {
 	switch e {
-	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAction, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterGovernedNode, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjectStatuses, TensionHasFilterNComments:
+	case TensionHasFilterCreatedBy, TensionHasFilterCreatedAt, TensionHasFilterUpdatedAt, TensionHasFilterMessage, TensionHasFilterEmitter, TensionHasFilterEmitterid, TensionHasFilterReceiver, TensionHasFilterReceiverid, TensionHasFilterTitle, TensionHasFilterType, TensionHasFilterStatus, TensionHasFilterAssignees, TensionHasFilterLabels, TensionHasFilterComments, TensionHasFilterBlobs, TensionHasFilterGovernedNode, TensionHasFilterHistory, TensionHasFilterMentions, TensionHasFilterContracts, TensionHasFilterSubscribers, TensionHasFilterProjectStatuses, TensionHasFilterNComments:
 		return true
 	}
 	return false

@@ -365,7 +365,6 @@ type Tension implements Post @auth(
   title: String!         @search(by: [fulltext])
   type_: TensionType!    @search @x_alter(r:"tensionTypeCheck")
   status: TensionStatus! @search
-  action: TensionAction
 
   assignees: [User!]     @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [Label!]       @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
@@ -675,21 +674,6 @@ enum TensionType {
   Alert
   Announcement
   # Poll, Event ?
-}
-
-enum TensionAction {
-  # Creating
-  NewRole
-  NewCircle
-  NewMd
-  # Updating
-  EditRole
-  EditCircle
-  EditMd
-  # Archiving
-  ArchivedRole
-  ArchivedCircle
-  ArchivedMd
 }
 
 enum TensionEvent {

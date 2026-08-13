@@ -92,7 +92,8 @@ The root circle is identified as the one with an empty `Circle ID` column (no pa
 web/handlers/import.go             — ImportNode types, HTTP handler, org builder
 web/handlers/import_readers.go     — xlsx reader + HTML-to-markdown converter
 web/handlers/import_holaspirit.go  — HolaSpirit adapter: sheets -> ImportNode tree
-web/handlers/import_test.go        — Unit tests
+web/handlers/import_test.go        — Parsing and conversion unit tests
+web/handlers/integration_import_test.go — Import persistence integration test
 ```
 
 ### Data flow
@@ -104,6 +105,13 @@ web/handlers/import_test.go        — Unit tests
 5. Builder creates root node + owner role (same as `CreateOrga`)
 6. Builder creates RoleExt templates for deduplicated roles
 7. Builder recursively creates child circles and roles with governance tensions
+8. Each governance tension stores a complete Node fragment, then establishes the validated `Node.source` and `Tension.governed_node` relation for the already-created Node
+
+### Failure and retry behavior
+
+Spreadsheet parsing and validation finish before persistence starts, but organisation creation is a multi-step operation without an automatic rollback. A persistence or governance-link failure returns an error and can leave a partial organisation. Retrying the whole HTTP request is not a resume operation and is not idempotent: inspect and remove the partial organisation before retrying with the same `nameid`. Using a new `nameid` avoids that collision but does not clean up the failed attempt.
+
+The governance-link step writes `Node.source` and `Tension.governed_node` for the Node it just created; it repairs nothing. Existing organisations are backfilled only by the deployment script documented in [Node governance](node-governance.md).
 
 **Limits:**
 - Maximum file size: 10 MB
