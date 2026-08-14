@@ -18,6 +18,12 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// node_op implements the DB-effect side of Node governance operations.
+// All Try* functions share the uniform (uctx, tension, subject, extras...) error
+// signature for consistency with the EMAP action layer, even when uctx/tension
+// are unused. Shape and lifecycle validation happens earlier in
+// resolveGovernanceSubject (tension_governance.go), so Try* trusts the subject.
+
 package graph
 
 import (
@@ -31,54 +37,62 @@ import (
 	"fractale/fractal6.go/web/auth"
 )
 
-// tryAddNode add a new node if user has the correct right
-func TryAddNode(uctx *model.UserCtx, tension *model.Tension, node *model.NodeFragment, bid *string) (bool, string, error) {
-	parentid := tension.Receiver.Nameid
+// TryAddNode creates the governed Node from the blob fragment, links it to the
+// tension and flags the blob as pushed. Returns the new node uid.
+func TryAddNode(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject) (string, error) {
+	fragment := subject.blob.Node
+	auth.InheritNodeCharacDefault(fragment, tension.Receiver)
 
-	auth.InheritNodeCharacDefault(node, tension.Receiver)
-
-	// Get References
-	_, nameid, err := codec.NodeIdCodec(parentid, *node.Nameid, *node.Type)
+	nid, err := PushNode(uctx.Username, tension, &subject.blob.ID, fragment, subject.nameid, tension.Receiver.Nameid)
 	if err != nil {
-		return false, "", err
+		return "", err
 	}
-
-	ok, err := NodeCheck(node, nameid)
-	if err != nil || !ok {
-		return ok, "", err
+	if err := db.GetDB().LinkGovernedNode(tension.ID, nid, subject.blob.ID); err != nil {
+		return "", err
 	}
-
-	nid, err := PushNode(uctx.Username, tension, bid, node, nameid, parentid)
-	return ok, nid, err
+	return nid, db.GetDB().SetPushedFlagBlob(subject.blob.ID, Now())
 }
 
-func TryUpdateNode(tension *model.Tension, node *model.NodeFragment, governed *model.Node, bid *string) (bool, error) {
-	ok, err := NodeCheck(node, governed.Nameid)
-	if err != nil || !ok {
-		return ok, err
+// TryUpdateNode updates the governed Node from the blob fragment and flags the blob as pushed.
+func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject) error {
+	nameid := subject.nameid
+	fragment := subject.blob.Node
+	// Map NodeFragment to Node Patch Input.
+	// The NodeFragment copy is only necessary for the @search feature.
+	// see https://discuss.dgraph.io/t/fulltext-search-across-multiple-fields/14354
+	nodePatchFilter := StructMap[model.NodePatchFromFragment](fragment)
+	nodePatch := StructMap[model.NodePatch](nodePatchFilter)
+	nodePatch.Source = &model.BlobRef{ID: &subject.blob.ID}
+	nodeInput := model.UpdateNodeInput{
+		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
+		Set:    &nodePatch,
+		// Remove: &delNodePatch, // @debug: omitempty issues
+	}
+	if err := db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput); err != nil {
+		return err
 	}
 
-	return ok, UpdateNode(tension, bid, node, governed)
+	// Update tension title
+	if err := db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(subject.node.Type, codec.IsRoot(nameid), *fragment.Name)); err != nil {
+		return err
+	}
+	return db.GetDB().SetPushedFlagBlob(subject.blob.ID, Now())
 }
 
-func TryChangeArchiveNode(node *model.NodeFragment, governed *model.Node, bid string, archived bool) (bool, error) {
-	nameid := governed.Nameid
-	ok, err := NodeCheck(node, nameid)
-	if err != nil || !ok {
-		return ok, err
-	}
+func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject, archived bool) error {
+	nameid := subject.nameid
 
 	if archived {
 		// Archive
 		// --
 		// Check that circle has no children
-		if *node.Type == model.NodeTypeCircle {
+		if *subject.blob.Node.Type == model.NodeTypeCircle {
 			children, err := db.GetDB().GetChildren(nameid)
 			if err != nil {
-				return ok, err
+				return err
 			}
 			if len(children) > 0 {
-				return ok, fmt.Errorf("Cannot archive circle with active children. Please archive children first.")
+				return fmt.Errorf("Cannot archive circle with active children. Please archive children first.")
 			}
 		}
 	} else {
@@ -87,82 +101,76 @@ func TryChangeArchiveNode(node *model.NodeFragment, governed *model.Node, bid st
 		// Check that parent node is not archived
 		parentIsArchived, err := db.GetDB().GetByEq("Node.nameid", nameid, "Node.parent", "Node.isArchived")
 		if err != nil {
-			return ok, err
+			return err
 		}
 		if parentIsArchived != nil && parentIsArchived.(bool) {
-			return ok, fmt.Errorf("Cannot unarchive node with archived parent. Please unarchive parent first.")
+			return fmt.Errorf("Cannot unarchive node with archived parent. Please unarchive parent first.")
 		}
 	}
 
-	if err = db.GetDB().SetGovernedNodeArchived(governed.ID, bid, Now(), archived); err != nil {
-		return false, err
+	if err := db.GetDB().SetGovernedNodeArchived(subject.node.ID, subject.blob.ID, Now(), archived); err != nil {
+		return err
 	}
 
 	// Eventually unlink first-link, once the archive is persisted. Unlink errors do not block it.
-	if archived && governed.FirstLink != nil {
-		rootnameid, _ := codec.Nid2rootid(nameid) // NodeCheck already validated the nameid.
-		UnlinkUser(rootnameid, nameid, governed.FirstLink.Username)
+	if archived && subject.node.FirstLink != nil {
+		rootnameid, _ := codec.Nid2rootid(nameid) // subject.nameid was validated by the resolver.
+		UnlinkUser(rootnameid, nameid, subject.node.FirstLink.Username)
 	}
 
-	return ok, err
+	return nil
 }
 
-func TryChangeAuthority(node *model.NodeFragment, governed *model.Node, value string) (bool, error) {
-	nameid := governed.Nameid
-	ok, err := NodeCheck(node, nameid)
-	if err != nil || !ok {
-		return ok, err
-	}
+func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject, value string) error {
+	nameid := subject.nameid
+	node := subject.blob.Node
+	var err error
 
 	switch *node.Type {
 	case model.NodeTypeRole:
 		if !model.RoleType(value).IsValid() {
-			return false, fmt.Errorf("Bad value for role_type.")
+			return fmt.Errorf("Bad value for role_type.")
 		}
 		if codec.IsMembershipRoleType(model.RoleType(value)) {
-			return false, fmt.Errorf("Membership roles are protected and cannot be created like this.")
+			return fmt.Errorf("Membership roles are protected and cannot be created like this.")
 		}
 		err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.role_type", value)
 		if err != nil {
-			return false, err
+			return err
 		}
 		_, err = db.GetDB().Meta("setSubFieldByEq", map[string]string{
 			"fieldid": "Node.nameid", "objid": nameid,
 			"predicate1": "Node.role_ext", "predicate2": "RoleExt.role_type", "value": value,
 		})
 		if err != nil {
-			return false, err
+			return err
 		}
 		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.role_type", value)
 	case model.NodeTypeCircle:
 		if !model.NodeMode(value).IsValid() {
-			return false, fmt.Errorf("Bad value for mode.")
+			return fmt.Errorf("Bad value for mode.")
 		}
 		err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.mode", value)
 		if err != nil {
-			return false, err
+			return err
 		}
 		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.mode", value)
 	}
 
-	return ok, err
+	return err
 }
 
-func TryChangeVisibility(node *model.NodeFragment, governed *model.Node, value string) (bool, error) {
-	nameid := governed.Nameid
-	ok, err := NodeCheck(node, nameid)
-	if err != nil || !ok {
-		return ok, err
-	}
+func TryChangeVisibility(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject, value string) error {
+	nameid := subject.nameid
 
 	visibility := model.NodeVisibility(value)
 	if !visibility.IsValid() {
-		return false, fmt.Errorf("Bad value for visibility.")
+		return fmt.Errorf("Bad value for visibility.")
 	}
 	// Update Node
-	_, err = db.GetDB().Meta("setNodeVisibility", map[string]string{"nameid": nameid, "value": value})
+	_, err := db.GetDB().Meta("setNodeVisibility", map[string]string{"nameid": nameid, "value": value})
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	// If nameid is the root, fix the organisation config.
@@ -170,106 +178,51 @@ func TryChangeVisibility(node *model.NodeFragment, governed *model.Node, value s
 	if visibility != model.NodeVisibilityPublic && nameid == rootid {
 		err = db.GetDB().SetFieldByEq("Node.nameid", nameid, "Node.userCanJoin", strconv.FormatBool(false))
 		if err != nil {
-			return false, err
+			return err
 		}
 	}
 
 	// Change all role direct children
-	err = db.GetDB().SetChildrenRoleVisibility(nameid, value)
-	return ok, err
+	return db.GetDB().SetChildrenRoleVisibility(nameid, value)
 }
 
-func TryUpdateLink(node *model.NodeFragment, governed *model.Node, event *model.EventRef, unsafe bool) (bool, error) {
-	var err error
-	var rootnameid string
-	var nameid string
-
-	// unsafe allows Guest user to be unlinked, as the nameid includes a "@" char.
-	if unsafe {
-		nameid = *node.Nameid
-		rootnameid, err = codec.Nid2rootid(nameid)
-		if err != nil {
-			return false, err
-		}
-	} else {
-		nameid = governed.Nameid
-		rootnameid, err = codec.Nid2rootid(nameid)
-		if err != nil {
-			return false, err
-		}
-		ok, err := NodeCheck(node, nameid)
-		if err != nil || !ok {
-			return false, err
-		}
+func TryUpdateLink(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject, event *model.EventRef) error {
+	nameid := subject.nameid
+	rootnameid, err := codec.Nid2rootid(nameid)
+	if err != nil {
+		return err
 	}
 
 	// Get the current first link
 	firstLink, err := db.GetDB().GetByEq("Node.nameid", nameid, "Node.first_link", "User.username")
 	if err != nil {
-		return false, err
+		return err
 	}
 
+	// MemberUnlinked carries the role type in event.New, not a username: the
+	// fragment first_link is cleared on unlink (consistent with LeaveRole).
+	fragmentLink := ""
 	switch *event.EventType {
 	case model.TensionEventMemberLinked:
-		// Link user
-		// --
 		if firstLink != nil {
-			return false, fmt.Errorf("Role is already linked.")
+			return fmt.Errorf("Role is already linked.")
 		}
-		err = LinkUser(rootnameid, nameid, *event.New)
-		if err != nil {
-			return false, err
+		if err := LinkUser(rootnameid, nameid, *event.New); err != nil {
+			return err
 		}
+		fragmentLink = *event.New
 	case model.TensionEventMemberUnlinked:
-		// UnLink user
-		// --
-		err = UnlinkUser(rootnameid, nameid, *event.Old)
-		if err != nil {
-			return false, err
+		if err := UnlinkUser(rootnameid, nameid, *event.Old); err != nil {
+			return err
 		}
 	}
 
 	// Update NodeFragment
-	if node.ID != "" {
-		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", *event.New)
+	fragment := subject.blob.Node
+	if fragment.ID != "" {
+		return db.GetDB().SetFieldById(fragment.ID, "NodeFragment.first_link", fragmentLink)
 	}
-
-	return true, err
-}
-
-// NodeCheck validates the fragment fields written to a Node.
-func NodeCheck(node *model.NodeFragment, nameid string) (bool, error) {
-	if node == nil || node.Name == nil {
-		return false, fmt.Errorf("node fragment name is required")
-	}
-	var ok bool
-	var err error
-
-	// Validate nameid
-	// @obsolete with NodeIdCodec ?
-	rootnameid, err := codec.Nid2rootid(nameid)
-	if err != nil {
-		return ok, err
-	}
-	err = auth.ValidateNameid(nameid, rootnameid)
-	if err != nil {
-		return ok, err
-	}
-
-	// Validate Name
-	name := *node.Name
-	err = auth.ValidateName(name)
-	if err != nil {
-		return ok, err
-	}
-
-	// Validate special role-type from being created
-	if node.RoleType != nil && codec.IsMembershipRoleType(*node.RoleType) {
-		return false, fmt.Errorf("Membership roles are protected and cannot be created like this.")
-	}
-
-	ok = true
-	return ok, err
+	return nil
 }
 
 // PushNode add a new role or circle in an graph.
@@ -307,34 +260,6 @@ func PushNode(username string, tension *model.Tension, bid *string, node *model.
 	// Update tension title
 	err = db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(*node.Type, *node.Nameid == "", *node.Name))
 	return nid, err
-}
-
-// UpdateNode update a node from the given fragment
-func UpdateNode(tension *model.Tension, bid *string, node *model.NodeFragment, governed *model.Node) error {
-	nameid := governed.Nameid
-	// Map NodeFragment to Node Patch Input
-	// The NodeFraglent copy is only necesary for the @search feature.
-	// see https://discuss.dgraph.io/t/fulltext-search-across-multiple-fields/14354
-	nodePatchFilter := StructMap[model.NodePatchFromFragment](node)
-	nodePatch := StructMap[model.NodePatch](nodePatchFilter)
-	// Blob reference update
-	if bid != nil {
-		nodePatch.Source = &model.BlobRef{ID: bid}
-	}
-	// Build input
-	nodeInput := model.UpdateNodeInput{
-		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid}},
-		Set:    &nodePatch,
-		// Remove: &delNodePatch, // @debug: omitempty issues
-	}
-	// Update the node in database
-	err := db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput)
-	if err != nil {
-		return err
-	}
-
-	// Update tension title
-	return db.GetDB().SetFieldById(tension.ID, "Tension.title", codec.UpdateTensionTitle(governed.Type, codec.IsRoot(nameid), *node.Name))
 }
 
 //

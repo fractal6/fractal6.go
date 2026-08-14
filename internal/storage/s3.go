@@ -198,9 +198,13 @@ func (c *Client) Exists(ctx context.Context, key string) (bool, error) {
 //
 // contentDisposition, when non-empty, is forwarded as the S3
 // `response-content-disposition` parameter so the storage backend stamps it
-// on the served response. Callers compose the full header value (e.g.
-// `inline; filename*=UTF-8''hello.png` or `attachment; filename=...`); see
-// the inline-safe MIME allowlist in web/handlers/files.go for the policy.
+// on the served response. Callers compose the full header value, e.g.
+//
+//	inline; filename*=UTF-8''hello.png
+//	attachment; filename=...
+//
+// See the inline-safe MIME allowlist in web/handlers/files.go for the policy.
+// (Indented as a code block so gofmt does not mangle the doubled apostrophes.)
 func (c *Client) PresignGet(ctx context.Context, key string, ttl time.Duration, contentDisposition string) (string, error) {
 	reqParams := url.Values{}
 	if contentDisposition != "" {

@@ -770,7 +770,7 @@ func TestInlineScreenshot_UpdateComment(t *testing.T) {
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 	filename := fmt.Sprintf("paste-%d.png", time.Now().UnixNano())
 
-	withCommentMessage(t, cid, "see ![](" + filename + ") here", func() {
+	withCommentMessage(t, cid, "see ![]("+filename+") here", func() {
 		rr := uploadCommentFile(t, tid, cid, filename, "image/png", pngBytes(), jwt)
 		requireStatus(t, rr, http.StatusOK)
 		resp := decodeUpload(t, rr)
@@ -802,7 +802,7 @@ func TestInlineScreenshot_NewComment(t *testing.T) {
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 	filename := fmt.Sprintf("paste-new-%d.png", time.Now().UnixNano())
 
-	withCommentMessage(t, cid, "fresh: ![](" + filename + ")", func() {
+	withCommentMessage(t, cid, "fresh: ![]("+filename+")", func() {
 		rr := uploadCommentFile(t, tid, cid, filename, "image/png", pngBytes(), jwt)
 		requireStatus(t, rr, http.StatusOK)
 		resp := decodeUpload(t, rr)
@@ -825,7 +825,7 @@ func TestInlineScreenshot_NewTensionInitialBody(t *testing.T) {
 	cid := resolveCommentByMessage(t, testutil.FileTestPublicCommentByUser1)
 	filename := fmt.Sprintf("init-%d.png", time.Now().UnixNano())
 
-	withCommentMessage(t, cid, "intro\n\n![](" + filename + ")\n\nend", func() {
+	withCommentMessage(t, cid, "intro\n\n![]("+filename+")\n\nend", func() {
 		rr := uploadCommentFile(t, tid, cid, filename, "image/png", pngBytes(), jwt)
 		requireStatus(t, rr, http.StatusOK)
 		resp := decodeUpload(t, rr)
@@ -978,4 +978,3 @@ func pngBytes() []byte {
 		0x42, 0x60, 0x82,
 	}
 }
-

@@ -316,7 +316,7 @@ func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Cl
 	}
 	e := model.TensionEventCommentPushed
 	event := &model.EventRef{EventType: &e}
-	ok, _, err := graph.ProcessEvent(uctx, tension, event, nil, nil, true, false)
+	ok, _, err := graph.ProcessEvent(uctx, tension, event, nil, true, false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -617,7 +617,7 @@ func safeFilename(name string) string {
 func commentKeyPrefix(rootnameid, tid, cid string) string {
 	return "orgas/" + rootnameid + "/tensions/" + tid + "/" + cid + "/"
 }
-func userKeyPrefix(username string) string  { return "users/" + username + "/" }
+func userKeyPrefix(username string) string   { return "users/" + username + "/" }
 func orgaKeyPrefix(rootnameid string) string { return "orgas/" + rootnameid + "/" }
 
 // randomID returns a 16-hex-char random string (~64 bits of entropy) used as
@@ -627,4 +627,3 @@ func randomID() string {
 	_, _ = rand.Read(b[:])
 	return hex.EncodeToString(b[:])
 }
-

@@ -110,12 +110,8 @@ func TestRemoveComment_OwnerCanDelete(t *testing.T) {
 	tension := &model.Tension{ID: tensionUID}
 	event := &model.EventRef{Old: &commentUID}
 
-	ok, err := RemoveComment(uctx, tension, event, nil)
-	if err != nil {
+	if err := RemoveComment(uctx, tension, event); err != nil {
 		t.Fatalf("RemoveComment by author should succeed, got error: %v", err)
-	}
-	if !ok {
-		t.Fatal("RemoveComment by author returned false, expected true")
 	}
 }
 
@@ -143,15 +139,12 @@ func TestRemoveComment_NonOwnerCannotDelete(t *testing.T) {
 	tension := &model.Tension{ID: tensionUID}
 	event := &model.EventRef{Old: &commentUID}
 
-	ok, err := RemoveComment(uctx, tension, event, nil)
+	err = RemoveComment(uctx, tension, event)
 	if err == nil {
 		t.Fatal("RemoveComment by non-author should fail, but got no error")
 	}
 	if !strings.Contains(err.Error(), "Only the author of the comment can delete it") {
 		t.Fatalf("expected 'Only the author of the comment can delete it' error, got: %v", err)
-	}
-	if ok {
-		t.Fatal("RemoveComment by non-author returned true, expected false")
 	}
 }
 
@@ -223,12 +216,8 @@ func TestRemoveComment_DeletesAttachedFiles(t *testing.T) {
 	uctx := &model.UserCtx{Username: testutil.TestUser}
 	tension := &model.Tension{ID: tensionUID}
 	event := &model.EventRef{Old: &commentUID}
-	ok, err := RemoveComment(uctx, tension, event, nil)
-	if err != nil {
+	if err := RemoveComment(uctx, tension, event); err != nil {
 		t.Fatalf("RemoveComment failed: %v", err)
-	}
-	if !ok {
-		t.Fatal("RemoveComment returned false")
 	}
 
 	// Object must be gone from MinIO. RemoveComment fires the S3 delete in a

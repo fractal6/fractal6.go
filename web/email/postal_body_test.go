@@ -44,7 +44,7 @@ func buildPostalBody(author, email, subject, htmlBody, plainBody, tid string, at
 		"plain_body": plainBody,
 		"headers": map[string]string{
 			"In-Reply-To": "<tension/" + tid + "@" + DOMAIN + ">",
-			"References": "<tension/" + tid + "@" + DOMAIN + ">",
+			"References":  "<tension/" + tid + "@" + DOMAIN + ">",
 		},
 	}
 	if len(attachments) > 0 {

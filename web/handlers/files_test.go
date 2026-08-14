@@ -19,11 +19,11 @@ func TestSafeFilename(t *testing.T) {
 		in, want string
 	}{
 		{"hello.png", "hello.png"},
-		{"../../etc/passwd", "passwd"},                      // path traversal stripped
-		{`C:\Windows\evil.exe`, "evil.exe"},                 // backslash separators normalised
+		{"../../etc/passwd", "passwd"},      // path traversal stripped
+		{`C:\Windows\evil.exe`, "evil.exe"}, // backslash separators normalised
 		{"name with space & punct.txt", "name with space & punct.txt"},
-		{"with\x00nul\x07bell.bin", "withnulbell.bin"},      // control chars stripped
-		{"", "file"},                                        // empty falls back to "file"
+		{"with\x00nul\x07bell.bin", "withnulbell.bin"}, // control chars stripped
+		{"", "file"}, // empty falls back to "file"
 		{".", "file"},
 		{"/", "file"},
 		{strings.Repeat("a", 200) + ".jpg", strings.Repeat("a", 120)}, // length cap

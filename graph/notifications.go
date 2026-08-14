@@ -71,7 +71,6 @@ func getLastCommentSettled(tid, username string) ([]map[string]any, error) {
 	}
 }
 
-
 //
 // Publisher functions (Redis)
 //

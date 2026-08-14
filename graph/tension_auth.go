@@ -51,7 +51,7 @@ type EventMap struct {
 	// Defined a propertie/variable the should be updated by the event (taking value from the event old/new attributes)
 	Propagate string
 	// Action defined the fonction that should be executed if the user has been authorized.
-	Action func(*model.UserCtx, *model.Tension, *model.EventRef, *model.BlobRef) (bool, error)
+	Action func(*model.UserCtx, *model.Tension, *model.EventRef) error
 }
 type EventsMap = map[model.TensionEvent]EventMap
 

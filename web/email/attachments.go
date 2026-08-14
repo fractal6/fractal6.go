@@ -146,10 +146,10 @@ type fetchedBytes struct {
 //
 //   - attachments: Postal payload entries (Bucket A first then B).
 //   - inlineByID:  the subset of file uids that DID get an inline CID slot —
-//                  used to rewrite `<img src="/file/<id>">` to `cid:<id>@DOMAIN`.
+//     used to rewrite `<img src="/file/<id>">` to `cid:<id>@DOMAIN`.
 //   - footerFiles: every plain (Bucket B) file the caller should render in
-//                  the footer link list; includes both attached and
-//                  cap-overflow entries so nothing is silently hidden.
+//     the footer link list; includes both attached and
+//     cap-overflow entries so nothing is silently hidden.
 //
 // Failing to fetch a single file's bytes is logged but never fatal — that
 // file degrades to footer-link-only (Bucket B) or absolute-URL fallback

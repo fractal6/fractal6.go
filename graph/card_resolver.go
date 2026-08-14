@@ -130,8 +130,8 @@ var QueryCardLocAndNewCol db.QueryMut = db.QueryMut{
 // rows into the card loc and the new column descriptor.
 func fetchCardAndNewCol(cardid, newColid string) (ProjectCardLoc, ProjectColumnDesc, error) {
 	rows, err := db.Gamma[projectCardMoveLoc](QueryCardLocAndNewCol, map[string]string{
-		"cardid":     cardid,
-		"new_colid":  newColid,
+		"cardid":    cardid,
+		"new_colid": newColid,
 	})
 	if err != nil {
 		return ProjectCardLoc{}, ProjectColumnDesc{}, err

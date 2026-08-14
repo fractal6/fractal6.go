@@ -23,7 +23,9 @@ package graph
 import (
 	"fmt"
 
+	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/web/auth"
 )
 
 type governanceOperation uint8
@@ -37,10 +39,10 @@ const (
 )
 
 type governanceSubject struct {
-	blob     *model.Blob
-	fragment *model.NodeFragment
-	node     *model.Node
-	create   bool
+	blob   *model.Blob
+	node   *model.Node
+	nameid string
+	create bool
 }
 
 // resolveGovernanceSubject is the single shape and lifecycle gate for Node governance events.
@@ -68,47 +70,64 @@ func resolveGovernanceSubject(tension *model.Tension, operation governanceOperat
 	if fragment.Type == nil || !fragment.Type.IsValid() {
 		return nil, fmt.Errorf("governance node fragment requires a valid type")
 	}
+	if fragment.Name == nil || *fragment.Name == "" {
+		return nil, fmt.Errorf("governance node fragment requires a name")
+	}
+	if err := auth.ValidateName(*fragment.Name); err != nil {
+		return nil, err
+	}
+	if fragment.RoleType != nil && codec.IsMembershipRoleType(*fragment.RoleType) {
+		return nil, fmt.Errorf("Membership roles are protected and cannot be created like this.")
+	}
 
-	subject := &governanceSubject{blob: blob, fragment: fragment, node: tension.GovernedNode}
+	subject := &governanceSubject{blob: blob, node: tension.GovernedNode}
 	if operation == governancePublish && subject.node == nil {
 		if fragment.Nameid == nil || *fragment.Nameid == "" {
 			return nil, fmt.Errorf("new governance node fragment requires a nameid")
 		}
-		if fragment.Name == nil || *fragment.Name == "" {
-			return nil, fmt.Errorf("new governance node fragment requires a name")
-		}
 		if *fragment.Type == model.NodeTypeRole && fragment.RoleType == nil {
 			return nil, fmt.Errorf("new role fragment requires a role_type")
 		}
+		_, nameid, err := codec.NodeIdCodec(tension.Receiver.Nameid, *fragment.Nameid, *fragment.Type)
+		if err != nil {
+			return nil, err
+		}
+		subject.nameid = nameid
 		subject.create = true
-		return subject, nil
-	}
-	if subject.node == nil {
-		return nil, fmt.Errorf("governance event requires a governed node")
-	}
-	if subject.node.ID == "" || subject.node.Nameid == "" || !subject.node.Type.IsValid() {
-		return nil, fmt.Errorf("governed node identity and type are required")
-	}
-	if subject.node.Type != *fragment.Type {
-		return nil, fmt.Errorf("node fragment type %q does not match governed node type %q", *fragment.Type, subject.node.Type)
+	} else {
+		if subject.node == nil {
+			return nil, fmt.Errorf("governance event requires a governed node")
+		}
+		if subject.node.ID == "" || subject.node.Nameid == "" || !subject.node.Type.IsValid() {
+			return nil, fmt.Errorf("governed node identity and type are required")
+		}
+		if subject.node.Type != *fragment.Type {
+			return nil, fmt.Errorf("node fragment type %q does not match governed node type %q", *fragment.Type, subject.node.Type)
+		}
+		subject.nameid = subject.node.Nameid
+
+		switch operation {
+		case governancePublish:
+			if subject.node.IsArchived {
+				return nil, fmt.Errorf("cannot publish an archived node")
+			}
+		case governanceArchive:
+			if subject.node.IsArchived {
+				return nil, fmt.Errorf("governed node is already archived")
+			}
+		case governanceUnarchive:
+			if !subject.node.IsArchived {
+				return nil, fmt.Errorf("governed node is not archived")
+			}
+		}
 	}
 
-	switch operation {
-	case governancePublish:
-		if subject.node.IsArchived {
-			return nil, fmt.Errorf("cannot publish an archived node")
-		}
-		if fragment.Name == nil || *fragment.Name == "" {
-			return nil, fmt.Errorf("governance node fragment requires a name")
-		}
-	case governanceArchive:
-		if subject.node.IsArchived {
-			return nil, fmt.Errorf("governed node is already archived")
-		}
-	case governanceUnarchive:
-		if !subject.node.IsArchived {
-			return nil, fmt.Errorf("governed node is not archived")
-		}
+	rootnameid, err := codec.Nid2rootid(subject.nameid)
+	if err != nil {
+		return nil, err
+	}
+	if err := auth.ValidateNameid(subject.nameid, rootnameid); err != nil {
+		return nil, err
 	}
 
 	return subject, nil

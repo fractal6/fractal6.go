@@ -254,11 +254,12 @@ func ExtractFilter[T any](ctx context.Context, filter *T) {
 // referenced from Init().
 //
 // Reminder: Api to access to input query:
-//  rc := graphql.GetResolverContext(ctx)
-//  rqc := graphql.GetRequestContext(ctx)
-//  cfc := graphql.CollectFieldsCtx(ctx, nil)
-//  fc := graphql.GetFieldContext(ctx)
-//  pc := graphql.GetPathContext(ctx) // .*.Field to get the field name
+//
+//	rc := graphql.GetResolverContext(ctx)
+//	rqc := graphql.GetRequestContext(ctx)
+//	cfc := graphql.CollectFieldsCtx(ctx, nil)
+//	fc := graphql.GetFieldContext(ctx)
+//	pc := graphql.GetPathContext(ctx) // .*.Field to get the field name
 func nothing(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	return next(ctx)
 }

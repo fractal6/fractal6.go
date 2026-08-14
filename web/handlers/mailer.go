@@ -352,7 +352,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 
 	// Verify author can create tension
 	eventRef := StructMap[model.EventRef](event)
-	ok, _, err := graph.ProcessEvent(uctx, &tension, &eventRef, nil, nil, true, false)
+	ok, _, err := graph.ProcessEvent(uctx, &tension, &eventRef, nil, true, false)
 	if !ok || err != nil {
 		http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 400)
 		return

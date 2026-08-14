@@ -58,37 +58,33 @@ func UnlinkUser(rootnameid, nameid, username string) error {
 	return err
 }
 
-func LeaveRole(uctx *model.UserCtx, node *model.NodeFragment, governed *model.Node) (bool, error) {
-	var err error
-	var rootnameid string
-	var nameid string
-
+// LeaveRole detaches the user from the role at the given nameid (membership or governed role).
+func LeaveRole(uctx *model.UserCtx, node *model.NodeFragment, nameid string) error {
 	// Type check
 	if node.RoleType == nil {
-		return false, LogErr("access denied", fmt.Errorf("Node needs a role type for this action."))
+		return LogErr("access denied", fmt.Errorf("Node needs a role type for this action."))
+	}
+
+	rootnameid, err := codec.Nid2rootid(nameid)
+	if err != nil {
+		return err
 	}
 
 	// Special case for membership role
-	IsMembershipRole := codec.IsMembershipRoleType(*node.RoleType)
-	if IsMembershipRole {
-		nameid = *node.Nameid
-		rootnameid, err = codec.Nid2rootid(nameid)
-		if err != nil {
-			return false, err
-		}
+	if codec.IsMembershipRoleType(*node.RoleType) {
 		if len(auth.GetRoles(uctx, nameid)) > 1 && *node.RoleType != model.RoleTypeOwner {
-			return false, LogErr("access denied", fmt.Errorf("Doh, you have active roles in this organisation. Please leave your roles first."))
+			return LogErr("access denied", fmt.Errorf("Doh, you have active roles in this organisation. Please leave your roles first."))
 		} else if *node.RoleType == model.RoleTypePending {
-			return false, LogErr("access denied", fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation."))
+			return LogErr("access denied", fmt.Errorf("Doh, you cannot leave a pending role. Please reject the invitation."))
 		} else if *node.RoleType == model.RoleTypeRetired {
-			return false, LogErr("access denied", fmt.Errorf("You are already retired from this role."))
+			return LogErr("access denied", fmt.Errorf("You are already retired from this role."))
 		} else if *node.RoleType == model.RoleTypeOwner {
 			// Owner can leave if not alone
 			// --
 			// Get all owners of the organization
 			owners := []string{}
 			if users, err := db.GetDB().Meta("getOwners", map[string]string{"nameid": rootnameid}); err != nil {
-				return false, err
+				return err
 			} else {
 				for _, u := range users {
 					owners = append(owners, u["username"].(string))
@@ -96,42 +92,32 @@ func LeaveRole(uctx *model.UserCtx, node *model.NodeFragment, governed *model.No
 			}
 			// If owner is alone, prevent orphan organization
 			if len(owners) < 2 {
-				return false, LogErr("access denied", fmt.Errorf("An organization needs at least one Owner. Please contact us if you need to transfer ownership."))
+				return LogErr("access denied", fmt.Errorf("An organization needs at least one Owner. Please contact us if you need to transfer ownership."))
 			}
 
 			// Downgrade Owner to Member
 			if err = db.GetDB().UpgradeMember(nameid, model.RoleTypeMember); err != nil {
-				return false, err
+				return err
 			}
-		}
-	} else {
-		if governed == nil {
-			return false, fmt.Errorf("leaving a governed role requires a governed node")
-		}
-		nameid = governed.Nameid
-		rootnameid, err = codec.Nid2rootid(nameid)
-		if err != nil {
-			return false, err
 		}
 	}
 
 	// If user doesn't play role, return error
 	if i := auth.UserPlaysRole(uctx, nameid); i < 0 {
-		return false, LogErr("access denied", fmt.Errorf("Role already left or not played."))
+		return LogErr("access denied", fmt.Errorf("Role already left or not played."))
 	}
 
-	err = UnlinkUser(rootnameid, nameid, uctx.Username)
-	if err != nil {
-		return false, err
+	if err = UnlinkUser(rootnameid, nameid, uctx.Username); err != nil {
+		return err
 	}
 
 	// Update NodeFragment
 	if node.ID != "" {
 		// @debug: should delete instead...DelFieldById => `<x> <x> * .`
-		err = db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
+		return db.GetDB().SetFieldById(node.ID, "NodeFragment.first_link", "")
 	}
 
-	return true, err
+	return nil
 }
 
 // maybeUpdateMembership check aitomatically to toggle user membership to Guest or Member if needed

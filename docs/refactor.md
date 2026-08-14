@@ -142,13 +142,13 @@ If a `nameid` value contains DQL metacharacters or quotes, this could produce ma
 - Example:
   ```go
   // Service layer (testable)
-  func ProcessTensionEvents(uctx *model.UserCtx, tid string, events []*model.EventRef, blob *model.BlobRef) error
+  func ProcessTensionEvents(uctx *model.UserCtx, tid string, events []*model.EventRef) error
 
   // Hook (thin adapter)
   func addTensionHook(ctx, obj, next) (interface{}, error) {
       uctx := auth.GetUserContext(ctx)
       // ... extract data ...
-      return ProcessTensionEvents(uctx, tid, events, blob)
+      return ProcessTensionEvents(uctx, tid, events)
   }
   ```
 
