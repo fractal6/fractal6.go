@@ -275,6 +275,7 @@ type AddNodeInput struct {
 	Lexicon                         *string               `json:"lexicon,omitempty"`
 	IsTemplateTensionOnly           *bool                 `json:"isTemplateTensionOnly,omitempty"`
 	IsPinnedTensionfetchRecursively *bool                 `json:"isPinnedTensionfetchRecursively,omitempty"`
+	IsRootArchived                  *bool                 `json:"isRootArchived,omitempty"`
 	Watchers                        []*UserRef            `json:"watchers,omitempty"`
 	Children                        []*NodeRef            `json:"children,omitempty"`
 	Projects                        []*ProjectRef         `json:"projects,omitempty"`
@@ -1562,6 +1563,7 @@ type Node struct {
 	Lexicon                         *string                         `json:"lexicon,omitempty"`
 	IsTemplateTensionOnly           *bool                           `json:"isTemplateTensionOnly,omitempty"`
 	IsPinnedTensionfetchRecursively *bool                           `json:"isPinnedTensionfetchRecursively,omitempty"`
+	IsRootArchived                  *bool                           `json:"isRootArchived,omitempty"`
 	Watchers                        []*User                         `json:"watchers,omitempty"`
 	Children                        []*Node                         `json:"children,omitempty"`
 	Projects                        []*Project                      `json:"projects,omitempty"`
@@ -1751,6 +1753,7 @@ type NodePatch struct {
 	Lexicon                         *string               `json:"lexicon,omitempty"`
 	IsTemplateTensionOnly           *bool                 `json:"isTemplateTensionOnly,omitempty"`
 	IsPinnedTensionfetchRecursively *bool                 `json:"isPinnedTensionfetchRecursively,omitempty"`
+	IsRootArchived                  *bool                 `json:"isRootArchived,omitempty"`
 	Watchers                        []*UserRef            `json:"watchers,omitempty"`
 	Children                        []*NodeRef            `json:"children,omitempty"`
 	Projects                        []*ProjectRef         `json:"projects,omitempty"`
@@ -1796,6 +1799,7 @@ type NodeRef struct {
 	Lexicon                         *string               `json:"lexicon,omitempty"`
 	IsTemplateTensionOnly           *bool                 `json:"isTemplateTensionOnly,omitempty"`
 	IsPinnedTensionfetchRecursively *bool                 `json:"isPinnedTensionfetchRecursively,omitempty"`
+	IsRootArchived                  *bool                 `json:"isRootArchived,omitempty"`
 	Watchers                        []*UserRef            `json:"watchers,omitempty"`
 	Children                        []*NodeRef            `json:"children,omitempty"`
 	Projects                        []*ProjectRef         `json:"projects,omitempty"`
@@ -5133,6 +5137,7 @@ const (
 	NodeHasFilterLexicon                         NodeHasFilter = "lexicon"
 	NodeHasFilterIsTemplateTensionOnly           NodeHasFilter = "isTemplateTensionOnly"
 	NodeHasFilterIsPinnedTensionfetchRecursively NodeHasFilter = "isPinnedTensionfetchRecursively"
+	NodeHasFilterIsRootArchived                  NodeHasFilter = "isRootArchived"
 	NodeHasFilterWatchers                        NodeHasFilter = "watchers"
 	NodeHasFilterChildren                        NodeHasFilter = "children"
 	NodeHasFilterProjects                        NodeHasFilter = "projects"
@@ -5177,6 +5182,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 	NodeHasFilterLexicon,
 	NodeHasFilterIsTemplateTensionOnly,
 	NodeHasFilterIsPinnedTensionfetchRecursively,
+	NodeHasFilterIsRootArchived,
 	NodeHasFilterWatchers,
 	NodeHasFilterChildren,
 	NodeHasFilterProjects,
@@ -5198,7 +5204,7 @@ var AllNodeHasFilter = []NodeHasFilter{
 
 func (e NodeHasFilter) IsValid() bool {
 	switch e {
-	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterIsTemplateTensionOnly, NodeHasFilterIsPinnedTensionfetchRecursively, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterTensionTemplates, NodeHasFilterProjectTemplates, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterAvatar, NodeHasFilterCascadeDirective:
+	case NodeHasFilterCreatedBy, NodeHasFilterCreatedAt, NodeHasFilterUpdatedAt, NodeHasFilterNameid, NodeHasFilterRootnameid, NodeHasFilterSource, NodeHasFilterName, NodeHasFilterAbout, NodeHasFilterSkills, NodeHasFilterIsRoot, NodeHasFilterParent, NodeHasFilterType, NodeHasFilterTensionsOut, NodeHasFilterTensionsIn, NodeHasFilterVisibility, NodeHasFilterMode, NodeHasFilterRights, NodeHasFilterIsArchived, NodeHasFilterIsPersonal, NodeHasFilterUserCanJoin, NodeHasFilterGuestCanCreateTension, NodeHasFilterLexicon, NodeHasFilterIsTemplateTensionOnly, NodeHasFilterIsPinnedTensionfetchRecursively, NodeHasFilterIsRootArchived, NodeHasFilterWatchers, NodeHasFilterChildren, NodeHasFilterProjects, NodeHasFilterPinned, NodeHasFilterLabels, NodeHasFilterRoles, NodeHasFilterTensionTemplates, NodeHasFilterProjectTemplates, NodeHasFilterRoleExt, NodeHasFilterRoleType, NodeHasFilterColor, NodeHasFilterFirstLink, NodeHasFilterContracts, NodeHasFilterEventsHistory, NodeHasFilterActivity, NodeHasFilterAvatar, NodeHasFilterCascadeDirective:
 		return true
 	}
 	return false

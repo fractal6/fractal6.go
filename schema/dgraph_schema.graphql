@@ -95,6 +95,7 @@ type Node @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\"} }"
   lexicon: String
   isTemplateTensionOnly: Boolean
   isPinnedTensionfetchRecursively: Boolean
+  isRootArchived: Boolean
   watchers: [User!] @hasInverse(field: watching)
   children: [Node!] @hasInverse(field: parent)
   projects: [Project!]
