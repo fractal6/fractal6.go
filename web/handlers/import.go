@@ -376,7 +376,6 @@ func createNodeTension(username, rootnameid, parentid, nameid, nodeID string, no
 	evt1 := model.TensionEventCreated
 	evt2 := model.TensionEventBlobCreated
 	evt3 := model.TensionEventBlobPushed
-	blobType := model.BlobTypeOnNode
 	isAnchor := nameid == rootnameid
 	emptyMsg := ""
 
@@ -401,7 +400,6 @@ func createNodeTension(username, rootnameid, parentid, nameid, nodeID string, no
 	blob := model.BlobRef{
 		CreatedAt:  &now,
 		CreatedBy:  &createdBy,
-		BlobType:   &blobType,
 		Node:       &nodeFragRef,
 		PushedFlag: &now,
 	}

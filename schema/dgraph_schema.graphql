@@ -674,11 +674,8 @@ type Reaction @auth(add:{ rule:"""query ($USERNAME: String!) {
 
 type Blob implements Post {
   tension: Tension!
-  blob_type: BlobType! @search
   pushedFlag: DateTime @search
-  archivedFlag: DateTime @search
   node: NodeFragment
-  md: String
 }
 
 type Event implements Post {
@@ -952,17 +949,6 @@ enum TensionEvent {
   Authority
   Visibility
   Moved
-}
-
-enum BlobType {
-
-  OnNode
-  OnAbout
-  OnMandate
-  OnAboutAndMandate
-
-  OnDoc
-
 }
 
 enum ProjectStatus {

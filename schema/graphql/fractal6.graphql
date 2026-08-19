@@ -442,13 +442,10 @@ type Reaction @auth(
 
 type Blob implements Post {
   tension: Tension!      @x_add(r:"ref")
-  blob_type: BlobType!   @search
   pushedFlag: DateTime   @search
-  archivedFlag: DateTime @search
 
   # data
   node: NodeFragment
-  md: String
 }
 
 type Event implements Post {
@@ -709,17 +706,6 @@ enum TensionEvent {
   Authority
   Visibility
   Moved
-}
-
-enum BlobType {
-  # Node
-  OnNode
-  OnAbout
-  OnMandate
-  OnAboutAndMandate
-  # Doc (md, spreadsheet, etc)
-  OnDoc
-  #OnDocTitle ?
 }
 
 ### Project

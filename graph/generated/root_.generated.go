@@ -358,33 +358,26 @@ type ComplexityRoot struct {
 	}
 
 	Blob struct {
-		ArchivedFlag func(childComplexity int) int
-		BlobType     func(childComplexity int) int
-		CreatedAt    func(childComplexity int) int
-		CreatedBy    func(childComplexity int, filter *model.UserFilter) int
-		ID           func(childComplexity int) int
-		Md           func(childComplexity int) int
-		Message      func(childComplexity int) int
-		Node         func(childComplexity int, filter *model.NodeFragmentFilter) int
-		PushedFlag   func(childComplexity int) int
-		Tension      func(childComplexity int, filter *model.TensionFilter) int
-		UpdatedAt    func(childComplexity int) int
+		CreatedAt  func(childComplexity int) int
+		CreatedBy  func(childComplexity int, filter *model.UserFilter) int
+		ID         func(childComplexity int) int
+		Message    func(childComplexity int) int
+		Node       func(childComplexity int, filter *model.NodeFragmentFilter) int
+		PushedFlag func(childComplexity int) int
+		Tension    func(childComplexity int, filter *model.TensionFilter) int
+		UpdatedAt  func(childComplexity int) int
 	}
 
 	BlobAggregateResult struct {
-		ArchivedFlagMax func(childComplexity int) int
-		ArchivedFlagMin func(childComplexity int) int
-		Count           func(childComplexity int) int
-		CreatedAtMax    func(childComplexity int) int
-		CreatedAtMin    func(childComplexity int) int
-		MdMax           func(childComplexity int) int
-		MdMin           func(childComplexity int) int
-		MessageMax      func(childComplexity int) int
-		MessageMin      func(childComplexity int) int
-		PushedFlagMax   func(childComplexity int) int
-		PushedFlagMin   func(childComplexity int) int
-		UpdatedAtMax    func(childComplexity int) int
-		UpdatedAtMin    func(childComplexity int) int
+		Count         func(childComplexity int) int
+		CreatedAtMax  func(childComplexity int) int
+		CreatedAtMin  func(childComplexity int) int
+		MessageMax    func(childComplexity int) int
+		MessageMin    func(childComplexity int) int
+		PushedFlagMax func(childComplexity int) int
+		PushedFlagMin func(childComplexity int) int
+		UpdatedAtMax  func(childComplexity int) int
+		UpdatedAtMin  func(childComplexity int) int
 	}
 
 	BuildInfo struct {
@@ -2444,20 +2437,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AddVotePayload.Vote(childComplexity, args["filter"].(*model.VoteFilter), args["order"].(*model.VoteOrder), args["first"].(*int), args["offset"].(*int)), true
 
-	case "Blob.archivedFlag":
-		if e.complexity.Blob.ArchivedFlag == nil {
-			break
-		}
-
-		return e.complexity.Blob.ArchivedFlag(childComplexity), true
-
-	case "Blob.blob_type":
-		if e.complexity.Blob.BlobType == nil {
-			break
-		}
-
-		return e.complexity.Blob.BlobType(childComplexity), true
-
 	case "Blob.createdAt":
 		if e.complexity.Blob.CreatedAt == nil {
 			break
@@ -2483,13 +2462,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Blob.ID(childComplexity), true
-
-	case "Blob.md":
-		if e.complexity.Blob.Md == nil {
-			break
-		}
-
-		return e.complexity.Blob.Md(childComplexity), true
 
 	case "Blob.message":
 		if e.complexity.Blob.Message == nil {
@@ -2536,20 +2508,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Blob.UpdatedAt(childComplexity), true
 
-	case "BlobAggregateResult.archivedFlagMax":
-		if e.complexity.BlobAggregateResult.ArchivedFlagMax == nil {
-			break
-		}
-
-		return e.complexity.BlobAggregateResult.ArchivedFlagMax(childComplexity), true
-
-	case "BlobAggregateResult.archivedFlagMin":
-		if e.complexity.BlobAggregateResult.ArchivedFlagMin == nil {
-			break
-		}
-
-		return e.complexity.BlobAggregateResult.ArchivedFlagMin(childComplexity), true
-
 	case "BlobAggregateResult.count":
 		if e.complexity.BlobAggregateResult.Count == nil {
 			break
@@ -2570,20 +2528,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.BlobAggregateResult.CreatedAtMin(childComplexity), true
-
-	case "BlobAggregateResult.mdMax":
-		if e.complexity.BlobAggregateResult.MdMax == nil {
-			break
-		}
-
-		return e.complexity.BlobAggregateResult.MdMax(childComplexity), true
-
-	case "BlobAggregateResult.mdMin":
-		if e.complexity.BlobAggregateResult.MdMin == nil {
-			break
-		}
-
-		return e.complexity.BlobAggregateResult.MdMin(childComplexity), true
 
 	case "BlobAggregateResult.messageMax":
 		if e.complexity.BlobAggregateResult.MessageMax == nil {
@@ -11513,7 +11457,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputBlobOrder,
 		ec.unmarshalInputBlobPatch,
 		ec.unmarshalInputBlobRef,
-		ec.unmarshalInputBlobType_hash,
 		ec.unmarshalInputBuildInfoFilter,
 		ec.unmarshalInputBuildInfoOrder,
 		ec.unmarshalInputBuildInfoPatch,
@@ -12275,11 +12218,8 @@ type Reaction {
 
 type Blob {
   tension(filter: TensionFilter): Tension!
-  blob_type: BlobType!
   pushedFlag: DateTime
-  archivedFlag: DateTime
   node(filter: NodeFragmentFilter): NodeFragment
-  md: String
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
@@ -12532,17 +12472,6 @@ enum TensionEvent {
   Moved
 }
 
-enum BlobType {
-
-  OnNode
-  OnAbout
-  OnMandate
-  OnAboutAndMandate
-
-  OnDoc
-
-}
-
 enum ProjectStatus {
   Open
   Closed
@@ -12583,35 +12512,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @id on FIELD_DEFINITION
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @cascade(fields: [String]) on FIELD
 
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
 
 directive @lambda on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
 
-directive @id on FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
 type ActivityAggregateResult {
   count: Int
@@ -12690,11 +12619,8 @@ input AddBlobInput {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef! @x_add(r:"ref")
-  blob_type: BlobType!
   pushedFlag: DateTime
-  archivedFlag: DateTime
   node: NodeFragmentRef
-  md: String
 }
 
 type AddBlobPayload {
@@ -13208,19 +13134,13 @@ type BlobAggregateResult {
   messageMax: String
   pushedFlagMin: DateTime
   pushedFlagMax: DateTime
-  archivedFlagMin: DateTime
-  archivedFlagMax: DateTime
-  mdMin: String
-  mdMax: String
 }
 
 input BlobFilter {
   id: [ID!]
   createdAt: DateTimeFilter
   message: StringFullTextFilter
-  blob_type: BlobType_hash
   pushedFlag: DateTimeFilter
-  archivedFlag: DateTimeFilter
   has: [BlobHasFilter]
   and: [BlobFilter]
   or: [BlobFilter]
@@ -13233,11 +13153,8 @@ enum BlobHasFilter {
   updatedAt
   message
   tension
-  blob_type
   pushedFlag
-  archivedFlag
   node
-  md
 }
 
 input BlobOrder {
@@ -13251,8 +13168,6 @@ enum BlobOrderable {
   updatedAt
   message
   pushedFlag
-  archivedFlag
-  md
 }
 
 input BlobPatch {
@@ -13261,11 +13176,8 @@ input BlobPatch {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef @x_patch_ro
-  blob_type: BlobType @x_patch_ro
   pushedFlag: DateTime @x_patch_ro
-  archivedFlag: DateTime @x_patch_ro
   node: NodeFragmentRef @x_patch_ro
-  md: String @x_patch_ro
 }
 
 input BlobRef {
@@ -13275,16 +13187,8 @@ input BlobRef {
   updatedAt: DateTime @x_alter(r:"isOwner", f:"createdBy")
   message: String @x_alter(r:"isOwner", f:"createdBy")
   tension: TensionRef @x_add(r:"ref")
-  blob_type: BlobType
   pushedFlag: DateTime
-  archivedFlag: DateTime
   node: NodeFragmentRef
-  md: String
-}
-
-input BlobType_hash {
-  eq: BlobType
-  in: [BlobType]
 }
 
 type BuildInfoAggregateResult {

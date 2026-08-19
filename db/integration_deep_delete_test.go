@@ -153,7 +153,6 @@ func TestDeleteTensionDeep_Integration(t *testing.T) {
                 _:c <Comment.files> _:f .
 
                 _:b <dgraph.type> "Blob" .
-                _:b <Blob.blob_type> "OnNode" .
                 _:b <Post.createdAt> "%s" .
                 _:b <Post.createdBy> uid(mt) .
                 _:b <Blob.tension> _:t .

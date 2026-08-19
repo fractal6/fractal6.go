@@ -127,9 +127,8 @@ _:tension <Post.message> "---\nbug\n---\n\nThis is the first comment on the test
 _:org <Node.tensions_out> _:tension .
 _:org <Node.tensions_in> _:tension .
 
-# Blob (OnNode, source for org)
+# Blob (source for org)
 _:blob <dgraph.type> "Blob" .
-_:blob <Blob.blob_type> "OnNode" .
 _:blob <Blob.tension> _:tension .
 _:blob <Post.createdBy> _:user1 .
 _:blob <Post.createdAt> "2026-01-01T00:00:00Z" .

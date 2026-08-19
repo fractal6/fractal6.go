@@ -82,16 +82,13 @@ type AddActivityPayload struct {
 }
 
 type AddBlobInput struct {
-	CreatedBy    *UserRef         `json:"createdBy"`
-	CreatedAt    string           `json:"createdAt"`
-	UpdatedAt    *string          `json:"updatedAt,omitempty"`
-	Message      *string          `json:"message,omitempty"`
-	Tension      *TensionRef      `json:"tension"`
-	BlobType     BlobType         `json:"blob_type"`
-	PushedFlag   *string          `json:"pushedFlag,omitempty"`
-	ArchivedFlag *string          `json:"archivedFlag,omitempty"`
-	Node         *NodeFragmentRef `json:"node,omitempty"`
-	Md           *string          `json:"md,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy"`
+	CreatedAt  string           `json:"createdAt"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Tension    *TensionRef      `json:"tension"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
+	Node       *NodeFragmentRef `json:"node,omitempty"`
 }
 
 type AddBlobPayload struct {
@@ -596,46 +593,37 @@ type AuthRule struct {
 }
 
 type Blob struct {
-	Tension      *Tension      `json:"tension"`
-	BlobType     BlobType      `json:"blob_type"`
-	PushedFlag   *string       `json:"pushedFlag,omitempty"`
-	ArchivedFlag *string       `json:"archivedFlag,omitempty"`
-	Node         *NodeFragment `json:"node,omitempty"`
-	Md           *string       `json:"md,omitempty"`
-	ID           string        `json:"id"`
-	CreatedBy    *User         `json:"createdBy"`
-	CreatedAt    string        `json:"createdAt"`
-	UpdatedAt    *string       `json:"updatedAt,omitempty"`
-	Message      *string       `json:"message,omitempty"`
+	Tension    *Tension      `json:"tension"`
+	PushedFlag *string       `json:"pushedFlag,omitempty"`
+	Node       *NodeFragment `json:"node,omitempty"`
+	ID         string        `json:"id"`
+	CreatedBy  *User         `json:"createdBy"`
+	CreatedAt  string        `json:"createdAt"`
+	UpdatedAt  *string       `json:"updatedAt,omitempty"`
+	Message    *string       `json:"message,omitempty"`
 }
 
 type BlobAggregateResult struct {
-	Count           *int    `json:"count,omitempty"`
-	CreatedAtMin    *string `json:"createdAtMin,omitempty"`
-	CreatedAtMax    *string `json:"createdAtMax,omitempty"`
-	UpdatedAtMin    *string `json:"updatedAtMin,omitempty"`
-	UpdatedAtMax    *string `json:"updatedAtMax,omitempty"`
-	MessageMin      *string `json:"messageMin,omitempty"`
-	MessageMax      *string `json:"messageMax,omitempty"`
-	PushedFlagMin   *string `json:"pushedFlagMin,omitempty"`
-	PushedFlagMax   *string `json:"pushedFlagMax,omitempty"`
-	ArchivedFlagMin *string `json:"archivedFlagMin,omitempty"`
-	ArchivedFlagMax *string `json:"archivedFlagMax,omitempty"`
-	MdMin           *string `json:"mdMin,omitempty"`
-	MdMax           *string `json:"mdMax,omitempty"`
+	Count         *int    `json:"count,omitempty"`
+	CreatedAtMin  *string `json:"createdAtMin,omitempty"`
+	CreatedAtMax  *string `json:"createdAtMax,omitempty"`
+	UpdatedAtMin  *string `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax  *string `json:"updatedAtMax,omitempty"`
+	MessageMin    *string `json:"messageMin,omitempty"`
+	MessageMax    *string `json:"messageMax,omitempty"`
+	PushedFlagMin *string `json:"pushedFlagMin,omitempty"`
+	PushedFlagMax *string `json:"pushedFlagMax,omitempty"`
 }
 
 type BlobFilter struct {
-	ID           []string              `json:"id,omitempty"`
-	CreatedAt    *DateTimeFilter       `json:"createdAt,omitempty"`
-	Message      *StringFullTextFilter `json:"message,omitempty"`
-	BlobType     *BlobTypeHash         `json:"blob_type,omitempty"`
-	PushedFlag   *DateTimeFilter       `json:"pushedFlag,omitempty"`
-	ArchivedFlag *DateTimeFilter       `json:"archivedFlag,omitempty"`
-	Has          []*BlobHasFilter      `json:"has,omitempty"`
-	And          []*BlobFilter         `json:"and,omitempty"`
-	Or           []*BlobFilter         `json:"or,omitempty"`
-	Not          *BlobFilter           `json:"not,omitempty"`
+	ID         []string              `json:"id,omitempty"`
+	CreatedAt  *DateTimeFilter       `json:"createdAt,omitempty"`
+	Message    *StringFullTextFilter `json:"message,omitempty"`
+	PushedFlag *DateTimeFilter       `json:"pushedFlag,omitempty"`
+	Has        []*BlobHasFilter      `json:"has,omitempty"`
+	And        []*BlobFilter         `json:"and,omitempty"`
+	Or         []*BlobFilter         `json:"or,omitempty"`
+	Not        *BlobFilter           `json:"not,omitempty"`
 }
 
 type BlobOrder struct {
@@ -645,35 +633,24 @@ type BlobOrder struct {
 }
 
 type BlobPatch struct {
-	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
-	CreatedAt    *string          `json:"createdAt,omitempty"`
-	UpdatedAt    *string          `json:"updatedAt,omitempty"`
-	Message      *string          `json:"message,omitempty"`
-	Tension      *TensionRef      `json:"tension,omitempty"`
-	BlobType     *BlobType        `json:"blob_type,omitempty"`
-	PushedFlag   *string          `json:"pushedFlag,omitempty"`
-	ArchivedFlag *string          `json:"archivedFlag,omitempty"`
-	Node         *NodeFragmentRef `json:"node,omitempty"`
-	Md           *string          `json:"md,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
+	CreatedAt  *string          `json:"createdAt,omitempty"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Tension    *TensionRef      `json:"tension,omitempty"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
+	Node       *NodeFragmentRef `json:"node,omitempty"`
 }
 
 type BlobRef struct {
-	ID           *string          `json:"id,omitempty"`
-	CreatedBy    *UserRef         `json:"createdBy,omitempty"`
-	CreatedAt    *string          `json:"createdAt,omitempty"`
-	UpdatedAt    *string          `json:"updatedAt,omitempty"`
-	Message      *string          `json:"message,omitempty"`
-	Tension      *TensionRef      `json:"tension,omitempty"`
-	BlobType     *BlobType        `json:"blob_type,omitempty"`
-	PushedFlag   *string          `json:"pushedFlag,omitempty"`
-	ArchivedFlag *string          `json:"archivedFlag,omitempty"`
-	Node         *NodeFragmentRef `json:"node,omitempty"`
-	Md           *string          `json:"md,omitempty"`
-}
-
-type BlobTypeHash struct {
-	Eq *BlobType   `json:"eq,omitempty"`
-	In []*BlobType `json:"in,omitempty"`
+	ID         *string          `json:"id,omitempty"`
+	CreatedBy  *UserRef         `json:"createdBy,omitempty"`
+	CreatedAt  *string          `json:"createdAt,omitempty"`
+	UpdatedAt  *string          `json:"updatedAt,omitempty"`
+	Message    *string          `json:"message,omitempty"`
+	Tension    *TensionRef      `json:"tension,omitempty"`
+	PushedFlag *string          `json:"pushedFlag,omitempty"`
+	Node       *NodeFragmentRef `json:"node,omitempty"`
 }
 
 type BuildInfo struct {
@@ -3585,16 +3562,13 @@ func (e ActivityOrderable) MarshalGQL(w io.Writer) {
 type BlobHasFilter string
 
 const (
-	BlobHasFilterCreatedBy    BlobHasFilter = "createdBy"
-	BlobHasFilterCreatedAt    BlobHasFilter = "createdAt"
-	BlobHasFilterUpdatedAt    BlobHasFilter = "updatedAt"
-	BlobHasFilterMessage      BlobHasFilter = "message"
-	BlobHasFilterTension      BlobHasFilter = "tension"
-	BlobHasFilterBlobType     BlobHasFilter = "blob_type"
-	BlobHasFilterPushedFlag   BlobHasFilter = "pushedFlag"
-	BlobHasFilterArchivedFlag BlobHasFilter = "archivedFlag"
-	BlobHasFilterNode         BlobHasFilter = "node"
-	BlobHasFilterMd           BlobHasFilter = "md"
+	BlobHasFilterCreatedBy  BlobHasFilter = "createdBy"
+	BlobHasFilterCreatedAt  BlobHasFilter = "createdAt"
+	BlobHasFilterUpdatedAt  BlobHasFilter = "updatedAt"
+	BlobHasFilterMessage    BlobHasFilter = "message"
+	BlobHasFilterTension    BlobHasFilter = "tension"
+	BlobHasFilterPushedFlag BlobHasFilter = "pushedFlag"
+	BlobHasFilterNode       BlobHasFilter = "node"
 )
 
 var AllBlobHasFilter = []BlobHasFilter{
@@ -3603,16 +3577,13 @@ var AllBlobHasFilter = []BlobHasFilter{
 	BlobHasFilterUpdatedAt,
 	BlobHasFilterMessage,
 	BlobHasFilterTension,
-	BlobHasFilterBlobType,
 	BlobHasFilterPushedFlag,
-	BlobHasFilterArchivedFlag,
 	BlobHasFilterNode,
-	BlobHasFilterMd,
 }
 
 func (e BlobHasFilter) IsValid() bool {
 	switch e {
-	case BlobHasFilterCreatedBy, BlobHasFilterCreatedAt, BlobHasFilterUpdatedAt, BlobHasFilterMessage, BlobHasFilterTension, BlobHasFilterBlobType, BlobHasFilterPushedFlag, BlobHasFilterArchivedFlag, BlobHasFilterNode, BlobHasFilterMd:
+	case BlobHasFilterCreatedBy, BlobHasFilterCreatedAt, BlobHasFilterUpdatedAt, BlobHasFilterMessage, BlobHasFilterTension, BlobHasFilterPushedFlag, BlobHasFilterNode:
 		return true
 	}
 	return false
@@ -3642,12 +3613,10 @@ func (e BlobHasFilter) MarshalGQL(w io.Writer) {
 type BlobOrderable string
 
 const (
-	BlobOrderableCreatedAt    BlobOrderable = "createdAt"
-	BlobOrderableUpdatedAt    BlobOrderable = "updatedAt"
-	BlobOrderableMessage      BlobOrderable = "message"
-	BlobOrderablePushedFlag   BlobOrderable = "pushedFlag"
-	BlobOrderableArchivedFlag BlobOrderable = "archivedFlag"
-	BlobOrderableMd           BlobOrderable = "md"
+	BlobOrderableCreatedAt  BlobOrderable = "createdAt"
+	BlobOrderableUpdatedAt  BlobOrderable = "updatedAt"
+	BlobOrderableMessage    BlobOrderable = "message"
+	BlobOrderablePushedFlag BlobOrderable = "pushedFlag"
 )
 
 var AllBlobOrderable = []BlobOrderable{
@@ -3655,13 +3624,11 @@ var AllBlobOrderable = []BlobOrderable{
 	BlobOrderableUpdatedAt,
 	BlobOrderableMessage,
 	BlobOrderablePushedFlag,
-	BlobOrderableArchivedFlag,
-	BlobOrderableMd,
 }
 
 func (e BlobOrderable) IsValid() bool {
 	switch e {
-	case BlobOrderableCreatedAt, BlobOrderableUpdatedAt, BlobOrderableMessage, BlobOrderablePushedFlag, BlobOrderableArchivedFlag, BlobOrderableMd:
+	case BlobOrderableCreatedAt, BlobOrderableUpdatedAt, BlobOrderableMessage, BlobOrderablePushedFlag:
 		return true
 	}
 	return false
@@ -3685,53 +3652,6 @@ func (e *BlobOrderable) UnmarshalGQL(v interface{}) error {
 }
 
 func (e BlobOrderable) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type BlobType string
-
-const (
-	BlobTypeOnNode            BlobType = "OnNode"
-	BlobTypeOnAbout           BlobType = "OnAbout"
-	BlobTypeOnMandate         BlobType = "OnMandate"
-	BlobTypeOnAboutAndMandate BlobType = "OnAboutAndMandate"
-	BlobTypeOnDoc             BlobType = "OnDoc"
-)
-
-var AllBlobType = []BlobType{
-	BlobTypeOnNode,
-	BlobTypeOnAbout,
-	BlobTypeOnMandate,
-	BlobTypeOnAboutAndMandate,
-	BlobTypeOnDoc,
-}
-
-func (e BlobType) IsValid() bool {
-	switch e {
-	case BlobTypeOnNode, BlobTypeOnAbout, BlobTypeOnMandate, BlobTypeOnAboutAndMandate, BlobTypeOnDoc:
-		return true
-	}
-	return false
-}
-
-func (e BlobType) String() string {
-	return string(e)
-}
-
-func (e *BlobType) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = BlobType(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid BlobType", str)
-	}
-	return nil
-}
-
-func (e BlobType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

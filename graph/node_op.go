@@ -108,7 +108,7 @@ func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, subject *
 		}
 	}
 
-	if err := db.GetDB().SetGovernedNodeArchived(subject.node.ID, subject.blob.ID, Now(), archived); err != nil {
+	if err := db.GetDB().SetFieldById(subject.node.ID, "Node.isArchived", strconv.FormatBool(archived)); err != nil {
 		return err
 	}
 
@@ -275,7 +275,6 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *strin
 	evt1 := model.TensionEventCreated
 	evt2 := model.TensionEventBlobCreated
 	evt3 := model.TensionEventBlobPushed
-	blob_type := model.BlobTypeOnNode
 	noderef := StructMap[model.NodeFragmentRef](node)
 	emptyString := "" // root's tension feature
 	noderef.Nameid = &emptyString
@@ -284,7 +283,6 @@ func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *strin
 	blob := model.BlobRef{
 		CreatedAt:  &now,
 		CreatedBy:  &createdBy,
-		BlobType:   &blob_type,
 		Node:       &noderef,
 		PushedFlag: &now,
 	}

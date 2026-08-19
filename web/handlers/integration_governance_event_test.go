@@ -101,7 +101,6 @@ func createGovernanceFixture(t *testing.T, key, nodeType string, name, roleType 
 		_:t <Tension.blobs> _:b .
 		_:b <dgraph.type> "Blob" .
 		_:b <Blob.tension> _:t .
-		_:b <Blob.blob_type> "OnNode" .
 		_:b <Blob.node> _:f .
 		_:b <Post.createdBy> uid(author) .
 		_:b <Post.createdAt> "2027-01-01T00:00:01Z" .
@@ -165,7 +164,6 @@ func addGovernanceBlob(t *testing.T, fixture governanceFixture, nodeType, name, 
 			uid(t) <Tension.blobs> _:b .
 			_:b <dgraph.type> "Blob" .
 			_:b <Blob.tension> uid(t) .
-			_:b <Blob.blob_type> "OnNode" .
 			_:b <Blob.node> _:f .
 			_:b <Post.createdBy> uid(author) .
 			_:b <Post.createdAt> "2027-01-02T00:00:00Z" .
@@ -250,22 +248,11 @@ func governedNodeID(t *testing.T, tensionID string) string {
 	return uid
 }
 
-func requireGovernanceState(t *testing.T, nodeID, blobID string, archived bool) {
+func requireGovernanceState(t *testing.T, nodeID string, archived bool) {
 	t.Helper()
 	state, err := db.GetDB().GetByUid(nodeID, "Node.isArchived")
 	if err != nil || state != archived {
 		t.Fatalf("Node.isArchived = %v, want %v (err=%v)", state, archived, err)
-	}
-	flags, err := db.GetDB().GetByUid(blobID, "Blob.pushedFlag Blob.archivedFlag")
-	if err != nil {
-		t.Fatalf("query blob flags: %v", err)
-	}
-	values, ok := flags.(map[string]any)
-	if !ok || values["pushedFlag"] == nil {
-		t.Fatalf("blob flags = %T(%v), want pushed flag", flags, flags)
-	}
-	if (values["archivedFlag"] != nil) != archived {
-		t.Fatalf("blob archivedFlag = %v, want archived=%v", values["archivedFlag"], archived)
 	}
 }
 
@@ -279,7 +266,7 @@ func TestGovernanceEventsThroughGraphQL(t *testing.T) {
 
 		requireGraphQLSuccess(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobPushed", nil))
 		nodeID := governedNodeID(t, fixture.tensionID)
-		requireGovernanceState(t, nodeID, fixture.blobID, false)
+		requireGovernanceState(t, nodeID, false)
 		if source, _ := db.GetDB().GetByUid(nodeID, "Node.source", "uid"); source != fixture.blobID {
 			t.Fatalf("first publication source = %v, want %s", source, fixture.blobID)
 		}
@@ -303,12 +290,12 @@ func TestGovernanceEventsThroughGraphQL(t *testing.T) {
 		}
 
 		requireGraphQLSuccess(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobArchived", nil))
-		requireGovernanceState(t, nodeID, secondBlobID, true)
+		requireGovernanceState(t, nodeID, true)
 		requireGraphQLError(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobArchived", nil), "already archived")
 		requireGraphQLError(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobPushed", nil), "cannot publish an archived node")
 
 		requireGraphQLSuccess(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobUnarchived", nil))
-		requireGovernanceState(t, nodeID, secondBlobID, false)
+		requireGovernanceState(t, nodeID, false)
 		requireGraphQLError(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobUnarchived", nil), "not archived")
 
 		fragmentID, err := db.GetDB().GetByUid(secondBlobID, "Blob.node", "uid")
@@ -326,7 +313,7 @@ func TestGovernanceEventsThroughGraphQL(t *testing.T) {
 		fixture := createGovernanceFixture(t, "circle", "Circle", &name, nil, true)
 		requireGraphQLSuccess(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobPushed", nil))
 		nodeID := governedNodeID(t, fixture.tensionID)
-		requireGovernanceState(t, nodeID, fixture.blobID, false)
+		requireGovernanceState(t, nodeID, false)
 		if kind, _ := db.GetDB().GetByUid(nodeID, "Node.type_"); kind != "Circle" {
 			t.Fatalf("circle publication kind = %v, want Circle", kind)
 		}

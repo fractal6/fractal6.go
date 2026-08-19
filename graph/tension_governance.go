@@ -57,12 +57,6 @@ func resolveGovernanceSubject(tension *model.Tension, operation governanceOperat
 	if blob == nil {
 		return nil, fmt.Errorf("governance event requires a blob")
 	}
-	// Md/document blobs are not part of Node governance.
-	switch blob.BlobType {
-	case model.BlobTypeOnNode, model.BlobTypeOnAbout, model.BlobTypeOnMandate, model.BlobTypeOnAboutAndMandate:
-	default:
-		return nil, fmt.Errorf("blob type %q cannot govern a node", blob.BlobType)
-	}
 	if blob.Node == nil {
 		return nil, fmt.Errorf("governance blob must contain a node fragment")
 	}

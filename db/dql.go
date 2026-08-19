@@ -929,7 +929,7 @@ func (dg Dgraph) SetFieldByEq(fieldid, objid, predicate, val string) error {
 	return err
 }
 
-// SetPushedFlagBlob sets the blob pushed flag and clears its archive flag.
+// SetPushedFlagBlob sets the blob pushed flag.
 func (dg Dgraph) SetPushedFlagBlob(bid, flag string) error {
 	if err := ValidateUids(bid); err != nil {
 		return err
@@ -944,19 +944,6 @@ func (dg Dgraph) LinkGovernedNode(tid, nid, bid string) error {
 		return err
 	}
 	_, err := dg.Meta("linkGovernedNode", map[string]string{"tid": tid, "nid": nid, "bid": bid})
-	return err
-}
-
-// SetGovernedNodeArchived changes canonical Node lifecycle and blob flags in one transaction.
-func (dg Dgraph) SetGovernedNodeArchived(nid, bid, flag string, archived bool) error {
-	if err := ValidateUids(nid, bid); err != nil {
-		return err
-	}
-	mutation := "unarchiveGovernedNode"
-	if archived {
-		mutation = "archiveGovernedNode"
-	}
-	_, err := dg.Meta(mutation, map[string]string{"nid": nid, "bid": bid, "flag": flag})
 	return err
 }
 

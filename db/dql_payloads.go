@@ -60,8 +60,6 @@ var tensionHookPayload string = `
 var tensionBlobHookPayload string = `
   Tension.blobs %s {
     uid
-    Blob.blob_type
-    Blob.md
     Blob.node {
       uid
       NodeFragment.type_

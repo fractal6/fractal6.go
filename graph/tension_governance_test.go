@@ -12,9 +12,8 @@ func governanceTestTension(fragment *model.NodeFragment, governed *model.Node) *
 		ID:       "0x1",
 		Receiver: &model.Node{Nameid: "org"},
 		Blobs: []*model.Blob{{
-			ID:       "0x2",
-			BlobType: model.BlobTypeOnNode,
-			Node:     fragment,
+			ID:   "0x2",
+			Node: fragment,
 		}},
 		GovernedNode: governed,
 	}
@@ -65,8 +64,6 @@ func TestResolveGovernanceSubject(t *testing.T) {
 		{name: "duplicate unarchive", tension: governanceTestTension(fragment(), governed(false)), operation: governanceUnarchive, wantError: "is not archived"},
 		{name: "archive transition", tension: governanceTestTension(fragment(), governed(false)), operation: governanceArchive, wantNameid: "org##designer"},
 		{name: "unarchive transition", tension: governanceTestTension(fragment(), governed(true)), operation: governanceUnarchive, wantNameid: "org##designer"},
-		{name: "Md rejected", tension: &model.Tension{Receiver: &model.Node{Nameid: "org"}, Blobs: []*model.Blob{{BlobType: model.BlobTypeOnDoc, Md: &name}}}, operation: governancePublish, wantError: "cannot govern a node"},
-		{name: "unknown blob type rejected", tension: &model.Tension{Receiver: &model.Node{Nameid: "org"}, Blobs: []*model.Blob{{BlobType: model.BlobType("Future"), Node: fragment()}}}, operation: governancePublish, wantError: "cannot govern a node"},
 	}
 
 	for _, test := range tests {

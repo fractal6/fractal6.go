@@ -13967,16 +13967,10 @@ func (ec *executionContext) fieldContext_AddBlobPayload_blob(ctx context.Context
 			switch field.Name {
 			case "tension":
 				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
 			case "pushedFlag":
 				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
 			case "node":
 				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
 			case "id":
 				return ec.fieldContext_Blob_id(ctx, field)
 			case "createdBy":
@@ -17341,47 +17335,6 @@ func (ec *executionContext) fieldContext_Blob_tension(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Blob_blob_type(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Blob_blob_type(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.BlobType, nil
-	})
-
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(model.BlobType)
-	fc.Result = res
-	return ec.marshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Blob_blob_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Blob",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type BlobType does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Blob_pushedFlag(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Blob_pushedFlag(ctx, field)
 	if err != nil {
@@ -17408,44 +17361,6 @@ func (ec *executionContext) _Blob_pushedFlag(ctx context.Context, field graphql.
 }
 
 func (ec *executionContext) fieldContext_Blob_pushedFlag(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Blob",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Blob_archivedFlag(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Blob_archivedFlag(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ArchivedFlag, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Blob_archivedFlag(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Blob",
 		Field:      field,
@@ -17531,44 +17446,6 @@ func (ec *executionContext) fieldContext_Blob_node(ctx context.Context, field gr
 	if fc.Args, err = ec.field_Blob_node_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Blob_md(ctx context.Context, field graphql.CollectedField, obj *model.Blob) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Blob_md(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Md, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Blob_md(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Blob",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
 	}
 	return fc, nil
 }
@@ -18194,158 +18071,6 @@ func (ec *executionContext) fieldContext_BlobAggregateResult_pushedFlagMax(_ con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlobAggregateResult_archivedFlagMin(ctx context.Context, field graphql.CollectedField, obj *model.BlobAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlobAggregateResult_archivedFlagMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ArchivedFlagMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlobAggregateResult_archivedFlagMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlobAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlobAggregateResult_archivedFlagMax(ctx context.Context, field graphql.CollectedField, obj *model.BlobAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlobAggregateResult_archivedFlagMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ArchivedFlagMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlobAggregateResult_archivedFlagMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlobAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlobAggregateResult_mdMin(ctx context.Context, field graphql.CollectedField, obj *model.BlobAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlobAggregateResult_mdMin(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MdMin, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlobAggregateResult_mdMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlobAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlobAggregateResult_mdMax(ctx context.Context, field graphql.CollectedField, obj *model.BlobAggregateResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlobAggregateResult_mdMax(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MdMax, nil
-	})
-
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlobAggregateResult_mdMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlobAggregateResult",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -21363,16 +21088,10 @@ func (ec *executionContext) fieldContext_DeleteBlobPayload_blob(ctx context.Cont
 			switch field.Name {
 			case "tension":
 				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
 			case "pushedFlag":
 				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
 			case "node":
 				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
 			case "id":
 				return ec.fieldContext_Blob_id(ctx, field)
 			case "createdBy":
@@ -37104,16 +36823,10 @@ func (ec *executionContext) fieldContext_Node_source(ctx context.Context, field 
 			switch field.Name {
 			case "tension":
 				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
 			case "pushedFlag":
 				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
 			case "node":
 				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
 			case "id":
 				return ec.fieldContext_Blob_id(ctx, field)
 			case "createdBy":
@@ -55404,16 +55117,10 @@ func (ec *executionContext) fieldContext_Query_getBlob(ctx context.Context, fiel
 			switch field.Name {
 			case "tension":
 				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
 			case "pushedFlag":
 				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
 			case "node":
 				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
 			case "id":
 				return ec.fieldContext_Blob_id(ctx, field)
 			case "createdBy":
@@ -55477,16 +55184,10 @@ func (ec *executionContext) fieldContext_Query_queryBlob(ctx context.Context, fi
 			switch field.Name {
 			case "tension":
 				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
 			case "pushedFlag":
 				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
 			case "node":
 				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
 			case "id":
 				return ec.fieldContext_Blob_id(ctx, field)
 			case "createdBy":
@@ -55566,14 +55267,6 @@ func (ec *executionContext) fieldContext_Query_aggregateBlob(ctx context.Context
 				return ec.fieldContext_BlobAggregateResult_pushedFlagMin(ctx, field)
 			case "pushedFlagMax":
 				return ec.fieldContext_BlobAggregateResult_pushedFlagMax(ctx, field)
-			case "archivedFlagMin":
-				return ec.fieldContext_BlobAggregateResult_archivedFlagMin(ctx, field)
-			case "archivedFlagMax":
-				return ec.fieldContext_BlobAggregateResult_archivedFlagMax(ctx, field)
-			case "mdMin":
-				return ec.fieldContext_BlobAggregateResult_mdMin(ctx, field)
-			case "mdMax":
-				return ec.fieldContext_BlobAggregateResult_mdMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BlobAggregateResult", field.Name)
 		},
@@ -60490,16 +60183,10 @@ func (ec *executionContext) fieldContext_Tension_blobs(ctx context.Context, fiel
 			switch field.Name {
 			case "tension":
 				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
 			case "pushedFlag":
 				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
 			case "node":
 				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
 			case "id":
 				return ec.fieldContext_Blob_id(ctx, field)
 			case "createdBy":
@@ -61724,14 +61411,6 @@ func (ec *executionContext) fieldContext_Tension_blobsAggregate(ctx context.Cont
 				return ec.fieldContext_BlobAggregateResult_pushedFlagMin(ctx, field)
 			case "pushedFlagMax":
 				return ec.fieldContext_BlobAggregateResult_pushedFlagMax(ctx, field)
-			case "archivedFlagMin":
-				return ec.fieldContext_BlobAggregateResult_archivedFlagMin(ctx, field)
-			case "archivedFlagMax":
-				return ec.fieldContext_BlobAggregateResult_archivedFlagMax(ctx, field)
-			case "mdMin":
-				return ec.fieldContext_BlobAggregateResult_mdMin(ctx, field)
-			case "mdMax":
-				return ec.fieldContext_BlobAggregateResult_mdMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type BlobAggregateResult", field.Name)
 		},
@@ -64268,16 +63947,10 @@ func (ec *executionContext) fieldContext_UpdateBlobPayload_blob(ctx context.Cont
 			switch field.Name {
 			case "tension":
 				return ec.fieldContext_Blob_tension(ctx, field)
-			case "blob_type":
-				return ec.fieldContext_Blob_blob_type(ctx, field)
 			case "pushedFlag":
 				return ec.fieldContext_Blob_pushedFlag(ctx, field)
-			case "archivedFlag":
-				return ec.fieldContext_Blob_archivedFlag(ctx, field)
 			case "node":
 				return ec.fieldContext_Blob_node(ctx, field)
-			case "md":
-				return ec.fieldContext_Blob_md(ctx, field)
 			case "id":
 				return ec.fieldContext_Blob_id(ctx, field)
 			case "createdBy":
@@ -73368,7 +73041,7 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "blob_type", "pushedFlag", "archivedFlag", "node", "md"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "pushedFlag", "node"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73494,13 +73167,6 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "blob_type":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blob_type"))
-			data, err := ec.unmarshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.BlobType = data
 		case "pushedFlag":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushedFlag"))
 			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -73508,13 +73174,6 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.PushedFlag = data
-		case "archivedFlag":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archivedFlag"))
-			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ArchivedFlag = data
 		case "node":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
 			data, err := ec.unmarshalONodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
@@ -73522,13 +73181,6 @@ func (ec *executionContext) unmarshalInputAddBlobInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.Node = data
-		case "md":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("md"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Md = data
 		}
 	}
 
@@ -77804,7 +77456,7 @@ func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "message", "blob_type", "pushedFlag", "archivedFlag", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "createdAt", "message", "pushedFlag", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -77832,13 +77484,6 @@ func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj in
 				return it, err
 			}
 			it.Message = data
-		case "blob_type":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blob_type"))
-			data, err := ec.unmarshalOBlobType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobTypeHash(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.BlobType = data
 		case "pushedFlag":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushedFlag"))
 			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
@@ -77846,13 +77491,6 @@ func (ec *executionContext) unmarshalInputBlobFilter(ctx context.Context, obj in
 				return it, err
 			}
 			it.PushedFlag = data
-		case "archivedFlag":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archivedFlag"))
-			data, err := ec.unmarshalODateTimeFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐDateTimeFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ArchivedFlag = data
 		case "has":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has"))
 			data, err := ec.unmarshalOBlobHasFilter2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobHasFilter(ctx, v)
@@ -77935,7 +77573,7 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "blob_type", "pushedFlag", "archivedFlag", "node", "md"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "tension", "pushedFlag", "node"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -78072,30 +77710,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "blob_type":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blob_type"))
-			directive0 := func(ctx context.Context) (interface{}, error) {
-				return ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
-			}
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*model.BlobType); ok {
-				it.BlobType = data
-			} else if tmp == nil {
-				it.BlobType = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.BlobType`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		case "pushedFlag":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushedFlag"))
 			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
@@ -78114,28 +77728,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				it.PushedFlag = data
 			} else if tmp == nil {
 				it.PushedFlag = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "archivedFlag":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archivedFlag"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalODateTime2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.ArchivedFlag = data
-			} else if tmp == nil {
-				it.ArchivedFlag = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
@@ -78164,28 +77756,6 @@ func (ec *executionContext) unmarshalInputBlobPatch(ctx context.Context, obj int
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.NodeFragmentRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "md":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("md"))
-			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
-			directive1 := func(ctx context.Context) (interface{}, error) {
-				if ec.directives.X_patch_ro == nil {
-					return nil, errors.New("directive x_patch_ro is not implemented")
-				}
-				return ec.directives.X_patch_ro(ctx, obj, directive0)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*string); ok {
-				it.Md = data
-			} else if tmp == nil {
-				it.Md = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
 		}
 	}
 
@@ -78199,7 +77769,7 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension", "blob_type", "pushedFlag", "archivedFlag", "node", "md"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "tension", "pushedFlag", "node"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -78334,13 +77904,6 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 				err := fmt.Errorf(`unexpected type %T from directive, should be *fractale/fractal6.go/graph/model.TensionRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
-		case "blob_type":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blob_type"))
-			data, err := ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.BlobType = data
 		case "pushedFlag":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushedFlag"))
 			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
@@ -78348,13 +77911,6 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.PushedFlag = data
-		case "archivedFlag":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archivedFlag"))
-			data, err := ec.unmarshalODateTime2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ArchivedFlag = data
 		case "node":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("node"))
 			data, err := ec.unmarshalONodeFragmentRef2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐNodeFragmentRef(ctx, v)
@@ -78362,47 +77918,6 @@ func (ec *executionContext) unmarshalInputBlobRef(ctx context.Context, obj inter
 				return it, err
 			}
 			it.Node = data
-		case "md":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("md"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Md = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputBlobType_hash(ctx context.Context, obj interface{}) (model.BlobTypeHash, error) {
-	var it model.BlobTypeHash
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"eq", "in"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "eq":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			data, err := ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Eq = data
-		case "in":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("in"))
-			data, err := ec.unmarshalOBlobType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.In = data
 		}
 	}
 
@@ -97354,19 +96869,10 @@ func (ec *executionContext) _Blob(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "blob_type":
-			out.Values[i] = ec._Blob_blob_type(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "pushedFlag":
 			out.Values[i] = ec._Blob_pushedFlag(ctx, field, obj)
-		case "archivedFlag":
-			out.Values[i] = ec._Blob_archivedFlag(ctx, field, obj)
 		case "node":
 			out.Values[i] = ec._Blob_node(ctx, field, obj)
-		case "md":
-			out.Values[i] = ec._Blob_md(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Blob_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -97438,14 +96944,6 @@ func (ec *executionContext) _BlobAggregateResult(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._BlobAggregateResult_pushedFlagMin(ctx, field, obj)
 		case "pushedFlagMax":
 			out.Values[i] = ec._BlobAggregateResult_pushedFlagMax(ctx, field, obj)
-		case "archivedFlagMin":
-			out.Values[i] = ec._BlobAggregateResult_archivedFlagMin(ctx, field, obj)
-		case "archivedFlagMax":
-			out.Values[i] = ec._BlobAggregateResult_archivedFlagMax(ctx, field, obj)
-		case "mdMin":
-			out.Values[i] = ec._BlobAggregateResult_mdMin(ctx, field, obj)
-		case "mdMax":
-			out.Values[i] = ec._BlobAggregateResult_mdMax(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -106543,16 +106041,6 @@ func (ec *executionContext) unmarshalNBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgrap
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, v interface{}) (model.BlobType, error) {
-	var res model.BlobType
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNBlobType2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, sel ast.SelectionSet, v model.BlobType) graphql.Marshaler {
-	return v
-}
-
 func (ec *executionContext) unmarshalNBuildInfoFilter2fractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBuildInfoFilter(ctx context.Context, v interface{}) (model.BuildInfoFilter, error) {
 	res, err := ec.unmarshalInputBuildInfoFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -108633,91 +108121,6 @@ func (ec *executionContext) unmarshalOBlobRef2ᚖfractaleᚋfractal6ᚗgoᚋgrap
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputBlobRef(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOBlobType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, v interface{}) ([]*model.BlobType, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.BlobType, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOBlobType2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, sel ast.SelectionSet, v []*model.BlobType) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) unmarshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, v interface{}) (*model.BlobType, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.BlobType)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOBlobType2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobType(ctx context.Context, sel ast.SelectionSet, v *model.BlobType) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalOBlobType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐBlobTypeHash(ctx context.Context, v interface{}) (*model.BlobTypeHash, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputBlobType_hash(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

@@ -231,7 +231,6 @@ func TestGovernedNodeMutations_Integration(t *testing.T) {
 		_:t <Tension.blobs> _:b .
 		_:b <dgraph.type> "Blob" .
 		_:b <Blob.tension> _:t .
-		_:b <Blob.blob_type> "OnNode" .
 		_:b <Blob.pushedFlag> "2026-01-01T00:00:00Z" .`}},
 	}
 	if _, err := GetDB().Gamma(create, nil); err != nil {
@@ -280,34 +279,18 @@ func TestGovernedNodeMutations_Integration(t *testing.T) {
 		t.Fatalf("link set governed node %v, want %s", governed, nid)
 	}
 
-	if err := GetDB().SetGovernedNodeArchived(nid, bid, "2026-01-02T00:00:00Z", true); err != nil {
+	if err := GetDB().SetFieldById(nid, "Node.isArchived", "true"); err != nil {
 		t.Fatalf("archive governed node: %v", err)
 	}
 	if state, _ := GetDB().GetByUid(nid, "Node.isArchived"); state != true {
 		t.Fatalf("archive left Node.isArchived at %v", state)
 	}
-	flags, err := GetDB().GetByUid(bid, "Blob.pushedFlag Blob.archivedFlag")
-	if err != nil {
-		t.Fatalf("reading archived blob flags: %v", err)
-	}
-	archivedFlags, ok := flags.(map[string]any)
-	if !ok || archivedFlags["pushedFlag"] == nil || archivedFlags["archivedFlag"] == nil {
-		t.Fatalf("archived blob flags disagree: %T(%v)", flags, flags)
-	}
 
-	if err := GetDB().SetGovernedNodeArchived(nid, bid, "2026-01-03T00:00:00Z", false); err != nil {
+	if err := GetDB().SetFieldById(nid, "Node.isArchived", "false"); err != nil {
 		t.Fatalf("unarchive governed node: %v", err)
 	}
 	if state, _ := GetDB().GetByUid(nid, "Node.isArchived"); state != false {
 		t.Fatalf("unarchive left Node.isArchived at %v", state)
-	}
-	flags, err = GetDB().GetByUid(bid, "Blob.pushedFlag Blob.archivedFlag")
-	if err != nil {
-		t.Fatalf("reading unarchived blob flags: %v", err)
-	}
-	unarchivedFlags, ok := flags.(map[string]any)
-	if !ok || unarchivedFlags["pushedFlag"] == nil || unarchivedFlags["archivedFlag"] != nil {
-		t.Fatalf("unarchived blob flags disagree: %T(%v)", flags, flags)
 	}
 }
 
