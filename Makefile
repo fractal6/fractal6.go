@@ -82,7 +82,8 @@ test-integration: test-integration-setup
 test-integration-down:
 	docker compose -f docker-compose.test.yml down -v --remove-orphans
 
-test-integration-clean: test-integration test-integration-down
+test-integration-clean:
+	$(MAKE) test-integration; ret=$$?; $(MAKE) test-integration-down; exit $$ret
 
 test-all: test test-integration-clean
 

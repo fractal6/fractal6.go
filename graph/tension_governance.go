@@ -45,6 +45,14 @@ type governanceSubject struct {
 	create bool
 }
 
+// isNodeArchived reads the archive lifecycle flag: a root org uses the lightweight isRootArchived flag (no recursion).
+func isNodeArchived(node *model.Node) bool {
+	if codec.IsRoot(node.Nameid) {
+		return node.IsRootArchived != nil && *node.IsRootArchived
+	}
+	return node.IsArchived
+}
+
 // resolveGovernanceSubject is the single shape and lifecycle gate for Node governance events.
 func resolveGovernanceSubject(tension *model.Tension, operation governanceOperation) (*governanceSubject, error) {
 	if tension == nil {
@@ -106,11 +114,11 @@ func resolveGovernanceSubject(tension *model.Tension, operation governanceOperat
 				return nil, fmt.Errorf("cannot publish an archived node")
 			}
 		case governanceArchive:
-			if subject.node.IsArchived {
+			if isNodeArchived(subject.node) {
 				return nil, fmt.Errorf("governed node is already archived")
 			}
 		case governanceUnarchive:
-			if !subject.node.IsArchived {
+			if !isNodeArchived(subject.node) {
 				return nil, fmt.Errorf("governed node is not archived")
 			}
 		}

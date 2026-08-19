@@ -319,6 +319,48 @@ func TestGovernanceEventsThroughGraphQL(t *testing.T) {
 		}
 	})
 
+	t.Run("root archive is a flag", func(t *testing.T) {
+		name := "Test Org"
+		fixture := createGovernanceFixture(t, "root", "Circle", &name, nil, true)
+		rootIDs, err := db.GetDB().GetIDs("Node.nameid", "test-org", nil, nil)
+		if err != nil || len(rootIDs) != 1 {
+			t.Fatalf("resolve root node: ids=%v err=%v", rootIDs, err)
+		}
+		rootID := rootIDs[0]
+		qm := db.QueryMut{
+			Q: `query {
+				t as var(func: uid(` + fixture.tensionID + `))
+				root as var(func: uid(` + rootID + `))
+			}`,
+			M: []db.X{{S: `uid(t) <Tension.governed_node> uid(root) .`}},
+		}
+		if _, err := db.GetDB().Gamma(qm, nil); err != nil {
+			t.Fatalf("link root as governed node: %v", err)
+		}
+		t.Cleanup(func() { _ = db.GetDB().SetFieldById(rootID, "Node.isRootArchived", "false") })
+
+		children, err := db.GetDB().GetChildren("test-org")
+		if err != nil {
+			t.Fatalf("get root children: %v", err)
+		}
+
+		requireGraphQLSuccess(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobArchived", nil))
+		if got, _ := db.GetDB().GetByUid(rootID, "Node.isRootArchived"); got != true {
+			t.Fatalf("Node.isRootArchived = %v, want true", got)
+		}
+		requireGovernanceState(t, rootID, false)
+		if got, err := db.GetDB().GetChildren("test-org"); err != nil || len(got) != len(children) {
+			t.Fatalf("root children = %d, want %d (err=%v)", len(got), len(children), err)
+		}
+		requireGraphQLError(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobArchived", nil), "already archived")
+
+		requireGraphQLSuccess(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobUnarchived", nil))
+		if got, _ := db.GetDB().GetByUid(rootID, "Node.isRootArchived"); got != false {
+			t.Fatalf("Node.isRootArchived = %v, want false", got)
+		}
+		requireGraphQLError(t, runTensionEvent(t, cookie, fixture.tensionID, "BlobUnarchived", nil), "not archived")
+	})
+
 	t.Run("null fragment fields return errors", func(t *testing.T) {
 		name := "Malformed Role"
 		cases := []struct {

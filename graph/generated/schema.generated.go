@@ -82396,7 +82396,7 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdAt", "nameid", "rootnameid", "name", "about", "skills", "isRoot", "type_", "visibility", "mode", "isArchived", "isPersonal", "role_type", "has", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "createdAt", "nameid", "rootnameid", "name", "about", "skills", "isRoot", "type_", "visibility", "mode", "isArchived", "isPersonal", "isRootArchived", "role_type", "has", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -82494,6 +82494,13 @@ func (ec *executionContext) unmarshalInputNodeFilter(ctx context.Context, obj in
 				return it, err
 			}
 			it.IsPersonal = data
+		case "isRootArchived":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isRootArchived"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IsRootArchived = data
 		case "role_type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role_type"))
 			data, err := ec.unmarshalORoleType_hash2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐRoleTypeHash(ctx, v)

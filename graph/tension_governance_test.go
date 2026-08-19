@@ -36,6 +36,9 @@ func TestResolveGovernanceSubject(t *testing.T) {
 	guest := model.RoleTypeGuest
 	rootFragment := &model.NodeFragment{Name: &name, Type: &circle}
 	rootGoverned := &model.Node{ID: "0x5", Nameid: "org", Type: circle}
+	rootArchived := func(archived bool) *model.Node {
+		return &model.Node{ID: "0x5", Nameid: "org", Type: circle, IsArchived: true, IsRootArchived: &archived}
+	}
 
 	tests := []struct {
 		name       string
@@ -64,6 +67,11 @@ func TestResolveGovernanceSubject(t *testing.T) {
 		{name: "duplicate unarchive", tension: governanceTestTension(fragment(), governed(false)), operation: governanceUnarchive, wantError: "is not archived"},
 		{name: "archive transition", tension: governanceTestTension(fragment(), governed(false)), operation: governanceArchive, wantNameid: "org##designer"},
 		{name: "unarchive transition", tension: governanceTestTension(fragment(), governed(true)), operation: governanceUnarchive, wantNameid: "org##designer"},
+		// Root lifecycle reads isRootArchived only, isArchived is ignored.
+		{name: "root archive transition", tension: governanceTestTension(rootFragment, rootGoverned), operation: governanceArchive, wantNameid: "org"},
+		{name: "root duplicate archive", tension: governanceTestTension(rootFragment, rootArchived(true)), operation: governanceArchive, wantError: "already archived"},
+		{name: "root unarchive transition", tension: governanceTestTension(rootFragment, rootArchived(true)), operation: governanceUnarchive, wantNameid: "org"},
+		{name: "root duplicate unarchive", tension: governanceTestTension(rootFragment, rootArchived(false)), operation: governanceUnarchive, wantError: "is not archived"},
 	}
 
 	for _, test := range tests {

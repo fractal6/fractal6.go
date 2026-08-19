@@ -53,6 +53,7 @@ var tensionHookPayload string = `
     Node.nameid
     Node.type_
     Node.isArchived
+    Node.isRootArchived
     Node.first_link { User.username }
   }
 `

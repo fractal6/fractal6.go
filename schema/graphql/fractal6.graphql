@@ -87,7 +87,7 @@ type Node @auth(
   lexicon: String
   isTemplateTensionOnly: Boolean
   isPinnedTensionfetchRecursively: Boolean
-  isRootArchived: Boolean
+  isRootArchived: Boolean @search
 
   # Watchers
   watchers: [User!] @hasInverse(field: watching)

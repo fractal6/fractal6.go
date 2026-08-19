@@ -82,6 +82,11 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, subject *governa
 func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject, archived bool) error {
 	nameid := subject.nameid
 
+	// A root org archive is a lightweight flag: no recursion, no children check, no first-link unlink.
+	if codec.IsRoot(nameid) {
+		return db.GetDB().SetFieldById(subject.node.ID, "Node.isRootArchived", strconv.FormatBool(archived))
+	}
+
 	if archived {
 		// Archive
 		// --

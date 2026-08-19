@@ -1598,24 +1598,25 @@ type NodeAggregateResult struct {
 }
 
 type NodeFilter struct {
-	ID         []string                            `json:"id,omitempty"`
-	CreatedAt  *DateTimeFilter                     `json:"createdAt,omitempty"`
-	Nameid     *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
-	Rootnameid *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
-	Name       *StringFullTextFilter               `json:"name,omitempty"`
-	About      *StringFullTextFilter               `json:"about,omitempty"`
-	Skills     *StringTermFilter                   `json:"skills,omitempty"`
-	IsRoot     *bool                               `json:"isRoot,omitempty"`
-	Type       *NodeTypeHash                       `json:"type_,omitempty"`
-	Visibility *NodeVisibilityHash                 `json:"visibility,omitempty"`
-	Mode       *NodeModeHash                       `json:"mode,omitempty"`
-	IsArchived *bool                               `json:"isArchived,omitempty"`
-	IsPersonal *bool                               `json:"isPersonal,omitempty"`
-	RoleType   *RoleTypeHash                       `json:"role_type,omitempty"`
-	Has        []*NodeHasFilter                    `json:"has,omitempty"`
-	And        []*NodeFilter                       `json:"and,omitempty"`
-	Or         []*NodeFilter                       `json:"or,omitempty"`
-	Not        *NodeFilter                         `json:"not,omitempty"`
+	ID             []string                            `json:"id,omitempty"`
+	CreatedAt      *DateTimeFilter                     `json:"createdAt,omitempty"`
+	Nameid         *StringHashFilterStringRegExpFilter `json:"nameid,omitempty"`
+	Rootnameid     *StringHashFilterStringRegExpFilter `json:"rootnameid,omitempty"`
+	Name           *StringFullTextFilter               `json:"name,omitempty"`
+	About          *StringFullTextFilter               `json:"about,omitempty"`
+	Skills         *StringTermFilter                   `json:"skills,omitempty"`
+	IsRoot         *bool                               `json:"isRoot,omitempty"`
+	Type           *NodeTypeHash                       `json:"type_,omitempty"`
+	Visibility     *NodeVisibilityHash                 `json:"visibility,omitempty"`
+	Mode           *NodeModeHash                       `json:"mode,omitempty"`
+	IsArchived     *bool                               `json:"isArchived,omitempty"`
+	IsPersonal     *bool                               `json:"isPersonal,omitempty"`
+	IsRootArchived *bool                               `json:"isRootArchived,omitempty"`
+	RoleType       *RoleTypeHash                       `json:"role_type,omitempty"`
+	Has            []*NodeHasFilter                    `json:"has,omitempty"`
+	And            []*NodeFilter                       `json:"and,omitempty"`
+	Or             []*NodeFilter                       `json:"or,omitempty"`
+	Not            *NodeFilter                         `json:"not,omitempty"`
 }
 
 type NodeFragment struct {
