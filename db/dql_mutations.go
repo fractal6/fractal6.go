@@ -99,6 +99,25 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 			D: `uid(n_old) <Node.pinned> uid(t) . `,
 		}},
 	},
+	// archiveNodesRecursive archives a node and all its non-archived descendants
+	// in a single upsert. The `all` block returns, for each archived node, its
+	// nameid and first-link username (aliased through @normalize) so the caller
+	// can unlink members afterwards.
+	"archiveNodesRecursive": {
+		Q: `query {
+            var(func: eq(Node.nameid, "{{.nameid}}")) @recurse {
+                n as uid
+                Node.children @filter(eq(Node.isArchived, false))
+            }
+            all(func: uid(n)) @normalize {
+                nameid: Node.nameid
+                Node.first_link { username: User.username }
+            }
+        }`,
+		M: []X{{
+			S: `uid(n) <Node.isArchived> "true" .`,
+		}},
+	},
 	"rewriteLabelEvents": {
 		Q: `query {
             var(func: eq(Node.rootnameid, "{{.rootnameid}}")) {

@@ -100,11 +100,11 @@ func init() {
 			Action: PushBlob,
 		},
 		model.TensionEventBlobArchived: EventMap{
-			Auth:   TargetCoordoHook | AssigneeHook,
+			Auth:   TargetCoordoHook,
 			Action: ChangeArchiveBlob,
 		},
 		model.TensionEventBlobUnarchived: EventMap{
-			Auth:   TargetCoordoHook | AssigneeHook,
+			Auth:   TargetCoordoHook,
 			Action: ChangeArchiveBlob,
 		},
 		model.TensionEventAuthority: EventMap{
@@ -393,7 +393,9 @@ func PushBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef
 
 // Archived/Unarchive the governed Node
 // - set Node.isArchived (lifecycle source of truth) and the blob archive/push flag
-// - unlink first-link on archive, once the archive is persisted
+// - archive recursively: the node and all its non-archived descendants
+// - unlink first-links on archive, once the archive is persisted
+// - event.New == "true" additionally closes every open tension of the archived subtree
 func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef) error {
 	operation := governanceArchive
 	switch *event.EventType {
@@ -408,7 +410,63 @@ func ChangeArchiveBlob(uctx *model.UserCtx, tension *model.Tension, event *model
 	if err != nil {
 		return err
 	}
-	return TryChangeArchiveNode(uctx, tension, subject, operation == governanceArchive)
+	nameids, err := TryChangeArchiveNode(uctx, tension, subject, operation == governanceArchive)
+	if err != nil {
+		return err
+	}
+
+	closeTensions := operation == governanceArchive && event.New != nil && *event.New == "true"
+	if !closeTensions || len(nameids) == 0 {
+		return nil
+	}
+
+	return closeSubtreeTensions(uctx, nameids)
+}
+
+// closeSubtreeTensions closes the open tensions of the archived subtree through the
+// standard pipeline (status, history, notifications). Authority is checked upstream.
+// ponytail: one fetch/update/notification per tension, no cap.
+func closeSubtreeTensions(uctx *model.UserCtx, nameids []string) error {
+	closed := model.TensionEventClosed
+	open, closedStatus := string(model.TensionStatusOpen), string(model.TensionStatusClosed)
+	statusField := "Tension.status"
+	var firstErr error
+	for _, nid := range nameids {
+		tids, err := db.GetDB().GetIDs("Tension.receiverid", nid, &statusField, &open)
+		if err != nil {
+			LogErr("closeSubtreeTensions", err)
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
+		}
+		for _, tid := range tids {
+			t, err := db.GetDB().GetTensionHook(tid, true, nil)
+			if err == nil {
+				now := Now()
+				event := model.EventRef{
+					EventType: &closed,
+					Old:       &open,
+					New:       &closedStatus,
+					CreatedAt: &now,
+					CreatedBy: &model.UserRef{Username: &uctx.Username},
+				}
+				// doCheck=false: the subtree check skips the target itself (gated on the
+				// receiver), so a re-check could deny the target's own tensions mid-close.
+				if _, _, err = ProcessEvent(uctx, t, &event, nil, false, true); err == nil {
+					// The notifier writes the history and sends the emails.
+					err = PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: []*model.EventRef{&event}})
+				}
+			}
+			if err != nil {
+				LogErr("closeSubtreeTensions", err)
+				if firstErr == nil {
+					firstErr = err
+				}
+			}
+		}
+	}
+	return firstErr
 }
 
 // ChangeAuthory

@@ -822,6 +822,25 @@ func (dg Dgraph) GetChildren(nameid string) ([]string, error) {
 	return result, nil
 }
 
+// ArchivedNode is one node archived by ArchiveNodesRecursive.
+// FirstLink is empty when the node has no linked user.
+type ArchivedNode struct {
+	Nameid    string `json:"nameid"`
+	FirstLink string `json:"username"`
+}
+
+// ArchiveNodesRecursive archives the given node and all its non-archived
+// descendants in a single upsert (see the "archiveNodesRecursive" template).
+// It returns the archived nodes with their first-link username, so callers
+// can unlink members.
+func (dg Dgraph) ArchiveNodesRecursive(nameid string) ([]ArchivedNode, error) {
+	res, err := dg.UpsertDql(dqlMutations["archiveNodesRecursive"], map[string]string{"nameid": nameid})
+	if err != nil {
+		return nil, err
+	}
+	return DecodeDqlBlock[ArchivedNode](res, "all")
+}
+
 // nodeParentNameids is a decode target for GetParents DQL results.
 // The @recurse + @normalize query may return nameid as a string (single parent)
 // or []any (multiple ancestors), so Nameid is typed as any.

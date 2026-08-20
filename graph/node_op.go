@@ -79,51 +79,63 @@ func TryUpdateNode(uctx *model.UserCtx, tension *model.Tension, subject *governa
 	return db.GetDB().SetPushedFlagBlob(subject.blob.ID, Now())
 }
 
-func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject, archived bool) error {
+// TryChangeArchiveNode archives/unarchives the governed node.
+// On archive it recurses: the node and all its non-archived descendants are
+// archived in one upsert, and every first-link found is unlinked.
+// It requires authority on every descendant circle, checked before any write.
+// Returns the archived nameids (nil for a root archive and for unarchive).
+func TryChangeArchiveNode(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject, archived bool) ([]string, error) {
 	nameid := subject.nameid
 
 	// A root org archive is a lightweight flag: no recursion, no children check, no first-link unlink.
 	if codec.IsRoot(nameid) {
-		return db.GetDB().SetFieldById(subject.node.ID, "Node.isRootArchived", strconv.FormatBool(archived))
+		return nil, db.GetDB().SetFieldById(subject.node.ID, "Node.isRootArchived", strconv.FormatBool(archived))
 	}
 
-	if archived {
-		// Archive
-		// --
-		// Check that circle has no children
-		if *subject.blob.Node.Type == model.NodeTypeCircle {
-			children, err := db.GetDB().GetChildren(nameid)
-			if err != nil {
-				return err
-			}
-			if len(children) > 0 {
-				return fmt.Errorf("Cannot archive circle with active children. Please archive children first.")
-			}
-		}
-	} else {
+	if !archived {
 		// Unarchive
 		// --
 		// Check that parent node is not archived
 		parentIsArchived, err := db.GetDB().GetByEq("Node.nameid", nameid, "Node.parent", "Node.isArchived")
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if parentIsArchived != nil && parentIsArchived.(bool) {
-			return fmt.Errorf("Cannot unarchive node with archived parent. Please unarchive parent first.")
+			return nil, fmt.Errorf("Cannot unarchive node with archived parent. Please unarchive parent first.")
+		}
+		return nil, db.GetDB().SetFieldById(subject.node.ID, "Node.isArchived", "false")
+	}
+
+	// Not an EMAP hook: em.Auth flags are OR-combined, this constraint is conjunctive.
+	ok, blocker, err := auth.HasSubtreeCoordoAuth(uctx, nameid)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		if blocker == "" {
+			blocker = "a hidden circle"
+		}
+		return nil, LogErr("access denied", fmt.Errorf(
+			"You need authority on all sub-circles to archive this node (blocked by %s).", blocker))
+	}
+
+	// Archive the node and its whole subtree in one upsert.
+	nodes, err := db.GetDB().ArchiveNodesRecursive(nameid)
+	if err != nil {
+		return nil, err
+	}
+
+	// Eventually unlink first-links, once the archive is persisted. Unlink errors do not block it.
+	rootnameid, _ := codec.Nid2rootid(nameid) // subject.nameid was validated by the resolver.
+	nameids := make([]string, 0, len(nodes))
+	for _, n := range nodes {
+		nameids = append(nameids, n.Nameid)
+		if n.FirstLink != "" {
+			UnlinkUser(rootnameid, n.Nameid, n.FirstLink)
 		}
 	}
 
-	if err := db.GetDB().SetFieldById(subject.node.ID, "Node.isArchived", strconv.FormatBool(archived)); err != nil {
-		return err
-	}
-
-	// Eventually unlink first-link, once the archive is persisted. Unlink errors do not block it.
-	if archived && subject.node.FirstLink != nil {
-		rootnameid, _ := codec.Nid2rootid(nameid) // subject.nameid was validated by the resolver.
-		UnlinkUser(rootnameid, nameid, subject.node.FirstLink.Username)
-	}
-
-	return nil
+	return nameids, nil
 }
 
 func TryChangeAuthority(uctx *model.UserCtx, tension *model.Tension, subject *governanceSubject, value string) error {

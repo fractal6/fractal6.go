@@ -124,6 +124,23 @@ func SubNodes(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, out)
 }
 
+// SubNodeAuth reports whether the user has authority on every descendant circle of
+// form.Nameid (the recursive-archive precondition). Advisory probe, the gate stays
+// TryChangeArchiveNode. Bare bool: the blocking circle name is not leaked.
+func SubNodeAuth(w http.ResponseWriter, r *http.Request) {
+	var form nodeQuery
+	if !decodeBody(w, r, &form) {
+		return
+	}
+	uctx := auth.GetUserContextOrEmpty(r.Context())
+	ok, _, err := auth.HasSubtreeCoordoAuth(&uctx, form.Nameid)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	writeJSON(w, ok)
+}
+
 // SubMembers returns members attached to circles in the subtree of form.Nameid
 // that the user is authorized to see.
 func SubMembers(w http.ResponseWriter, r *http.Request) {

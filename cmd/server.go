@@ -168,6 +168,7 @@ func RunServer() {
 			sub := db.GetDB().GetSubNodeVisibilities
 			r.Route("/nodes", func(r chi.Router) {
 				r.Post("/sub", handle6.SubNodes)
+				r.Post("/subauth", handle6.SubNodeAuth)
 			})
 			r.Route("/members", func(r chi.Router) {
 				r.Post("/sub", handle6.SubMembers)

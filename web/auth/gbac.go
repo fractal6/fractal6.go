@@ -186,6 +186,35 @@ func HasCoordoAuth(uctx *model.UserCtx, nameid string, mode *model.NodeMode) (bo
 	return ok, err
 }
 
+// HasSubtreeCoordoAuth reports whether uctx has authority on every descendant circle of
+// nameid, and the first blocking nameid otherwise. The target itself is gated upstream.
+// ponytail: one auth probe per sub-circle, no caching.
+func HasSubtreeCoordoAuth(uctx *model.UserCtx, nameid string) (bool, string, error) {
+	// A root archive is a flag, no recursion (and no full-org scan).
+	if codec.IsRoot(nameid) {
+		return true, "", nil
+	}
+	// Stricter than archiveNodesRecursive: archived branches are not pruned.
+	vis, err := db.GetDB().GetSubNodeVisibilities("nameid", nameid, false)
+	if err != nil {
+		return false, "", err
+	}
+	for nid, v := range vis {
+		ok, err := HasCoordoAuth(uctx, nid, nil)
+		if err != nil {
+			return false, nid, err
+		}
+		if !ok {
+			// Don't leak the nameid of circles hidden to the user.
+			if v == model.NodeVisibilitySecret {
+				nid = ""
+			}
+			return false, nid, nil
+		}
+	}
+	return true, "", nil
+}
+
 //
 // Checkers
 //
