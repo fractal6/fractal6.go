@@ -54,13 +54,17 @@ type Config struct {
 	AccessKey       string
 	SecretKey       string
 	UseSSL          bool
-	PublicURLPrefix string // optional: rewrites presigned host to a public-facing CDN/proxy
+	PublicURLPrefix string // optional: scheme://host of the public-facing proxy/CDN; presigned URLs are signed with it
 }
 
 // Client is the storage handle; wrap minio.Client and a resolved bucket.
+// pmc is the presigning client bound to PublicURLPrefix (nil when unset): SigV4
+// signs the Host header, so presigned URLs must be signed with the host the
+// browser will actually hit, not the private data-plane endpoint.
 type Client struct {
 	cfg Config
 	mc  *minio.Client
+	pmc *minio.Client
 }
 
 // global is the process-wide storage handle, set explicitly by cmd/server.go
@@ -120,7 +124,24 @@ func New(cfg Config) (*Client, error) {
 		return nil, fmt.Errorf("storage: minio client init: %w", err)
 	}
 
-	return &Client{cfg: cfg, mc: mc}, nil
+	c := &Client{cfg: cfg, mc: mc}
+
+	if cfg.PublicURLPrefix != "" {
+		u, err := url.Parse(cfg.PublicURLPrefix)
+		if err != nil || u.Host == "" {
+			return nil, fmt.Errorf("storage: public_url_prefix must be scheme://host[:port], got %q", cfg.PublicURLPrefix)
+		}
+		c.pmc, err = minio.New(u.Host, &minio.Options{
+			Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
+			Secure: u.Scheme != "http",
+			Region: cfg.Region,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("storage: presign client init: %w", err)
+		}
+	}
+
+	return c, nil
 }
 
 // Bucket returns the configured bucket name (mainly for logging/diagnostics).
@@ -210,18 +231,15 @@ func (c *Client) PresignGet(ctx context.Context, key string, ttl time.Duration, 
 	if contentDisposition != "" {
 		reqParams.Set("response-content-disposition", contentDisposition)
 	}
-	u, err := c.mc.PresignedGetObject(ctx, c.cfg.Bucket, key, ttl, reqParams)
+	mc := c.mc
+	if c.pmc != nil {
+		mc = c.pmc
+	}
+	u, err := mc.PresignedGetObject(ctx, c.cfg.Bucket, key, ttl, reqParams)
 	if err != nil {
 		return "", err
 	}
-	out := u.String()
-	// If a public-facing URL prefix is configured (e.g. CDN or reverse proxy
-	// in front of Garage), rewrite the host portion so browsers don't try to
-	// hit a private endpoint.
-	if c.cfg.PublicURLPrefix != "" {
-		out = c.cfg.PublicURLPrefix + u.RequestURI()
-	}
-	return out, nil
+	return u.String(), nil
 }
 
 // EnsureBucket creates the bucket if it doesn't exist. Intended for first-run

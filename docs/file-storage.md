@@ -246,12 +246,14 @@ bucket             = "fractale-storage"
 access_key         = "..."
 secret_key         = "..."
 use_ssl            = true                   # Garage on a separate host → require TLS
-public_url_prefix  = ""                     # optional CDN/proxy host rewrite
+public_url_prefix  = ""                     # public-facing proxy/CDN, e.g. "https://files.fractale.co"
 max_upload_bytes   = 10485760               # 10 MiB
 presign_ttl_sec    = 600                    # 10 min
 ```
 
 Leave `endpoint` empty in dev environments to disable upload features cleanly (handlers return 503 instead of crashing).
+
+`endpoint` is the data-plane address the backend uses (may be private, e.g. `127.0.0.1:3900`). When it is not reachable by browsers, set `public_url_prefix` to the public proxy in front of Garage (`scheme://host[:port]`, no path): presigned URLs are then *signed with that host*, since SigV4 covers the `Host` header. The proxy must forward the Host header unchanged, otherwise Garage answers `SignatureDoesNotMatch`.
 
 ## Deployment
 

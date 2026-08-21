@@ -57,7 +57,7 @@ bucket             = "fractale-storage"
 access_key         = "..."
 secret_key         = "..."
 use_ssl            = true                # require HTTPS when storage is on another host
-public_url_prefix  = ""                  # optional; e.g. "https://files.YOUR_DOMAIN" to rewrite presigned host
+public_url_prefix  = ""                  # public proxy in front of storage when `endpoint` is private; e.g. "https://files.YOUR_DOMAIN" (scheme://host, no path)
 max_upload_bytes   = 10485760            # 10 MiB
 presign_ttl_sec    = 7200                # presigned URL TTL, seconds (2 hours)
 
