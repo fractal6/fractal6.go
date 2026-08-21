@@ -28,6 +28,7 @@ import (
 
 	"fractale/fractal6.go/graph/codec"
 	"fractale/fractal6.go/graph/model"
+	. "fractale/fractal6.go/internal/tools"
 )
 
 type TensionQuery struct {
@@ -90,7 +91,9 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 		tf = append(tf, fmt.Sprintf(`eq(Tension.type_, "%s")`, q.Type))
 	}
 	if q.Pattern != nil {
-		tf = append(tf, fmt.Sprintf(`(anyoftext(Tension.title, "%s") OR anyoftext(Post.message, "%s"))`, *q.Pattern, *q.Pattern))
+		// QuoteString: user input spliced into a DQL string literal (same escaping as the index writer).
+		pattern := QuoteString(*q.Pattern)
+		tf = append(tf, fmt.Sprintf(`(anyoftext(Tension.title, "%s") OR anyoftext(Post.message, "%s"))`, pattern, pattern))
 	}
 	if len(q.Authors) > 0 {
 		tf = append(tf, `has(Post.createdBy)`)

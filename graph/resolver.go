@@ -194,7 +194,7 @@ func Init() gen.Config {
 	c.Directives.Hook_deleteCommentInput = nothing
 	// --
 	c.Directives.Hook_addComment = nothing
-	c.Directives.Hook_updateComment = nothing
+	c.Directives.Hook_updateComment = updateCommentHook // search-index resync on first-comment edits
 	c.Directives.Hook_deleteComment = nothing
 	// Reaction
 	c.Directives.Hook_getReactionInput = nothing

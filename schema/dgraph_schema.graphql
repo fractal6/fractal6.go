@@ -612,7 +612,7 @@ type Tension implements Post @auth(query:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root\
   status: TensionStatus! @search
   assignees: [User!]
   labels: [Label!]
-  comments: [Comment!]
+  comments: [Comment!] @dgraph(pred:"Tension.comments")
   blobs: [Blob!] @hasInverse(field: tension)
   governed_node: Node
   history: [Event!] @hasInverse(field: tension)
@@ -631,6 +631,7 @@ type Comment implements Post @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root
     }"""
 }]
 }) {
+  tensions: [Tension!] @dgraph(pred:"~Tension.comments")
   reactions: [Reaction!] @hasInverse(field: comment)
   files: [File!] @hasInverse(field: comment)
 }

@@ -629,6 +629,17 @@ var dqlQueries map[string]string = map[string]string{
             }
         }
     }`,
+	// getCommentTension walks the @reverse edge of Tension.comments to find the
+	// parent tension of a comment (empty for contract comments), plus the
+	// tension's first comment uid to detect whether {{.cid}} is the first one.
+	"getCommentTension": `{
+        all(func: uid({{.cid}})) {
+            tension: ~Tension.comments {
+                tid: uid
+                first: Tension.comments(first:1, orderasc: Post.createdAt) { uid }
+            }
+        }
+    }`,
 	// getFileAuth fetches everything the /file/<id> proxy needs in a single
 	// hop. File is anchor-polymorphic: exactly one of comment/user/node is set.
 	// File.tension is denormalised alongside File.comment for the comment branch

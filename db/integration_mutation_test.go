@@ -297,7 +297,11 @@ func TestGovernedNodeMutations_Integration(t *testing.T) {
 func TestUpsertActivity_Integration(t *testing.T) {
 	today := time.Now().UTC().Format("2006-01-02")
 	todayISO := today + "T00:00:00Z"
-	activityid := "u#testuser#" + today
+	// Synthetic owner: "testuser" activity rows are shared with the graph and
+	// web/handlers test binaries (which run concurrently and increment them via
+	// trackActivity), so exact-count asserts and the delete-cleanup below are
+	// only safe on a key nothing else writes.
+	activityid := "u#upsert-test#" + today
 
 	// Clean up any leftover from a previous run
 	cleanup := QueryMut{
@@ -309,7 +313,7 @@ func TestUpsertActivity_Integration(t *testing.T) {
 	// Helper to query the count for today's activity entry
 	getCount := func() int {
 		results, err := GetDB().Meta("getUserActivity", map[string]string{
-			"username": "testuser",
+			"username": "upsert-test",
 		})
 		if err != nil {
 			t.Fatalf("getUserActivity returned error: %v", err)
@@ -333,7 +337,7 @@ func TestUpsertActivity_Integration(t *testing.T) {
 	for i := 1; i <= 3; i++ {
 		_, err := GetDB().Meta("upsertActivity", map[string]string{
 			"activityid": activityid,
-			"ownerid":    "u#testuser",
+			"ownerid":    "u#upsert-test",
 			"date":       todayISO,
 		})
 		if err != nil {

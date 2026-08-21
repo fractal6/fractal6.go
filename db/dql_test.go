@@ -23,6 +23,7 @@ package db_test
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 	"text/template"
 
@@ -361,5 +362,29 @@ func TestValidateUids(t *testing.T) {
 	}
 	if err := ValidateUids("0x1", "bad"); err == nil {
 		t.Errorf("ValidateUids variadic should reject any bad id")
+	}
+}
+
+// TestFormatTensionIntExtMap_PatternEscaped pins that the user search pattern
+// is escaped before being spliced into the DQL anyoftext(...) string literal,
+// so a quote in the pattern cannot break out of the filter.
+func TestFormatTensionIntExtMap_PatternEscaped(t *testing.T) {
+	t.Parallel()
+	pattern := `break") OR uid(0x1) OR anyoftext(Post.message, "x`
+	q := TensionQuery{
+		Nameids: []string{"test-org"},
+		First:   10,
+		Pattern: &pattern,
+	}
+	maps, err := FormatTensionIntExtMap(q)
+	if err != nil {
+		t.Fatalf("FormatTensionIntExtMap returned error: %v", err)
+	}
+	tf := (*maps)["tensionFilter"]
+	if strings.Contains(tf, `break")`) {
+		t.Errorf("raw quote leaked into tensionFilter: %s", tf)
+	}
+	if !strings.Contains(tf, `break\"`) {
+		t.Errorf("expected escaped quote in tensionFilter: %s", tf)
 	}
 }

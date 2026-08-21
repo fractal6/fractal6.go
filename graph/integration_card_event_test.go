@@ -368,11 +368,15 @@ func TestPushProjectAdded_TracksActivity(t *testing.T) {
 		t.Fatalf("PushProjectAdded: %v", err)
 	}
 
-	if got := activityCount(t, userKey); got != beforeUser+1 {
-		t.Errorf("user activity count = %d, want %d", got, beforeUser+1)
+	// These daily counters are shared with the concurrently-running web/handlers
+	// test binary and other card-event tests (async trackActivity goroutines),
+	// which may also increment them between the reads. They are increment-only,
+	// so assert >= rather than an exact delta.
+	if got := activityCount(t, userKey); got < beforeUser+1 {
+		t.Errorf("user activity count = %d, want >= %d", got, beforeUser+1)
 	}
-	if got := activityCount(t, orgKey); got != beforeOrg+1 {
-		t.Errorf("org activity count = %d, want %d", got, beforeOrg+1)
+	if got := activityCount(t, orgKey); got < beforeOrg+1 {
+		t.Errorf("org activity count = %d, want >= %d", got, beforeOrg+1)
 	}
 }
 

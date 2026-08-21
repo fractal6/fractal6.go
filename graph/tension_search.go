@@ -21,8 +21,11 @@
 package graph
 
 import (
+	"context"
 	"fmt"
 	"strings"
+
+	"github.com/99designs/gqlgen/graphql"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
@@ -37,11 +40,11 @@ import (
 //   - CommentPushed via updateTension is always a NEW (non-first) comment, so
 //     the synthesized message — which only includes the FIRST comment — does
 //     not change.
-//   - First-comment edits (via updateComment) and deletions (via the
-//     CommentDeleted EMAP action) would require a cid → tid + first-comment
-//     lookup; doing that without a reverse edge means scanning all tensions
-//     with uid_in, which is too costly for the rare-path. The denormalized
-//     index will be refreshed the next time a label changes on the tension.
+//   - First-comment edits go through updateComment and are synced by
+//     updateCommentHook below (cid → tid via the ~Tension.comments reverse
+//     edge).
+//   - First-comment deletions (CommentDeleted EMAP action) are not synced:
+//     the denormalized index is refreshed on the next label change.
 var searchSyncEvents = map[model.TensionEvent]bool{
 	model.TensionEventLabelAdded:   true,
 	model.TensionEventLabelRemoved: true,
@@ -92,19 +95,55 @@ func SyncTensionSearchMessage(tid string) error {
 	return nil
 }
 
-// GoSyncSearchMessage runs SyncTensionSearchMessage in a goroutine. Call this
-// from resolvers/handlers AFTER the mutation that changed the tension content
-// has been persisted; firing it before the write completes races with Dgraph
-// and yields a stale index.
-func GoSyncSearchMessage(tid string) {
+// SyncCommentSearchMessage rebuilds the search index of the tension owning
+// comment cid, but only when cid is the tension's FIRST comment (the only one
+// denormalized into Post.message). No-op for other comments and for contract
+// comments (no ~Tension.comments edge).
+func SyncCommentSearchMessage(cid string) error {
+	tid, isFirst, err := db.GetDB().GetCommentTension(cid)
+	if err != nil {
+		return fmt.Errorf("comment tension lookup: %w", err)
+	}
+	if !isFirst {
+		return nil
+	}
+	return SyncTensionSearchMessage(tid)
+}
+
+// goSyncSearch runs a search-index rebuild in a goroutine. Fire AFTER the
+// mutation that changed the content has been persisted; firing it before the
+// write completes races with Dgraph and yields a stale index.
+func goSyncSearch(label, id string, fn func(string) error) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				fmt.Printf("error: SyncTensionSearchMessage panic for %s: %v\n", tid, r)
+				fmt.Printf("error: %s panic for %s: %v\n", label, id, r)
 			}
 		}()
-		if err := SyncTensionSearchMessage(tid); err != nil {
-			fmt.Printf("error: SyncTensionSearchMessage for %s: %v\n", tid, err)
+		if err := fn(id); err != nil {
+			fmt.Printf("error: %s for %s: %v\n", label, id, err)
 		}
 	}()
+}
+
+// GoSyncSearchMessage asynchronously rebuilds the search index of a tension.
+func GoSyncSearchMessage(tid string) {
+	goSyncSearch("SyncTensionSearchMessage", tid, SyncTensionSearchMessage)
+}
+
+// Update "Comment" - Hook. Auth (authorship) is enforced by the Dgraph @auth
+// rule during the mutation; this hook only refreshes the denormalized search
+// index when a first comment (i.e. a tension body) is edited.
+func updateCommentHook(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
+	var input model.UpdateCommentInput
+	ExtractInput(ctx, &input)
+
+	data, err := next(ctx)
+	if err != nil || input.Set == nil || input.Set.Message == nil || input.Filter == nil {
+		return data, err
+	}
+	for _, cid := range input.Filter.ID {
+		goSyncSearch("SyncCommentSearchMessage", cid, SyncCommentSearchMessage)
+	}
+	return data, err
 }

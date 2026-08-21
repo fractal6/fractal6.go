@@ -369,7 +369,9 @@ type Tension implements Post @auth(
 
   assignees: [User!]     @x_alter(r:"hasEvent", e:[AssigneeAdded, AssigneeRemoved]) @x_alter(r:"ref")
   labels: [Label!]       @x_alter(r:"hasEvent", e:[LabelAdded, LabelRemoved]) @x_alter(r:"ref")
-  comments: [Comment!]   @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
+  # @dgraph(pred): explicit mapping (same as the auto-generated name) so the
+  # ~Tension.comments reverse edge on Comment.tensions can bind to it.
+  comments: [Comment!]   @dgraph(pred: "Tension.comments") @x_alter(r:"hasEvent", e:[Created, CommentPushed, CommentDeleted]) @x_alter(r:"oneByOne")
   blobs: [Blob!]         @x_alter(r:"hasEvent", e:[BlobCreated, BlobCommitted]) @x_alter(r:"oneByOne") @hasInverse(field: tension)
   governed_node: Node    @x_ro # the node behind the publish blob
   history: [Event!]      @x_alter @hasInverse(field: tension) # entry point
@@ -393,6 +395,10 @@ type Comment implements Post @auth(
   update: <<update-comment>>
 ) @hook_ {
   message: String! @search(by: [fulltext]) @x_alter
+  # Parent tension via Dgraph-maintained reverse edge (Dgraph mandates a list
+  # type for ~ predicates; in practice a singleton, empty for contract comments).
+  # Used by the search-index resync on first-comment edits (graph/tension_search.go).
+  tensions: [Tension!] @dgraph(pred: "~Tension.comments")
   reactions: [Reaction!] @hasInverse(field: comment)
   # File attachments. Read-only via GraphQL; bytes are served by REST /file/<id>
   # which re-checks the parent comment's tension visibility.

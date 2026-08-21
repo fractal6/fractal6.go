@@ -702,12 +702,14 @@ type CardKindRef struct {
 
 type Comment struct {
 	Message            string                   `json:"message"`
+	Tensions           []*Tension               `json:"tensions,omitempty"`
 	Reactions          []*Reaction              `json:"reactions,omitempty"`
 	Files              []*File                  `json:"files,omitempty"`
 	ID                 string                   `json:"id"`
 	CreatedBy          *User                    `json:"createdBy"`
 	CreatedAt          string                   `json:"createdAt"`
 	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
+	TensionsAggregate  *TensionAggregateResult  `json:"tensionsAggregate,omitempty"`
 	ReactionsAggregate *ReactionAggregateResult `json:"reactionsAggregate,omitempty"`
 	FilesAggregate     *FileAggregateResult     `json:"filesAggregate,omitempty"`
 }
@@ -3786,6 +3788,7 @@ const (
 	CommentHasFilterCreatedAt CommentHasFilter = "createdAt"
 	CommentHasFilterUpdatedAt CommentHasFilter = "updatedAt"
 	CommentHasFilterMessage   CommentHasFilter = "message"
+	CommentHasFilterTensions  CommentHasFilter = "tensions"
 	CommentHasFilterReactions CommentHasFilter = "reactions"
 	CommentHasFilterFiles     CommentHasFilter = "files"
 )
@@ -3795,13 +3798,14 @@ var AllCommentHasFilter = []CommentHasFilter{
 	CommentHasFilterCreatedAt,
 	CommentHasFilterUpdatedAt,
 	CommentHasFilterMessage,
+	CommentHasFilterTensions,
 	CommentHasFilterReactions,
 	CommentHasFilterFiles,
 }
 
 func (e CommentHasFilter) IsValid() bool {
 	switch e {
-	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterReactions, CommentHasFilterFiles:
+	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterTensions, CommentHasFilterReactions, CommentHasFilterFiles:
 		return true
 	}
 	return false

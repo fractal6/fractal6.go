@@ -161,16 +161,18 @@ func buildMetaArgs(ctx context.Context, obj any, k []string) (map[string]string,
 		}
 	}
 
+	// Field arguments are user input spliced into quoted DQL positions
+	// (e.g. anyoftext(..., "{{.query}}"), between(..., "{{.from}}")): escape them.
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		for argName, argVal := range fc.Args {
 			switch v := argVal.(type) {
 			case string:
 				if v != "" {
-					maps[argName] = v
+					maps[argName] = QuoteString(v)
 				}
 			case *string:
 				if v != nil && *v != "" {
-					maps[argName] = *v
+					maps[argName] = QuoteString(*v)
 				}
 			}
 		}

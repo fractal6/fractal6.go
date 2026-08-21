@@ -2228,6 +2228,63 @@ func (ec *executionContext) field_Comment_reactions_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Comment_tensionsAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Comment_tensions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.TensionFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOTensionFilter2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.TensionOrder
+	if tmp, ok := rawArgs["order"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order"))
+		arg1, err = ec.unmarshalOTensionOrder2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["order"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg3
+	return args, nil
+}
+
 func (ec *executionContext) field_Contract_candidatesAggregate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -14165,6 +14222,8 @@ func (ec *executionContext) fieldContext_AddCommentPayload_comment(ctx context.C
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -14177,6 +14236,8 @@ func (ec *executionContext) fieldContext_AddCommentPayload_comment(ctx context.C
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -18386,6 +18447,121 @@ func (ec *executionContext) fieldContext_Comment_message(_ context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Comment_tensions(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_tensions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tensions, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Tension)
+	fc.Result = res
+	return ec.marshalOTension2ᚕᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_tensions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "emitter":
+				return ec.fieldContext_Tension_emitter(ctx, field)
+			case "emitterid":
+				return ec.fieldContext_Tension_emitterid(ctx, field)
+			case "receiver":
+				return ec.fieldContext_Tension_receiver(ctx, field)
+			case "receiverid":
+				return ec.fieldContext_Tension_receiverid(ctx, field)
+			case "title":
+				return ec.fieldContext_Tension_title(ctx, field)
+			case "type_":
+				return ec.fieldContext_Tension_type_(ctx, field)
+			case "status":
+				return ec.fieldContext_Tension_status(ctx, field)
+			case "assignees":
+				return ec.fieldContext_Tension_assignees(ctx, field)
+			case "labels":
+				return ec.fieldContext_Tension_labels(ctx, field)
+			case "comments":
+				return ec.fieldContext_Tension_comments(ctx, field)
+			case "blobs":
+				return ec.fieldContext_Tension_blobs(ctx, field)
+			case "governed_node":
+				return ec.fieldContext_Tension_governed_node(ctx, field)
+			case "history":
+				return ec.fieldContext_Tension_history(ctx, field)
+			case "mentions":
+				return ec.fieldContext_Tension_mentions(ctx, field)
+			case "contracts":
+				return ec.fieldContext_Tension_contracts(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_Tension_subscribers(ctx, field)
+			case "project_statuses":
+				return ec.fieldContext_Tension_project_statuses(ctx, field)
+			case "n_comments":
+				return ec.fieldContext_Tension_n_comments(ctx, field)
+			case "id":
+				return ec.fieldContext_Tension_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Tension_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Tension_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Tension_updatedAt(ctx, field)
+			case "message":
+				return ec.fieldContext_Tension_message(ctx, field)
+			case "assigneesAggregate":
+				return ec.fieldContext_Tension_assigneesAggregate(ctx, field)
+			case "labelsAggregate":
+				return ec.fieldContext_Tension_labelsAggregate(ctx, field)
+			case "commentsAggregate":
+				return ec.fieldContext_Tension_commentsAggregate(ctx, field)
+			case "blobsAggregate":
+				return ec.fieldContext_Tension_blobsAggregate(ctx, field)
+			case "historyAggregate":
+				return ec.fieldContext_Tension_historyAggregate(ctx, field)
+			case "mentionsAggregate":
+				return ec.fieldContext_Tension_mentionsAggregate(ctx, field)
+			case "contractsAggregate":
+				return ec.fieldContext_Tension_contractsAggregate(ctx, field)
+			case "subscribersAggregate":
+				return ec.fieldContext_Tension_subscribersAggregate(ctx, field)
+			case "project_statusesAggregate":
+				return ec.fieldContext_Tension_project_statusesAggregate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Tension", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Comment_tensions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comment_reactions(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comment_reactions(ctx, field)
 	if err != nil {
@@ -18764,6 +18940,91 @@ func (ec *executionContext) fieldContext_Comment_updatedAt(_ context.Context, fi
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type DateTime does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comment_tensionsAggregate(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_tensionsAggregate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TensionsAggregate, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TensionAggregateResult)
+	fc.Result = res
+	return ec.marshalOTensionAggregateResult2ᚖfractaleᚋfractal6ᚗgoᚋgraphᚋmodelᚐTensionAggregateResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_tensionsAggregate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "count":
+				return ec.fieldContext_TensionAggregateResult_count(ctx, field)
+			case "createdAtMin":
+				return ec.fieldContext_TensionAggregateResult_createdAtMin(ctx, field)
+			case "createdAtMax":
+				return ec.fieldContext_TensionAggregateResult_createdAtMax(ctx, field)
+			case "updatedAtMin":
+				return ec.fieldContext_TensionAggregateResult_updatedAtMin(ctx, field)
+			case "updatedAtMax":
+				return ec.fieldContext_TensionAggregateResult_updatedAtMax(ctx, field)
+			case "messageMin":
+				return ec.fieldContext_TensionAggregateResult_messageMin(ctx, field)
+			case "messageMax":
+				return ec.fieldContext_TensionAggregateResult_messageMax(ctx, field)
+			case "emitteridMin":
+				return ec.fieldContext_TensionAggregateResult_emitteridMin(ctx, field)
+			case "emitteridMax":
+				return ec.fieldContext_TensionAggregateResult_emitteridMax(ctx, field)
+			case "receiveridMin":
+				return ec.fieldContext_TensionAggregateResult_receiveridMin(ctx, field)
+			case "receiveridMax":
+				return ec.fieldContext_TensionAggregateResult_receiveridMax(ctx, field)
+			case "titleMin":
+				return ec.fieldContext_TensionAggregateResult_titleMin(ctx, field)
+			case "titleMax":
+				return ec.fieldContext_TensionAggregateResult_titleMax(ctx, field)
+			case "n_commentsMin":
+				return ec.fieldContext_TensionAggregateResult_n_commentsMin(ctx, field)
+			case "n_commentsMax":
+				return ec.fieldContext_TensionAggregateResult_n_commentsMax(ctx, field)
+			case "n_commentsSum":
+				return ec.fieldContext_TensionAggregateResult_n_commentsSum(ctx, field)
+			case "n_commentsAvg":
+				return ec.fieldContext_TensionAggregateResult_n_commentsAvg(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TensionAggregateResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Comment_tensionsAggregate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19818,6 +20079,8 @@ func (ec *executionContext) fieldContext_Contract_comments(ctx context.Context, 
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -19830,6 +20093,8 @@ func (ec *executionContext) fieldContext_Contract_comments(ctx context.Context, 
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -21362,6 +21627,8 @@ func (ec *executionContext) fieldContext_DeleteCommentPayload_comment(ctx contex
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -21374,6 +21641,8 @@ func (ec *executionContext) fieldContext_DeleteCommentPayload_comment(ctx contex
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -27951,6 +28220,8 @@ func (ec *executionContext) fieldContext_File_comment(ctx context.Context, field
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -27963,6 +28234,8 @@ func (ec *executionContext) fieldContext_File_comment(ctx context.Context, field
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -54500,6 +54773,8 @@ func (ec *executionContext) fieldContext_Query_getComment(ctx context.Context, f
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -54512,6 +54787,8 @@ func (ec *executionContext) fieldContext_Query_getComment(ctx context.Context, f
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -54569,6 +54846,8 @@ func (ec *executionContext) fieldContext_Query_queryComment(ctx context.Context,
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -54581,6 +54860,8 @@ func (ec *executionContext) fieldContext_Query_queryComment(ctx context.Context,
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -57854,6 +58135,8 @@ func (ec *executionContext) fieldContext_Reaction_comment(ctx context.Context, f
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -57866,6 +58149,8 @@ func (ec *executionContext) fieldContext_Reaction_comment(ctx context.Context, f
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -60114,6 +60399,8 @@ func (ec *executionContext) fieldContext_Tension_comments(ctx context.Context, f
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -60126,6 +60413,8 @@ func (ec *executionContext) fieldContext_Tension_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -64145,6 +64434,8 @@ func (ec *executionContext) fieldContext_UpdateCommentPayload_comment(ctx contex
 			switch field.Name {
 			case "message":
 				return ec.fieldContext_Comment_message(ctx, field)
+			case "tensions":
+				return ec.fieldContext_Comment_tensions(ctx, field)
 			case "reactions":
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
@@ -64157,6 +64448,8 @@ func (ec *executionContext) fieldContext_UpdateCommentPayload_comment(ctx contex
 				return ec.fieldContext_Comment_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Comment_updatedAt(ctx, field)
+			case "tensionsAggregate":
+				return ec.fieldContext_Comment_tensionsAggregate(ctx, field)
 			case "reactionsAggregate":
 				return ec.fieldContext_Comment_reactionsAggregate(ctx, field)
 			case "filesAggregate":
@@ -97075,6 +97368,8 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "tensions":
+			out.Values[i] = ec._Comment_tensions(ctx, field, obj)
 		case "reactions":
 			out.Values[i] = ec._Comment_reactions(ctx, field, obj)
 		case "files":
@@ -97096,6 +97391,8 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Comment_updatedAt(ctx, field, obj)
+		case "tensionsAggregate":
+			out.Values[i] = ec._Comment_tensionsAggregate(ctx, field, obj)
 		case "reactionsAggregate":
 			out.Values[i] = ec._Comment_reactionsAggregate(ctx, field, obj)
 		case "filesAggregate":

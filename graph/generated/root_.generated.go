@@ -402,6 +402,8 @@ type ComplexityRoot struct {
 		Message            func(childComplexity int) int
 		Reactions          func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
 		ReactionsAggregate func(childComplexity int, filter *model.ReactionFilter) int
+		Tensions           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsAggregate  func(childComplexity int, filter *model.TensionFilter) int
 		UpdatedAt          func(childComplexity int) int
 	}
 
@@ -2700,6 +2702,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comment.ReactionsAggregate(childComplexity, args["filter"].(*model.ReactionFilter)), true
+
+	case "Comment.tensions":
+		if e.complexity.Comment.Tensions == nil {
+			break
+		}
+
+		args, err := ec.field_Comment_tensions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Comment.Tensions(childComplexity, args["filter"].(*model.TensionFilter), args["order"].(*model.TensionOrder), args["first"].(*int), args["offset"].(*int)), true
+
+	case "Comment.tensionsAggregate":
+		if e.complexity.Comment.TensionsAggregate == nil {
+			break
+		}
+
+		args, err := ec.field_Comment_tensionsAggregate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Comment.TensionsAggregate(childComplexity, args["filter"].(*model.TensionFilter)), true
 
 	case "Comment.updatedAt":
 		if e.complexity.Comment.UpdatedAt == nil {
@@ -12182,6 +12208,7 @@ type Tension {
 
 type Comment {
   message: String!
+  tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
   files(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File!]
   id: ID!
@@ -12189,6 +12216,7 @@ type Comment {
   createdAt: DateTime!
   updatedAt: DateTime
 
+  tensionsAggregate(filter: TensionFilter): TensionAggregateResult
   reactionsAggregate(filter: ReactionFilter): ReactionAggregateResult
   filesAggregate(filter: FileFilter): FileAggregateResult
 }
@@ -12514,33 +12542,33 @@ enum Lang {
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @lambda on FIELD_DEFINITION
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @cascade(fields: [String]) on FIELD
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @hasInverse(field: String!) on FIELD_DEFINITION
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
 directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
 
-directive @cascade(fields: [String]) on FIELD
+directive @lambda on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
 
 type ActivityAggregateResult {
   count: Int
@@ -13273,6 +13301,7 @@ enum CommentHasFilter {
   createdAt
   updatedAt
   message
+  tensions
   reactions
   files
 }

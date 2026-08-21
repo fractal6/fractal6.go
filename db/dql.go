@@ -903,6 +903,9 @@ type tensionSearchData struct {
 // GetTensionSearchData fetches label names and the first comment text for a tension.
 // Used to build the denormalized Post.message search index.
 func (dg Dgraph) GetTensionSearchData(tid string) ([]string, string, error) {
+	if err := ValidateUids(tid); err != nil {
+		return nil, "", err
+	}
 	res, err := dg.QueryDql("getTensionSearchData", map[string]string{"tid": tid})
 	if err != nil {
 		return nil, "", err
@@ -932,6 +935,48 @@ func (dg Dgraph) GetTensionSearchData(tid string) ([]string, string, error) {
 	}
 
 	return labels, firstComment, nil
+}
+
+// commentTensionData is a decode target for GetCommentTension DQL results.
+// Note: CleanDqlMap renames the raw `uid` key to `id`.
+type commentTensionData struct {
+	Tension []struct {
+		Tid   string `json:"tid"`
+		First []struct {
+			ID string `json:"id"`
+		} `json:"first"`
+	} `json:"tension"`
+}
+
+// GetCommentTension resolves the parent tension of a comment through the
+// ~Tension.comments reverse edge, and reports whether cid is the tension's
+// first comment (the only one denormalized into the search index).
+// Returns ("", false, nil) for contract comments and unknown uids.
+func (dg Dgraph) GetCommentTension(cid string) (string, bool, error) {
+	if err := ValidateUids(cid); err != nil {
+		return "", false, err
+	}
+	res, err := dg.QueryDql("getCommentTension", map[string]string{"cid": cid})
+	if err != nil {
+		return "", false, err
+	}
+	r, err := unmarshalDqlResp(res)
+	if err != nil {
+		return "", false, err
+	}
+	if len(r.All) != 1 {
+		return "", false, nil
+	}
+	data, err := DecodeDql[commentTensionData](r.All[0])
+	if err != nil {
+		return "", false, err
+	}
+	if len(data.Tension) == 0 {
+		return "", false, nil
+	}
+	t := data.Tension[0]
+	isFirst := len(t.First) > 0 && strings.EqualFold(t.First[0].ID, cid)
+	return t.Tid, isFirst, nil
 }
 
 // DQL Mutations

@@ -105,6 +105,72 @@ func TestGetTensionSearchData_Integration(t *testing.T) {
 	})
 }
 
+// commentUID resolves a seeded comment uid by its exact Post.message.
+func commentUID(t *testing.T, message string) string {
+	t.Helper()
+	cids, err := GetDB().GetIDs("Post.message", message, nil, nil)
+	if err != nil {
+		t.Fatalf("GetIDs(Post.message) returned error: %v", err)
+	}
+	if len(cids) == 0 {
+		t.Fatalf("No comment found with message %q", message)
+	}
+	return cids[0]
+}
+
+func TestGetCommentTension_Integration(t *testing.T) {
+	t.Parallel()
+	tid := getTensionUID(t)
+
+	t.Run("first_comment", func(t *testing.T) {
+		t.Parallel()
+		cid := commentUID(t, "This is the first comment on the test tension")
+		gotTid, isFirst, err := GetDB().GetCommentTension(cid)
+		if err != nil {
+			t.Fatalf("GetCommentTension returned error: %v", err)
+		}
+		if gotTid != tid {
+			t.Errorf("tid = %q, want %q", gotTid, tid)
+		}
+		if !isFirst {
+			t.Error("isFirst = false, want true for the first comment")
+		}
+	})
+
+	t.Run("non_first_comment", func(t *testing.T) {
+		t.Parallel()
+		cid := commentUID(t, "file-test: public comment by testuser")
+		gotTid, isFirst, err := GetDB().GetCommentTension(cid)
+		if err != nil {
+			t.Fatalf("GetCommentTension returned error: %v", err)
+		}
+		if gotTid != tid {
+			t.Errorf("tid = %q, want %q", gotTid, tid)
+		}
+		if isFirst {
+			t.Error("isFirst = true, want false for a non-first comment")
+		}
+	})
+
+	t.Run("unknown_uid", func(t *testing.T) {
+		t.Parallel()
+		gotTid, isFirst, err := GetDB().GetCommentTension("0xdeadbeef")
+		if err != nil {
+			t.Fatalf("GetCommentTension returned error: %v", err)
+		}
+		if gotTid != "" || isFirst {
+			t.Errorf("got (%q, %v), want empty result for unknown uid", gotTid, isFirst)
+		}
+	})
+
+	t.Run("invalid_uid", func(t *testing.T) {
+		t.Parallel()
+		if _, _, err := GetDB().GetCommentTension("not-a-uid"); err == nil {
+			t.Error("GetCommentTension accepted an invalid uid, want error")
+		}
+	})
+}
+
 func TestGetTensions_PatternMatchesMessage_Integration(t *testing.T) {
 	t.Parallel()
 

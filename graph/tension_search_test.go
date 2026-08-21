@@ -19,7 +19,8 @@ import (
 // with a matching update here.
 //
 // Comment events are intentionally excluded — see the doc comment on
-// `searchSyncEvents` for the rationale.
+// `searchSyncEvents` for the rationale. First-comment EDITS are synced
+// separately by updateCommentHook (not event-driven).
 func TestHistoryNeedsSearchSync(t *testing.T) {
 	cases := map[model.TensionEvent]bool{
 		// Synced
