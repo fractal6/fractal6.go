@@ -141,39 +141,40 @@ type fetchedBytes struct {
 	UsedCID bool
 }
 
-// buildAttachments fetches bytes for each file (Bucket A first, then B),
-// stops once a cap is hit, and returns:
+// Attachments is the comment-file payload of one notification, fetched once
+// (S3 downloads) and shared across every recipient of that notification:
 //
-//   - attachments: Postal payload entries (Bucket A first then B).
-//   - inlineByID:  the subset of file uids that DID get an inline CID slot —
-//     used to rewrite `<img src="/file/<id>">` to `cid:<id>@DOMAIN`.
-//   - footerFiles: every plain (Bucket B) file the caller should render in
-//     the footer link list; includes both attached and
-//     cap-overflow entries so nothing is silently hidden.
-//
-// Failing to fetch a single file's bytes is logged but never fatal — that
-// file degrades to footer-link-only (Bucket B) or absolute-URL fallback
-// (Bucket A, handled by the caller via the inlineByID set).
-func buildAttachments(ctx context.Context, cli *storage.Client, files []emailFile) (attachments []postalAttachment, inlineByID map[string]bool, footerFiles []emailFile) {
-	inlineByID = make(map[string]bool)
+//   - payload:    Postal attachment entries (Bucket A first, then B).
+//   - inlineByID: file uids that got an inline CID slot — used to rewrite
+//     `<img src="/file/<id>">` to `cid:<id>@DOMAIN`.
+//   - footer:     every plain (Bucket B) file to render in the footer link
+//     list; includes cap-overflow entries so nothing is silently hidden.
+type Attachments struct {
+	payload    []postalAttachment
+	inlineByID map[string]bool
+	footer     []emailFile
+}
+
+// buildAttachments fetches bytes for each file (Bucket A first, then B) and
+// stops once a cap is hit. Failing to fetch a single file's bytes is never
+// fatal — that file degrades to footer-link-only (Bucket B) or absolute-URL
+// fallback (Bucket A, handled by the caller via the inlineByID set).
+func buildAttachments(ctx context.Context, cli *storage.Client, files []emailFile) Attachments {
+	inline, plain := partition(files)
+	// Plain files always reach the footer, even when storage is unset or the
+	// caps drop them from the payload, so the recipient can click through.
+	att := Attachments{inlineByID: make(map[string]bool), footer: plain}
 	if len(files) == 0 || cli == nil {
-		// Storage unset or no files: still expose every plain file in the
-		// footer so the recipient can click through.
-		_, plain := partition(files)
-		footerFiles = plain
-		return
+		return att
 	}
 	limits := loadAttachmentLimits()
-
-	inline, plain := partition(files)
-	footerFiles = plain
 
 	var total int64
 	// Bucket A — inline images first. They're the highest signal payload
 	// (visually rendered in-body); the recipient's mail client may not
 	// even surface paperclip attachments, but it WILL render <img cid:>.
 	for _, f := range inline {
-		if len(attachments) >= limits.MaxCount {
+		if len(att.payload) >= limits.MaxCount {
 			break
 		}
 		if f.Size > 0 && f.Size > limits.PerFileBytes {
@@ -188,20 +189,20 @@ func buildAttachments(ctx context.Context, cli *storage.Client, files []emailFil
 			// fallback (absolute URL) will at least surface the link.
 			continue
 		}
-		attachments = append(attachments, postalAttachment{
+		att.payload = append(att.payload, postalAttachment{
 			Name:        f.Filename,
 			ContentType: f.ContentType,
 			Data:        fetched.Base64,
 			ContentID:   cidForFile(f.ID),
 		})
-		inlineByID[f.ID] = true
+		att.inlineByID[f.ID] = true
 		total += int64(len(fetched.Base64) * 3 / 4) // approximate decoded size
 	}
 
 	// Bucket B — plain attachments. Dropped first if we approach the total
 	// budget; spillover lives on as footer links.
 	for _, f := range plain {
-		if len(attachments) >= limits.MaxCount {
+		if len(att.payload) >= limits.MaxCount {
 			break
 		}
 		if f.Size > 0 && f.Size > limits.PerFileBytes {
@@ -214,14 +215,14 @@ func buildAttachments(ctx context.Context, cli *storage.Client, files []emailFil
 		if err != nil {
 			continue
 		}
-		attachments = append(attachments, postalAttachment{
+		att.payload = append(att.payload, postalAttachment{
 			Name:        f.Filename,
 			ContentType: f.ContentType,
 			Data:        fetched.Base64,
 		})
 		total += int64(len(fetched.Base64) * 3 / 4)
 	}
-	return
+	return att
 }
 
 // fetchBase64 streams a file from storage and returns its body base64-encoded.

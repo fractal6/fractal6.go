@@ -279,6 +279,9 @@ func PushEventNotifications(notif model.EventNotif) error {
 		return nil
 	}
 
+	// Attachments (S3 downloads) are fetched lazily, once for all recipients.
+	var att *email.Attachments
+
 	// Push user event notification
 	for u, ui := range users {
 		// Don't self notify.
@@ -311,15 +314,17 @@ func PushEventNotifications(notif model.EventNotif) error {
 
 		// Email
 		if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
+			// Emailable but not notifiable (no eid): skip this user, keep notifying the others.
 			if eid == "" {
-				// @deprected warning: unnecessary/noisy
-				// log.Printf("Notification Error: an event is emailable but not notifiable !")
-				return nil
+				continue
 			}
 			ui.Eid = eid
-			err = email.SendEventNotificationEmail(ui, notif)
-			if err != nil {
-				return err
+			if att == nil {
+				att = email.FetchEventAttachments(notif)
+			}
+			// Log and keep going: one failing email must not drop the remaining recipients.
+			if err := email.SendEventNotificationEmail(ui, notif, att); err != nil {
+				LogErr("Email `event` notification error", err)
 			}
 		}
 	}
@@ -418,6 +423,9 @@ func PushContractNotifications(notif model.ContractNotif) error {
 		return fmt.Errorf("contract %s not found.", notif.Tid)
 	}
 
+	// Attachments (S3 downloads) are fetched lazily, once for all recipients.
+	var att *email.Attachments
+
 	// Push user event notification
 	for u, ui := range users {
 		// Don't self notify.
@@ -472,9 +480,12 @@ func PushContractNotifications(notif model.ContractNotif) error {
 		// Email
 		if notif.Uctx.Rights.HasEmailNotifications && ui.User.NotifyByEmail && notif.IsEmailable(ui) {
 			ui.Eid = eid
-			err = email.SendContractNotificationEmail(ui, notif)
+			if att == nil {
+				att = email.FetchContractAttachments(notif)
+			}
+			err = email.SendContractNotificationEmail(ui, notif, att)
 			if err != nil {
-				LogErr("Email error", err)
+				LogErr("Email `contract` notification error", err)
 				err = nil
 			}
 		}

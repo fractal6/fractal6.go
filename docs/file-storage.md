@@ -346,9 +346,13 @@ in the recipient's client; Private/Secret-org images will 404. The HTML is
 re-sanitised with bluemonday after the rewrites; `cid:` is in the URL-scheme
 allowlist (`web/email/main.go`).
 
+Attachments are fetched once per notification (`email.FetchEventAttachments` /
+`FetchContractAttachments`, called lazily from `graph/notifications.go`) and
+shared across all recipients, so S3 traffic doesn't scale with recipient count.
+
 Where it lives:
 - `web/email/attachments.go` — partition, fetch, rewrite, footer
-- `web/email/main.go` — `SendEventNotificationEmail` / `SendContractNotificationEmail` integration
+- `web/email/main.go` — `Fetch*Attachments` + `Send*NotificationEmail` integration
 - `db/dql_templates.go::getLastCommentFiles` / `getLastContractCommentFiles` — file projection
 - `db/files.go::GetLastCommentFiles` / `GetLastContractCommentFiles` — Go decoders
 - `internal/storage/s3.go::GetObject` — byte fetch (base64-encoded into the Postal payload)

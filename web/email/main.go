@@ -149,6 +149,35 @@ func Ping(ctx context.Context) error {
 	return nil
 }
 
+// sendPostal POSTs a JSON payload to the mailer API. Postal replies HTTP 200
+// even for refused messages, with {"status": "error", ...} in the body, so
+// the body-level status is checked too (absent status — e.g. test mocks — passes).
+func sendPostal(body []byte) error {
+	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Server-API-Key", emailSecret)
+
+	resp, err := mailerHTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	raw, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("postal: %s: %s", resp.Status, strings.TrimSpace(string(raw)))
+	}
+	var r struct {
+		Status string `json:"status"`
+	}
+	if json.Unmarshal(raw, &r) == nil && r.Status != "" && r.Status != "success" {
+		return fmt.Errorf("postal: status %q: %s", r.Status, strings.TrimSpace(string(raw)))
+	}
+	return nil
+}
+
 //
 // System Email
 //
@@ -167,20 +196,7 @@ func SendMaintainerEmail(subject, body string) error {
     }`, "Fractal6 Alert", maintainerEmail, subject, tools.QuoteString(body))
 	// Other fields: http://apiv1.postalserver.io/controllers/send/message
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Server-API-Key", emailSecret)
-
-	resp, err := mailerHTTPClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("http postal error, see body. (code %s)", resp.Status)
-	}
-
-	return nil
+	return sendPostal([]byte(body))
 }
 
 //
@@ -213,17 +229,7 @@ func SendVerificationEmail(email, token string) error {
         "plain_body": "%s"
     }`, email, tools.CleanString(content, true), tools.QuoteString(plainContent))
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Server-API-Key", emailSecret)
-
-	resp, err := mailerHTTPClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
+	return sendPostal([]byte(body))
 }
 
 // Send an email to reset a user password
@@ -253,17 +259,7 @@ func SendResetEmail(email, token string) error {
         "plain_body": "%s"
     }`, email, tools.CleanString(content, true), tools.QuoteString(plainContent))
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Server-API-Key", emailSecret)
-
-	resp, err := mailerHTTPClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
+	return sendPostal([]byte(body))
 }
 
 //
@@ -303,24 +299,43 @@ func SendOwnerGrantedEmail(username, nameid, orgName string) error {
         "plain_body": "%s"
     }`, email, orgName, tools.CleanString(content, true), tools.QuoteString(plainContent))
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer([]byte(body)))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Server-API-Key", emailSecret)
-
-	resp, err := mailerHTTPClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
+	return sendPostal([]byte(body))
 }
 
 //
 // Graph/Structured email
 //
 
-func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) error {
+// FetchEventAttachments loads the files of the comment rendered by the email
+// (Created / CommentPushed only: state-change events like Closed / UserJoined
+// never render a comment body, so attaching files to those would be a spurious
+// side-channel in the recipient's mail UI).
+func FetchEventAttachments(notif model.EventNotif) *Attachments {
+	if !notif.HasEvent(model.TensionEventCreated) && !notif.HasEvent(model.TensionEventCommentPushed) {
+		return &Attachments{}
+	}
+	commentFiles, _ := db.GetDB().GetLastCommentFiles(notif.Tid, notif.Uctx.Username)
+	// Bound the S3 fetches so a hung storage backend can't stall the daemon.
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	att := buildAttachments(ctx, storage.Global(), fromDBFiles(commentFiles))
+	return &att
+}
+
+// FetchContractAttachments loads the files on the contract's latest comment
+// authored by the actor.
+func FetchContractAttachments(notif model.ContractNotif) *Attachments {
+	if notif.Contract == nil {
+		return &Attachments{}
+	}
+	cfiles, _ := db.GetDB().GetLastContractCommentFiles(notif.Contract.ID, notif.Uctx.Username)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	att := buildAttachments(ctx, storage.Global(), fromDBFiles(cfiles))
+	return &att
+}
+
+func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif, att *Attachments) error {
 	// Get inputs
 	var err error
 	var url_redirect string
@@ -331,21 +346,9 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	var title string = notif.Title
 	var message string = notif.Msg
 
-	// Fetch attachments only when this email actually renders a comment
-	// body (Created or CommentPushed). State-change events like Closed /
-	// UserJoined never render `notif.Msg`, so attaching the latest comment-
-	// by-actor's files to those would be a spurious side-channel — visible
-	// in the recipient's mail UI even though no inline rewrite or footer
-	// reference exists in the body.
-	var attachments []postalAttachment
-	inlineByID := make(map[string]bool)
-	var footerFiles []emailFile
-	if notif.HasEvent(model.TensionEventCreated) || notif.HasEvent(model.TensionEventCommentPushed) {
-		commentFiles, _ := db.GetDB().GetLastCommentFiles(notif.Tid, notif.Uctx.Username)
-		// Bound the S3 fetches so a hung storage backend can't stall the daemon.
-		actx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		attachments, inlineByID, footerFiles = buildAttachments(actx, storage.Global(), fromDBFiles(commentFiles))
-		cancel()
+	// Attachments are prefetched once per notification (FetchEventAttachments).
+	if att == nil {
+		att = &Attachments{}
 	}
 	// Recipient email
 	var email string = ui.User.Email
@@ -398,7 +401,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			rendered := rewriteFileImgs(buf.String(), inlineByID)
+			rendered := rewriteFileImgs(buf.String(), att.inlineByID)
 			payload = sanitizer.Sanitize(rendered)
 		}
 
@@ -441,7 +444,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 				case model.RoleTypeOwner:
 					auto_msg = fmt.Sprintf(`%s left his owner role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
 				default:
-					panic("Not implemented Role Type on UserLeft event notif/email.")
+					return fmt.Errorf("unhandled ex-role type %q on UserLeft event email (tension %s)", notif.GetExRoleType(), notif.Tid)
 				}
 			} else {
 				auto_msg = fmt.Sprintf(`%s left his role in <a href="%s">%s</a>.<br>`, u, url_redirect, notif.Tid)
@@ -487,7 +490,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			rendered := rewriteFileImgs(buf.String(), inlineByID)
+			rendered := rewriteFileImgs(buf.String(), att.inlineByID)
 			comment = sanitizer.Sanitize(rendered)
 		}
 
@@ -507,7 +510,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 	// click-through list even when their mail client hides Postal
 	// attachments behind a paperclip. Bucket A files (inline CID) are
 	// already visible in-body and intentionally NOT listed here.
-	if footer := renderAttachmentFooter(footerFiles); footer != "" {
+	if footer := renderAttachmentFooter(att.footer); footer != "" {
 		payload += footer
 	}
 
@@ -552,8 +555,8 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 			"References":  fmt.Sprintf("<tension/%s@"+DOMAIN+">", notif.Tid),
 		},
 	}
-	if len(attachments) > 0 {
-		bodyPayload["attachments"] = attachments
+	if len(att.payload) > 0 {
+		bodyPayload["attachments"] = att.payload
 	}
 	// @TODO; "List-Unsubscribe": "<%s>"
 	// see https://github.com/postalserver/postal/issues/2788
@@ -563,23 +566,10 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif) 
 		return err
 	}
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Server-API-Key", emailSecret)
-
-	resp, err := mailerHTTPClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("http postal error, see body. (code %s)", resp.Status)
-	}
-
-	return nil
+	return sendPostal(body)
 }
 
-func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractNotif) error {
+func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractNotif, att *Attachments) error {
 	// Get inputs
 	var err error
 	var url_redirect string
@@ -589,17 +579,10 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 	var payload string
 	var recv string = strings.ReplaceAll(notif.Receiverid, "#", "/")
 
-	// Contract emails carry the latest comment authored by the actor (if
-	// any). Files attached to that comment ride out as Postal attachments
-	// the same way tension emails do.
-	var attachments []postalAttachment
-	inlineByID := make(map[string]bool)
-	var footerFiles []emailFile
-	if notif.Contract != nil {
-		cfiles, _ := db.GetDB().GetLastContractCommentFiles(notif.Contract.ID, notif.Uctx.Username)
-		actx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		attachments, inlineByID, footerFiles = buildAttachments(actx, storage.Global(), fromDBFiles(cfiles))
-		cancel()
+	// Contract emails carry the latest comment authored by the actor (if any);
+	// its files are prefetched once per notification (FetchContractAttachments).
+	if att == nil {
+		att = &Attachments{}
 	}
 	// Recipient email
 	var email string = ui.User.Email
@@ -709,13 +692,13 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		if err = md.Convert([]byte(notif.Msg), &buf); err != nil {
 			return err
 		}
-		rendered := rewriteFileImgs(buf.String(), inlineByID)
+		rendered := rewriteFileImgs(buf.String(), att.inlineByID)
 		payload += sanitizer.Sanitize(rendered)
 	} else {
 		payload += "<br><br>"
 	}
 
-	if footer := renderAttachmentFooter(footerFiles); footer != "" {
+	if footer := renderAttachmentFooter(att.footer); footer != "" {
 		payload += footer
 	}
 
@@ -745,26 +728,13 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 			"References":  fmt.Sprintf("<contract/%s@"+DOMAIN+">", notif.Contract.ID),
 		},
 	}
-	if len(attachments) > 0 {
-		bodyPayload["attachments"] = attachments
+	if len(att.payload) > 0 {
+		bodyPayload["attachments"] = att.payload
 	}
 	body, err := json.Marshal(bodyPayload)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Server-API-Key", emailSecret)
-
-	resp, err := mailerHTTPClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("http postal error, see body. (code %s)", resp.Status)
-	}
-
-	return nil
+	return sendPostal(body)
 }

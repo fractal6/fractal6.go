@@ -223,6 +223,9 @@ func (notif EventNotif) IsNotifiable(ui UserNotifInfo) bool {
 
 	// Policy for
 	// - coordo
+	// Note: Reopened is intentionally absent (unlike Closed): coordos that are
+	// emailable but not notifiable are skipped entirely at delivery
+	// (see PushEventNotifications). Keep this asymmetry as policy.
 	if ui.Reason == ReasonIsCoordo && (notif.HasEvent(TensionEventCreated) ||
 		notif.HasEvent(TensionEventBlobPushed) ||
 		notif.HasEvent(TensionEventClosed) ||
