@@ -32,21 +32,42 @@ import (
 )
 
 type TensionQuery struct {
-	Nameids []string             `json:"nameids"`
-	First   int                  `json:"first"`
-	Offset  int                  `json:"offset"`
-	Pattern *string              `json:"pattern"`
-	Sort    *string              `json:"sort"`
-	Status  *model.TensionStatus `json:"status"`
-	Type    *model.TensionType   `json:"type_"`
-	Authors []string             `json:"authors"`
-	Labels  []string             `json:"labels"`
+	Nameids []string `json:"nameids"`
+	First   int      `json:"first"`
+	Offset  int      `json:"offset"`
+	Pattern *string  `json:"pattern"`
+	// Quoted search spans: all-words (alloftext) match, pre-parsed by the client.
+	PatternExact []string             `json:"pattern_exact"`
+	Sort         *string              `json:"sort"`
+	Status       *model.TensionStatus `json:"status"`
+	Type         *model.TensionType   `json:"type_"`
+	Authors      []string             `json:"authors"`
+	Labels       []string             `json:"labels"`
 	// Either filter tension that is in or NOT in the given project
 	InProject bool    `json:"in_project"`
 	Projectid *string `json:"projectid"`
 	// Protected tensions @auth
 	NameidsProtected []string
 	Username         string
+}
+
+// SearchTextFilter builds the DQL text-filter clauses for a search: anyoftext
+// on the pattern AND alloftext per exact span, each matching title OR message.
+// Values are user input spliced into DQL string literals: QuoteString them.
+func SearchTextFilter(pattern *string, exact []string) string {
+	var clauses []string
+	if pattern != nil && *pattern != "" {
+		p := QuoteString(*pattern)
+		clauses = append(clauses, fmt.Sprintf(`(anyoftext(Tension.title, "%s") OR anyoftext(Post.message, "%s"))`, p, p))
+	}
+	for _, s := range exact {
+		if s == "" {
+			continue
+		}
+		p := QuoteString(s)
+		clauses = append(clauses, fmt.Sprintf(`(alloftext(Tension.title, "%s") OR alloftext(Post.message, "%s"))`, p, p))
+	}
+	return strings.Join(clauses, " AND ")
 }
 
 // Note: We assumes here all nameids have the same rootnameid.
@@ -90,10 +111,8 @@ func FormatTensionIntExtMap(q TensionQuery) (*map[string]string, error) {
 	if q.Type != nil {
 		tf = append(tf, fmt.Sprintf(`eq(Tension.type_, "%s")`, q.Type))
 	}
-	if q.Pattern != nil {
-		// QuoteString: user input spliced into a DQL string literal (same escaping as the index writer).
-		pattern := QuoteString(*q.Pattern)
-		tf = append(tf, fmt.Sprintf(`(anyoftext(Tension.title, "%s") OR anyoftext(Post.message, "%s"))`, pattern, pattern))
+	if f := SearchTextFilter(q.Pattern, q.PatternExact); f != "" {
+		tf = append(tf, f)
 	}
 	if len(q.Authors) > 0 {
 		tf = append(tf, `has(Post.createdBy)`)

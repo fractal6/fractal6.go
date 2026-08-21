@@ -365,6 +365,27 @@ func TestValidateUids(t *testing.T) {
 	}
 }
 
+// TestSearchTextFilter pins the clause shape: anyoftext on the pattern AND one
+// alloftext clause per exact span, each over title OR message, values escaped.
+func TestSearchTextFilter(t *testing.T) {
+	t.Parallel()
+	pattern := "feature x"
+	got := SearchTextFilter(&pattern, []string{"alice@gmail.com", ""})
+	want := `(anyoftext(Tension.title, "feature x") OR anyoftext(Post.message, "feature x"))` +
+		` AND (alloftext(Tension.title, "alice@gmail.com") OR alloftext(Post.message, "alice@gmail.com"))`
+	if got != want {
+		t.Errorf("SearchTextFilter = %s, want %s", got, want)
+	}
+	if got := SearchTextFilter(nil, nil); got != "" {
+		t.Errorf("empty search should yield no filter, got: %s", got)
+	}
+	// Exact-only search, with escaping of a raw quote.
+	got = SearchTextFilter(nil, []string{`say "hi"`})
+	if strings.Contains(got, "anyoftext") || !strings.Contains(got, `alloftext(Tension.title, "say \"hi\"")`) {
+		t.Errorf("exact-only filter wrong: %s", got)
+	}
+}
+
 // TestFormatTensionIntExtMap_PatternEscaped pins that the user search pattern
 // is escaped before being spliced into the DQL anyoftext(...) string literal,
 // so a quote in the pattern cannot break out of the filter.
