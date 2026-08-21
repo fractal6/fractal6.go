@@ -126,6 +126,14 @@ func TestMoveOrdinaryTension(t *testing.T) {
 	sessions.GetCache().Del(context.Background(), testutil.TestUser+"roles")
 
 	cookie := loginAs(testutil.TestUser, testutil.TestPassword)
+	requireGraphQLError(t, runTensionEvent(t, cookie, uids["t"], "Moved", map[string]any{
+		"old": movSrc,
+		"new": "test-org",
+	}), "another organisation")
+	if got, _ := db.GetDB().GetByUid(uids["t"], "Tension.receiverid"); got != movSrc {
+		t.Fatalf("cross-org move mutated receiverid = %v, want %s", got, movSrc)
+	}
+
 	requireGraphQLSuccess(t, runTensionEvent(t, cookie, uids["t"], "Moved", map[string]any{
 		"old": movSrc,
 		"new": movDst,

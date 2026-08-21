@@ -558,6 +558,17 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 
 	receiverid_old := *event.Old // == tension.Receiverid
 	receiverid_new := *event.New
+	rootOld, err := codec.Nid2rootid(receiverid_old)
+	if err != nil {
+		return err
+	}
+	rootNew, err := codec.Nid2rootid(receiverid_new)
+	if err != nil {
+		return err
+	}
+	if rootOld != rootNew {
+		return fmt.Errorf("You can't move a tension to another organisation.")
+	}
 
 	// A tension governing a node moves that node too; a regular tension only changes receiver.
 	if tension.GovernedNode != nil {
@@ -615,10 +626,12 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 	}
 
 	// update tension
-	err := db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
+	err = db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
 	if err != nil {
 		return err
 	}
+	tension.Receiverid = receiverid_new
+	tension.Receiver.Nameid = receiverid_new
 
 	// Update tension pin
 	_, err = db.GetDB().Meta("movePinnedTension", map[string]string{"nameid_old": receiverid_old, "nameid_new": receiverid_new, "tid": tension.ID})
