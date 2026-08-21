@@ -30,11 +30,16 @@ format:
 # Build commands
 #
 
+GO_WATCH := (git ls-files '*.go' '*.graphql'; echo config.toml)
+
 run_api:
-	go run main.go api
+	#go run main.go api
+	$(GO_WATCH) | entr -rcc go run main.go api
+
 
 run_notifier:
-	go run main.go notifier
+	#go run main.go notifier
+	$(GO_WATCH) | entr -rcc go run main.go notifier
 
 build:
 	go build $(GOFLAGS) -o $(BINARY) main.go

@@ -32,7 +32,98 @@ import (
 
 	. "fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
+	"fractale/fractal6.go/internal/testutil"
 )
+
+// TestGetLastCommentFiles_Integration guards the @cascade(Post.createdBy)
+// parameterization of getLastCommentFiles: a bare @cascade also requires
+// Comment.files, so a file-less newest comment would be skipped and an older
+// comment's files would leak into the notification email.
+func TestGetLastCommentFiles_Integration(t *testing.T) {
+	t.Parallel()
+	tid := getTensionUID(t)
+
+	// Seed: older comment WITH a file, newest comment WITHOUT, same author.
+	qm := QueryMut{
+		Q: `query {
+            t as var(func: uid(` + tid + `))
+            u as var(func: eq(User.username, "` + testutil.TestUser2 + `"))
+        }`,
+		M: []X{{
+			S: `_:f1 <dgraph.type> "File" .
+                _:f1 <File.storageKey> "test/lcf-old" .
+                _:f1 <File.filename> "old.png" .
+                _:f1 <File.contentType> "image/png" .
+                _:f1 <File.size> "12" .
+                _:f1 <File.embedded> "false" .
+                _:c1 <dgraph.type> "Comment" .
+                _:c1 <Post.createdBy> uid(u) .
+                _:c1 <Post.createdAt> "2026-03-01T00:00:00Z" .
+                _:c1 <Post.message> "lcfmarkerold" .
+                _:c1 <Comment.files> _:f1 .
+                _:c2 <dgraph.type> "Comment" .
+                _:c2 <Post.createdBy> uid(u) .
+                _:c2 <Post.createdAt> "2026-03-02T00:00:00Z" .
+                _:c2 <Post.message> "lcfmarkernew" .
+                uid(t) <Tension.comments> _:c1 .
+                uid(t) <Tension.comments> _:c2 .`,
+		}},
+	}
+	if _, err := GetDB().Gamma(qm, map[string]string{}); err != nil {
+		t.Fatalf("seed comments: %v", err)
+	}
+	t.Cleanup(func() {
+		qm := QueryMut{
+			Q: `query {
+                t as var(func: uid(` + tid + `))
+                c as var(func: eq(Post.message, ["lcfmarkerold", "lcfmarkernew"])) {
+                    f as Comment.files
+                }
+            }`,
+			M: []X{{
+				D: `uid(t) <Tension.comments> uid(c) .
+                    uid(f) * * .
+                    uid(c) * * .`,
+			}},
+		}
+		if _, err := GetDB().Gamma(qm, map[string]string{}); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	})
+
+	// Newest comment has no files: expect none (not the older comment's).
+	files, err := GetDB().GetLastCommentFiles(tid, testutil.TestUser2)
+	if err != nil {
+		t.Fatalf("GetLastCommentFiles: %v", err)
+	}
+	if len(files) != 0 {
+		t.Fatalf("files = %+v, want none (older comment's files leaked)", files)
+	}
+
+	// Attach a file to the newest comment: expect exactly that file.
+	qm2 := QueryMut{
+		Q: `query { c2 as var(func: eq(Post.message, "lcfmarkernew")) }`,
+		M: []X{{
+			S: `_:f2 <dgraph.type> "File" .
+                _:f2 <File.storageKey> "test/lcf-new" .
+                _:f2 <File.filename> "new.png" .
+                _:f2 <File.contentType> "image/png" .
+                _:f2 <File.size> "34" .
+                _:f2 <File.embedded> "false" .
+                uid(c2) <Comment.files> _:f2 .`,
+		}},
+	}
+	if _, err := GetDB().Gamma(qm2, map[string]string{}); err != nil {
+		t.Fatalf("attach file: %v", err)
+	}
+	files, err = GetDB().GetLastCommentFiles(tid, testutil.TestUser2)
+	if err != nil {
+		t.Fatalf("GetLastCommentFiles: %v", err)
+	}
+	if len(files) != 1 || files[0].Filename != "new.png" {
+		t.Fatalf("files = %+v, want exactly new.png", files)
+	}
+}
 
 func TestGetUserRoles_Integration(t *testing.T) {
 	t.Parallel()
