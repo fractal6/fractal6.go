@@ -194,10 +194,12 @@ func runTensionEvent(t *testing.T, cookie *http.Cookie, tensionID, eventType str
 	if value, ok := set["type_"]; ok && eventType == "TypeUpdated" {
 		event["new"] = value
 	}
-	// "new" is an event field, not a tension patch field: move it to the event.
-	if value, ok := set["new"]; ok {
-		event["new"] = value
-		delete(set, "new")
+	// "old"/"new" are event fields, not tension patch fields: move them to the event.
+	for _, field := range []string{"old", "new"} {
+		if value, ok := set[field]; ok {
+			event[field] = value
+			delete(set, field)
+		}
 	}
 	set["history"] = []any{event}
 	response := doRequest("POST", "/api", map[string]any{

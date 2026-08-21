@@ -552,53 +552,57 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 	if event.Old == nil || event.New == nil {
 		return fmt.Errorf("old and new event data must be defined.")
 	}
-	subject, err := resolveGovernanceSubject(tension, governanceUpdate)
-	if err != nil {
-		return err
-	}
 	if *event.Old != tension.Receiver.Nameid {
 		return LogErr("access denied", fmt.Errorf("Contract outdated: event source (%s) and actual source (%s) differ. Please, refresh or remove this contract.", *event.Old, tension.Receiver.Nameid))
 	}
 
 	receiverid_old := *event.Old // == tension.Receiverid
 	receiverid_new := *event.New
-	nameid_old := subject.node.Nameid
-	parts := strings.Split(nameid_old, "#")
-	localNameid := parts[len(parts)-1]
-	_, nameid_new, err := codec.NodeIdCodec(receiverid_new, localNameid, subject.node.Type)
-	if err != nil {
-		return err
-	}
 
-	if codec.IsRoot(nameid_old) {
-		return fmt.Errorf("You can't move the root node.")
-	}
-	if receiverid_new == nameid_new {
-		return fmt.Errorf("A node cannot be its own parent.")
-	}
-	isChild, err := db.GetDB().IsChild(nameid_old, receiverid_new)
-	if err != nil {
-		return err
-	}
-	if isChild {
-		return fmt.Errorf("You can't move a node in their children.")
-	}
-	if codec.IsRole(receiverid_new) {
-		return fmt.Errorf("You can't move a node in a Role.")
-	}
-
-	nodeInput := model.UpdateNodeInput{
-		Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid_old}},
-		Set:    &model.NodePatch{Parent: &model.NodeRef{Nameid: &receiverid_new}},
-	}
-	if err = db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput); err != nil {
-		return err
-	}
-	if nameid_old != nameid_new {
-		if _, err = db.GetDB().Meta("patchNameid", map[string]string{"nameid_old": nameid_old, "nameid_new": nameid_new}); err != nil {
+	// A tension governing a node moves that node too; a regular tension only changes receiver.
+	if tension.GovernedNode != nil {
+		subject, err := resolveGovernanceSubject(tension, governanceUpdate)
+		if err != nil {
 			return err
 		}
-		subject.node.Nameid = nameid_new
+		nameid_old := subject.node.Nameid
+		parts := strings.Split(nameid_old, "#")
+		localNameid := parts[len(parts)-1]
+		_, nameid_new, err := codec.NodeIdCodec(receiverid_new, localNameid, subject.node.Type)
+		if err != nil {
+			return err
+		}
+
+		if codec.IsRoot(nameid_old) {
+			return fmt.Errorf("You can't move the root node.")
+		}
+		if receiverid_new == nameid_new {
+			return fmt.Errorf("A node cannot be its own parent.")
+		}
+		isChild, err := db.GetDB().IsChild(nameid_old, receiverid_new)
+		if err != nil {
+			return err
+		}
+		if isChild {
+			return fmt.Errorf("You can't move a node in their children.")
+		}
+		if codec.IsRole(receiverid_new) {
+			return fmt.Errorf("You can't move a node in a Role.")
+		}
+
+		nodeInput := model.UpdateNodeInput{
+			Filter: &model.NodeFilter{Nameid: &model.StringHashFilterStringRegExpFilter{Eq: &nameid_old}},
+			Set:    &model.NodePatch{Parent: &model.NodeRef{Nameid: &receiverid_new}},
+		}
+		if err = db.GetDB().Update(db.GetDB().GetRootUctx(), "node", nodeInput); err != nil {
+			return err
+		}
+		if nameid_old != nameid_new {
+			if _, err = db.GetDB().Meta("patchNameid", map[string]string{"nameid_old": nameid_old, "nameid_new": nameid_new}); err != nil {
+				return err
+			}
+			subject.node.Nameid = nameid_new
+		}
 	}
 
 	// tension input
@@ -611,7 +615,7 @@ func MoveTension(uctx *model.UserCtx, tension *model.Tension, event *model.Event
 	}
 
 	// update tension
-	err = db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
+	err := db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", tensionInput)
 	if err != nil {
 		return err
 	}
