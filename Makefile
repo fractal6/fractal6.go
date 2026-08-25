@@ -34,12 +34,12 @@ GO_WATCH := (git ls-files '*.go' '*.graphql'; echo config.toml)
 
 run_api:
 	#go run main.go api
-	$(GO_WATCH) | entr -rcc go run main.go api
+	while true; do $(GO_WATCH) | entr -drcc go run main.go api; sleep 0.5; done
 
 
 run_notifier:
 	#go run main.go notifier
-	$(GO_WATCH) | entr -rcc go run main.go notifier
+	while true; do $(GO_WATCH) | entr -drcc go run main.go notifier; sleep 0.5; done
 
 build:
 	go build $(GOFLAGS) -o $(BINARY) main.go
