@@ -1,267 +1,137 @@
-# Refactoring Recommendations
+# Refactoring backlog
+
+Open improvement opportunities, ordered by priority. Items are dropped from this file
+once done — it is a backlog, not a changelog.
+
+| # | Item | Impact | Effort |
+|---|------|--------|--------|
+| 1 | Test coverage for `graph/` and `db/` | High | High |
+| 2 | DQL template injection safety (residual) | Medium | Medium |
+| 3 | Eliminate the dual bridge system | High | Medium |
+| 4 | Replace the Redis `@meta_patch` hack | High | Low |
+| 5 | Structured error handling | High | Medium |
+| 6 | Extract business logic from hooks | High | High |
+| 7 | Consolidate hook registration | Medium | Low |
+| 8 | Type-safe input extraction | Medium | Low |
+| 9 | Standardize resolver activation | Medium | Low |
+| 10 | Request-level observability | Medium | Medium |
+| 11 | Database interface abstraction | Medium | Medium |
+| 12 | Modernize dependencies | Medium | Medium |
+| 13 | Unify the artefact resolver pattern | Medium | Medium |
+| 14 | Reduce hardcoded DQL payloads | Low | Medium |
+| 15 | Resolve scattered `@DEBUG` / `@obsolete` annotations | Low | Low |
+| 16 | Schema documentation | Low | Medium |
 
-Major improvement opportunities identified across the fractal6.go codebase, ordered by impact.
+## 1. Test coverage for `graph/` and `db/`
+
+Integration tests cover `db/` queries and the HTTP handlers, but the tension event
+pipeline (`TensionEventHook`, `ProcessEvent`), the EMAP auth hooks in
+`tension_auth.go` and most `xw_directive.go` rules still have no safety net —
+these are the security-critical paths.
 
-## Summary: Priority Matrix
+## 2. DQL template injection safety (residual)
 
-| # | Improvement | Impact | Effort | Priority |
-|---|-------------|--------|--------|----------|
-| 2 | Test coverage for graph/db | High | High | Critical |
-| 6 | DQL template injection safety | High | Medium | Critical |
-| 5 | Structured error handling | High | Medium | High |
-| 1 | Split dql.go | Medium | Low | High |
-| 4 | ~~Remove dot-imports~~ | Medium | Low | High |
-| 8 | Extract business logic from hooks | High | High | High |
-| 3 | Replace reflection with generics | Medium | Medium | Medium (mostly done) |
-| 14 | Database interface abstraction | Medium | Medium | Medium |
-| 10 | Request-level observability | Medium | Medium | Medium |
-| 7 | Consolidate hook registration | Low | Low | Medium |
-| 11 | Simplify meta() type switch | Low | Low | Medium |
-| 9 | Modernize dependencies | Medium | Medium | Low (mapstructure direct dependency removed) |
-| 12 | Reduce hardcoded payloads | Low | Medium | Low |
-| 13 | Clean up TODO/DEBUG | Low | Low | Low |
-| 15 | Schema documentation | Medium | Medium | Low |
+The two exploitable paths are already closed: `db.ValidateUids` guards every
+client-supplied id before it reaches a `uid()` root, and `QuoteString` escapes user
+patterns spliced into string literals (see [text search](search.md)).
 
+What remains is the other `text/template` interpolations (`{{.nameid}}` and friends),
+which carry internally-generated or already-validated values and are therefore not
+known to be exploitable — just unguarded by construction. Closing it means moving
+them to Dgraph query variables (`$nameid`) where the template shape allows, and
+labelling the parameters that are user-controlled so the next template author knows
+which need escaping.
 
----
+## 3. Eliminate the dual bridge system
 
-## 1. Split `db/dql.go` (~2800 lines)
+`DgraphBridgeRaw` forwards the client's raw query string, losing directive
+modifications, and regex-strips the `history` field via a `cut_history` context flag.
+The `Get*` queries are its last callers. A `DgraphGetBridge` built on the existing
+`GetQueryGraph` infrastructure would let the hook simply nil out `input.Set.History`
+and remove the regex entirely.
 
-**Problem:** `dql.go` is the largest source file. It mixes DQL query templates, payload strings, query execution methods, and data transformation utilities in a single file.
+## 4. Replace the Redis `@meta_patch` hack
 
-**Recommendation:**
-- ~~Extract DQL templates into a `db/dql_templates.go` (or use embedded `.dql` files with `//go:embed`)~~
-- ~~Extract payload definitions into `db/payloads.go`~~
-- ~~Keep execution methods (`Meta()`, `Gamma()`, `QueryDql()`, generic helpers `Meta[T]`/`Gamma[T]`/`First[T]`) in `dql.go`~~
-- ~~Extract data mapping helpers (`CleanCompositeName`, `Map2Struct` wrappers) into `db/mappers.go`~~ (Done: `DecodeDql[T]` generic helper in `internal/tools/dql_decode.go` replaces all DQL mapstructure boilerplate)
+`@w_meta_patch` stashes function/key/value in Redis under `username + "meta_patch_*"`
+with a 5s TTL, read back in `postGqlProcess`. Concurrent requests from the same user
+overwrite each other. The operation is request-scoped — pass it through
+`context.Context` instead.
 
-**Benefit:** Easier navigation, clear separation between query definitions and execution logic. The existing `@refactor` comment at line 38 already acknowledges this need.
+## 5. Structured error handling
 
----
+No error type hierarchy: `LogErr()` returns flat strings, some authorization failures
+return empty responses instead of errors, and messages mix French and English. Define
+sentinel errors (`ErrUnauthorized`, `ErrNotFound`, `ErrValidation`, `ErrConflict`),
+wrap with `%w`, check with `errors.Is/As`, and standardise on English so the frontend
+can distinguish cases.
 
-## 2. Increase Test Coverage
+## 6. Extract business logic from hooks
 
-**Problem:** Only 6 test files exist, all in `tools/` and `web/auth/`. Zero tests for `graph/` (resolver logic, authorization, event processing) and `db/` (query building, data mapping). These are the most critical packages.
+Resolver hooks mix GraphQL plumbing (context extraction, type assertions, directive
+chain) with business logic (event processing, auth, notifications). Extracting the
+logic into service functions taking typed parameters would make it unit-testable
+without a GraphQL context, leaving hooks as thin adapters.
 
-**Recommendation:**
-- Add integration tests for the tension event pipeline (`TensionEventHook`, `ProcessEvent`)
-- Extend unit coverage of `xw_directive.go` rule functions beyond the registry/dispatch checks already in `xw_directive_test.go` (`isOwner`, `unique`, `hasEvent`, `tensionTypeCheck` — all need a richer graphql/Dgraph fixture).
-- Add unit tests for `tension_auth.go` authorization hook checks
-- Add tests for DQL template rendering (ensure `{{.nameid}}` substitution works correctly)
-- Add tests for `codec/` encoding/decoding functions
-- Consider a test harness with a test Dgraph instance for integration testing
+## 7. Consolidate hook registration
 
-**Benefit:** Currently, authorization logic changes have no safety net. The EMAP and directive system are central to security and correctness.
+`resolver.go:Init()` registers ~60 hooks by hand and most are the pass-through
+`nothing`. Defaulting every `Hook_*` field via a reflection loop and registering only
+the custom ones would cut `Init()` by ~80%.
 
----
+## 8. Type-safe input extraction
 
-## 3. Replace Reflection with Type-Safe Patterns
+The generic `ExtractInputs[T]` / `ExtractInput[T]` helpers exist in `resolver.go` but are
+used inconsistently: `node_resolver.go` uses them while `tension_resolver.go` and
+`contract_resolver.go` still do raw `Args["input"].(...)` assertions that panic on
+failure. Unify on the helpers, and give them error returns instead of panicking.
 
-**Problem:** The `meta()` function in `resolver.go` (lines 307-381) uses heavy reflection to:
-- Extract field values from objects (`reflect.ValueOf(obj).Elem().FieldByName(...)`)
-- Convert `[]map[string]interface{}` results to typed slices
-- Dynamically dispatch based on return type (`reflect.TypeOf`, `reflect.MakeSlice`)
+## 9. Standardize resolver activation
 
-**Recommendation:**
-- ~~Use Go generics (1.18+) for the type conversion layer~~ (Done: `DecodeDql[T]` generic in `internal/tools/dql_decode.go`)
-- Register typed handlers per @meta field instead of relying on runtime type switching
-- ~~Replace `Map2Struct` reflection with explicit struct mapping functions for known types (`Event`, `EventCount`)~~ (Done: `Map2Struct` now uses `json.Marshal/Unmarshal`, `meta()` uses `reflect.New` + JSON)
-- ~~Migrate standalone `Map2Struct` callers to `DecodeDql[T]`~~ (Done: all call sites migrated; `Map2Struct` deleted)
-- ~~Factorize `Meta1`/`Gamma1` into generic package-level `db.Meta[T]`/`db.Gamma[T]` + `First[T]`~~ (Done: `Meta1`/`Gamma1` deleted; all call sites migrated to `First(db.Meta[T](...))` or `First(db.Gamma[T](...))`; `First[T]` and `DecodeDql[T]` moved to `internal/tools/dql_decode.go`; `DecodeDqlSlice` removed — unified on `DecodeDql[[]T]`)
+`schema.resolvers.go` has ~130 `panic("not implemented")` bodies mixed in with live
+bridge calls and one-off implementations, with no way to see what is exposed without
+reading the whole file. Some of them *should* be wired (e.g. `DeleteLabel`). A
+registration table would document it, and returning a GraphQL error rather than
+panicking would stop an unexpected call from taking down the server.
 
-**Current state:** The DQL data mapping layer is now fully generic. The remaining reflection is in `meta()` (resolver.go) which dynamically dispatches `@meta` field results — this requires either per-field typed handlers or staying with reflection since `@meta` operates on schema-declared types unknown at compile time.
+## 10. Request-level observability
 
-**Benefit:** Compile-time type safety, clearer error messages, better performance, easier debugging.
+Logging is `fmt.Println` in DEV mode. Prometheus metrics exist
+(`web/handlers/instrumentation.go`) but there is no structured logging, no DQL query
+timing, and no audit trail of authorization denials. `slog` plus the existing
+`RequestID` middleware covers most of it.
 
----
+## 11. Database interface abstraction
 
+`Resolver` holds a concrete `*db.Dgraph`. A `db.Store` interface over the core
+operations would allow mock implementations in tests.
 
-## 5. Structured Error Handling
+## 12. Modernize dependencies
 
-**Problem:** Error handling uses `LogErr()` which captures stack traces but returns flat error strings. There is no error type hierarchy. Some operations fail silently (authorization checks return empty responses instead of errors). Error messages mix French and English.
+`go-redis/redis/v8` (v9 is current, context-first API) and `dgraph-io/dgo/v200`
+(legacy versioning) are both behind.
 
-**Recommendation:**
-- Define sentinel errors for common cases: `ErrUnauthorized`, `ErrNotFound`, `ErrValidation`, `ErrConflict`
-- Use `fmt.Errorf("...: %w", err)` wrapping consistently to maintain error chains
-- Replace silent failures with explicit authorization errors where appropriate
-- Use `errors.Is()` / `errors.As()` for error checking instead of string matching
-- Standardize all error messages in English
+## 13. Unify the artefact resolver pattern
 
-**Benefit:** Enables proper error handling by callers, better observability, cleaner API error responses.
+Label, RoleExt and Project share one authorization shape (artefacts attached to nodes,
+coordinator auth) but go through ad-hoc `AddArtefactInput` / `UpdateArtefactInput` proxy
+types in `node_resolver.go` that partially duplicate the generated models. A generic
+hook factory constrained on `GetNodes()` / `GetRootnameid()` would remove the proxies
+and the `typeName` switching in `updateNodeArtefactHook`.
 
----
+## 14. Reduce hardcoded DQL payloads
 
-## 6. DQL Template Injection Safety
+`db/dql_payloads.go` duplicates field selections from the schema by hand; a schema
+change requires updating them manually with no compile-time signal. Generate them
+during `make generate`, or at minimum test the field names against the live schema.
 
-**Problem:** DQL queries use raw string template substitution (`RawFormat` with `text/template`):
-```go
-var(func: eq(Node.nameid, "{{.nameid}}"))
-```
-If a `nameid` value contains DQL metacharacters or quotes, this could produce malformed queries. While values largely come from internal sources (Dgraph UIDs, validated nameids), this is a fragile pattern.
+## 15. Resolve scattered annotations
 
-**Recommendation:**
-- Use Dgraph's parameterized query variables (`$nameid: string`) instead of string interpolation where possible
-- For DQL queries that must use template substitution, add an explicit sanitization step
-- Document which query parameters are user-controlled vs. system-generated
+`@DEBUG`, `@debug`, `@future`, `@obsolete` and `@refactor` markers accumulate in the
+schema and code (a dozen in `fractal6.graphql` alone), several waiting on Dgraph
+features like nested filters. Audit each one: resolve, convert to a tracked issue, or
+delete.
 
-**Benefit:** Defense in depth against injection, clearer security boundaries.
+## 16. Schema documentation
 
----
-
-## 7. Consolidate Resolver Hook Registration
-
-**Problem:** `graph/resolver.go` `Init()` registers ~60+ hook directives manually. Many share the same handler (e.g., multiple `nothing` hooks, multiple `setContextWithID` hooks). Adding a new type requires adding entries in multiple places.
-
-**Recommendation:**
-- Group hooks by handler function using a registration helper:
-  ```go
-  registerHooks(c, setContextWithID,
-      "Hook_addTensionInput", "Hook_updateTensionInput",
-      "Hook_addContractInput", ...)
-  ```
-- Or use a declarative map:
-  ```go
-  hookMap := map[string]DirectiveFunc{
-      "Hook_addTensionInput": setContextWithID,
-      "Hook_addTension":      addTensionHook,
-  }
-  ```
-- Consider code generation from annotations if the pattern grows further
-
-**Benefit:** Reduces boilerplate, makes hook registration self-documenting, harder to miss a registration.
-
----
-
-## 8. Extract Business Logic from Resolver Hooks
-
-**Problem:** Resolver hook functions (e.g., `addTensionHook`, `updateContractHook`) mix GraphQL plumbing (context extraction, type assertions, directive chain) with business logic (event processing, authorization, notifications). This makes business logic hard to test in isolation.
-
-**Recommendation:**
-- Extract pure business logic into service-layer functions that accept typed parameters and return typed results
-- Keep resolver hooks as thin adapters that extract data from context and delegate to service functions
-- Example:
-  ```go
-  // Service layer (testable)
-  func ProcessTensionEvents(uctx *model.UserCtx, tid string, events []*model.EventRef) error
-
-  // Hook (thin adapter)
-  func addTensionHook(ctx, obj, next) (interface{}, error) {
-      uctx := auth.GetUserContext(ctx)
-      // ... extract data ...
-      return ProcessTensionEvents(uctx, tid, events)
-  }
-  ```
-
-**Benefit:** Enables unit testing of business logic without GraphQL context, clearer separation of concerns.
-
----
-
-## 9. Modernize Dependency Versions
-
-**Problem:** Several dependencies are on older versions:
-- `dgraph-io/dgo/v200` - Uses Dgraph's v200 client (legacy versioning)
-- `go-redis/redis/v8` - v9 is current with context-first API
-- `go.mod` declares Go 1.21 with toolchain 1.22 - could target 1.22 directly
-
-**Recommendation:**
-- Evaluate upgrading to `go-redis/redis/v9` for improved context handling
-- Check if Dgraph client has a newer release compatible with current Dgraph version
-- Set `go 1.22` directly in go.mod since that's the toolchain used
-- Review all dependencies for security patches
-
-**Benefit:** Security patches, performance improvements, access to newer Go features.
-
----
-
-## 10. Add Request-Level Observability
-
-**Problem:** Logging is basic (`fmt.Println` for DEV mode query names). Prometheus metrics exist (`web/handlers/instrumentation.go`) but there's no structured logging, no request tracing, and no visibility into DQL query performance.
-
-**Recommendation:**
-- Replace `fmt.Println` with structured logging (e.g., `slog` from stdlib in Go 1.21+)
-- Add DQL query timing metrics (template name, duration, result count)
-- Add trace IDs through the request lifecycle (already have `RequestID` middleware)
-- Log authorization decisions (especially denials) for security auditing
-- Add Dgraph gRPC connection pool metrics
-
-**Benefit:** Production debugging, performance profiling, security audit trail.
-
----
-
-## 11. Simplify the `meta()` Type Switch
-
-**Problem:** The `meta()` function handles three return type categories (`*int`, slices, default structs) with nested reflection. The code is dense and hard to follow.
-
-**Recommendation:**
-- Register return type converters per @meta field name at init time:
-  ```go
-  metaConverters = map[string]func([]map[string]interface{}) (interface{}, error){
-      "getNodeHistory": convertToEvents,
-      "getEventCount":  convertToEventCount,
-  }
-  ```
-- Each converter is a simple, testable function that knows its target type
-- Fall back to reflection-based conversion for unregistered fields
-
-**Benefit:** Debuggable, testable, explicit instead of reflective.
-
----
-
-## 12. Reduce Hardcoded DQL Payload Strings
-
-**Problem:** `db/dql.go` contains ~20 multi-line payload string variables (`userCtxPayload`, `tensionHookPayload`, `contractHookPayload`, etc.) that duplicate field selections from the schema. If the schema changes, these payloads must be updated manually.
-
-**Recommendation:**
-- Use `//go:embed` to load payloads from `.dql` files that can be validated
-- Or generate payload strings from the schema during `make generate`
-- At minimum, add a test that validates payload field names against the current schema
-
-**Benefit:** Reduces drift between schema and DQL payloads, catches errors earlier.
-
----
-
-## 13. Clean Up TODO/DEBUG Comments
-
-**Problem:** The schema and code contain many `@DEBUG`, `@debug`, `@future`, `@obsolete`, and `@refactor` annotations, some dating back to early development:
-- `@DEBUG: Waiting Nested filter in Dgraph` (multiple places in schema)
-- `@debug: Aggregate count result` (User type)
-- `@obsolete ?!` (NodeFragment fields)
-- `@refactor: modularize generic function` (dql.go line 38)
-
-**Recommendation:**
-- Audit each annotation: resolve, convert to GitHub issues, or remove if obsolete
-- Replace inline `@DEBUG` with tracked issues so they don't accumulate
-- Remove `@obsolete` markers if the code is truly unused
-
-**Benefit:** Cleaner codebase, tracked technical debt instead of scattered annotations.
-
----
-
-## 14. Add Interface Abstractions for Database Layer
-
-**Problem:** The `Resolver` struct holds a concrete `*db.Dgraph` pointer. All database operations go through concrete method calls. This tightly couples the GraphQL layer to Dgraph.
-
-**Recommendation:**
-- Define a `db.Store` interface with the core operations (`Query`, `Get`, `Add`, `Update`, `Delete`, `Meta`)
-- Have `Dgraph` implement this interface
-- Accept the interface in `Resolver` and hook functions
-- This enables mock implementations for testing
-
-**Benefit:** Testability, potential for alternative backends, cleaner dependency boundaries.
-
----
-
-## 15. Schema Documentation
-
-**Problem:** The GraphQL schema (`fractal6.graphql`) has minimal field documentation. Most types and fields lack `"""description"""` strings. The schema is the primary API contract with the frontend.
-
-**Recommendation:**
-- Add descriptions to all public types and their key fields
-- Document enum values (especially `TensionEvent` - the most complex enum)
-- Document authorization requirements per type (which roles can query/mutate)
-- Generate API documentation from the annotated schema
-
-**Benefit:** Self-documenting API, better developer experience for frontend and API consumers.
-
----
-
+`fractal6.graphql` has almost no `"""description"""` strings, despite being the
+primary contract with the frontend. `TensionEvent` in particular is undocumented.

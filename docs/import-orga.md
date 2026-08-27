@@ -1,125 +1,61 @@
 # Import Organisation from Spreadsheet
 
-Import an organisation structure from a spreadsheet export (xlsx or csv) of platforms like HolaSpirit or Glassfrog.
+Create an organisation from a spreadsheet export of another platform (HolaSpirit,
+Glassfrog).
 
-## API
+`POST /auth/createorga/spreadsheet` takes a multipart form with the file plus the
+usual org creation fields (name, nameid, visibility, about) and an optional `format`
+override — the source platform is otherwise auto-detected from the sheet names. Needs
+a valid JWT cookie. Handler signature and validation live in `web/handlers/import.go`.
 
-**`POST /auth/createorga/spreadsheet`**
+`.xlsx` (multi-sheet) and `.csv` (single sheet, named after the file) are accepted,
+capped at 10 MB and 10k rows per sheet.
 
-Multipart form with the following fields:
-
-| Field        | Type   | Required | Description                                    |
-|-------------|--------|----------|------------------------------------------------|
-| `file`      | file   | yes      | The spreadsheet file (.xlsx or .csv)           |
-| `name`      | string | yes      | Organisation display name                      |
-| `nameid`    | string | yes      | Organisation slug (URL-safe identifier)        |
-| `format`    | string | no       | Source platform: `holaspirit`, `glassfrog`. Auto-detected if omitted |
-| `visibility`| string | no       | `Public`, `Private`, or `Secret`. Default: `Public` |
-| `about`     | string | no       | Organisation description                       |
-
-Authentication: requires a valid JWT cookie.
-
-### Response
-
-**Success (200):**
-```json
-{"nameid": "my-org"}
-```
-
-**Error (400/500):**
-Plain text error message.
-
-### Example
-
-```bash
-curl -X POST http://localhost:8888/auth/createorga/spreadsheet \
-  -H "Cookie: jwt=<token>" \
-  -F "file=@export.xlsx" \
-  -F "name=My Organisation" \
-  -F "nameid=my-org" \
-  -F "format=holaspirit"
-```
-
-## Supported File Formats
-
-| Extension | Description |
-|-----------|-------------|
-| `.xlsx`   | Excel spreadsheet with multiple sheets |
-| `.csv`    | Single CSV file. The filename (without extension) is used as the sheet name, so `Circles & Roles.csv` maps to the `"Circles & Roles"` sheet expected by HolaSpirit. |
-
-## Supported Formats
-
-### HolaSpirit
-
-Auto-detected by the presence of a "Circles & Roles" sheet.
-
-**Required sheets:**
-- **Circles & Roles** — columns: Circle ID, Circle, Role ID, Role, Template, IsCircle, Purpose, Domains, Accountabilities, Strategy/Strategie, Created
-- **Policies** (optional) — columns: Circle ID, Circle, Role ID, Role, Policy, Description
-
-**HolaSpirit ID mapping:**
-In HolaSpirit exports, each circle has two different IDs: a `roleID` (in its own `isCircle=TRUE` row) and a `circleID` (used when referenced as parent in child rows). These are different values. The importer resolves this via circle name matching to build the correct hierarchy.
-
-**Root circle detection:**
-The root circle is identified as the one with an empty `Circle ID` column (no parent).
-
-**What gets imported:**
-- Circle hierarchy (nested circles), ordered by creation time when available
-- Roles within circles (with role type mapping)
-- Mandate data: purpose, domains, responsibilities (from Accountabilities), policies
-- Strategy content is appended to purpose as a `### Strategy` sub-section
-- HTML content in cells is sanitized (bluemonday) then converted to markdown
-- Policies from the Policies sheet are formatted as a markdown list under each circle/role
-- Empty fields are left unset (nil) rather than set to empty strings
-- Node names are sanitized via `NameidEncoder` (mirrors frontend Elm `nameidEncoder`)
-
-**Role type mapping:**
-- "Lead", "Leader", "Coordinateur", "Facilitateur", "1er lien" -> Coordinator
-- Everything else -> Peer
-
-**Role templates (RoleExt):**
-- Roles marked with `Template=TRUE` in the HolaSpirit export are created as RoleExt templates at the root circle level
-- Additionally, roles with identical names and content across multiple circles are automatically deduplicated into RoleExt templates
-- All role instances referencing a template are linked to the corresponding RoleExt
-
-**Not imported:**
-- Members / assignations (deferred)
-- The "Members" sheet is ignored
-
-## Architecture
+## Where things live
 
 ```
-web/handlers/import.go             — ImportNode types, HTTP handler, org builder
-web/handlers/import_readers.go     — xlsx reader + HTML-to-markdown converter
-web/handlers/import_holaspirit.go  — HolaSpirit adapter: sheets -> ImportNode tree
-web/handlers/import_test.go        — Parsing and conversion unit tests
-web/handlers/integration_import_test.go — Import persistence integration test
+web/handlers/import.go             ImportNode types, HTTP handler, org builder
+web/handlers/import_readers.go     xlsx/csv readers + HTML-to-markdown converter
+web/handlers/import_holaspirit.go  HolaSpirit adapter: sheets -> ImportNode tree
 ```
 
-### Data flow
+Dependencies: `excelize/v2` (xlsx), `bluemonday` (sanitisation), `x/net/html` (markdown
+conversion), stdlib `encoding/csv`.
 
-1. HTTP handler authenticates user and parses multipart form
-2. Spreadsheet is read into `map[string][][]string` (sheet name -> rows)
-3. Source format is detected from sheet names (or `format` field)
-4. Format adapter parses sheets into an `ImportNode` tree
-5. Builder creates root node + owner role (same as `CreateOrga`)
-6. Builder creates RoleExt templates for deduplicated roles
-7. Builder recursively creates child circles and roles with governance tensions
-8. Each governance tension stores a complete Node fragment, then establishes the validated `Node.source` and `Tension.governed_node` relation for the already-created Node
+## Data flow
 
-### Failure and retry behavior
+The handler authenticates and parses the form, the reader turns the file into
+`sheet -> rows`, a format adapter parses that into an `ImportNode` tree, and the
+builder persists it: root node + owner role (same path as `CreateOrga`), then RoleExt
+templates, then circles and roles created recursively with a governance tension each.
+Every governance tension stores a complete Node fragment and then links
+`Node.source` / `Tension.governed_node` for the Node it just created.
 
-Spreadsheet parsing and validation finish before persistence starts, but organisation creation is a multi-step operation without an automatic rollback. A persistence or governance-link failure returns an error and can leave a partial organisation. Retrying the whole HTTP request is not a resume operation and is not idempotent: inspect and remove the partial organisation before retrying with the same `nameid`. Using a new `nameid` avoids that collision but does not clean up the failed attempt.
+## HolaSpirit specifics
 
-The governance-link step writes `Node.source` and `Tension.governed_node` for the Node it just created; it repairs nothing. Existing organisations are backfilled only by the deployment script documented in [Node governance](node-governance.md).
+Detected by the "Circles & Roles" sheet; an optional "Policies" sheet is merged in.
+The root circle is the row with an empty `Circle ID`.
 
-**Limits:**
-- Maximum file size: 10 MB
-- Maximum rows per sheet: 10,000
+Circles carry two distinct ids — a `roleID` on their own row and a `circleID` when
+referenced as a parent — so the adapter resolves the hierarchy by circle name instead.
 
-## Dependencies
+Imported: circle hierarchy (creation-ordered), roles with a type mapping (lead /
+coordinator-ish names -> Coordinator, everything else -> Peer), and mandate content
+(purpose, domains, responsibilities, policies, strategy appended as a sub-section).
+HTML cells are sanitised then converted to markdown; names go through `NameidEncoder`,
+mirroring the frontend's Elm encoder. Empty fields stay nil.
 
-- `github.com/xuri/excelize/v2` — xlsx reader
-- `github.com/microcosm-cc/bluemonday` — HTML sanitization
-- `encoding/csv` — CSV reader (stdlib)
-- `golang.org/x/net/html` — HTML parsing for markdown conversion (stdlib)
+Roles flagged `Template=TRUE`, and roles that repeat identically across circles, become
+RoleExt templates at root level, with every instance linked back.
+
+Members and assignations are not imported.
+
+## Failure behaviour
+
+Parsing and validation complete before persistence, but org creation is multi-step with
+no rollback: a failure can leave a partial organisation. Retrying the request is not a
+resume and is not idempotent — remove the partial org first, or use a fresh nameid
+(which does not clean up the previous attempt).
+
+The governance-link step only writes the Node it just created; it repairs nothing.
+Existing orgs are backfilled by the upgrade script in [node governance](node-governance.md).
