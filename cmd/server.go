@@ -96,6 +96,9 @@ func RunServer() {
 	r.Use(middle6.JwtDecode)                       // Set user claims
 	// Log request
 	r.Use(middleware.Logger)
+	// Gzip static bundles and /api JSON (after Logger, so logged bytes are wire bytes).
+	// Note: exclude any route hijacking the connection (e.g. GraphQL subscriptions) if enabled.
+	r.Use(middleware.Compress(5))
 	// Recover from panic   //r.Use(middleware.Recoverer)
 	r.Use(middle6.Recoverer)
 	// Set a timeout value on the request context (ctx), that will signal
