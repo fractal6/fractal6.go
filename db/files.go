@@ -31,6 +31,7 @@ import (
 
 	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/internal/storage"
+	"fractale/fractal6.go/internal/tools"
 )
 
 // FileKind discriminates the populated anchor branch in FileAuth.
@@ -175,6 +176,51 @@ func decodeLastCommentFiles(dg Dgraph, query string, args map[string]string) ([]
 			Size:        asInt(m["size"]),
 			Embedded:    asBool(m["embedded"]),
 		})
+	}
+	return out, nil
+}
+
+// FileFingerprint keys a file by (filename, size) — the only two facts an
+// MUA preserves when it re-attaches a quoted inline image on reply.
+func FileFingerprint(filename string, size int) string {
+	return fmt.Sprintf("%s\x00%d", filename, size)
+}
+
+// GetTensionFileFingerprints returns the FileFingerprint set of the files
+// attached to the newest comments of `tid` and of its contracts. Used by the
+// inbound-email path to drop re-attached quoted images before they compete
+// with the real paste. Depth-bounded (see getTensionFiles): an image quoted
+// from further back slips through and may mispair, as before the dedup existed.
+func (dg Dgraph) GetTensionFileFingerprints(tid string) (map[string]bool, error) {
+	type comment struct {
+		Files []struct {
+			Filename string
+			Size     int
+		}
+	}
+	type tensionFiles struct {
+		Comments  []comment
+		Contracts []struct{ Comments []comment }
+	}
+	results, err := dg.Meta("getTensionFiles", map[string]string{"tid": tid})
+	if err != nil {
+		return nil, err
+	}
+	rows, err := tools.DecodeDql[[]tensionFiles](results)
+	if err != nil {
+		return nil, err
+	}
+	out := map[string]bool{}
+	for _, r := range rows {
+		comments := r.Comments
+		for _, c := range r.Contracts {
+			comments = append(comments, c.Comments...)
+		}
+		for _, c := range comments {
+			for _, f := range c.Files {
+				out[FileFingerprint(f.Filename, f.Size)] = true
+			}
+		}
 	}
 	return out, nil
 }

@@ -375,6 +375,13 @@ func TestDeleteContractDeep_Integration(t *testing.T) {
                 _:cr <Reaction.comment> _:cc .
                 _:cc <Comment.reactions> _:cr .
 
+                _:cf <dgraph.type> "File" .
+                _:cf <File.storageKey> "test/%s-cfile" .
+                _:cf <File.filename> "cfile.png" .
+                _:cf <File.comment> _:cc .
+                _:cf <File.tension> _:t .
+                _:cc <Comment.files> _:cf .
+
                 _:ue <dgraph.type> "UserEvent" .
                 _:ue <UserEvent.createdAt> "%s" .
                 _:ue <UserEvent.isRead> "false" .
@@ -388,6 +395,7 @@ func TestDeleteContractDeep_Integration(t *testing.T) {
 				pendingUsername, pendingEmail,
 				tag, now,
 				tag,
+				tag,
 				now,
 			),
 		}},
@@ -399,7 +407,7 @@ func TestDeleteContractDeep_Integration(t *testing.T) {
 	}
 
 	uids := res.Uids
-	required := []string{"t", "ct", "ce", "vt", "pu", "cc", "cr", "ue"}
+	required := []string{"t", "ct", "ce", "vt", "pu", "cc", "cr", "cf", "ue"}
 	for _, k := range required {
 		if uids[k] == "" {
 			t.Fatalf("setup: missing uid for %q", k)
@@ -430,7 +438,7 @@ func TestDeleteContractDeep_Integration(t *testing.T) {
 	// template nukes — pu IS deleted as `uid(all_ids) * *` removes any uid
 	// listed in all_ids; but pu isn't in all_ids. Reverse edge is removed.
 	// So pu still exists, just disconnected.)
-	gone := []string{"ct", "ce", "vt", "cc", "cr", "ue"}
+	gone := []string{"ct", "ce", "vt", "cc", "cr", "cf", "ue"}
 	for _, k := range gone {
 		if uidExists(t, uids[k]) {
 			t.Errorf("uid %s (%s) still present after DeleteContractDeep", k, uids[k])

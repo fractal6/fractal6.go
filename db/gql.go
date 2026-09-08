@@ -418,8 +418,8 @@ func (dg Dgraph) AddExtra(uctx model.UserCtx, vertex string, input any, upsert *
 		"QueryName":    queryName,               // Query name (e.g addUser)
 		"InputType":    inputType,               // input type name (e.g AddUserInput)
 		"QueryInput":   QuoteString(queryInput), // inputs data
-		"QueryGraph":   CleanString(qg, true),   // output data
 		"InputPayload": string(inputs),          // inputs data
+		"QueryGraph":   CleanString(qg, true),   // output data
 	}
 
 	// Send request

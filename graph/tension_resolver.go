@@ -26,7 +26,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 
-	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
 	. "fractale/fractal6.go/internal/tools"
 	"fractale/fractal6.go/web/auth"
@@ -64,6 +63,7 @@ func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, e
 	ctx = context.WithValue(ctx, "cut_history", true) // Used by DgraphQueryResolverRaw
 	history := input.History
 	input.History = nil
+
 	// Execute query
 	data, err := next(ctx)
 	if err != nil {
@@ -72,27 +72,11 @@ func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, e
 	if data.(*model.AddTensionPayload) == nil {
 		return nil, LogErr("add tension", fmt.Errorf("silent error: no tension added."))
 	}
-	tension := data.(*model.AddTensionPayload).Tension[0]
-	id := tension.ID
-
-	// Validate and process Blob Event
-	ok, _, err := TensionEventHook(uctx, id, history, nil)
-	if !ok || err != nil {
-		// Delete the tension just added
-		e := db.GetDB().DeleteTensionDeep(id)
-		if e != nil {
-			panic(e)
-		}
+	id := data.(*model.AddTensionPayload).Tension[0].ID
+	if err := CreateTensionHook(uctx, id, history, nil); err != nil {
+		return nil, err
 	}
-	if err != nil {
-		return data, err
-	}
-	if ok {
-		GoSyncSearchMessage(id)
-		PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: id, History: history})
-		return data, err
-	}
-	return nil, LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this resource."))
+	return data, nil
 }
 
 // Update Tension - Hook
@@ -133,6 +117,7 @@ func updateTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any
 			now := Now()
 			input.Set.History = nil
 			input.Set.UpdatedAt = &now
+
 			// Execute query
 			data, err := next(ctx)
 			if err != nil {

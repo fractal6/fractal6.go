@@ -125,6 +125,88 @@ func TestGetLastCommentFiles_Integration(t *testing.T) {
 	}
 }
 
+// TestGetTensionFileFingerprints_Integration covers the inbound-email dedup
+// source: a file already on the tension, or on one of its contracts, must be
+// fingerprintable by (filename, size) so the quoted re-attachment gets dropped.
+func TestGetTensionFileFingerprints_Integration(t *testing.T) {
+	t.Parallel()
+
+	// Throwaway tension: the shared "Test tension" is read by other parallel
+	// tests that assert on its newest comment.
+	const title = "tff-tension"
+	qm := QueryMut{
+		Q: `query {
+            u as var(func: eq(User.username, "` + testutil.TestUser2 + `"))
+        }`,
+		M: []X{{
+			S: `_:t <dgraph.type> "Tension" .
+                _:t <Tension.title> "` + title + `" .
+                _:c1 <Post.createdBy> uid(u) .
+                _:f1 <dgraph.type> "File" .
+                _:f1 <File.storageKey> "test/tff-1" .
+                _:f1 <File.filename> "tff-shot.png" .
+                _:f1 <File.contentType> "image/png" .
+                _:f1 <File.size> "4242" .
+                _:f1 <File.embedded> "true" .
+                _:c1 <dgraph.type> "Comment" .
+                _:c1 <Post.createdAt> "2026-04-01T00:00:00Z" .
+                _:c1 <Post.message> "tffmarker" .
+                _:c1 <Comment.files> _:f1 .
+                _:t <Tension.comments> _:c1 .
+                _:ct <dgraph.type> "Contract" .
+                _:ct <Contract.contractid> "tff-contract" .
+                _:t <Tension.contracts> _:ct .
+                _:c2 <dgraph.type> "Comment" .
+                _:c2 <Post.createdAt> "2026-04-02T00:00:00Z" .
+                _:c2 <Post.message> "tffmarker" .
+                _:ct <Contract.comments> _:c2 .
+                _:f2 <dgraph.type> "File" .
+                _:f2 <File.storageKey> "test/tff-2" .
+                _:f2 <File.filename> "tff-contract.png" .
+                _:f2 <File.size> "777" .
+                _:c2 <Comment.files> _:f2 .`,
+		}},
+	}
+	if _, err := GetDB().Gamma(qm, map[string]string{}); err != nil {
+		t.Fatalf("seed tension: %v", err)
+	}
+	t.Cleanup(func() {
+		qm := QueryMut{
+			Q: `query {
+                t as var(func: eq(Tension.title, "` + title + `")) {
+                    ct as Tension.contracts
+                }
+                c as var(func: eq(Post.message, "tffmarker")) {
+                    f as Comment.files
+                }
+            }`,
+			M: []X{{
+				D: `uid(f) * * .
+                    uid(c) * * .
+                    uid(ct) * * .
+                    uid(t) * * .`,
+			}},
+		}
+		if _, err := GetDB().Gamma(qm, map[string]string{}); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	})
+
+	tids, err := GetDB().GetIDs("Tension.title", title, nil, nil)
+	if err != nil || len(tids) == 0 {
+		t.Fatalf("GetIDs(%s) = %v, %v", title, tids, err)
+	}
+	tid := tids[0]
+
+	known, err := GetDB().GetTensionFileFingerprints(tid)
+	if err != nil {
+		t.Fatalf("GetTensionFileFingerprints: %v", err)
+	}
+	if !known[FileFingerprint("tff-shot.png", 4242)] || !known[FileFingerprint("tff-contract.png", 777)] {
+		t.Fatalf("fingerprints of seeded files missing: %+v", known)
+	}
+}
+
 func TestGetUserRoles_Integration(t *testing.T) {
 	t.Parallel()
 	roles, err := Meta[*model.Node]("getUserRoles", map[string]string{"userid": "testuser"})

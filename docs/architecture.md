@@ -91,12 +91,14 @@ The `/q/*` REST routes and DQL bypass layer 1 entirely and re-implement visibili
 Tensions are the core communication primitive; every change creates an `Event`, forming an immutable history. Pipeline in `graph/tension_op.go`:
 
 ```
-updateTension → TensionEventHook → ProcessEvent (per event)
-                                     ├── EMAP[event].Check    (auth)
-                                     ├── EMAP[event].Action   (side effects)
-                                     ├── leaveTrace           (timestamps + activity)
-                                     └── PublishTensionEvent  (Redis pub/sub)
+updateTension                                  → TensionEventHook → ProcessEvent (per event)
+addTension / POST /mailing → CreateTensionHook → TensionEventHook      ├── EMAP[event].Check    (auth)
+                                                                        ├── EMAP[event].Action   (side effects)
+                                                                        ├── leaveTrace           (timestamps + activity)
+                                                                        └── PublishTensionEvent  (Redis pub/sub)
 ```
+
+`CreateTensionHook` is the post-insert half of tension creation — hook, rollback on refusal, optional attachment step, search index, notification — shared by the GraphQL mutation and the email-to-tension webhook so both leave the same trace.
 
 Notable events and their authorization category live in the `EventsMap` table at the top of `tension_op.go`. The `Project*` events are internal: they are emitted only from the `ProjectCard` hooks (`graph/card_resolver.go`), with auth enforced upstream by `CheckProjectAuth`, and their EMAP entries use `RejectInternalEvent` so reaching them through the standard `updateTension(history:…)` pipeline fails explicitly.
 
@@ -182,7 +184,7 @@ GET    /file/{id}                      Per-anchor auth → 302 to presigned S3 U
 DELETE /file/{id}                      Uploader-only
 
 # Webhooks
-POST /notifications  /mailing  /postal_webhook       # /notifications also persists inbound attachments
+POST /notifications  /mailing  /postal_webhook       # /notifications and /mailing also persist inbound attachments
 
 # Dev / static
 GET  /playground  /ping  /assets/*  /*

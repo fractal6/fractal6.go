@@ -23,6 +23,8 @@ package handlers
 import (
 	"strings"
 	"testing"
+
+	"fractale/fractal6.go/db"
 )
 
 func TestExtractCIDRefs_basic(t *testing.T) {
@@ -260,5 +262,26 @@ func TestApplyCIDResolutions_codeRegionsUntouched(t *testing.T) {
 	}
 	if !strings.Contains(out, "/file/0xabc") {
 		t.Errorf("rewrite missing: %q", out)
+	}
+}
+
+func TestDropKnownAttachments(t *testing.T) {
+	// The MUA re-attached the quoted notification's image (same name+size)
+	// ahead of the fresh paste; without the drop, the fallback in
+	// resolveCIDs pairs the reply's cid ref with the OLD image.
+	known := map[string]bool{db.FileFingerprint("old.png", 100): true}
+	atts := []InboundAttachment{
+		{Filename: "old.png", Size: 100},
+		{Filename: "paste.png", Size: 42},
+	}
+	kept := dropKnownAttachments(known, atts)
+	if len(kept) != 1 || kept[0].Filename != "paste.png" {
+		t.Fatalf("kept = %+v, want only paste.png", kept)
+	}
+
+	refs := []cidRef{{token: "ii_m1abc"}}
+	pair, _, orphans := resolveCIDs(refs, kept, "fractale.co")
+	if len(orphans) != 0 || pair[0] != 0 {
+		t.Fatalf("pair = %+v orphans = %+v, want ref->paste.png", pair, orphans)
 	}
 }

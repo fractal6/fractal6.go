@@ -355,3 +355,108 @@ func TestUpsertActivity_Integration(t *testing.T) {
 		t.Logf("cleanup warning: %v", err)
 	}
 }
+
+// TestAddTensionComment_Integration guards the inbound-email comment insert:
+// it must return the new uid (the anchor for attachments) and produce a node
+// the app reads back as a Post/Comment.
+func TestAddTensionComment_Integration(t *testing.T) {
+	t.Parallel()
+
+	// Throwaway tension: parallel tests assert on the shared one's comments.
+	const title = "atc-tension"
+	seed := QueryMut{
+		Q: `query { r as var(func: eq(Node.nameid, "test-org")) }`,
+		M: []X{{
+			S: `_:t <dgraph.type> "Tension" .
+                _:t <Tension.title> "` + title + `" .
+                _:t <Tension.receiver> uid(r) .`,
+		}},
+	}
+	if _, err := GetDB().Gamma(seed, map[string]string{}); err != nil {
+		t.Fatalf("seed tension: %v", err)
+	}
+	t.Cleanup(func() {
+		del := QueryMut{
+			Q: `query {
+                t as var(func: eq(Tension.title, "` + title + `")) { c as Tension.comments }
+            }`,
+			M: []X{{D: `uid(c) * * .
+                       uid(t) * * .`}},
+		}
+		if _, err := GetDB().Gamma(del, map[string]string{}); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	})
+	tids, err := GetDB().GetIDs("Tension.title", title, nil, nil)
+	if err != nil || len(tids) == 0 {
+		t.Fatalf("GetIDs(%s) = %v, %v", title, tids, err)
+	}
+	tid := tids[0]
+
+	cid, err := GetDB().AddTensionComment(tid, "testuser", `hello "quoted" reply`, "2026-05-01T00:00:00Z")
+	if err != nil || cid == "" {
+		t.Fatalf("AddTensionComment = %q, %v", cid, err)
+	}
+
+	// Belongs to the tension, carries author + message (the upload path's view).
+	c, err := GetDB().GetCommentForUpload(tid, cid)
+	if err != nil {
+		t.Fatalf("GetCommentForUpload: %v", err)
+	}
+	if !c.Found || c.AuthorUsername != "testuser" || c.Message != `hello "quoted" reply` {
+		t.Fatalf("comment = %+v", c)
+	}
+
+	// The GraphQL layer writes both interface and concrete type; queries on
+	// Post would skip the node otherwise.
+	types := QueryMut{Q: `query { all(func: uid(` + cid + `)) @filter(type(Post) AND type(Comment)) { uid } }`}
+	res, err := GetDB().Gamma(types, map[string]string{})
+	if err != nil || len(res) != 1 {
+		t.Fatalf("type(Post) AND type(Comment) = %+v, %v", res, err)
+	}
+}
+
+// TestAddContractComment_Integration: the contract-reply insert must return
+// the new uid and hang the comment under Contract.comments with its author.
+func TestAddContractComment_Integration(t *testing.T) {
+	t.Parallel()
+
+	const contractid = "acc-contract"
+	seed := QueryMut{M: []X{{
+		S: `_:c <dgraph.type> "Contract" .
+            _:c <Contract.contractid> "` + contractid + `" .`,
+	}}}
+	res, err := GetDB().UpsertDql(seed, map[string]string{})
+	if err != nil {
+		t.Fatalf("seed contract: %v", err)
+	}
+	contractUid := res.Uids["c"]
+	t.Cleanup(func() {
+		del := QueryMut{
+			Q: `query { c as var(func: uid(` + contractUid + `)) { cm as Contract.comments } }`,
+			M: []X{{D: `uid(cm) * * .
+                       uid(c) * * .`}},
+		}
+		if _, err := GetDB().Gamma(del, map[string]string{}); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	})
+
+	cid, err := GetDB().AddContractComment(contractUid, "testuser", "contract reply", "2026-05-01T00:00:00Z")
+	if err != nil || cid == "" {
+		t.Fatalf("AddContractComment = %q, %v", cid, err)
+	}
+
+	q := QueryMut{Q: `query {
+        all(func: uid(` + contractUid + `)) @normalize {
+            Contract.comments @filter(uid(` + cid + `)) {
+                message: Post.message
+                Post.createdBy { username: User.username }
+            }
+        }
+    }`}
+	rows, err := GetDB().Gamma(q, map[string]string{})
+	if err != nil || len(rows) != 1 || rows[0]["message"] != "contract reply" || rows[0]["username"] != "testuser" {
+		t.Fatalf("comment under contract = %+v, %v", rows, err)
+	}
+}

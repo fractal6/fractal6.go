@@ -30,8 +30,10 @@ package handlers
 
 import (
 	"regexp"
+	"slices"
 	"strings"
 
+	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/internal/tools"
 )
 
@@ -183,6 +185,15 @@ func resolveCIDs(refs []cidRef, atts []InboundAttachment, ourDomain string) (pai
 		usedAtt[j] = true
 	}
 	return pair, prefilled, orphans
+}
+
+// dropKnownAttachments drops attachments already on the tension: MUAs
+// re-attach the quoted notification's inline images, and Postal ships them
+// with no Content-ID to tell them apart from a fresh paste.
+func dropKnownAttachments(known map[string]bool, atts []InboundAttachment) []InboundAttachment {
+	return slices.DeleteFunc(atts, func(a InboundAttachment) bool {
+		return known[db.FileFingerprint(safeFilename(a.Filename), a.Size)]
+	})
 }
 
 func nextUnused(used map[int]bool, n int) int {

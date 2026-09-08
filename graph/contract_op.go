@@ -154,3 +154,17 @@ func HasContractRight(uctx *model.UserCtx, contract *model.Contract) (bool, erro
 	ok, c, err := ProcessEvent(uctx, tension, &event, nil, true, false)
 	return ok || c != nil, err
 }
+
+// CanCommentContract: validators (HasContractRight) and candidates may comment.
+func CanCommentContract(uctx *model.UserCtx, contract *model.Contract) (bool, error) {
+	ok, err := HasContractRight(uctx, contract)
+	if ok || err != nil {
+		return ok, err
+	}
+	for _, c := range contract.Candidates {
+		if c.Username == uctx.Username {
+			return true, nil
+		}
+	}
+	return false, nil
+}

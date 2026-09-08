@@ -222,6 +222,36 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 	return ok, contract, err
 }
 
+// CreateTensionHook is the post-insert half of tension creation, shared by
+// addTensionHook and POST /mailing: EMAP pipeline (rollback on refusal), then
+// `attach` if given, then search index + notification.
+//
+// Attachments differ by path. The GraphQL API carries no bytes: the client
+// uploads through POST /file/upload afterwards and the notifier settle-polls,
+// so it passes nil. The mailer has the bytes in the webhook and persists them
+// here: after auth (no S3 writes for a tension about to be rolled back) and
+// before notify (the email snapshots the files).
+func CreateTensionHook(uctx *model.UserCtx, tid string, history []*model.EventRef, attach func()) error {
+	ok, _, err := TensionEventHook(uctx, tid, history, nil)
+	if !ok || err != nil {
+		if e := db.GetDB().DeleteTensionDeep(tid); e != nil {
+			panic(e)
+		}
+	}
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return LogErr("Access denied", fmt.Errorf("Contact a coordinator to access this resource."))
+	}
+	if attach != nil {
+		attach()
+	}
+	GoSyncSearchMessage(tid)
+	PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history})
+	return nil
+}
+
 func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract,
 	doCheck, doProcess bool,
 ) (bool, *model.Contract, error) {

@@ -668,6 +668,22 @@ var dqlQueries map[string]string = map[string]string{
             File.node { Node.nameid Node.visibility }
         }
     }`,
+	// getTensionFiles projects the (filename, size) of the attachments in a
+	// tension and its contract threads, fingerprinted by the inbound-email
+	// dedup. Bounded to the 20 newest comments per thread: an unbounded
+	// fan-out probes Comment.files for the whole history.
+	"getTensionFiles": `{
+        all(func: uid({{.tid}})) {
+            Tension.comments(orderdesc: Post.createdAt, first: 20) {
+                Comment.files { File.filename File.size }
+            }
+            Tension.contracts {
+                Contract.comments(orderdesc: Post.createdAt, first: 20) {
+                    Comment.files { File.filename File.size }
+                }
+            }
+        }
+    }`,
 	// getCommentMessage: read Comment.message + author, but only if `cid`
 	// belongs to `tid`. Used by the upload handler for the inline-screenshot
 	// rewrite *and* the comment-author check. Empty `all` response means cid

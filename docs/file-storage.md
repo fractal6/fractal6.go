@@ -31,7 +31,8 @@ Every `File` row has exactly one anchor, picked from the populated form fields:
 | `orgaid` | org avatar | node visibility | coordinator |
 
 Deletion is uploader-only for all kinds. `File.tension` is denormalised alongside
-`File.comment` so read auth is a single DQL hop. Avatars are replace-on-upload: the
+`File.comment` so read auth is a single DQL hop; a contract comment's files carry the
+contract's tension there, so they follow the same visibility and the same cascade. Avatars are replace-on-upload: the
 previous row is dropped and its S3 object GC'd asynchronously.
 
 Mutations on `File` are root-only in the GraphQL schema — all writes go through the
@@ -105,16 +106,38 @@ poll at all.
 
 ### Inbound email replies
 
-`POST /notifications` (`web/handlers/mailer.go`) turns an email reply into a Comment.
-Postal ships attachments with no Content-ID, so `processInboundAttachments` resolves
-`cid:` references in three passes: quoted-back outbound CIDs (rewrite only), filename
-heuristic, then document-order pairing. Unmatched refs are dropped; unmatched
-attachments are persisted as plain paperclips. All decisions roll up into a single
-`EmbedCommentMessage` upsert.
+`POST /notifications` (`web/handlers/mailer.go`) turns an email reply into a tension
+or contract Comment, `POST /mailing` an email into a new Tension; all three then run
+`processInboundAttachments` on the comment they just wrote. That anchor is exact:
+`AddTensionComment` / `AddContractComment` return the new uid, never "newest comment
+of this author" — two replies within the same second share a second-precision
+`createdAt`. The tension body is the one exception: it is created inside
+`AddTensionInput`, and being the author's only comment on a brand-new tension,
+`getLastComment` resolves it unambiguously.
+
+The tension path is the app's: `POST /mailing` inserts, then runs
+`graph.CreateTensionHook` exactly like `addTensionHook`, passing the attachment step
+as the hook's `attach` callback so it lands after auth and before the search index and
+notification. Contract replies are gated by `graph.CanCommentContract`, shared with
+`updateContractHook`.
+
+MUAs re-attach the quoted notification's inline images, and Postal ships attachments
+with no Content-ID, so those look exactly like a fresh paste. They are dropped first
+(`dropKnownAttachments`, fingerprint `(safe filename, size)` against
+`GetTensionFileFingerprints`, which covers the tension's comments and its contracts')
+— otherwise they get re-persisted and win the document-order pairing, putting the
+*previous* image in the new comment. A deliberate re-send of a byte-identical file is
+dropped too.
+
+`cid:` references are then resolved in three passes: quoted-back outbound CIDs
+(rewrite only), filename heuristic, then document-order pairing. Unmatched refs are
+dropped; unmatched attachments are persisted as plain paperclips. All decisions roll
+up into a single `EmbedCommentMessage` upsert.
 
 Writes are sequential here, so no settle poll is needed. Every attachment failure is
 logged and skipped — the comment itself always commits. Authorship trusts `From:`,
-gated by Postal's webhook signature. Contract replies are text-only for now.
+gated by Postal's webhook signature. `POST /file/upload` still anchors on tension
+comments only; the app's contract comment editor has attachments disabled.
 
 ## Deployment and operations
 
@@ -141,6 +164,8 @@ Known ceilings:
   only way to kill outstanding URLs, and it kills all of them).
 - **No byte-access audit**: the backend sees the presigned request, not the user. Swap
   the redirect in `FileGet` for a proxy stream if that changes.
+- **Inbound dedup depth**: the fingerprint set covers the 20 newest comments only; an
+  image quoted from further back mispairs as it did before the dedup existed.
 - **Cascade-delete GC** is fire-and-forget (`deleteStorageKeysAsync`), driven by the
   `Delete*Deep` wrappers; with storage unset the DQL still drops the `File` nodes and
   the objects are left orphaned.

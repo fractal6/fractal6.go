@@ -86,12 +86,13 @@ type InboundAttachment struct {
 // parseEmailReferences extracts the tension or contract uid an inbound reply
 // points at, from the References header set by our outbound mails
 // (`<tension/{uid}@domain>` / `<contract/{uid}@domain>`, see web/email/main.go).
-// Exactly one of (tid, cid) is returned; both empty means no reference matched.
+// Exactly one of (tid, contractid) is returned; both empty means no reference
+// matched.
 //
 // The header is sender-controlled, so ids are validated as well-formed uids
 // here — they end up in DQL uid() roots downstream (getTensionHook,
-// getLastComment, getContractHook).
-func parseEmailReferences(references string) (tid string, cid string, err error) {
+// getContractHook, addTensionComment, addContractComment).
+func parseEmailReferences(references string) (tid string, contractid string, err error) {
 	for _, r := range strings.Split(references, " ") {
 		l := strings.TrimPrefix(r, "<")
 		at := strings.Index(l, "@")
@@ -103,31 +104,29 @@ func parseEmailReferences(references string) (tid string, cid string, err error)
 			break
 		}
 		if strings.HasPrefix(l, "contract/") {
-			cid = l[len("contract/"):at]
+			contractid = l[len("contract/"):at]
 			break
 		}
 	}
 	if (tid != "" && db.ValidateUids(tid) != nil) ||
-		(cid != "" && db.ValidateUids(cid) != nil) {
+		(contractid != "" && db.ValidateUids(contractid) != nil) {
 		return "", "", fmt.Errorf("Unknown references")
 	}
-	return tid, cid, nil
+	return tid, contractid, nil
 }
 
-// Handle user email responses. Receiving email response from email notifications.
-func Notifications(w http.ResponseWriter, r *http.Request) {
-	// Validate WebHook identity
+// decodeInboundEmail validates the Postal signature, decodes the webhook body
+// and returns the message as markdown with the quoted original stripped. On
+// failure the HTTP error has been written.
+func decodeInboundEmail(w http.ResponseWriter, r *http.Request) (EmailForm, string, bool) {
 	if err := ValidatePostalSignature(r, postalWebhookPK); err != nil {
 		http.Error(w, err.Error(), 400)
-		return
+		return EmailForm{}, "", false
 	}
-
-	// Get request form
 	var form EmailForm
 	if !decodeBody(w, r, &form) {
-		return
+		return EmailForm{}, "", false
 	}
-
 	// Prefer html_body to avoid email line-wrapping artifacts in plain_body
 	msg := form.Msg
 	if form.HtmlMsg != "" {
@@ -135,36 +134,36 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 			msg = converted
 		}
 	}
-	// Strip quoted original message from the reply
-	msg = StripEmailQuote(msg)
+	return form, StripEmailQuote(msg), true
+}
 
-	// Determine where from and to where it goes
-	isTid, isCid, err := parseEmailReferences(form.References)
+// Handle user email responses. Receiving email response from email notifications.
+func Notifications(w http.ResponseWriter, r *http.Request) {
+	form, msg, ok := decodeInboundEmail(w, r)
+	if !ok {
+		return
+	}
+	tid, contractid, err := parseEmailReferences(form.References)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-
-	// Get author
 	uctx, err := db.GetDB().GetUctx("email", form.From)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-
 	createdAt := Now()
-	createdBy := model.UserRef{Username: &uctx.Username}
 
-	if isTid != "" { // Is a tension reply/comment
-		// Build Event
+	switch {
+	case tid != "": // tension reply
 		e := model.TensionEventCommentPushed
 		history := []*model.EventRef{{
 			CreatedAt: &createdAt,
-			CreatedBy: &createdBy,
+			CreatedBy: &model.UserRef{Username: &uctx.Username},
 			EventType: &e,
 		}}
-		// Check event
-		ok, _, err := graph.TensionEventHook(uctx, isTid, history, nil)
+		ok, _, err := graph.TensionEventHook(uctx, tid, history, nil)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -173,133 +172,54 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "access denied", 400)
 			return
 		}
-		// Publish  event
-		db.GetDB().Update(db.GetDB().GetRootUctx(), "tension", model.UpdateTensionInput{
-			Filter: &model.TensionFilter{ID: []string{isTid}},
-			Set: &model.TensionPatch{
-				Comments: []*model.CommentRef{{
-					CreatedAt: &createdAt,
-					CreatedBy: &createdBy,
-					Message:   &msg,
-				}},
-			},
-		})
-
-		// Attachments — best-effort; never abort the comment on failure.
-		// Reads the freshly-inserted comment's uid + tension rootnameid in
-		// the same hop so processInboundAttachments has what it needs to
-		// route into the comment-anchor storage layout.
-		if len(form.Attachments) > 0 {
-			if m, err := db.GetDB().Meta("getLastComment", map[string]string{
-				"tid": isTid, "username": uctx.Username,
-			}); err == nil && len(m) > 0 {
-				cid, _ := m[0]["id"].(string)
-				rootnameid, _ := m[0]["rootnameid"].(string)
-				if cid != "" && rootnameid != "" {
-					processInboundAttachments(
-						r.Context(), uctx, isTid, cid, rootnameid, msg, form.Attachments,
-					)
-				}
-			} else if err != nil {
-				log.Printf("Warning: inbound attachments getLastComment: %v", err)
-			}
-		}
-
-		// Publish Notification
-		// --
-		notif := model.EventNotif{
-			Uctx:    uctx,
-			Tid:     isTid,
-			History: history,
-		}
-		// Push notification
-		if err := graph.PublishTensionEvent(notif); err != nil {
-			http.Error(w, "PublishTensionEvent error: "+err.Error(), 500)
-			return
-		}
-	} else if isCid != "" { // If contract reply/comment
-		// Build Event
-		contract, err := db.GetDB().GetContractHook(isCid)
+		cid, err := db.GetDB().AddTensionComment(tid, uctx.Username, msg, createdAt)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-		// Check  event
-		ok, err := graph.HasContractRight(uctx, contract)
+		rid, err := db.GetDB().GetByUid(tid, "Tension.receiverid")
+		if err != nil || rid == nil {
+			http.Error(w, fmt.Sprintf("tension receiver: %v", err), 500)
+			return
+		}
+		rootnameid, _ := codec.Nid2rootid(rid.(string))
+		processInboundAttachments(r.Context(), uctx, tid, cid, rootnameid, msg, form.Attachments)
+		graph.PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history})
+	case contractid != "": // contract reply
+		contract, err := db.GetDB().GetContractHook(contractid)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		ok, err := graph.CanCommentContract(uctx, contract)
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
 		if !ok {
-			// Check if user is candidate
-			for _, c := range contract.Candidates {
-				if c.Username == uctx.Username {
-					ok = true
-					break
-				}
-			}
-			if !ok {
-				http.Error(w, "access denied", 400)
-				return
-			}
-		}
-		// Publish  event
-		db.GetDB().Update(db.GetDB().GetRootUctx(), "contract", model.UpdateContractInput{
-			Filter: &model.ContractFilter{ID: []string{isCid}},
-			Set: &model.ContractPatch{
-				Comments: []*model.CommentRef{{
-					CreatedAt: &createdAt,
-					CreatedBy: &createdBy,
-					Message:   &msg,
-				}},
-			},
-		})
-
-		// Publish Notification
-		// --
-		notif := model.ContractNotif{
-			Uctx:          uctx,
-			Tid:           contract.Tension.ID,
-			Contract:      contract,
-			ContractEvent: model.NewComment,
-		}
-		// Push notification
-		if err := graph.PublishContractEvent(notif); err != nil {
-			http.Error(w, "PublishContractEvent error: "+err.Error(), 500)
+			http.Error(w, "access denied", 400)
 			return
 		}
-	} else {
-		// In every other case, it returns an error.
+		cid, err := db.GetDB().AddContractComment(contractid, uctx.Username, msg, createdAt)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		// Files anchor on the contract's tension: that is what /file/<id> authorises against.
+		rootnameid, _ := codec.Nid2rootid(contract.Tension.Receiverid)
+		processInboundAttachments(r.Context(), uctx, contract.Tension.ID, cid, rootnameid, msg, form.Attachments)
+		graph.PublishContractEvent(model.ContractNotif{Uctx: uctx, Tid: contract.Tension.ID, Contract: contract, ContractEvent: model.NewComment})
+	default:
 		http.Error(w, "Unknown references", 400)
-		return
 	}
 }
 
 // Handle email sent to orga. Convert email to tension.
 func Mailing(w http.ResponseWriter, r *http.Request) {
-	// Validate WebHook identity
-	if err := ValidatePostalSignature(r, postalWebhookPK); err != nil {
-		http.Error(w, err.Error(), 400)
+	form, msg, ok := decodeInboundEmail(w, r)
+	if !ok {
 		return
 	}
-
-	// Get request form
-	var form EmailForm
-	if !decodeBody(w, r, &form) {
-		return
-	}
-
-	// Prefer html_body to avoid email line-wrapping artifacts in plain_body
-	msg := form.Msg
-	if form.HtmlMsg != "" {
-		if converted, err := HTMLToMarkdown(form.HtmlMsg); err == nil && converted != "" {
-			msg = converted
-		}
-	}
-	// Strip quoted original message from the reply
-	msg = StripEmailQuote(msg)
-
-	// Get author
 	uctx, err := db.GetDB().GetUctx("email", form.From)
 	if err != nil {
 		http.Error(w, "You need an account on Fractale to send email to organisation, please visit https://fractale.co \n\n"+err.Error(), 400)
@@ -321,18 +241,18 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Build the tension
+	// Build the tension. Auth, subscription and trace come from CreateTensionHook.
 	e := model.TensionEventCreated
 	rootnameid, _ := codec.Nid2rootid(receiverid)
 	emitterid := codec.MemberIdCodec(rootnameid, uctx.Username)
-	event := model.Event{
-		CreatedAt: createdAt,
-		CreatedBy: &createdBy,
-		EventType: e,
-	}
+	history := []*model.EventRef{{
+		CreatedAt: &createdAt,
+		CreatedBy: &model.UserRef{Username: &uctx.Username},
+		EventType: &e,
+	}}
 	tension := model.Tension{
 		CreatedAt:  createdAt,
-		CreatedBy:  &model.User{Username: uctx.Username},
+		CreatedBy:  &createdBy,
 		Emitterid:  emitterid,
 		Emitter:    &model.Node{Nameid: emitterid},
 		Receiverid: receiverid,
@@ -340,42 +260,29 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 		Type:       model.TensionTypeOperational,
 		Status:     model.TensionStatusOpen,
 		Title:      form.Title,
-		Comments: []*model.Comment{
-			{
-				CreatedAt: createdAt,
-				CreatedBy: &createdBy,
-				Message:   msg,
-			},
-		},
-		Subscribers: []*model.User{{Username: uctx.Username}},
+		Comments: []*model.Comment{{
+			CreatedAt: createdAt,
+			CreatedBy: &createdBy,
+			Message:   msg,
+		}},
 	}
-
-	// Verify author can create tension
-	eventRef := StructMap[model.EventRef](event)
-	ok, _, err := graph.ProcessEvent(uctx, &tension, &eventRef, nil, true, false)
-	if !ok || err != nil {
-		http.Error(w, "NOT AUTHORIZED TO CREATE TENSION HERE", 400)
-		return
-	}
-
-	// Create tension
-	tensionInput := StructMap[model.AddTensionInput](tension)
-	tid, err := db.GetDB().Add(*uctx, "tension", tensionInput)
+	tid, err := db.GetDB().Add(*uctx, "tension", StructMap[model.AddTensionInput](tension))
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-
-	// Publish Notification
-	// --
-	notif := model.EventNotif{
-		Uctx:    uctx,
-		Tid:     tid,
-		History: []*model.EventRef{&eventRef},
+	// Attachments anchor on the body comment, created inside AddTensionInput (no
+	// uid of its own came back). It is the author's only comment at this point.
+	attach := func() {
+		last, err := db.Meta[struct{ ID string }]("getLastComment", map[string]string{"tid": tid, "username": uctx.Username})
+		if err != nil || len(last) == 0 || last[0].ID == "" {
+			log.Printf("Warning: inbound attachments getLastComment: %v", err)
+			return
+		}
+		processInboundAttachments(r.Context(), uctx, tid, last[0].ID, rootnameid, msg, form.Attachments)
 	}
-	// Push notification
-	if err := graph.PublishTensionEvent(notif); err != nil {
-		http.Error(w, "PublishTensionEvent: "+err.Error(), 500)
+	if err := graph.CreateTensionHook(uctx, tid, history, attach); err != nil {
+		http.Error(w, err.Error(), 400)
 		return
 	}
 }
@@ -397,7 +304,7 @@ func processInboundAttachments(
 	tid, cid, rootnameid, msg string, atts []InboundAttachment,
 ) {
 	cli := storage.Global()
-	if cli == nil {
+	if cli == nil || len(atts) == 0 {
 		return
 	}
 
@@ -406,6 +313,13 @@ func processInboundAttachments(
 		"notify.inbound_attachment_per_file_bytes",
 		ViperPositiveInt("storage.max_upload_bytes", 10*1024*1024),
 	))
+	// Drop re-attached quoted images first, so they can't crowd out real
+	// pastes through the count cap nor win the document-order fallback.
+	if known, err := db.GetDB().GetTensionFileFingerprints(tid); err != nil {
+		log.Printf("Warning: inbound attachments fingerprints: %v", err)
+	} else {
+		atts = dropKnownAttachments(known, atts)
+	}
 	if maxCount > 0 && len(atts) > maxCount {
 		atts = atts[:maxCount]
 	}

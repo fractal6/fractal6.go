@@ -184,19 +184,9 @@ func updateContractHook(ctx context.Context, obj any, next graphql.Resolver) (an
 		if err != nil {
 			return nil, err
 		}
-		// Check if user has admin right
-		ok, err = HasContractRight(uctx, contract)
+		ok, err = CanCommentContract(uctx, contract)
 		if err != nil {
 			return nil, err
-		}
-		if !ok {
-			// Check if user is candidate
-			for _, c := range contract.Candidates {
-				if c.Username == uctx.Username {
-					ok = true
-					break
-				}
-			}
 		}
 		if ok {
 			// Execute query

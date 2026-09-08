@@ -20,6 +20,8 @@
 
 package db
 
+import "fmt"
+
 type QueryMut struct {
 	Q string // DQL Query
 	M []X    // DQL Mutation
@@ -396,10 +398,10 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 		}},
 	},
 	// deleteContract cascades a contract and its participants/comments/
-	// reactions, plus User.events rows whose `event` edge points back at
+	// reactions/files, plus User.events rows whose `event` edge points back at
 	// the contract (the desync_events case). Reverse edges from Tension,
 	// User, PendingUser, Node are dropped manually — same @hasInverse
-	// caveat as deleteTension. No storage keys today.
+	// caveat as deleteTension. The `all` block returns the storage keys.
 	"deleteContract": {
 		Q: `query {
             id as var(func: uid({{.id}})) {
@@ -418,6 +420,7 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
               }
               c as Contract.comments {
                 r as Comment.reactions
+                files as Comment.files
               }
             }
 
@@ -427,8 +430,11 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
                 }
             }
 
-            var(func: uid(id,a,votes,c,r)) {
+            var(func: uid(id,a,votes,c,r,files)) {
                 all_ids as uid
+            }
+            all(func: uid(files)) {
+                File.storageKey
             }
         }`,
 		M: []X{{
@@ -463,6 +469,44 @@ var dqlMutations map[string]QueryMut = map[string]QueryMut{
 				uid(reactions) * *  .
 				uid(files) * * .
 				uid(c) * * .
+				`,
+		}},
+	},
+	// addTensionComment inserts a comment on a tension and returns its uid
+	// (blank node "c"). Exists because the GraphQL comments patch returns no
+	// nested uid, and looking the comment up afterwards by author+recency
+	// mispicks within the same second.
+	//
+	// Inputs (all required): tid, username, message, now (RFC3339).
+	"addTensionComment": {
+		Q: `query {
+            var(func: uid({{.tid}})) { t as uid }
+            var(func: eq(User.username, "{{.username}}")) { u as uid }
+        }`,
+		M: []X{{
+			S: `_:c <dgraph.type> "Post" .
+				_:c <dgraph.type> "Comment" .
+				_:c <Post.createdAt> "{{.now}}" .
+				_:c <Post.createdBy> uid(u) .
+				_:c <Post.message> "{{.message}}" .
+				uid(t) <Tension.comments> _:c .
+				`,
+		}},
+	},
+	// addContractComment: addTensionComment for a contract thread. Inputs: cid
+	// (contract uid), username, message, now.
+	"addContractComment": {
+		Q: `query {
+            var(func: uid({{.cid}})) { p as uid }
+            var(func: eq(User.username, "{{.username}}")) { u as uid }
+        }`,
+		M: []X{{
+			S: `_:c <dgraph.type> "Post" .
+				_:c <dgraph.type> "Comment" .
+				_:c <Post.createdAt> "{{.now}}" .
+				_:c <Post.createdBy> uid(u) .
+				_:c <Post.message> "{{.message}}" .
+				uid(p) <Contract.comments> _:c .
 				`,
 		}},
 	},
@@ -803,6 +847,40 @@ func collectStorageKeys(resp []map[string]any) []string {
 	return out
 }
 
+// AddTensionComment inserts a comment authored by username on tid and returns
+// its uid. Auth is the caller's responsibility.
+func (dg Dgraph) AddTensionComment(tid, username, message, nowRFC3339 string) (string, error) {
+	return dg.addComment("addTensionComment", map[string]string{
+		"tid":      tid,
+		"username": username,
+		"message":  escapeNQuad(message),
+		"now":      nowRFC3339,
+	})
+}
+
+// AddContractComment inserts a comment authored by username on contract cid
+// and returns its uid. Auth is the caller's responsibility.
+func (dg Dgraph) AddContractComment(cid, username, message, nowRFC3339 string) (string, error) {
+	return dg.addComment("addContractComment", map[string]string{
+		"cid":      cid,
+		"username": username,
+		"message":  escapeNQuad(message),
+		"now":      nowRFC3339,
+	})
+}
+
+func (dg Dgraph) addComment(tmpl string, args map[string]string) (string, error) {
+	res, err := dg.UpsertDql(dqlMutations[tmpl], args)
+	if err != nil {
+		return "", err
+	}
+	uid, ok := res.Uids["c"]
+	if !ok || uid == "" {
+		return "", fmt.Errorf("%s: no uid returned", tmpl)
+	}
+	return uid, nil
+}
+
 // DeleteCommentDeep removes a comment (see "deleteComment" template) and
 // fires async S3 cleanup for every attached file. Per-key S3 failures are
 // logged in the goroutine. Auth is the caller's responsibility.
@@ -831,11 +909,17 @@ func (dg Dgraph) DeleteTensionDeep(id string) error {
 	return nil
 }
 
-// DeleteContractDeep cascades a contract delete (see "deleteContract").
-// No S3 GC: contract comments don't carry files in the current schema.
+// DeleteContractDeep cascades a contract delete (see "deleteContract") and
+// fires async S3 cleanup for its comment attachments.
 func (dg Dgraph) DeleteContractDeep(id string) error {
-	_, err := dg.Meta("deleteContract", map[string]string{"id": id})
-	return err
+	resp, err := dg.Meta("deleteContract", map[string]string{"id": id})
+	if err != nil {
+		return err
+	}
+	if keys := collectStorageKeys(resp); len(keys) > 0 {
+		deleteStorageKeysAsync(keys)
+	}
+	return nil
 }
 
 // DeleteUser runs the deleteUser cascade and fires async S3 cleanup of the
