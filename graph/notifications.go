@@ -133,11 +133,16 @@ func PushHistory(notif *model.EventNotif) error {
 	if err != nil {
 		return err
 	}
+	// @auth rules can filter created events out of the payload: a partial id
+	// list cannot be zipped back (id of event k would land on event i).
+	if len(ids) != len(inputs) {
+		return fmt.Errorf("event history mismatch for tension %s: pushed %d events, got %d ids back", notif.Tid, len(inputs), len(ids))
+	}
 	// Set event ids for further notifications
 	for i, id := range ids {
 		notif.History[i].ID = &id
 	}
-	return err
+	return nil
 }
 
 /* EXTERNAL (email, chat, etc) */
@@ -271,7 +276,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 		if i == 0 {
 			createdAt = *e.CreatedAt
 		}
-		if *e.ID != "" {
+		if e.ID != nil && *e.ID != "" {
 			eventBatch = append(eventBatch, &model.EventKindRef{EventRef: &model.EventRef{ID: e.ID}})
 		}
 	}

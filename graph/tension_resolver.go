@@ -60,7 +60,6 @@ func addTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any, e
 	// In order to notify user on the given event, we need to know their ids to pass and link them
 	// to the notification (UserEvent edge) function. To do so we first cut the history from the original
 	// input, and push then the history (see the PushHistory function).
-	ctx = context.WithValue(ctx, "cut_history", true) // Used by DgraphQueryResolverRaw
 	history := input.History
 	input.History = nil
 
@@ -112,7 +111,6 @@ func updateTensionHook(ctx context.Context, obj any, next graphql.Resolver) (any
 			// their ids to pass and link them to the user's notifications (UserEvent edge).
 			// To do so we first cut the history from the original input,
 			// and push then the history (see the [[PushHistory]] function).
-			ctx = context.WithValue(ctx, "cut_history", true) // Used by DgraphQueryResolverRaw
 			history := input.Set.History
 			now := Now()
 			input.Set.History = nil

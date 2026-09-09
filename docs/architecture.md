@@ -115,6 +115,8 @@ Two interfaces to Dgraph live side by side in `db/`:
 | GraphQL over HTTP | `db/gql.go` | Standard CRUD; Dgraph `@auth` enforced automatically |
 | DQL over gRPC | `db/dql.go` | Aggregations, traversals, `@meta` queries; bypasses GraphQL auth (custom auth required) |
 
+`db/gql.go` builds every GraphQL request from four `text/template` shapes: `rawQuery` (deprecated raw passthrough), `query` (declares only the arguments actually provided), `add` (list input) and `mutation` (single input, for update and delete). `QueryGraph` / `AddGraph` / `UpdateGraph` / `DeleteGraph` take the requested payload graph and decode into the caller's data: they back the bridges below. `Query` / `Add` / `AddMany` / `Update` / `Delete` are shortcuts over them for internal callers that only need vertex ids. An empty payload means `@auth` filtered the result — a missing one means the request was refused.
+
 DQL templates use Go `text/template` substitution (`{{.nameid}}`). Generic helpers: `db.Meta[T]`, `db.Gamma[T]`, and `First[T]` / `DecodeDql[T]` (in `internal/tools/dql_decode.go`).
 
 DQL responses are passed through `tools.CleanDqlMap`, which strips the type prefix from every key (`File.storageKey` → `storageKey`, `uid` → `id`). Decoders must target the cleaned name — using the raw predicate silently yields empty values instead of an error.

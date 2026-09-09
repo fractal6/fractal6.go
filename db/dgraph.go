@@ -23,6 +23,7 @@ package db
 import (
 	"bytes"
 	"context"
+	crand "crypto/rand"
 	"crypto/rsa"
 	"encoding/json"
 	"fmt"
@@ -158,12 +159,30 @@ func GetDB() *Dgraph {
 	return db_dg
 }
 
-// SetTestDB overrides the global db_dg singleton for integration tests.
-func SetTestDB(gqlAddr, grpcAddr string) {
-	db_dg = &Dgraph{
+// NewDgraph build a client for the given endpoints.
+func NewDgraph(gqlAddr, grpcAddr string) *Dgraph {
+	return &Dgraph{
 		gqlAddr:  gqlAddr,
 		grpcAddr: grpcAddr,
 	}
+}
+
+// SetTestDB overrides the global db_dg singleton for integration tests.
+func SetTestDB(gqlAddr, grpcAddr string) {
+	db_dg = NewDgraph(gqlAddr, grpcAddr)
+}
+
+// SetTestJWTKeys installs an ephemeral keypair when no Dgraph JWT key is
+// configured, so tests can query a fake Dgraph endpoint. No-op otherwise.
+func SetTestJWTKeys() {
+	if dgraphPrivateKey != nil && dgraphPublicKey != nil {
+		return
+	}
+	key, err := rsa.GenerateKey(crand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+	dgraphPrivateKey, dgraphPublicKey = key, &key.PublicKey
 }
 
 func initDB() *Dgraph {

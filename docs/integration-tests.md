@@ -22,6 +22,12 @@ Files are tagged `//go:build integration`, so plain `go test ./...` skips them. 
 hitting external services (Matrix) use `//go:build external` and are excluded from
 both.
 
+The GQL request builder (`db/gql_test.go`) and the Dgraph bridges
+(`graph/dgraph_resolver_test.go`) are covered container-free: they impersonate the
+Dgraph endpoint with `internal/testutil` (`FakeGqlServer` / `CheckRequest`), so that
+layer needs no Docker — only a local Redis (the `graph` package `init()` exits without
+one).
+
 ## Test data
 
 `cmd/testsetup` seeds once before any package runs; each `TestMain` only verifies the

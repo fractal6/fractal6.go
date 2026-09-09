@@ -24,8 +24,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/99designs/gqlgen/graphql"
 
@@ -53,17 +51,13 @@ func init() {
  * @warning: It looses eventual directive in the query graph (@cascade, @skip, @include...)
  */
 
-func (r *queryResolver) DgraphGetBridge(ctx context.Context, maps map[string]any, data any) error {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *queryResolver) DgraphQueryBridge(ctx context.Context, filter any, order any, first *int, offset *int, data any) error {
 	uctx := auth.GetUserContextOrEmpty(ctx)
 	_, typeName, _, err := queryTypeFromGraphqlContext(ctx)
 	if err != nil {
 		return err
 	}
-	err = r.db.QueryExtra(uctx, typeName, filter, order, first, offset, GetQueryGraph(ctx), data)
+	err = r.db.QueryGraph(uctx, typeName, filter, order, first, offset, GetQueryGraph(ctx), data)
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
@@ -72,7 +66,7 @@ func (r *mutationResolver) DgraphAddBridge(ctx context.Context, input any, upser
 	if err != nil {
 		return err
 	}
-	err = r.db.AddExtra(*uctx, typeName, input, upsert, GetQueryGraph(ctx), data)
+	err = r.db.AddGraph(*uctx, typeName, input, upsert, GetQueryGraph(ctx), data)
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
@@ -81,7 +75,7 @@ func (r *mutationResolver) DgraphUpdateBridge(ctx context.Context, input any, da
 	if err != nil {
 		return err
 	}
-	err = r.db.UpdateExtra(*uctx, typeName, input, GetQueryGraph(ctx), data)
+	err = r.db.UpdateGraph(*uctx, typeName, input, GetQueryGraph(ctx), data)
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
@@ -90,7 +84,7 @@ func (r *mutationResolver) DgraphDeleteBridge(ctx context.Context, filter any, d
 	if err != nil {
 		return err
 	}
-	err = r.db.DeleteExtra(*uctx, typeName, filter, GetQueryGraph(ctx), data)
+	err = r.db.DeleteGraph(*uctx, typeName, filter, GetQueryGraph(ctx), data)
 	return postGqlProcess(ctx, r.db, data, err)
 }
 
@@ -183,7 +177,7 @@ func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data any) error 
 
 	/* Rebuild the Graphql inputs request from this context */
 	gc := graphql.GetRequestContext(ctx)
-	queryType, typeName, queryName, err := queryTypeFromGraphqlContext(ctx)
+	queryType, _, queryName, err := queryTypeFromGraphqlContext(ctx)
 	if err != nil {
 		return tools.LogErr("DgraphRawResolver", err)
 	}
@@ -196,31 +190,12 @@ func DgraphQueryResolverRaw(ctx context.Context, db *db.Dgraph, data any) error 
 		}
 	}
 
-	rawQuery := gc.RawQuery
-	variables := gc.Variables
-	// Remove some input
-	if ctx.Value("cut_history") != nil {
-		// Go along PushHistory...
-		// improve that hack with gqlgen #1144 issue
-		// lazy (non-greedy) matching
-		reg := regexp.MustCompile(`,?\s*history\s*:\s*\[("[^"]*"|[^\]])*?\]`)
-		// If we remove completely history, it cause some "no data" box error on the frontend.
-		rawQuery = reg.ReplaceAllString(rawQuery, "history:[]")
-
-		// If Graphql variables are given...
-		t := strings.ToLower(typeName) // @DEBUG: only the first letter must lowered ?!
-		if variables[t] != nil && variables[t].(map[string]any)["set"] != nil {
-			s := variables[t].(map[string]any)["set"].(map[string]any)
-			s["history"] = nil
-		}
-	}
-
-	variables_, _ := json.Marshal(variables)
+	variables_, _ := json.Marshal(gc.Variables)
 	reqInput := map[string]string{
 		"QueryName": queryName,
 		// @warning: CleanString will lose format for text and mardown text data.
 		//"RawQuery": tools.CleanString(gc.RawQuery, true),
-		"RawQuery":  tools.QuoteString(rawQuery),
+		"RawQuery":  tools.QuoteString(gc.RawQuery),
 		"Variables": string(variables_),
 	}
 

@@ -45,10 +45,15 @@ which need escaping.
 ## 3. Eliminate the dual bridge system
 
 `DgraphBridgeRaw` forwards the client's raw query string, losing directive
-modifications, and regex-strips the `history` field via a `cut_history` context flag.
-The `Get*` queries are its last callers. A `DgraphGetBridge` built on the existing
-`GetQueryGraph` infrastructure would let the hook simply nil out `input.Set.History`
-and remove the regex entirely.
+modifications. Its last callers are the 9 `Get*` / `Aggregate*` query resolvers;
+adding a `DgraphGetBridge` built on the existing `GetQueryGraph` infrastructure would
+retire it. The raw path is characterization-tested (`TestDgraphBridgeRaw*` in
+`graph/dgraph_resolver_test.go`), which is the safety net for that deletion.
+
+It no longer rewrites anything: the `cut_history` flag and its regex are gone.
+Cutting the tension history out of a mutation (so `PushHistory` can create the events
+and link their notifications) happens on the Go input in `addTensionHook` /
+`updateTensionHook`, which reach Dgraph through the structured bridges.
 
 ## 4. Replace the Redis `@meta_patch` hack
 

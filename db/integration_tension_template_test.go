@@ -60,17 +60,17 @@ func TestTensionTemplateCRUD_Integration(t *testing.T) {
 		Type:        model.TensionTypeOperational,
 	}}
 	var addResult model.AddTensionTemplatePayload
-	err := GetDB().AddExtra(uctx, "tensionTemplate", input, nil,
+	err := GetDB().AddGraph(uctx, "tensionTemplate", input, nil,
 		"tensionTemplate { id name rootnameid is_recursive title comment type_ }", &addResult)
 	if err != nil {
-		t.Fatalf("AddExtra(tensionTemplate) returned error: %v", err)
+		t.Fatalf("AddGraph(tensionTemplate) returned error: %v", err)
 	}
 	if len(addResult.TensionTemplate) == 0 {
-		t.Fatal("AddExtra returned no tension templates")
+		t.Fatal("AddGraph returned no tension templates")
 	}
 	templateID := addResult.TensionTemplate[0].ID
 	if templateID == "" {
-		t.Fatal("AddExtra returned empty ID")
+		t.Fatal("AddGraph returned empty ID")
 	}
 	if addResult.TensionTemplate[0].Name != templateName {
 		t.Errorf("name = %q, want %q", addResult.TensionTemplate[0].Name, templateName)
@@ -92,13 +92,13 @@ func TestTensionTemplateCRUD_Integration(t *testing.T) {
 	// --- Delete ---
 	filter := model.TensionTemplateFilter{ID: []string{templateID}}
 	var delResult model.DeleteTensionTemplatePayload
-	err = GetDB().DeleteExtra(uctx, "tensionTemplate", filter,
+	err = GetDB().DeleteGraph(uctx, "tensionTemplate", filter,
 		"tensionTemplate { id name } msg numUids", &delResult)
 	if err != nil {
-		t.Fatalf("DeleteExtra(tensionTemplate) returned error: %v", err)
+		t.Fatalf("DeleteGraph(tensionTemplate) returned error: %v", err)
 	}
 	if delResult.NumUids == nil || *delResult.NumUids == 0 {
-		t.Error("DeleteExtra returned numUids=0, expected at least 1")
+		t.Error("DeleteGraph returned numUids=0, expected at least 1")
 	}
 
 	// --- Verify deleted ---
