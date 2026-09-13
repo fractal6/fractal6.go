@@ -178,6 +178,7 @@ type Mandate {
   responsabilities: String @x_alter
   domains: String          @x_alter
   policies: String         @x_alter
+  rules: String         @x_alter
 }
 
 type Label @auth(

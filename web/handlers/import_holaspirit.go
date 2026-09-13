@@ -49,6 +49,7 @@ type holaCircleRow struct {
 	purpose    string
 	domains    string
 	accountab  string // accountabilities -> maps to Mandate.responsabilities
+	rules      string // optional column, not part of standard HolaSpirit exports
 	strategy   string
 	template   bool
 	created    time.Time
@@ -120,6 +121,12 @@ func parseHolaCirclesSheet(sheets map[string][][]string) ([]holaCircleRow, error
 			strat = getCol(row, colIdx, "Strategy")
 		}
 		r.strategy = mustHTMLToMarkdown(strat)
+		// Rules column (may be named "Rules" or "Règles")
+		rules := getCol(row, colIdx, "Rules")
+		if rules == "" {
+			rules = getCol(row, colIdx, "Règles")
+		}
+		r.rules = mustHTMLToMarkdown(rules)
 		// Parse Created timestamp
 		if cs := getCol(row, colIdx, "Created"); cs != "" {
 			if t, err := time.Parse("2006-01-02 15:04:05.999999", cs); err == nil {
@@ -220,6 +227,7 @@ func buildHolaTree(crRows []holaCircleRow, policies []holaPolicyRow) (*ImportNod
 			Name:             r.roleName,
 			Purpose:          purpose,
 			Domains:          r.domains,
+			Rules:            r.rules,
 			Responsabilities: r.accountab,
 			Type:             model.NodeTypeCircle,
 		}
@@ -276,6 +284,7 @@ func buildHolaTree(crRows []holaCircleRow, policies []holaPolicyRow) (*ImportNod
 	type roleSignature struct {
 		purpose   string
 		domains   string
+		rules     string
 		accountab string
 	}
 	templateRoles := make(map[string]*ImportRoleExt) // roleName -> template (from Template=TRUE column)
@@ -299,6 +308,7 @@ func buildHolaTree(crRows []holaCircleRow, policies []holaPolicyRow) (*ImportNod
 		roleOccurrences[r.roleName] = append(roleOccurrences[r.roleName], roleSignature{
 			purpose:   purpose,
 			domains:   r.domains,
+			rules:     r.rules,
 			accountab: r.accountab,
 		})
 
@@ -307,6 +317,7 @@ func buildHolaTree(crRows []holaCircleRow, policies []holaPolicyRow) (*ImportNod
 			Name:             r.roleName,
 			Purpose:          purpose,
 			Domains:          r.domains,
+			Rules:            r.rules,
 			Responsabilities: r.accountab,
 			Type:             model.NodeTypeRole,
 			RoleType:         &rt,
@@ -321,10 +332,11 @@ func buildHolaTree(crRows []holaCircleRow, policies []holaPolicyRow) (*ImportNod
 					RoleType: rt,
 				}
 				// Set mandate only if there's actual content
-				if purpose != "" || r.domains != "" || r.accountab != "" {
+				if purpose != "" || r.domains != "" || r.rules != "" || r.accountab != "" {
 					templateRoles[r.roleName].Mandate = &ImportMandate{
 						Purpose:          purpose,
 						Domains:          r.domains,
+						Rules:            r.rules,
 						Responsabilities: r.accountab,
 					}
 				}
@@ -344,7 +356,7 @@ func buildHolaTree(crRows []holaCircleRow, policies []holaPolicyRow) (*ImportNod
 		first := sigs[0]
 		allSame := true
 		for _, s := range sigs[1:] {
-			if s.purpose != first.purpose || s.domains != first.domains || s.accountab != first.accountab {
+			if s != first {
 				allSame = false
 				break
 			}
@@ -357,10 +369,11 @@ func buildHolaTree(crRows []holaCircleRow, policies []holaPolicyRow) (*ImportNod
 			Name:     roleName,
 			RoleType: rt,
 		}
-		if first.purpose != "" || first.domains != "" || first.accountab != "" {
+		if first != (roleSignature{}) {
 			templateRoles[roleName].Mandate = &ImportMandate{
 				Purpose:          first.purpose,
 				Domains:          first.domains,
+				Rules:            first.rules,
 				Responsabilities: first.accountab,
 			}
 		}

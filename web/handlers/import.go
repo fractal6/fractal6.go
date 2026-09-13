@@ -43,6 +43,7 @@ type ImportNode struct {
 	Purpose          string           // maps to Mandate.purpose
 	Domains          string           // maps to Mandate.domains
 	Policies         string           // maps to Mandate.policies
+	Rules            string           // maps to Mandate.rules
 	Responsabilities string           // maps to Mandate.responsabilities
 	Type             model.NodeType   // Circle or Role
 	RoleType         *model.RoleType  // Coordinator, Peer, etc. (roles only)
@@ -64,6 +65,7 @@ type ImportMandate struct {
 	Purpose          string
 	Domains          string
 	Policies         string
+	Rules            string
 	Responsabilities string
 }
 
@@ -463,8 +465,11 @@ func createRoleExt(rootnameid string, re *ImportRoleExt) (string, error) {
 		if re.Mandate.Policies != "" {
 			m.Policies = &re.Mandate.Policies
 		}
+		if re.Mandate.Rules != "" {
+			m.Rules = &re.Mandate.Rules
+		}
 		// Only set mandate if at least one field is non-empty
-		if m.Purpose != nil || m.Responsabilities != nil || m.Domains != nil || m.Policies != nil {
+		if m.Purpose != nil || m.Responsabilities != nil || m.Domains != nil || m.Policies != nil || m.Rules != nil {
 			input.Mandate = m
 		}
 	}
@@ -474,7 +479,7 @@ func createRoleExt(rootnameid string, re *ImportRoleExt) (string, error) {
 // buildMandateRef creates a MandateRef from an ImportNode if it has mandate data.
 // Empty fields are left nil rather than set to empty strings.
 func buildMandateRef(node *ImportNode) *model.MandateRef {
-	if node.Purpose == "" && node.Domains == "" && node.Policies == "" && node.Responsabilities == "" {
+	if node.Purpose == "" && node.Domains == "" && node.Policies == "" && node.Rules == "" && node.Responsabilities == "" {
 		return nil
 	}
 	m := &model.MandateRef{}
@@ -489,6 +494,9 @@ func buildMandateRef(node *ImportNode) *model.MandateRef {
 	}
 	if node.Policies != "" {
 		m.Policies = &node.Policies
+	}
+	if node.Rules != "" {
+		m.Rules = &node.Rules
 	}
 	return m
 }

@@ -14991,6 +14991,8 @@ func (ec *executionContext) fieldContext_AddMandatePayload_mandate(ctx context.C
 				return ec.fieldContext_Mandate_domains(ctx, field)
 			case "policies":
 				return ec.fieldContext_Mandate_policies(ctx, field)
+			case "rules":
+				return ec.fieldContext_Mandate_rules(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mandate", field.Name)
 		},
@@ -22864,6 +22866,8 @@ func (ec *executionContext) fieldContext_DeleteMandatePayload_mandate(ctx contex
 				return ec.fieldContext_Mandate_domains(ctx, field)
 			case "policies":
 				return ec.fieldContext_Mandate_policies(ctx, field)
+			case "rules":
+				return ec.fieldContext_Mandate_rules(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mandate", field.Name)
 		},
@@ -30590,6 +30594,44 @@ func (ec *executionContext) fieldContext_Mandate_policies(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Mandate_rules(ctx context.Context, field graphql.CollectedField, obj *model.Mandate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mandate_rules(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rules, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mandate_rules(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mandate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MandateAggregateResult_count(ctx context.Context, field graphql.CollectedField, obj *model.MandateAggregateResult) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MandateAggregateResult_count(ctx, field)
 	if err != nil {
@@ -30920,6 +30962,82 @@ func (ec *executionContext) _MandateAggregateResult_policiesMax(ctx context.Cont
 }
 
 func (ec *executionContext) fieldContext_MandateAggregateResult_policiesMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MandateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MandateAggregateResult_rulesMin(ctx context.Context, field graphql.CollectedField, obj *model.MandateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MandateAggregateResult_rulesMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RulesMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MandateAggregateResult_rulesMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MandateAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MandateAggregateResult_rulesMax(ctx context.Context, field graphql.CollectedField, obj *model.MandateAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MandateAggregateResult_rulesMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RulesMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MandateAggregateResult_rulesMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MandateAggregateResult",
 		Field:      field,
@@ -41791,6 +41909,8 @@ func (ec *executionContext) fieldContext_NodeFragment_mandate(ctx context.Contex
 				return ec.fieldContext_Mandate_domains(ctx, field)
 			case "policies":
 				return ec.fieldContext_Mandate_policies(ctx, field)
+			case "rules":
+				return ec.fieldContext_Mandate_rules(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mandate", field.Name)
 		},
@@ -52312,6 +52432,8 @@ func (ec *executionContext) fieldContext_Query_getMandate(ctx context.Context, f
 				return ec.fieldContext_Mandate_domains(ctx, field)
 			case "policies":
 				return ec.fieldContext_Mandate_policies(ctx, field)
+			case "rules":
+				return ec.fieldContext_Mandate_rules(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mandate", field.Name)
 		},
@@ -52373,6 +52495,8 @@ func (ec *executionContext) fieldContext_Query_queryMandate(ctx context.Context,
 				return ec.fieldContext_Mandate_domains(ctx, field)
 			case "policies":
 				return ec.fieldContext_Mandate_policies(ctx, field)
+			case "rules":
+				return ec.fieldContext_Mandate_rules(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mandate", field.Name)
 		},
@@ -52442,6 +52566,10 @@ func (ec *executionContext) fieldContext_Query_aggregateMandate(ctx context.Cont
 				return ec.fieldContext_MandateAggregateResult_policiesMin(ctx, field)
 			case "policiesMax":
 				return ec.fieldContext_MandateAggregateResult_policiesMax(ctx, field)
+			case "rulesMin":
+				return ec.fieldContext_MandateAggregateResult_rulesMin(ctx, field)
+			case "rulesMax":
+				return ec.fieldContext_MandateAggregateResult_rulesMax(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MandateAggregateResult", field.Name)
 		},
@@ -59146,6 +59274,8 @@ func (ec *executionContext) fieldContext_RoleExt_mandate(ctx context.Context, fi
 				return ec.fieldContext_Mandate_domains(ctx, field)
 			case "policies":
 				return ec.fieldContext_Mandate_policies(ctx, field)
+			case "rules":
+				return ec.fieldContext_Mandate_rules(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mandate", field.Name)
 		},
@@ -65433,6 +65563,8 @@ func (ec *executionContext) fieldContext_UpdateMandatePayload_mandate(ctx contex
 				return ec.fieldContext_Mandate_domains(ctx, field)
 			case "policies":
 				return ec.fieldContext_Mandate_policies(ctx, field)
+			case "rules":
+				return ec.fieldContext_Mandate_rules(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mandate", field.Name)
 		},
@@ -74641,7 +74773,7 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"purpose", "responsabilities", "domains", "policies"}
+	fieldsInOrder := [...]string{"purpose", "responsabilities", "domains", "policies", "rules"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -74676,6 +74808,13 @@ func (ec *executionContext) unmarshalInputAddMandateInput(ctx context.Context, o
 				return it, err
 			}
 			it.Policies = data
+		case "rules":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rules"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rules = data
 		}
 	}
 
@@ -82808,7 +82947,7 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"purpose", "responsabilities", "domains", "policies"}
+	fieldsInOrder := [...]string{"purpose", "responsabilities", "domains", "policies", "rules"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -82843,6 +82982,13 @@ func (ec *executionContext) unmarshalInputMandatePatch(ctx context.Context, obj 
 				return it, err
 			}
 			it.Policies = data
+		case "rules":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rules"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rules = data
 		}
 	}
 
@@ -82856,7 +83002,7 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "purpose", "responsabilities", "domains", "policies"}
+	fieldsInOrder := [...]string{"id", "purpose", "responsabilities", "domains", "policies", "rules"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -82898,6 +83044,13 @@ func (ec *executionContext) unmarshalInputMandateRef(ctx context.Context, obj in
 				return it, err
 			}
 			it.Policies = data
+		case "rules":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rules"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rules = data
 		}
 	}
 
@@ -99749,6 +99902,8 @@ func (ec *executionContext) _Mandate(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Mandate_domains(ctx, field, obj)
 		case "policies":
 			out.Values[i] = ec._Mandate_policies(ctx, field, obj)
+		case "rules":
+			out.Values[i] = ec._Mandate_rules(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -99801,6 +99956,10 @@ func (ec *executionContext) _MandateAggregateResult(ctx context.Context, sel ast
 			out.Values[i] = ec._MandateAggregateResult_policiesMin(ctx, field, obj)
 		case "policiesMax":
 			out.Values[i] = ec._MandateAggregateResult_policiesMax(ctx, field, obj)
+		case "rulesMin":
+			out.Values[i] = ec._MandateAggregateResult_rulesMin(ctx, field, obj)
+		case "rulesMax":
+			out.Values[i] = ec._MandateAggregateResult_rulesMax(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

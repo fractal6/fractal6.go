@@ -769,6 +769,7 @@ type ComplexityRoot struct {
 		Policies         func(childComplexity int) int
 		Purpose          func(childComplexity int) int
 		Responsabilities func(childComplexity int) int
+		Rules            func(childComplexity int) int
 	}
 
 	MandateAggregateResult struct {
@@ -781,6 +782,8 @@ type ComplexityRoot struct {
 		PurposeMin          func(childComplexity int) int
 		ResponsabilitiesMax func(childComplexity int) int
 		ResponsabilitiesMin func(childComplexity int) int
+		RulesMax            func(childComplexity int) int
+		RulesMin            func(childComplexity int) int
 	}
 
 	MultiPolygon struct {
@@ -4612,6 +4615,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mandate.Responsabilities(childComplexity), true
 
+	case "Mandate.rules":
+		if e.complexity.Mandate.Rules == nil {
+			break
+		}
+
+		return e.complexity.Mandate.Rules(childComplexity), true
+
 	case "MandateAggregateResult.count":
 		if e.complexity.MandateAggregateResult.Count == nil {
 			break
@@ -4674,6 +4684,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MandateAggregateResult.ResponsabilitiesMin(childComplexity), true
+
+	case "MandateAggregateResult.rulesMax":
+		if e.complexity.MandateAggregateResult.RulesMax == nil {
+			break
+		}
+
+		return e.complexity.MandateAggregateResult.RulesMax(childComplexity), true
+
+	case "MandateAggregateResult.rulesMin":
+		if e.complexity.MandateAggregateResult.RulesMin == nil {
+			break
+		}
+
+		return e.complexity.MandateAggregateResult.RulesMin(childComplexity), true
 
 	case "MultiPolygon.polygons":
 		if e.complexity.MultiPolygon.Polygons == nil {
@@ -12048,6 +12072,7 @@ type Mandate {
   responsabilities: String
   domains: String
   policies: String
+  rules: String
 }
 
 type Label {
@@ -12581,35 +12606,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @remoteResponse(name: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @lambda on FIELD_DEFINITION
-
 directive @hasInverse(field: String!) on FIELD_DEFINITION
 
 directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @lambda on FIELD_DEFINITION
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
 
 directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @id on FIELD_DEFINITION
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+directive @remoteResponse(name: String) on FIELD_DEFINITION
 
-directive @cacheControl(maxAge: Int!) on QUERY
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
 
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 type ActivityAggregateResult {
   count: Int
@@ -12822,6 +12847,7 @@ input AddMandateInput {
   responsabilities: String
   domains: String
   policies: String
+  rules: String
 }
 
 type AddMandatePayload {
@@ -14160,6 +14186,8 @@ type MandateAggregateResult {
   domainsMax: String
   policiesMin: String
   policiesMax: String
+  rulesMin: String
+  rulesMax: String
 }
 
 input MandateFilter {
@@ -14176,6 +14204,7 @@ enum MandateHasFilter {
   responsabilities
   domains
   policies
+  rules
 }
 
 input MandateOrder {
@@ -14189,6 +14218,7 @@ enum MandateOrderable {
   responsabilities
   domains
   policies
+  rules
 }
 
 input MandatePatch {
@@ -14196,6 +14226,7 @@ input MandatePatch {
   responsabilities: String
   domains: String
   policies: String
+  rules: String
 }
 
 input MandateRef {
@@ -14204,6 +14235,7 @@ input MandateRef {
   responsabilities: String
   domains: String
   policies: String
+  rules: String
 }
 
 enum Mode {

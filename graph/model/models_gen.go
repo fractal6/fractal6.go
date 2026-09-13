@@ -221,6 +221,7 @@ type AddMandateInput struct {
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
 	Policies         *string `json:"policies,omitempty"`
+	Rules            *string `json:"rules,omitempty"`
 }
 
 type AddMandatePayload struct {
@@ -1464,6 +1465,7 @@ type Mandate struct {
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
 	Policies         *string `json:"policies,omitempty"`
+	Rules            *string `json:"rules,omitempty"`
 }
 
 type MandateAggregateResult struct {
@@ -1476,6 +1478,8 @@ type MandateAggregateResult struct {
 	DomainsMax          *string `json:"domainsMax,omitempty"`
 	PoliciesMin         *string `json:"policiesMin,omitempty"`
 	PoliciesMax         *string `json:"policiesMax,omitempty"`
+	RulesMin            *string `json:"rulesMin,omitempty"`
+	RulesMax            *string `json:"rulesMax,omitempty"`
 }
 
 type MandateFilter struct {
@@ -1498,6 +1502,7 @@ type MandatePatch struct {
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
 	Policies         *string `json:"policies,omitempty"`
+	Rules            *string `json:"rules,omitempty"`
 }
 
 type MandateRef struct {
@@ -1506,6 +1511,7 @@ type MandateRef struct {
 	Responsabilities *string `json:"responsabilities,omitempty"`
 	Domains          *string `json:"domains,omitempty"`
 	Policies         *string `json:"policies,omitempty"`
+	Rules            *string `json:"rules,omitempty"`
 }
 
 type MultiPolygon struct {
@@ -4813,6 +4819,7 @@ const (
 	MandateHasFilterResponsabilities MandateHasFilter = "responsabilities"
 	MandateHasFilterDomains          MandateHasFilter = "domains"
 	MandateHasFilterPolicies         MandateHasFilter = "policies"
+	MandateHasFilterRules            MandateHasFilter = "rules"
 )
 
 var AllMandateHasFilter = []MandateHasFilter{
@@ -4820,11 +4827,12 @@ var AllMandateHasFilter = []MandateHasFilter{
 	MandateHasFilterResponsabilities,
 	MandateHasFilterDomains,
 	MandateHasFilterPolicies,
+	MandateHasFilterRules,
 }
 
 func (e MandateHasFilter) IsValid() bool {
 	switch e {
-	case MandateHasFilterPurpose, MandateHasFilterResponsabilities, MandateHasFilterDomains, MandateHasFilterPolicies:
+	case MandateHasFilterPurpose, MandateHasFilterResponsabilities, MandateHasFilterDomains, MandateHasFilterPolicies, MandateHasFilterRules:
 		return true
 	}
 	return false
@@ -4858,6 +4866,7 @@ const (
 	MandateOrderableResponsabilities MandateOrderable = "responsabilities"
 	MandateOrderableDomains          MandateOrderable = "domains"
 	MandateOrderablePolicies         MandateOrderable = "policies"
+	MandateOrderableRules            MandateOrderable = "rules"
 )
 
 var AllMandateOrderable = []MandateOrderable{
@@ -4865,11 +4874,12 @@ var AllMandateOrderable = []MandateOrderable{
 	MandateOrderableResponsabilities,
 	MandateOrderableDomains,
 	MandateOrderablePolicies,
+	MandateOrderableRules,
 }
 
 func (e MandateOrderable) IsValid() bool {
 	switch e {
-	case MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains, MandateOrderablePolicies:
+	case MandateOrderablePurpose, MandateOrderableResponsabilities, MandateOrderableDomains, MandateOrderablePolicies, MandateOrderableRules:
 		return true
 	}
 	return false
