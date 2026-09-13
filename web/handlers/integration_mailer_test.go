@@ -14,9 +14,12 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
@@ -177,24 +180,43 @@ func TestMailingAttachments(t *testing.T) {
 					t.Fatal("mailing did not publish a notification")
 				}
 			}
-			if !notif.AttachmentsReady {
-				t.Fatal("mailing notification did not mark attachments ready")
-			}
-
-			interval := time.Duration(tools.ViperPositiveInt("notify.upload_poll_interval_sec", 5)) * time.Second
+			// Settle poll: the notifier waits until the comment's declared
+			// attachments are anchored on it (one file here), never longer.
+			interval := time.Second
+			prevInterval := tools.ViperPositiveInt("notify.upload_poll_interval_ms", 1500)
+			prevAttempts := tools.ViperPositiveInt("notify.upload_poll_attempts", 30)
+			viper.Set("notify.upload_poll_interval_ms", 1000)
+			viper.Set("notify.upload_poll_attempts", 2)
+			t.Cleanup(func() {
+				viper.Set("notify.upload_poll_interval_ms", prevInterval)
+				viper.Set("notify.upload_poll_attempts", prevAttempts)
+			})
+			prevCap := tools.ViperPositiveInt("notify.inbound_attachment_max_count", 20)
+			t.Cleanup(func() { viper.Set("notify.inbound_attachment_max_count", prevCap) })
 			for _, tt := range []struct {
-				name  string
-				event model.TensionEvent
-				ready bool
+				name     string
+				event    model.TensionEvent
+				expected int
+				cap_     int
+				wait     bool
 			}{
-				{"inbound creation", model.TensionEventCreated, true},
-				{"inbound reply", model.TensionEventCommentPushed, true},
-				{"browser creation", model.TensionEventCreated, false},
-				{"browser reply", model.TensionEventCommentPushed, false},
+				{"inbound creation", model.TensionEventCreated, 0, prevCap, false},
+				{"inbound reply", model.TensionEventCommentPushed, 0, prevCap, false},
+				{"declared upload landed", model.TensionEventCreated, 1, prevCap, false},
+				{"declared upload missing", model.TensionEventCommentPushed, 3, prevCap, true},
+				// A lying client cannot wait longer than the cap allows.
+				{"declared count capped", model.TensionEventCommentPushed, 999, 1, false},
 			} {
 				t.Run(tt.name, func(t *testing.T) {
+					viper.Set("notify.inbound_attachment_max_count", tt.cap_)
+					q := db.QueryMut{
+						Q: `query { c as var(func: uid({{.cid}})) }`,
+						M: []db.X{{S: `uid(c) <Comment.expected_attachments> "{{.n}}"^^<xs:int> .`}},
+					}
+					if _, err := db.GetDB().Gamma(q, map[string]string{"cid": comment.ID, "n": strconv.Itoa(tt.expected)}); err != nil {
+						t.Fatal(err)
+					}
 					current := notif
-					current.AttachmentsReady = tt.ready
 					event := *notif.History[0]
 					event.ID, event.EventType = nil, &tt.event
 					current.History = []*model.EventRef{&event}
@@ -203,8 +225,8 @@ func TestMailingAttachments(t *testing.T) {
 						t.Fatal(err)
 					}
 					elapsed := time.Since(start)
-					if (tt.ready && elapsed >= interval) || (!tt.ready && elapsed < interval) {
-						t.Errorf("notification took %v with attachments_ready=%v (poll interval %v)", elapsed, tt.ready, interval)
+					if tt.wait != (elapsed >= interval) {
+						t.Errorf("notification took %v with expected_attachments=%d (poll interval %v)", elapsed, tt.expected, interval)
 					}
 				})
 			}

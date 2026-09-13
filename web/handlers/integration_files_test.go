@@ -46,6 +46,7 @@ import (
 	"github.com/spf13/viper"
 
 	"fractale/fractal6.go/db"
+	"fractale/fractal6.go/graph/model"
 	"fractale/fractal6.go/internal/storage"
 	"fractale/fractal6.go/internal/testutil"
 	"fractale/fractal6.go/internal/tools"
@@ -928,6 +929,63 @@ func TestParallelUploadsToSameComment(t *testing.T) {
 			t.Errorf("both originals still present in message — neither write applied: %q", s)
 		}
 	})
+}
+
+// --- Declared attachment count ---
+
+// The notifier settle poll reads Comment.expected_attachments, and only the
+// client can write it. If @x_add or the generated input ever drops the field,
+// every attachment notification degrades silently — guard the write path.
+func TestAddTension_DeclaredAttachmentCountPersists(t *testing.T) {
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	now := tools.Now()
+	title := fmt.Sprintf("declared-count-%d", time.Now().UnixNano())
+	author := map[string]any{"username": testutil.TestUser}
+	rr := doRequest("POST", "/api", map[string]any{
+		"query": `mutation AddTension($input: [AddTensionInput!]!) {
+			addTension(input: $input) { tension { id } }
+		}`,
+		"variables": map[string]any{"input": []any{map[string]any{
+			"createdBy": author, "createdAt": now,
+			"title": title, "type_": "Operational", "status": "Open",
+			// add-tension @auth: the emitter must be a role the user owns.
+			"emitter": map[string]any{"nameid": "test-org##@" + testutil.TestUser}, "emitterid": "test-org##@" + testutil.TestUser,
+			"receiver": map[string]any{"nameid": "test-org"}, "receiverid": "test-org",
+			"comments": []any{map[string]any{
+				"createdBy": author, "createdAt": now,
+				"message":              title + " body",
+				"expected_attachments": 2,
+			}},
+			"history": []any{map[string]any{
+				"createdBy": author, "createdAt": now, "event_type": "Created",
+			}},
+		}}},
+	}, jwt)
+	requireStatus(t, rr, http.StatusOK)
+	var result graphqlResult
+	if err := json.Unmarshal(rr.Body.Bytes(), &result); err != nil {
+		t.Fatalf("decode addTension response: %v (%s)", err, rr.Body.String())
+	}
+	requireGraphQLSuccess(t, result)
+
+	q := db.QueryMut{Q: `{
+		all(func: type(Tension)) @filter(eq(Tension.title, "{{.title}}")) {
+			uid Tension.comments { uid Comment.expected_attachments }
+		}
+	}`}
+	tension, err := tools.First(db.Gamma[model.Tension](q, map[string]string{"title": title}))
+	if err != nil || tension.ID == "" {
+		t.Fatalf("created tension not found: %+v, %v", tension, err)
+	}
+	t.Cleanup(func() {
+		if err := db.GetDB().DeleteTensionDeep(tension.ID); err != nil {
+			t.Error(err)
+		}
+	})
+	if len(tension.Comments) != 1 || tension.Comments[0].ExpectedAttachments == nil ||
+		*tension.Comments[0].ExpectedAttachments != 2 {
+		t.Fatalf("expected_attachments did not survive the mutation: %+v", tension.Comments)
+	}
 }
 
 // --- internal helpers (need access to handler internals only via routing) ---

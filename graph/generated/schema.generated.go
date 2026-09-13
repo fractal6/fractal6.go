@@ -14228,6 +14228,8 @@ func (ec *executionContext) fieldContext_AddCommentPayload_comment(ctx context.C
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -18698,6 +18700,44 @@ func (ec *executionContext) fieldContext_Comment_files(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Comment_expected_attachments(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comment_expected_attachments(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpectedAttachments, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comment_expected_attachments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comment_id(ctx, field)
 	if err != nil {
@@ -19437,6 +19477,158 @@ func (ec *executionContext) fieldContext_CommentAggregateResult_messageMax(_ con
 	return fc, nil
 }
 
+func (ec *executionContext) _CommentAggregateResult_expected_attachmentsMin(ctx context.Context, field graphql.CollectedField, obj *model.CommentAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CommentAggregateResult_expected_attachmentsMin(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpectedAttachmentsMin, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CommentAggregateResult_expected_attachmentsMin(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CommentAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CommentAggregateResult_expected_attachmentsMax(ctx context.Context, field graphql.CollectedField, obj *model.CommentAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CommentAggregateResult_expected_attachmentsMax(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpectedAttachmentsMax, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CommentAggregateResult_expected_attachmentsMax(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CommentAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CommentAggregateResult_expected_attachmentsSum(ctx context.Context, field graphql.CollectedField, obj *model.CommentAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CommentAggregateResult_expected_attachmentsSum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpectedAttachmentsSum, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CommentAggregateResult_expected_attachmentsSum(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CommentAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CommentAggregateResult_expected_attachmentsAvg(ctx context.Context, field graphql.CollectedField, obj *model.CommentAggregateResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CommentAggregateResult_expected_attachmentsAvg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp := ec._fieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExpectedAttachmentsAvg, nil
+	})
+
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CommentAggregateResult_expected_attachmentsAvg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CommentAggregateResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Contract_contractid(ctx context.Context, field graphql.CollectedField, obj *model.Contract) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Contract_contractid(ctx, field)
 	if err != nil {
@@ -20085,6 +20277,8 @@ func (ec *executionContext) fieldContext_Contract_comments(ctx context.Context, 
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -20745,6 +20939,14 @@ func (ec *executionContext) fieldContext_Contract_commentsAggregate(ctx context.
 				return ec.fieldContext_CommentAggregateResult_messageMin(ctx, field)
 			case "messageMax":
 				return ec.fieldContext_CommentAggregateResult_messageMax(ctx, field)
+			case "expected_attachmentsMin":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsMin(ctx, field)
+			case "expected_attachmentsMax":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsMax(ctx, field)
+			case "expected_attachmentsSum":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsSum(ctx, field)
+			case "expected_attachmentsAvg":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CommentAggregateResult", field.Name)
 		},
@@ -21633,6 +21835,8 @@ func (ec *executionContext) fieldContext_DeleteCommentPayload_comment(ctx contex
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -28226,6 +28430,8 @@ func (ec *executionContext) fieldContext_File_comment(ctx context.Context, field
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -54779,6 +54985,8 @@ func (ec *executionContext) fieldContext_Query_getComment(ctx context.Context, f
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -54852,6 +55060,8 @@ func (ec *executionContext) fieldContext_Query_queryComment(ctx context.Context,
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -54931,6 +55141,14 @@ func (ec *executionContext) fieldContext_Query_aggregateComment(ctx context.Cont
 				return ec.fieldContext_CommentAggregateResult_messageMin(ctx, field)
 			case "messageMax":
 				return ec.fieldContext_CommentAggregateResult_messageMax(ctx, field)
+			case "expected_attachmentsMin":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsMin(ctx, field)
+			case "expected_attachmentsMax":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsMax(ctx, field)
+			case "expected_attachmentsSum":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsSum(ctx, field)
+			case "expected_attachmentsAvg":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CommentAggregateResult", field.Name)
 		},
@@ -58141,6 +58359,8 @@ func (ec *executionContext) fieldContext_Reaction_comment(ctx context.Context, f
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -60405,6 +60625,8 @@ func (ec *executionContext) fieldContext_Tension_comments(ctx context.Context, f
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -61631,6 +61853,14 @@ func (ec *executionContext) fieldContext_Tension_commentsAggregate(ctx context.C
 				return ec.fieldContext_CommentAggregateResult_messageMin(ctx, field)
 			case "messageMax":
 				return ec.fieldContext_CommentAggregateResult_messageMax(ctx, field)
+			case "expected_attachmentsMin":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsMin(ctx, field)
+			case "expected_attachmentsMax":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsMax(ctx, field)
+			case "expected_attachmentsSum":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsSum(ctx, field)
+			case "expected_attachmentsAvg":
+				return ec.fieldContext_CommentAggregateResult_expected_attachmentsAvg(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CommentAggregateResult", field.Name)
 		},
@@ -64440,6 +64670,8 @@ func (ec *executionContext) fieldContext_UpdateCommentPayload_comment(ctx contex
 				return ec.fieldContext_Comment_reactions(ctx, field)
 			case "files":
 				return ec.fieldContext_Comment_files(ctx, field)
+			case "expected_attachments":
+				return ec.fieldContext_Comment_expected_attachments(ctx, field)
 			case "id":
 				return ec.fieldContext_Comment_id(ctx, field)
 			case "createdBy":
@@ -73521,7 +73753,7 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "reactions", "files"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "reactions", "files", "expected_attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -73610,6 +73842,13 @@ func (ec *executionContext) unmarshalInputAddCommentInput(ctx context.Context, o
 				return it, err
 			}
 			it.Files = data
+		case "expected_attachments":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expected_attachments"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExpectedAttachments = data
 		}
 	}
 
@@ -78596,7 +78835,7 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "reactions", "files"}
+	fieldsInOrder := [...]string{"createdBy", "createdAt", "updatedAt", "message", "reactions", "files", "expected_attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -78734,6 +78973,28 @@ func (ec *executionContext) unmarshalInputCommentPatch(ctx context.Context, obj 
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.FileRef`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
+		case "expected_attachments":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expected_attachments"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_patch_ro == nil {
+					return nil, errors.New("directive x_patch_ro is not implemented")
+				}
+				return ec.directives.X_patch_ro(ctx, obj, directive0)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.ExpectedAttachments = data
+			} else if tmp == nil {
+				it.ExpectedAttachments = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -78747,7 +79008,7 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "reactions", "files"}
+	fieldsInOrder := [...]string{"id", "createdBy", "createdAt", "updatedAt", "message", "reactions", "files", "expected_attachments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -78860,6 +79121,28 @@ func (ec *executionContext) unmarshalInputCommentRef(ctx context.Context, obj in
 				it.Files = nil
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be []*fractale/fractal6.go/graph/model.FileRef`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "expected_attachments":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expected_attachments"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalOInt2ᚖint(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				if ec.directives.X_add == nil {
+					return nil, errors.New("directive x_add is not implemented")
+				}
+				return ec.directives.X_add(ctx, obj, directive0, nil, nil, nil, nil)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*int); ok {
+				it.ExpectedAttachments = data
+			} else if tmp == nil {
+				it.ExpectedAttachments = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *int`, tmp)
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 		}
@@ -97374,6 +97657,8 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Comment_reactions(ctx, field, obj)
 		case "files":
 			out.Values[i] = ec._Comment_files(ctx, field, obj)
+		case "expected_attachments":
+			out.Values[i] = ec._Comment_expected_attachments(ctx, field, obj)
 		case "id":
 			out.Values[i] = ec._Comment_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -97445,6 +97730,14 @@ func (ec *executionContext) _CommentAggregateResult(ctx context.Context, sel ast
 			out.Values[i] = ec._CommentAggregateResult_messageMin(ctx, field, obj)
 		case "messageMax":
 			out.Values[i] = ec._CommentAggregateResult_messageMax(ctx, field, obj)
+		case "expected_attachmentsMin":
+			out.Values[i] = ec._CommentAggregateResult_expected_attachmentsMin(ctx, field, obj)
+		case "expected_attachmentsMax":
+			out.Values[i] = ec._CommentAggregateResult_expected_attachmentsMax(ctx, field, obj)
+		case "expected_attachmentsSum":
+			out.Values[i] = ec._CommentAggregateResult_expected_attachmentsSum(ctx, field, obj)
+		case "expected_attachmentsAvg":
+			out.Values[i] = ec._CommentAggregateResult_expected_attachmentsAvg(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

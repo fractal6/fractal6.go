@@ -38,7 +38,8 @@ import (
 // TestGetLastCommentFiles_Integration guards the @cascade(Post.createdBy)
 // parameterization of getLastCommentFiles: a bare @cascade also requires
 // Comment.files, so a file-less newest comment would be skipped and an older
-// comment's files would leak into the notification email.
+// comment's files would leak into the notification email. Same guard for
+// getLastComment, whose n_files count feeds the notifier settle poll.
 func TestGetLastCommentFiles_Integration(t *testing.T) {
 	t.Parallel()
 	tid := getTensionUID(t)
@@ -99,6 +100,9 @@ func TestGetLastCommentFiles_Integration(t *testing.T) {
 	if len(files) != 0 {
 		t.Fatalf("files = %+v, want none (older comment's files leaked)", files)
 	}
+	if got := lastCommentFileCount(t, tid); got != 0 {
+		t.Fatalf("getLastComment n_files = %d, want 0", got)
+	}
 
 	// Attach a file to the newest comment: expect exactly that file.
 	qm2 := QueryMut{
@@ -123,6 +127,25 @@ func TestGetLastCommentFiles_Integration(t *testing.T) {
 	if len(files) != 1 || files[0].Filename != "new.png" {
 		t.Fatalf("files = %+v, want exactly new.png", files)
 	}
+	if got := lastCommentFileCount(t, tid); got != 1 {
+		t.Fatalf("getLastComment n_files = %d, want 1", got)
+	}
+}
+
+// lastCommentFileCount reads the n_files count getLastComment projects for the
+// newest comment of testutil.TestUser2 — zero must mean "no files", never
+// "comment dropped by @cascade".
+func lastCommentFileCount(t *testing.T, tid string) int {
+	t.Helper()
+	m, err := GetDB().Meta("getLastComment", map[string]string{"tid": tid, "username": testutil.TestUser2})
+	if err != nil {
+		t.Fatalf("Meta(getLastComment): %v", err)
+	}
+	if len(m) == 0 || m[0]["message"] == nil {
+		t.Fatalf("getLastComment returned no comment: %+v", m)
+	}
+	n, _ := m[0]["n_files"].(float64)
+	return int(n)
 }
 
 // TestGetTensionFileFingerprints_Integration covers the inbound-email dedup

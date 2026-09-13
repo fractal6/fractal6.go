@@ -404,6 +404,9 @@ type Comment implements Post @auth(
   # which re-checks the parent comment's tension visibility.
   # Uploads/deletes go through REST /file (POST/DELETE) too — never via GraphQL.
   files: [File!] @hasInverse(field: comment) @x_ro
+  # Number of files expected to be uploads by the frontend, at creation only (update mutation does not notify).
+  # Used by the notifier to poll-wait for uploads to complete.
+  expected_attachments: Int @x_add
 }
 
 # File metadata for assets stored in S3-compatible storage (Garage/MinIO).

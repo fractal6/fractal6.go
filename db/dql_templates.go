@@ -386,6 +386,10 @@ var dqlQueries map[string]string = map[string]string{
             {{.user_payload}}
         }
     }`,
+	// The notifier settle poll reads message/expected_attachments/n_files from
+	// here, so it needs a single query per attempt. @cascade is parameterized on
+	// the two required fields: a bare @cascade would also require
+	// Comment.expected_attachments, skipping the comments that declared none.
 	"getLastComment": `{
         all(func: uid({{.tid}})) @normalize {
             title: Tension.title
@@ -393,9 +397,11 @@ var dqlQueries map[string]string = map[string]string{
                 rootnameid: Node.rootnameid
                 receiverid: Node.nameid
             }
-            Tension.comments(first:1, orderdesc: Post.createdAt) @cascade {
+            Tension.comments(first:1, orderdesc: Post.createdAt) @cascade(Post.message, Post.createdBy) {
                 id: uid
                 message: Post.message
+                expected_attachments: Comment.expected_attachments
+                n_files: count(Comment.files)
                 Post.createdBy @filter(eq(User.username, "{{.username}}"))
             }
         }

@@ -60,7 +60,8 @@ JWT keys.
 - `web/handlers/` — end-to-end through a real chi router with JWT middleware. Shared
   helpers (`doRequest`, `loginAs`, …) live in `integration_test.go`; auth, org, import
   and `/file/*` suites sit alongside. `integration_mailer_test.go` exercises signed
-  `/mailing` requests, inline attachment persistence, and rejected-creation rollback.
+  `/mailing` requests, inline attachment persistence, rejected-creation rollback and
+the notifier settle poll (declared attachment count vs. anchored files).
 
 Email is mocked with a local `httptest.Server` (`email.SetTestConfig`); Redis and S3
 are the real Docker containers.

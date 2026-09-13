@@ -31,6 +31,32 @@ func eventNotif(n int) model.EventNotif {
 	return notif
 }
 
+// The settle predicate gates every notification email: too lax drops
+// attachments, too strict delays the mail until the poll budget expires.
+func TestAttachmentsSettled(t *testing.T) {
+	cases := []struct {
+		name     string
+		msg      string
+		expected int
+		nfiles   int
+		want     bool
+	}{
+		{"nothing declared, nothing pending", "hello", 0, 0, true},
+		{"declared upload landed", "see ![](/file/0x1)", 1, 1, true},
+		{"declared upload missing", "hello", 2, 1, false},
+		{"more files than declared", "hello", 1, 3, true},
+		{"count reached but token not rewritten", "![](paste.png)", 1, 1, false},
+		{"token pending with nothing declared", "![](paste.png)", 0, 0, false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := attachmentsSettled(c.msg, c.expected, c.nfiles); got != c.want {
+				t.Errorf("attachmentsSettled(%q, %d, %d) = %v, want %v", c.msg, c.expected, c.nfiles, got, c.want)
+			}
+		})
+	}
+}
+
 // PushHistory zips the returned ids back onto the events, but @auth rules can
 // filter created events out of the mutation payload: a partial list must error
 // instead of assigning the id of event k to event i.

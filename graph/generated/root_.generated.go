@@ -394,27 +394,32 @@ type ComplexityRoot struct {
 	}
 
 	Comment struct {
-		CreatedAt          func(childComplexity int) int
-		CreatedBy          func(childComplexity int, filter *model.UserFilter) int
-		Files              func(childComplexity int, filter *model.FileFilter, order *model.FileOrder, first *int, offset *int) int
-		FilesAggregate     func(childComplexity int, filter *model.FileFilter) int
-		ID                 func(childComplexity int) int
-		Message            func(childComplexity int) int
-		Reactions          func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
-		ReactionsAggregate func(childComplexity int, filter *model.ReactionFilter) int
-		Tensions           func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
-		TensionsAggregate  func(childComplexity int, filter *model.TensionFilter) int
-		UpdatedAt          func(childComplexity int) int
+		CreatedAt           func(childComplexity int) int
+		CreatedBy           func(childComplexity int, filter *model.UserFilter) int
+		ExpectedAttachments func(childComplexity int) int
+		Files               func(childComplexity int, filter *model.FileFilter, order *model.FileOrder, first *int, offset *int) int
+		FilesAggregate      func(childComplexity int, filter *model.FileFilter) int
+		ID                  func(childComplexity int) int
+		Message             func(childComplexity int) int
+		Reactions           func(childComplexity int, filter *model.ReactionFilter, order *model.ReactionOrder, first *int, offset *int) int
+		ReactionsAggregate  func(childComplexity int, filter *model.ReactionFilter) int
+		Tensions            func(childComplexity int, filter *model.TensionFilter, order *model.TensionOrder, first *int, offset *int) int
+		TensionsAggregate   func(childComplexity int, filter *model.TensionFilter) int
+		UpdatedAt           func(childComplexity int) int
 	}
 
 	CommentAggregateResult struct {
-		Count        func(childComplexity int) int
-		CreatedAtMax func(childComplexity int) int
-		CreatedAtMin func(childComplexity int) int
-		MessageMax   func(childComplexity int) int
-		MessageMin   func(childComplexity int) int
-		UpdatedAtMax func(childComplexity int) int
-		UpdatedAtMin func(childComplexity int) int
+		Count                  func(childComplexity int) int
+		CreatedAtMax           func(childComplexity int) int
+		CreatedAtMin           func(childComplexity int) int
+		ExpectedAttachmentsAvg func(childComplexity int) int
+		ExpectedAttachmentsMax func(childComplexity int) int
+		ExpectedAttachmentsMin func(childComplexity int) int
+		ExpectedAttachmentsSum func(childComplexity int) int
+		MessageMax             func(childComplexity int) int
+		MessageMin             func(childComplexity int) int
+		UpdatedAtMax           func(childComplexity int) int
+		UpdatedAtMin           func(childComplexity int) int
 	}
 
 	Contract struct {
@@ -2641,6 +2646,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.CreatedBy(childComplexity, args["filter"].(*model.UserFilter)), true
 
+	case "Comment.expected_attachments":
+		if e.complexity.Comment.ExpectedAttachments == nil {
+			break
+		}
+
+		return e.complexity.Comment.ExpectedAttachments(childComplexity), true
+
 	case "Comment.files":
 		if e.complexity.Comment.Files == nil {
 			break
@@ -2754,6 +2766,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CommentAggregateResult.CreatedAtMin(childComplexity), true
+
+	case "CommentAggregateResult.expected_attachmentsAvg":
+		if e.complexity.CommentAggregateResult.ExpectedAttachmentsAvg == nil {
+			break
+		}
+
+		return e.complexity.CommentAggregateResult.ExpectedAttachmentsAvg(childComplexity), true
+
+	case "CommentAggregateResult.expected_attachmentsMax":
+		if e.complexity.CommentAggregateResult.ExpectedAttachmentsMax == nil {
+			break
+		}
+
+		return e.complexity.CommentAggregateResult.ExpectedAttachmentsMax(childComplexity), true
+
+	case "CommentAggregateResult.expected_attachmentsMin":
+		if e.complexity.CommentAggregateResult.ExpectedAttachmentsMin == nil {
+			break
+		}
+
+		return e.complexity.CommentAggregateResult.ExpectedAttachmentsMin(childComplexity), true
+
+	case "CommentAggregateResult.expected_attachmentsSum":
+		if e.complexity.CommentAggregateResult.ExpectedAttachmentsSum == nil {
+			break
+		}
+
+		return e.complexity.CommentAggregateResult.ExpectedAttachmentsSum(childComplexity), true
 
 	case "CommentAggregateResult.messageMax":
 		if e.complexity.CommentAggregateResult.MessageMax == nil {
@@ -12211,6 +12251,7 @@ type Comment {
   tensions(filter: TensionFilter, order: TensionOrder, first: Int, offset: Int): [Tension!]
   reactions(filter: ReactionFilter, order: ReactionOrder, first: Int, offset: Int): [Reaction!]
   files(filter: FileFilter, order: FileOrder, first: Int, offset: Int): [File!]
+  expected_attachments: Int
   id: ID!
   createdBy(filter: UserFilter): User!
   createdAt: DateTime!
@@ -12540,35 +12581,35 @@ enum Lang {
 
 # Dgraph.Authorization {"Header":"X-Frac6-Auth","Namespace":"https://fractale.co/jwt/claims","Algo":"RS256","VerificationKey":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqfBbJAanlwf2mYlBszBA\nxgHw3hTu6gZ9nmej+5fCCdyA85IXhw14+F14o+vLogPe/giFuPMpG9eCOPWKvL/T\nGyahW5Lm8TRB4Pf54fZq5+VKdf5/i9u2e8CelpFvT+zLRdBmNVy9H9MitOF9mSGK\nHviPH1nHzU6TGvuVf44s60LAKliiwagALF+T/3ReDFhoqdLb1J3w4JkxFO6Guw5p\n3aDT+RMjjz9W8XpT3+k8IHocWxcEsuWMKdhuNwOHX2l7yU+/yLOrK1nuAMH7KewC\nCT4gJOan1qFO8NKe37jeQgsuRbhtF5C+L6CKs3n+B2A3ZOYB4gzdJfMLXxW/wwr1\nRQIDAQAB\n-----END PUBLIC KEY-----"}
 
-directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
-
-directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
-
-directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
-
-directive @cascade(fields: [String]) on FIELD
-
-directive @cacheControl(maxAge: Int!) on QUERY
-
-directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
-
-directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
 
 directive @auth(password: AuthRule, query: AuthRule, add: AuthRule, update: AuthRule, delete: AuthRule) on OBJECT|INTERFACE
 
-directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
-
-directive @lambda on FIELD_DEFINITION
-
-directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
-
-directive @id on FIELD_DEFINITION
-
-directive @withSubscription on OBJECT|INTERFACE|FIELD_DEFINITION
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
 
 directive @remoteResponse(name: String) on FIELD_DEFINITION
 
+directive @cascade(fields: [String]) on FIELD
+
+directive @lambda on FIELD_DEFINITION
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+
+directive @dgraph(type: String, pred: String) on OBJECT|INTERFACE|FIELD_DEFINITION
+
+directive @id on FIELD_DEFINITION
+
+directive @remote on OBJECT|INTERFACE|UNION|INPUT_OBJECT|ENUM
+
 directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT|INTERFACE
+
+directive @cacheControl(maxAge: Int!) on QUERY
+
+directive @secret(field: String!, pred: String) on OBJECT|INTERFACE
+
+directive @generate(query: GenerateQueryParams, mutation: GenerateMutationParams, subscription: Boolean) on OBJECT|INTERFACE
 
 type ActivityAggregateResult {
   count: Int
@@ -12673,6 +12714,7 @@ input AddCommentInput {
   message: String
   reactions: [ReactionRef!]
   files: [FileRef!]
+  expected_attachments: Int
 }
 
 type AddCommentPayload {
@@ -13284,6 +13326,10 @@ type CommentAggregateResult {
   updatedAtMax: DateTime
   messageMin: String
   messageMax: String
+  expected_attachmentsMin: Int
+  expected_attachmentsMax: Int
+  expected_attachmentsSum: Int
+  expected_attachmentsAvg: Float
 }
 
 input CommentFilter {
@@ -13304,6 +13350,7 @@ enum CommentHasFilter {
   tensions
   reactions
   files
+  expected_attachments
 }
 
 input CommentOrder {
@@ -13316,6 +13363,7 @@ enum CommentOrderable {
   createdAt
   updatedAt
   message
+  expected_attachments
 }
 
 input CommentPatch {
@@ -13325,6 +13373,7 @@ input CommentPatch {
   message: String
   reactions: [ReactionRef!] @x_patch_ro
   files: [FileRef!] @x_ro
+  expected_attachments: Int @x_patch_ro
 }
 
 input CommentRef {
@@ -13335,6 +13384,7 @@ input CommentRef {
   message: String
   reactions: [ReactionRef!]
   files: [FileRef!] @x_ro
+  expected_attachments: Int @x_add
 }
 
 input ContainsFilter {

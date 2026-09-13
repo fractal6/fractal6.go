@@ -634,6 +634,7 @@ type Comment implements Post @auth(update:{ or:[{ rule:"{ $USERTYPE: {eq: \"Root
   tensions: [Tension!] @dgraph(pred:"~Tension.comments")
   reactions: [Reaction!] @hasInverse(field: comment)
   files: [File!] @hasInverse(field: comment)
+  expected_attachments: Int
 }
 
 type File @auth(add:{ rule:"{ $USERTYPE: {eq: \"Root\"} }"

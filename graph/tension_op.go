@@ -227,10 +227,11 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 // `attach` if given, then search index + notification.
 //
 // Attachments differ by path. The GraphQL API carries no bytes: the client
-// uploads through POST /file/upload afterwards and the notifier settle-polls,
-// so it passes nil. The mailer has the bytes in the webhook and persists them
-// here: after auth (no S3 writes for a tension about to be rolled back) and
-// before notify (AttachmentsReady skips the notifier's settle poll).
+// uploads through POST /file/upload afterwards and the notifier settle-polls
+// on the comment's expected_attachments, so it passes nil. The mailer has the
+// bytes in the webhook and persists them here: after auth (no S3 writes for a
+// tension about to be rolled back) and before notify — it declares nothing, so
+// the notifier settles on its first read.
 func CreateTensionHook(uctx *model.UserCtx, tid string, history []*model.EventRef, attach func()) error {
 	ok, _, err := TensionEventHook(uctx, tid, history, nil)
 	if !ok || err != nil {
@@ -248,7 +249,7 @@ func CreateTensionHook(uctx *model.UserCtx, tid string, history []*model.EventRe
 		attach()
 	}
 	GoSyncSearchMessage(tid)
-	PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history, AttachmentsReady: attach != nil})
+	PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history})
 	return nil
 }
 

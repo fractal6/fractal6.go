@@ -43,28 +43,36 @@ import (
 
 var ctx context.Context = context.Background()
 
-// getLastCommentSettled fetches the author's most recent comment on the
-// tension, re-fetching until no bare inline-paste tokens (`![](paste.png)`)
-// remain in the message — i.e. until in-flight /file/upload calls have
-// rewritten them to /file/<id> — or the attempt budget runs out. The message
-// itself is the ground truth, so no cross-process coordination is needed.
-// One baseline sleep precedes the first fetch so plain (non-inline)
-// attachments, which leave no token, also get a chance to land.
+// attachmentsSettled reports whether a comment is ready to be emailed: as many
+// File rows as its author declared, and no bare inline-paste token
+// (`![](paste.png)`) left in the message. Both are needed — the count proves
+// the File rows exist, the token that the upload rewrite landed.
+func attachmentsSettled(msg string, expected, nfiles int) bool {
+	return nfiles >= expected && CountInlineImageCandidates(msg) == 0
+}
+
+// getLastCommentSettled fetches the author's most recent comment, re-fetching
+// until it settles or the attempt budget runs out (a failed or abandoned
+// upload). Declaring no attachment settles on the first fetch.
 func getLastCommentSettled(tid, username string) ([]map[string]any, error) {
-	interval := time.Duration(ViperPositiveInt("notify.upload_poll_interval_sec", 5)) * time.Second
-	attempts := ViperPositiveInt("notify.upload_poll_attempts", 10)
+	interval := time.Duration(ViperPositiveInt("notify.upload_poll_interval_ms", 1500)) * time.Millisecond
+	attempts := ViperPositiveInt("notify.upload_poll_attempts", 30)
+	// A lying client can only delay its own email, up to the budget.
+	maxExpected := ViperPositiveInt("notify.inbound_attachment_max_count", 20)
 	args := map[string]string{"tid": tid, "username": username}
-	time.Sleep(interval)
 	for i := 0; ; i++ {
 		m, err := db.GetDB().Meta("getLastComment", args)
 		if err != nil {
 			return nil, err
 		}
 		var msg string
+		var expected, nfiles float64
 		if len(m) > 0 {
 			msg, _ = m[0]["message"].(string)
+			expected, _ = m[0]["expected_attachments"].(float64)
+			nfiles, _ = m[0]["n_files"].(float64)
 		}
-		if i >= attempts || CountInlineImageCandidates(msg) == 0 {
+		if attachmentsSettled(msg, min(int(expected), maxExpected), int(nfiles)) || i >= attempts {
 			return m, nil
 		}
 		time.Sleep(interval)
@@ -205,9 +213,9 @@ func PushEventNotifications(notif model.EventNotif) error {
 			return err
 		}
 	}
-	// Add mentions and set tension data; settle browser uploads, not completed inbound processing.
+	// Add mentions and set tension data; settle in-flight uploads first.
 	var m []map[string]any
-	if !notif.AttachmentsReady && (notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated)) {
+	if notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated) {
 		m, err = getLastCommentSettled(notif.Tid, notif.Uctx.Username)
 	} else {
 		m, err = db.GetDB().Meta("getLastComment", map[string]string{"tid": notif.Tid, "username": notif.Uctx.Username})

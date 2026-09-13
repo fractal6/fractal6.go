@@ -99,11 +99,9 @@ func FindUsernames(msg string) []string {
 	return match
 }
 
-// InlineImageRe matches a markdown image token `![alt](url)` and captures
-// the URL portion. This is THE inline-paste matcher for the whole codebase:
-// the upload gate's Register count (here) and embedIfReferenced's rewrite +
-// Signal (web/handlers/files.go) both go through it, so the counts can never
-// diverge.
+// InlineImageRe matches a markdown image token `![alt](url)` and captures the URL
+// portion. THE inline-paste matcher: the settle poll's count (here) and
+// rewriteMessageForFile (web/handlers/files.go) both use it, so they cannot diverge.
 var InlineImageRe = re.MustCompile(`!\[[^\]]*\]\(([^)\s]+)\)`)
 
 // CountInlineImageCandidates returns the number of `![alt](url)` references
@@ -111,10 +109,9 @@ var InlineImageRe = re.MustCompile(`!\[[^\]]*\]\(([^)\s]+)\)`)
 // path separator, and not data:/cid:. Code regions are masked via
 // MaskCodeRegions so filenames mentioned in fenced/inline code do not count.
 //
-// Used by the tension resolver hooks (graph/tension_resolver.go) to
-// pre-Register the per-tension upload gate BEFORE PublishTensionEvent fires,
-// so the notifier daemon can wait for the matching /file/upload calls to
-// arrive before reading Comment.files.
+// Used by the notifier settle poll (graph/notifications.go): a pending paste still
+// carries its bare filename, a landed one has been rewritten to /file/<id>.
+// Plain (non-inline) attachments leave no token and are invisible here.
 func CountInlineImageCandidates(msg string) int {
 	if msg == "" {
 		return 0

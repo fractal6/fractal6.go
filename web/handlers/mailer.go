@@ -184,7 +184,9 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 		}
 		rootnameid, _ := codec.Nid2rootid(rid.(string))
 		processInboundAttachments(r.Context(), uctx, tid, cid, rootnameid, msg, form.Attachments)
-		graph.PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history, AttachmentsReady: true})
+		// Files are written above and the comment declares none: the notifier
+		// settles on its first read.
+		graph.PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history})
 	case contractid != "": // contract reply
 		contract, err := db.GetDB().GetContractHook(contractid)
 		if err != nil {

@@ -216,7 +216,7 @@ API server  ──PublishTensionEvent──▶  Redis pub/sub  ──▶  notifi
 
 Event categories: `EventNotif` (tension events), `ContractNotif` (contract voting), `NotifNotif` (generic). Subscribers are resolved from: tension subscribers, assignees, receiver coordinators, emitter coordinators (created tensions only), contract candidates.
 
-Browser uploads can still be in flight when a notification fires, so the notifier re-polls the comment (`getLastCommentSettled`). Inbound tension replies (`POST /notifications`) and creation (`POST /mailing`) finish attachment processing before publishing with `EventNotif.AttachmentsReady=true`, bypassing both the baseline delay and polling. Contract notifications already read without settling. See [file storage](file-storage.md) for attachment handling and caps.
+Browser uploads can still be in flight when a notification fires, so the notifier re-polls the comment (`getLastCommentSettled`) until its declared `expected_attachments` are anchored on it and no bare `![](paste.png)` token remains, or the poll budget expires. Declaring nothing sends on the first read — inbound email paths persist their files before publishing, so they never wait. See [file storage](file-storage.md) for attachment handling and caps.
 
 ## Configuration
 

@@ -97,12 +97,18 @@ traffic doesn't scale with recipient count.
 
 ### Upload settle poll
 
-The notifier daemon can fire while browser uploads are still in flight. The message
-is the ground truth — a successful inline upload rewrites the bare token — so
-`getLastCommentSettled` (`graph/notifications.go`) re-polls the comment until no bare
-`![](paste.png)` tokens remain, or the attempt budget runs out. A baseline delay
-(default five seconds) also gives non-inline attachments time to land. Past the
-budget, the email degrades exactly like a slow upload with no poll at all.
+The notifier daemon can fire while browser uploads are still in flight. The author
+declares how many attachments are coming in `Comment.expected_attachments` (never
+which — an integer carries no authority; capped by
+`notify.inbound_attachment_max_count`). Uploads still go through `POST /file/upload`
+after the comment exists.
+
+`getLastCommentSettled` (`graph/notifications.go`) fetches first: settled when that
+many `File` rows are anchored on the comment and no bare `![](paste.png)` token
+remains (the count proves the rows exist, the token that the rewrite landed).
+Declaring nothing settles on the first read, no delay. Otherwise it re-polls every
+`notify.upload_poll_interval_ms` up to `notify.upload_poll_attempts` times (1.5s × 30
+≈ 45s); past the budget the email degrades as with no poll at all.
 
 ### Inbound email replies
 
@@ -133,9 +139,9 @@ dropped too.
 dropped; unmatched attachments are persisted as plain paperclips. All decisions roll
 up into a single `EmbedCommentMessage` upsert.
 
-Sequential inbound processing finishes before publication. Tension notifications
-set `AttachmentsReady=true` after this step and skip the notifier's delay and polling;
-contract notifications already fetch immediately. The flag means processing is done,
+Sequential inbound processing finishes before publication. Inbound comments declare no
+`expected_attachments`, so the notifier settles on its first read and skips polling;
+contract notifications already fetch immediately. Settling means processing is done,
 not that every attachment succeeded. Every attachment failure is logged and skipped
 — the comment itself always commits. Authorship trusts `From:`,
 gated by Postal's webhook signature. `POST /file/upload` still anchors on tension

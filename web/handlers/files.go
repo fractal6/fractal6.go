@@ -415,9 +415,10 @@ func writeCommentAttachment(
 // (they're independent), and the UI is lenient about embedded=true files
 // whose URL is no longer in the message (renders them as plain attachments).
 //
-// The rewrite is also what the notifier's settle poll waits on: the emailed
-// message is read only once no bare `![](filename)` tokens remain. See
-// getLastCommentSettled in graph/notifications.go.
+// The rewrite is one half of what the notifier's settle poll waits on (the
+// other is the comment's declared attachment count): the message is emailed
+// only once no bare `![](filename)` token remains. See getLastCommentSettled
+// in graph/notifications.go.
 func embedIfReferenced(cid, fid, filename, message string) bool {
 	newMsg, matched := rewriteMessageForFile(message, filename, fid)
 	if !matched {

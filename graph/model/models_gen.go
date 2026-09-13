@@ -107,12 +107,13 @@ type AddBuildInfoPayload struct {
 }
 
 type AddCommentInput struct {
-	CreatedBy *UserRef       `json:"createdBy"`
-	CreatedAt string         `json:"createdAt"`
-	UpdatedAt *string        `json:"updatedAt,omitempty"`
-	Message   *string        `json:"message,omitempty"`
-	Reactions []*ReactionRef `json:"reactions,omitempty"`
-	Files     []*FileRef     `json:"files,omitempty"`
+	CreatedBy           *UserRef       `json:"createdBy"`
+	CreatedAt           string         `json:"createdAt"`
+	UpdatedAt           *string        `json:"updatedAt,omitempty"`
+	Message             *string        `json:"message,omitempty"`
+	Reactions           []*ReactionRef `json:"reactions,omitempty"`
+	Files               []*FileRef     `json:"files,omitempty"`
+	ExpectedAttachments *int           `json:"expected_attachments,omitempty"`
 }
 
 type AddCommentPayload struct {
@@ -701,27 +702,32 @@ type CardKindRef struct {
 }
 
 type Comment struct {
-	Message            string                   `json:"message"`
-	Tensions           []*Tension               `json:"tensions,omitempty"`
-	Reactions          []*Reaction              `json:"reactions,omitempty"`
-	Files              []*File                  `json:"files,omitempty"`
-	ID                 string                   `json:"id"`
-	CreatedBy          *User                    `json:"createdBy"`
-	CreatedAt          string                   `json:"createdAt"`
-	UpdatedAt          *string                  `json:"updatedAt,omitempty"`
-	TensionsAggregate  *TensionAggregateResult  `json:"tensionsAggregate,omitempty"`
-	ReactionsAggregate *ReactionAggregateResult `json:"reactionsAggregate,omitempty"`
-	FilesAggregate     *FileAggregateResult     `json:"filesAggregate,omitempty"`
+	Message             string                   `json:"message"`
+	Tensions            []*Tension               `json:"tensions,omitempty"`
+	Reactions           []*Reaction              `json:"reactions,omitempty"`
+	Files               []*File                  `json:"files,omitempty"`
+	ExpectedAttachments *int                     `json:"expected_attachments,omitempty"`
+	ID                  string                   `json:"id"`
+	CreatedBy           *User                    `json:"createdBy"`
+	CreatedAt           string                   `json:"createdAt"`
+	UpdatedAt           *string                  `json:"updatedAt,omitempty"`
+	TensionsAggregate   *TensionAggregateResult  `json:"tensionsAggregate,omitempty"`
+	ReactionsAggregate  *ReactionAggregateResult `json:"reactionsAggregate,omitempty"`
+	FilesAggregate      *FileAggregateResult     `json:"filesAggregate,omitempty"`
 }
 
 type CommentAggregateResult struct {
-	Count        *int    `json:"count,omitempty"`
-	CreatedAtMin *string `json:"createdAtMin,omitempty"`
-	CreatedAtMax *string `json:"createdAtMax,omitempty"`
-	UpdatedAtMin *string `json:"updatedAtMin,omitempty"`
-	UpdatedAtMax *string `json:"updatedAtMax,omitempty"`
-	MessageMin   *string `json:"messageMin,omitempty"`
-	MessageMax   *string `json:"messageMax,omitempty"`
+	Count                  *int     `json:"count,omitempty"`
+	CreatedAtMin           *string  `json:"createdAtMin,omitempty"`
+	CreatedAtMax           *string  `json:"createdAtMax,omitempty"`
+	UpdatedAtMin           *string  `json:"updatedAtMin,omitempty"`
+	UpdatedAtMax           *string  `json:"updatedAtMax,omitempty"`
+	MessageMin             *string  `json:"messageMin,omitempty"`
+	MessageMax             *string  `json:"messageMax,omitempty"`
+	ExpectedAttachmentsMin *int     `json:"expected_attachmentsMin,omitempty"`
+	ExpectedAttachmentsMax *int     `json:"expected_attachmentsMax,omitempty"`
+	ExpectedAttachmentsSum *int     `json:"expected_attachmentsSum,omitempty"`
+	ExpectedAttachmentsAvg *float64 `json:"expected_attachmentsAvg,omitempty"`
 }
 
 type CommentFilter struct {
@@ -741,22 +747,24 @@ type CommentOrder struct {
 }
 
 type CommentPatch struct {
-	CreatedBy *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt *string        `json:"createdAt,omitempty"`
-	UpdatedAt *string        `json:"updatedAt,omitempty"`
-	Message   *string        `json:"message,omitempty"`
-	Reactions []*ReactionRef `json:"reactions,omitempty"`
-	Files     []*FileRef     `json:"files,omitempty"`
+	CreatedBy           *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt           *string        `json:"createdAt,omitempty"`
+	UpdatedAt           *string        `json:"updatedAt,omitempty"`
+	Message             *string        `json:"message,omitempty"`
+	Reactions           []*ReactionRef `json:"reactions,omitempty"`
+	Files               []*FileRef     `json:"files,omitempty"`
+	ExpectedAttachments *int           `json:"expected_attachments,omitempty"`
 }
 
 type CommentRef struct {
-	ID        *string        `json:"id,omitempty"`
-	CreatedBy *UserRef       `json:"createdBy,omitempty"`
-	CreatedAt *string        `json:"createdAt,omitempty"`
-	UpdatedAt *string        `json:"updatedAt,omitempty"`
-	Message   *string        `json:"message,omitempty"`
-	Reactions []*ReactionRef `json:"reactions,omitempty"`
-	Files     []*FileRef     `json:"files,omitempty"`
+	ID                  *string        `json:"id,omitempty"`
+	CreatedBy           *UserRef       `json:"createdBy,omitempty"`
+	CreatedAt           *string        `json:"createdAt,omitempty"`
+	UpdatedAt           *string        `json:"updatedAt,omitempty"`
+	Message             *string        `json:"message,omitempty"`
+	Reactions           []*ReactionRef `json:"reactions,omitempty"`
+	Files               []*FileRef     `json:"files,omitempty"`
+	ExpectedAttachments *int           `json:"expected_attachments,omitempty"`
 }
 
 type ContainsFilter struct {
@@ -3784,13 +3792,14 @@ func (e CardKindType) MarshalGQL(w io.Writer) {
 type CommentHasFilter string
 
 const (
-	CommentHasFilterCreatedBy CommentHasFilter = "createdBy"
-	CommentHasFilterCreatedAt CommentHasFilter = "createdAt"
-	CommentHasFilterUpdatedAt CommentHasFilter = "updatedAt"
-	CommentHasFilterMessage   CommentHasFilter = "message"
-	CommentHasFilterTensions  CommentHasFilter = "tensions"
-	CommentHasFilterReactions CommentHasFilter = "reactions"
-	CommentHasFilterFiles     CommentHasFilter = "files"
+	CommentHasFilterCreatedBy           CommentHasFilter = "createdBy"
+	CommentHasFilterCreatedAt           CommentHasFilter = "createdAt"
+	CommentHasFilterUpdatedAt           CommentHasFilter = "updatedAt"
+	CommentHasFilterMessage             CommentHasFilter = "message"
+	CommentHasFilterTensions            CommentHasFilter = "tensions"
+	CommentHasFilterReactions           CommentHasFilter = "reactions"
+	CommentHasFilterFiles               CommentHasFilter = "files"
+	CommentHasFilterExpectedAttachments CommentHasFilter = "expected_attachments"
 )
 
 var AllCommentHasFilter = []CommentHasFilter{
@@ -3801,11 +3810,12 @@ var AllCommentHasFilter = []CommentHasFilter{
 	CommentHasFilterTensions,
 	CommentHasFilterReactions,
 	CommentHasFilterFiles,
+	CommentHasFilterExpectedAttachments,
 }
 
 func (e CommentHasFilter) IsValid() bool {
 	switch e {
-	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterTensions, CommentHasFilterReactions, CommentHasFilterFiles:
+	case CommentHasFilterCreatedBy, CommentHasFilterCreatedAt, CommentHasFilterUpdatedAt, CommentHasFilterMessage, CommentHasFilterTensions, CommentHasFilterReactions, CommentHasFilterFiles, CommentHasFilterExpectedAttachments:
 		return true
 	}
 	return false
@@ -3835,20 +3845,22 @@ func (e CommentHasFilter) MarshalGQL(w io.Writer) {
 type CommentOrderable string
 
 const (
-	CommentOrderableCreatedAt CommentOrderable = "createdAt"
-	CommentOrderableUpdatedAt CommentOrderable = "updatedAt"
-	CommentOrderableMessage   CommentOrderable = "message"
+	CommentOrderableCreatedAt           CommentOrderable = "createdAt"
+	CommentOrderableUpdatedAt           CommentOrderable = "updatedAt"
+	CommentOrderableMessage             CommentOrderable = "message"
+	CommentOrderableExpectedAttachments CommentOrderable = "expected_attachments"
 )
 
 var AllCommentOrderable = []CommentOrderable{
 	CommentOrderableCreatedAt,
 	CommentOrderableUpdatedAt,
 	CommentOrderableMessage,
+	CommentOrderableExpectedAttachments,
 }
 
 func (e CommentOrderable) IsValid() bool {
 	switch e {
-	case CommentOrderableCreatedAt, CommentOrderableUpdatedAt, CommentOrderableMessage:
+	case CommentOrderableCreatedAt, CommentOrderableUpdatedAt, CommentOrderableMessage, CommentOrderableExpectedAttachments:
 		return true
 	}
 	return false
