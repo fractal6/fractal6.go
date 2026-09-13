@@ -168,6 +168,9 @@ func buildTestRouter() chi.Router {
 		})
 	})
 
+	// Signed inbound-email webhook.
+	r.Post("/mailing", Mailing)
+
 	// File attachments — same wiring as cmd/server.go.
 	r.Route("/file", func(r chi.Router) {
 		r.Post("/upload", FileUploadHandler(testStorageCli))

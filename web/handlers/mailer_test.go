@@ -7,6 +7,14 @@ package handlers
 
 import "testing"
 
+// SetTestPostalKey installs a webhook verification key for external-package integration tests.
+func SetTestPostalKey(t *testing.T, key string) {
+	t.Helper()
+	previous := postalWebhookPK
+	postalWebhookPK = key
+	t.Cleanup(func() { postalWebhookPK = previous })
+}
+
 // TestParseEmailReferences covers the inbound-reply routing header. The
 // References value is sender-controlled, so the parser must reject anything
 // that isn't a well-formed uid (it feeds DQL uid() roots downstream) and must

@@ -91,12 +91,15 @@ The `/q/*` REST routes and DQL bypass layer 1 entirely and re-implement visibili
 Tensions are the core communication primitive; every change creates an `Event`, forming an immutable history. Pipeline in `graph/tension_op.go`:
 
 ```
-updateTension                                  → TensionEventHook → ProcessEvent (per event)
-addTension / POST /mailing → CreateTensionHook → TensionEventHook      ├── EMAP[event].Check    (auth)
-                                                                        ├── EMAP[event].Action   (side effects)
-                                                                        ├── leaveTrace           (timestamps + activity)
-                                                                        └── PublishTensionEvent  (Redis pub/sub)
+updateTensionHook / CreateTensionHook
+├── TensionEventHook
+│   └── ProcessEvent (per event)
+│       ├── AuthorizeEvent (EMAP checks + contract decision)
+│       └── ApplyEvent (propagation, actions, trace + contract persistence)
+└── PublishTensionEvent (Redis pub/sub, after mutation and any inbound attachments)
 ```
+
+`ProcessEvent` composes `AuthorizeEvent` (EMAP check and in-memory contract decision) with `ApplyEvent` (propagation, actions, asynchronous trace and contract persistence). Read-only permission checks call `AuthorizeEvent`; callers already authorized upstream call `ApplyEvent`.
 
 `CreateTensionHook` is the post-insert half of tension creation — hook, rollback on refusal, optional attachment step, search index, notification — shared by the GraphQL mutation and the email-to-tension webhook so both leave the same trace.
 
@@ -202,7 +205,7 @@ The `/q/*` routes follow a two-phase shape: a cheap DQL call collects `{nameid �
 
 ```
 API server  ──PublishTensionEvent──▶  Redis pub/sub  ──▶  notifier daemon
-                                                            │ settle poll: re-fetch comment until
+                                                            │ browser uploads: re-fetch comment until
                                                             │ no bare ![](paste) tokens remain
                                                             ├── build subscriber list
                                                             ├── create UserEvent records
@@ -213,7 +216,7 @@ API server  ──PublishTensionEvent──▶  Redis pub/sub  ──▶  notifi
 
 Event categories: `EventNotif` (tension events), `ContractNotif` (contract voting), `NotifNotif` (generic). Subscribers are resolved from: tension subscribers, assignees, receiver coordinators, emitter coordinators (created tensions only), contract candidates.
 
-A notification can fire while inline-screenshot uploads are still in flight; the notifier alone handles it by re-polling the comment (`getLastCommentSettled`). The reverse direction — email replies carrying attachments — lands in `web/handlers/mailer.go::Notifications`. Both flows, and the attachment caps, are described in [file storage](file-storage.md).
+Browser uploads can still be in flight when a notification fires, so the notifier re-polls the comment (`getLastCommentSettled`). Inbound tension replies (`POST /notifications`) and creation (`POST /mailing`) finish attachment processing before publishing with `EventNotif.AttachmentsReady=true`, bypassing both the baseline delay and polling. Contract notifications already read without settling. See [file storage](file-storage.md) for attachment handling and caps.
 
 ## Configuration
 

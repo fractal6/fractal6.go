@@ -116,9 +116,10 @@ const (
 )
 
 type EventNotif struct {
-	Uctx    *UserCtx    `json:"uctx"`
-	Tid     string      `json:"tid"`
-	History []*EventRef `json:"history"`
+	Uctx             *UserCtx    `json:"uctx"`
+	Tid              string      `json:"tid"`
+	History          []*EventRef `json:"history"`
+	AttachmentsReady bool        `json:"attachments_ready"` // No attachment writes remain in flight.
 	// The following are get after the cache publication
 	// to keep the messaging system light and as fast as possible.
 	Rootnameid string `json:"rootnameid"`

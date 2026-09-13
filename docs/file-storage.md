@@ -97,26 +97,25 @@ traffic doesn't scale with recipient count.
 
 ### Upload settle poll
 
-The notifier daemon can fire while uploads are still in flight. The message is the
-ground truth — a successful inline upload rewrites the bare token — so
+The notifier daemon can fire while browser uploads are still in flight. The message
+is the ground truth — a successful inline upload rewrites the bare token — so
 `getLastCommentSettled` (`graph/notifications.go`) re-polls the comment until no bare
-`![](paste.png)` tokens remain, or the attempt budget runs out. No cross-process
-coordination; past the budget the email degrades exactly like a slow upload with no
-poll at all.
+`![](paste.png)` tokens remain, or the attempt budget runs out. A baseline delay
+(default five seconds) also gives non-inline attachments time to land. Past the
+budget, the email degrades exactly like a slow upload with no poll at all.
 
 ### Inbound email replies
 
 `POST /notifications` (`web/handlers/mailer.go`) turns an email reply into a tension
 or contract Comment, `POST /mailing` an email into a new Tension; all three then run
 `processInboundAttachments` on the comment they just wrote. That anchor is exact:
-`AddTensionComment` / `AddContractComment` return the new uid, never "newest comment
-of this author" — two replies within the same second share a second-precision
-`createdAt`. The tension body is the one exception: it is created inside
-`AddTensionInput`, and being the author's only comment on a brand-new tension,
-`getLastComment` resolves it unambiguously.
+`AddTensionComment` / `AddContractComment` return the new uid; `POST /mailing` uses
+`AddGraph` to return both the tension and its inline body comment IDs from the insert.
+Attachment handling uses these IDs directly, without selecting a comment by timestamp.
 
-The tension path is the app's: `POST /mailing` inserts, then runs
-`graph.CreateTensionHook` exactly like `addTensionHook`, passing the attachment step
+The tension path is the app's: `POST /mailing` builds an `AddTensionInput` with
+user/node references, inserts, then runs `graph.CreateTensionHook` exactly like
+`addTensionHook`, passing the attachment step
 as the hook's `attach` callback so it lands after auth and before the search index and
 notification. Contract replies are gated by `graph.CanCommentContract`, shared with
 `updateContractHook`.
@@ -134,8 +133,11 @@ dropped too.
 dropped; unmatched attachments are persisted as plain paperclips. All decisions roll
 up into a single `EmbedCommentMessage` upsert.
 
-Writes are sequential here, so no settle poll is needed. Every attachment failure is
-logged and skipped — the comment itself always commits. Authorship trusts `From:`,
+Sequential inbound processing finishes before publication. Tension notifications
+set `AttachmentsReady=true` after this step and skip the notifier's delay and polling;
+contract notifications already fetch immediately. The flag means processing is done,
+not that every attachment succeeded. Every attachment failure is logged and skipped
+— the comment itself always commits. Authorship trusts `From:`,
 gated by Postal's webhook signature. `POST /file/upload` still anchors on tension
 comments only; the app's contract comment editor has attachments disabled.
 

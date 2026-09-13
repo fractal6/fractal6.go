@@ -20,7 +20,7 @@ Writes go through the `upsertActivity` DQL mutation — a conditional upsert
 (increment, else create with `count=1`) in a single Dgraph transaction, so
 concurrent events cannot race.
 
-It hangs off the tension event pipeline: `ProcessEvent` fires `leaveTrace` as a
+It hangs off the tension event pipeline: `ApplyEvent` fires `leaveTrace` as a
 goroutine, which bumps node timestamps and calls `trackActivity`. The counter is only
 bumped for events in `graph/activity.go::trackedEvents` — the noise filter and single
 source of truth. Two upserts follow, one for the user and one for the org.

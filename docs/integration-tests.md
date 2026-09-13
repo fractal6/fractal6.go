@@ -54,9 +54,13 @@ JWT keys.
 
 - `db/` — DQL read tests (`integration_query_test.go`) and write tests
   (`integration_mutation_test.go`).
+- `graph/` — business hooks against Dgraph. `integration_contract_event_test.go`
+  covers authorization-only checks and pending/canceled/accepted invitation processing,
+  including membership changes and contract/vote deduplication-key cleanup.
 - `web/handlers/` — end-to-end through a real chi router with JWT middleware. Shared
   helpers (`doRequest`, `loginAs`, …) live in `integration_test.go`; auth, org, import
-  and `/file/*` suites sit alongside.
+  and `/file/*` suites sit alongside. `integration_mailer_test.go` exercises signed
+  `/mailing` requests, inline attachment persistence, and rejected-creation rollback.
 
 Email is mocked with a local `httptest.Server` (`email.SetTestConfig`); Redis and S3
 are the real Docker containers.

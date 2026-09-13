@@ -305,10 +305,7 @@ func FileUploadHandler(cli *storage.Client) http.HandlerFunc {
 // --- per-anchor upload paths ---
 
 func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Client, uctx *model.UserCtx, anchor uploadAnchor, file io.Reader, header *multipart.FileHeader, safeName, contentType string) {
-	// Auth: caller must be allowed to push CommentPushed on the tension. We
-	// reuse the EMAP entry so any future tightening (e.g. quota, throttle)
-	// applies uniformly. ProcessEvent with doProcess=false runs Check only —
-	// no side effects.
+	// AuthorizeEvent reuses EMAP's CommentPushed check without executing the event.
 	tension, err := db.GetDB().GetTensionHook(anchor.Tid, false, nil)
 	if err != nil || tension == nil {
 		http.Error(w, "tension not found", http.StatusNotFound)
@@ -316,7 +313,7 @@ func handleCommentUpload(w http.ResponseWriter, r *http.Request, cli *storage.Cl
 	}
 	e := model.TensionEventCommentPushed
 	event := &model.EventRef{EventType: &e}
-	ok, _, err := graph.ProcessEvent(uctx, tension, event, nil, true, false)
+	ok, _, err := graph.AuthorizeEvent(uctx, tension, event, nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return

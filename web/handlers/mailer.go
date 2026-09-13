@@ -184,7 +184,7 @@ func Notifications(w http.ResponseWriter, r *http.Request) {
 		}
 		rootnameid, _ := codec.Nid2rootid(rid.(string))
 		processInboundAttachments(r.Context(), uctx, tid, cid, rootnameid, msg, form.Attachments)
-		graph.PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history})
+		graph.PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history, AttachmentsReady: true})
 	case contractid != "": // contract reply
 		contract, err := db.GetDB().GetContractHook(contractid)
 		if err != nil {
@@ -226,7 +226,7 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	createdAt := Now()
-	createdBy := model.User{Username: uctx.Username}
+	createdBy := &model.UserRef{Username: &uctx.Username}
 
 	// Get the nameid of the targeted circle
 	toEmail, err := mail.ParseAddress(form.To)
@@ -247,39 +247,46 @@ func Mailing(w http.ResponseWriter, r *http.Request) {
 	emitterid := codec.MemberIdCodec(rootnameid, uctx.Username)
 	history := []*model.EventRef{{
 		CreatedAt: &createdAt,
-		CreatedBy: &model.UserRef{Username: &uctx.Username},
+		CreatedBy: createdBy,
 		EventType: &e,
 	}}
-	tension := model.Tension{
+	tension := model.AddTensionInput{
 		CreatedAt:  createdAt,
-		CreatedBy:  &createdBy,
+		CreatedBy:  createdBy,
 		Emitterid:  emitterid,
-		Emitter:    &model.Node{Nameid: emitterid},
+		Emitter:    &model.NodeRef{Nameid: &emitterid},
 		Receiverid: receiverid,
-		Receiver:   &model.Node{Nameid: receiverid},
+		Receiver:   &model.NodeRef{Nameid: &receiverid},
 		Type:       model.TensionTypeOperational,
 		Status:     model.TensionStatusOpen,
 		Title:      form.Title,
-		Comments: []*model.Comment{{
-			CreatedAt: createdAt,
-			CreatedBy: &createdBy,
-			Message:   msg,
+		Comments: []*model.CommentRef{{
+			CreatedAt: &createdAt,
+			CreatedBy: createdBy,
+			Message:   &msg,
 		}},
 	}
-	tid, err := db.GetDB().Add(*uctx, "tension", StructMap[model.AddTensionInput](tension))
+	var payload model.AddTensionPayload
+	err = db.GetDB().AddGraph(*uctx, "tension", tension, nil,
+		"tension { id comments { id } }", &payload)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-	// Attachments anchor on the body comment, created inside AddTensionInput (no
-	// uid of its own came back). It is the author's only comment at this point.
+	if len(payload.Tension) != 1 || payload.Tension[0] == nil || payload.Tension[0].ID == "" {
+		http.Error(w, "Unauthorized request. Possibly, name already exists.", 400)
+		return
+	}
+	tid := payload.Tension[0].ID
+	// Attachments anchor on the body comment returned by the insert.
 	attach := func() {
-		last, err := db.Meta[struct{ ID string }]("getLastComment", map[string]string{"tid": tid, "username": uctx.Username})
-		if err != nil || len(last) == 0 || last[0].ID == "" {
-			log.Printf("Warning: inbound attachments getLastComment: %v", err)
+		comments := payload.Tension[0].Comments
+		if len(comments) != 1 || comments[0] == nil || comments[0].ID == "" {
+			log.Print("Warning: inbound attachments: initial comment ID missing from tension payload")
 			return
 		}
-		processInboundAttachments(r.Context(), uctx, tid, last[0].ID, rootnameid, msg, form.Attachments)
+		cid := comments[0].ID
+		processInboundAttachments(r.Context(), uctx, tid, cid, rootnameid, msg, form.Attachments)
 	}
 	if err := graph.CreateTensionHook(uctx, tid, history, attach); err != nil {
 		http.Error(w, err.Error(), 400)

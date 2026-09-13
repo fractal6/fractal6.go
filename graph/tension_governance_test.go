@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -129,12 +130,69 @@ func TestGovernanceActionsRejectInvalidStateBeforePersistence(t *testing.T) {
 	}
 }
 
-// ProcessEvent must pass ok=true through when the check is skipped (auth decided upstream).
-func TestProcessEventSkippedCheckPassesOkThrough(t *testing.T) {
-	eventType := model.TensionEventCreated
-	tension := &model.Tension{ID: "0x1", Receiver: &model.Node{Nameid: "org"}}
-	ok, _, err := ProcessEvent(nil, tension, &model.EventRef{EventType: &eventType}, nil, false, false)
-	if err != nil || !ok {
-		t.Fatalf("ProcessEvent(doCheck=false, doProcess=false) = (%v, %v), want (true, nil)", ok, err)
+func TestEventMapGuards(t *testing.T) {
+	eventType := model.TensionEventTitleUpdated
+	unknown := model.TensionEvent("Nope")
+	tension := &model.Tension{ID: "0x1"}
+	tests := []struct {
+		name    string
+		tension *model.Tension
+		event   *model.EventRef
+		wantErr string
+	}{
+		{"nil tension", nil, &model.EventRef{EventType: &eventType}, "tension not found"},
+		{"nil event", tension, nil, "event type is required"},
+		{"nil event type", tension, &model.EventRef{}, "event type is required"},
+		{"unmapped event", tension, &model.EventRef{EventType: &unknown}, "Event not implemented"},
+		{"valid event", tension, &model.EventRef{EventType: &eventType}, ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			em, err := eventMap(tt.tension, tt.event)
+			if tt.wantErr != "" {
+				if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+					t.Fatalf("eventMap error = %v, want %q", err, tt.wantErr)
+				}
+				return
+			}
+			if err != nil || em.Propagate != "title" || em.Auth != SourceCoordoHook|TargetCoordoHook|AuthorHook|AssigneeHook {
+				t.Fatalf("eventMap = %+v, %v, want TitleUpdated entry", em, err)
+			}
+		})
+	}
+}
+
+func TestProcessEventDecisionAndExecution(t *testing.T) {
+	eventType := model.TensionEvent("test-decision-execution")
+	event := &model.EventRef{EventType: &eventType}
+	tension := &model.Tension{Emitter: &model.Node{}}
+	contract := &model.Contract{Status: model.ContractStatusClosed}
+	actionErr := errors.New("action failed")
+	calls := 0
+	em := EventMap{Auth: PassingHook, Action: func(*model.UserCtx, *model.Tension, *model.EventRef) error {
+		calls++
+		return actionErr
+	}}
+	EMAP[eventType] = em
+	t.Cleanup(func() { delete(EMAP, eventType) })
+
+	ok, got, err := AuthorizeEvent(nil, tension, event, contract)
+	if !ok || got != contract || err != nil || calls != 0 {
+		t.Fatalf("AuthorizeEvent = (%v, %v, %v), action calls = %d", ok, got, err, calls)
+	}
+	ok, got, err = ProcessEvent(nil, tension, event, contract)
+	if ok || got != contract || err != actionErr || calls != 1 {
+		t.Fatalf("ProcessEvent = (%v, %v, %v), action calls = %d", ok, got, err, calls)
+	}
+
+	em.Auth = 0
+	EMAP[eventType] = em
+	ok, _, err = ProcessEvent(nil, tension, event, nil)
+	if ok || err == nil || err == actionErr || calls != 1 {
+		t.Fatalf("denied ProcessEvent = (%v, %v), action calls = %d", ok, err, calls)
+	}
+	ok, got, err = ApplyEvent(nil, tension, event, contract)
+	if ok || got != contract || err != actionErr || calls != 2 {
+		t.Fatalf("ApplyEvent = (%v, %v, %v), action calls = %d", ok, got, err, calls)
 	}
 }

@@ -172,6 +172,24 @@ func TestAddGraph_SingleInputIsListed(t *testing.T) {
 		`{"input":[{"name":"l1","rootnameid":""}]}`)
 }
 
+func TestAddGraph_TensionCommentID(t *testing.T) {
+	dg, got := fakeDgraph(t, `{"data":{"addTension":{"tension":[{"id":"0x1","comments":[{"id":"0x2"}]}]}}}`)
+
+	message := "mail body"
+	input := model.AddTensionInput{Title: "mail", Comments: []*model.CommentRef{{Message: &message}}}
+	var payload model.AddTensionPayload
+	if err := dg.AddGraph(testUctx, "tension", input, nil, "tension { id comments { id } }", &payload); err != nil {
+		t.Fatalf("AddGraph returned error: %v", err)
+	}
+	if len(payload.Tension) != 1 || payload.Tension[0].ID != "0x1" ||
+		len(payload.Tension[0].Comments) != 1 || payload.Tension[0].Comments[0].ID != "0x2" {
+		t.Fatalf("payload = %+v, want tension 0x1 with comment 0x2", payload)
+	}
+	testutil.CheckRequest(t, got,
+		`mutation addTension($input:[AddTensionInput!]!) { addTension(input: $input) { tension { id comments { id } } } }`,
+		`{"input":[{"comments":[{"message":"mail body"}],"createdAt":"","emitterid":"","receiverid":"","status":"","title":"mail","type_":""}]}`)
+}
+
 func TestUpdateGraph(t *testing.T) {
 	dg, got := fakeDgraph(t, `{"data":{"updateLabel":{"label":[{"id":"0x1"}]}}}`)
 

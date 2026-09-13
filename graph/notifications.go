@@ -205,12 +205,9 @@ func PushEventNotifications(notif model.EventNotif) error {
 			return err
 		}
 	}
-	// Add mentions and **set tension data**. For events carrying a comment
-	// body, read it through the settle poll: in-flight /file/upload calls get
-	// a chance to rewrite bare `![](paste-N.png)` tokens into /file/<id>
-	// before the message (and Comment.files) is snapshotted for the email.
+	// Add mentions and set tension data; settle browser uploads, not completed inbound processing.
 	var m []map[string]any
-	if notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated) {
+	if !notif.AttachmentsReady && (notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated)) {
 		m, err = getLastCommentSettled(notif.Tid, notif.Uctx.Username)
 	} else {
 		m, err = db.GetDB().Meta("getLastComment", map[string]string{"tid": notif.Tid, "username": notif.Uctx.Username})

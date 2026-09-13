@@ -201,7 +201,7 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 		}
 
 		// Process event
-		ok, contract, err = ProcessEvent(uctx, tension, event, nil, true, true)
+		ok, contract, err = ProcessEvent(uctx, tension, event, nil)
 		if !ok || err != nil {
 			break
 		}
@@ -230,7 +230,7 @@ func TensionEventHook(uctx *model.UserCtx, tid string, events []*model.EventRef,
 // uploads through POST /file/upload afterwards and the notifier settle-polls,
 // so it passes nil. The mailer has the bytes in the webhook and persists them
 // here: after auth (no S3 writes for a tension about to be rolled back) and
-// before notify (the email snapshots the files).
+// before notify (AttachmentsReady skips the notifier's settle poll).
 func CreateTensionHook(uctx *model.UserCtx, tid string, history []*model.EventRef, attach func()) error {
 	ok, _, err := TensionEventHook(uctx, tid, history, nil)
 	if !ok || err != nil {
@@ -248,50 +248,55 @@ func CreateTensionHook(uctx *model.UserCtx, tid string, history []*model.EventRe
 		attach()
 	}
 	GoSyncSearchMessage(tid)
-	PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history})
+	PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: history, AttachmentsReady: attach != nil})
 	return nil
 }
 
-func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract,
-	doCheck, doProcess bool,
-) (bool, *model.Contract, error) {
-	// ok defaults to true: doCheck=false means authorization was decided upstream.
-	ok := true
-	var err error
-
+// eventMap validates the event inputs and returns its EMAP entry.
+func eventMap(tension *model.Tension, event *model.EventRef) (EventMap, error) {
 	if tension == nil {
-		return false, contract, LogErr("Access denied", fmt.Errorf("tension not found."))
+		return EventMap{}, LogErr("Access denied", fmt.Errorf("tension not found."))
 	}
 	if event == nil || event.EventType == nil {
-		return false, contract, fmt.Errorf("event type is required")
+		return EventMap{}, fmt.Errorf("event type is required")
 	}
 
 	em, hasEvent := EMAP[*event.EventType]
 	if !hasEvent { // Minimum level of authorization
-		return false, nil, LogErr("Access denied", fmt.Errorf("Event not implemented."))
+		return EventMap{}, LogErr("Access denied", fmt.Errorf("Event not implemented."))
 	}
+	return em, nil
+}
 
-	// Check Authorization (optionally generate a contract)
-	if doCheck {
-		ok, contract, err = em.Check(uctx, tension, event, contract)
-		if !ok || err != nil {
-			return ok, contract, err
-		}
+// AuthorizeEvent checks authorization and derives contract state without persisting changes.
+func AuthorizeEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+	em, err := eventMap(tension, event)
+	if err != nil {
+		return false, contract, err
+	}
+	return em.Check(uctx, tension, event, contract)
+}
+
+// ApplyEvent executes an event whose authorization was decided upstream.
+func ApplyEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+	em, err := eventMap(tension, event)
+	if err != nil {
+		return false, contract, err
 	}
 
 	// act is false if contract is cancelled for example !
 	act := contract == nil || contract.Status == model.ContractStatusClosed
 
 	// Trigger Action
-	if act && doProcess {
+	if act {
 		if em.Propagate != "" {
 			v, err := CheckEvent(tension, event)
 			if err != nil {
-				return ok, contract, err
+				return true, contract, err
 			}
 			err = db.GetDB().UpdateValue(*uctx, "tension", tension.ID, em.Propagate, v)
 			if err != nil {
-				return ok, contract, err
+				return true, contract, err
 			}
 		}
 		if em.Action != nil {
@@ -305,7 +310,7 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 	}
 
 	// Set contract status if any
-	if contract != nil && doProcess {
+	if contract != nil {
 		err = db.GetDB().SetFieldById(contract.ID, "Contract.status", string(contract.Status))
 		if err != nil {
 			return false, contract, err
@@ -318,7 +323,16 @@ func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.Even
 		}
 	}
 
-	return ok, contract, err
+	return true, contract, nil
+}
+
+// ProcessEvent authorizes an event, then applies it if authorized.
+func ProcessEvent(uctx *model.UserCtx, tension *model.Tension, event *model.EventRef, contract *model.Contract) (bool, *model.Contract, error) {
+	ok, contract, err := AuthorizeEvent(uctx, tension, event, contract)
+	if !ok || err != nil {
+		return ok, contract, err
+	}
+	return ApplyEvent(uctx, tension, event, contract)
 }
 
 // GetBlob returns the first blob found in the given tension.
@@ -481,9 +495,9 @@ func closeSubtreeTensions(uctx *model.UserCtx, nameids []string) error {
 					CreatedAt: &now,
 					CreatedBy: &model.UserRef{Username: &uctx.Username},
 				}
-				// doCheck=false: the subtree check skips the target itself (gated on the
+				// Skip authorization: the subtree check skips the target itself (gated on the
 				// receiver), so a re-check could deny the target's own tensions mid-close.
-				if _, _, err = ProcessEvent(uctx, t, &event, nil, false, true); err == nil {
+				if _, _, err = ApplyEvent(uctx, t, &event, nil); err == nil {
 					// The notifier writes the history and sends the emails.
 					err = PublishTensionEvent(model.EventNotif{Uctx: uctx, Tid: tid, History: []*model.EventRef{&event}})
 				}

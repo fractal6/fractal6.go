@@ -416,6 +416,54 @@ func TestAddTensionComment_Integration(t *testing.T) {
 	}
 }
 
+// The mailing insert must expose the body comment ID under the sender's Dgraph authorization.
+func TestAddGraph_TensionCommentID_Integration(t *testing.T) {
+	uctx := buildTestUserCtx(t)
+	const title = "add-graph-initial-comment"
+	t.Cleanup(func() {
+		del := QueryMut{
+			Q: `query { t as var(func: eq(Tension.title, "` + title + `")) { c as Tension.comments } }`,
+			M: []X{{D: `uid(c) * * .
+				uid(t) * * .`}},
+		}
+		if _, err := GetDB().Gamma(del, nil); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	})
+
+	createdAt := time.Now().UTC().Format(time.RFC3339)
+	createdBy := &model.UserRef{Username: &uctx.Username}
+	emitterid, receiverid := "test-org##@testuser", "test-org"
+	message := "initial mail body"
+	input := model.AddTensionInput{
+		CreatedAt:  createdAt,
+		CreatedBy:  createdBy,
+		Emitterid:  emitterid,
+		Emitter:    &model.NodeRef{Nameid: &emitterid},
+		Receiverid: receiverid,
+		Receiver:   &model.NodeRef{Nameid: &receiverid},
+		Type:       model.TensionTypeOperational,
+		Status:     model.TensionStatusOpen,
+		Title:      title,
+		Comments:   []*model.CommentRef{{CreatedAt: &createdAt, CreatedBy: createdBy, Message: &message}},
+	}
+	var payload model.AddTensionPayload
+	if err := GetDB().AddGraph(uctx, "tension", input, nil, "tension { id comments { id } }", &payload); err != nil {
+		t.Fatalf("AddGraph: %v", err)
+	}
+	if len(payload.Tension) != 1 || payload.Tension[0] == nil || payload.Tension[0].ID == "" {
+		t.Fatalf("expected one tension ID, got %+v", payload)
+	}
+	tension := payload.Tension[0]
+	if len(tension.Comments) != 1 || tension.Comments[0] == nil || tension.Comments[0].ID == "" {
+		t.Fatalf("expected one comment ID, got %+v", tension.Comments)
+	}
+	comment, err := GetDB().GetCommentForUpload(tension.ID, tension.Comments[0].ID)
+	if err != nil || !comment.Found || comment.AuthorUsername != uctx.Username || comment.Message != message {
+		t.Fatalf("body comment = %+v, %v", comment, err)
+	}
+}
+
 // TestAddContractComment_Integration: the contract-reply insert must return
 // the new uid and hang the comment under Contract.comments with its author.
 func TestAddContractComment_Integration(t *testing.T) {
