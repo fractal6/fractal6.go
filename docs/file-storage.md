@@ -108,7 +108,9 @@ many `File` rows are anchored on the comment and no bare `![](paste.png)` token
 remains (the count proves the rows exist, the token that the rewrite landed).
 Declaring nothing settles on the first read, no delay. Otherwise it re-polls every
 `notify.upload_poll_interval_ms` up to `notify.upload_poll_attempts` times (1.5s × 30
-≈ 45s); past the budget the email degrades as with no poll at all.
+≈ 45s); past the budget the email degrades as with no poll at all, and the count of
+still-missing files is carried on `EventNotif.MissingAttachments` to render a hint
+line at the end of the email body (`renderMissingAttachmentsHint`).
 
 ### Inbound email replies
 

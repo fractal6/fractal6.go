@@ -125,6 +125,8 @@ type EventNotif struct {
 	Receiverid string `json:"receiverid"`
 	Title      string `json:"title"`
 	Msg        string `json:"msg"`
+	// Declared attachments still missing when the upload poll timed out.
+	MissingAttachments int `json:"missing_attachments"`
 }
 
 type ContractNotif struct {

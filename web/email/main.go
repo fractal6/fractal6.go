@@ -513,6 +513,8 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif, 
 	if footer := renderAttachmentFooter(att.footer); footer != "" {
 		payload += footer
 	}
+	// Attachments declared but never uploaded before the notifier poll gave up.
+	payload += renderMissingAttachmentsHint(notif.MissingAttachments)
 
 	// Add footer
 	var url_unsubscribe string

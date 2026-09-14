@@ -54,7 +54,9 @@ func attachmentsSettled(msg string, expected, nfiles int) bool {
 // getLastCommentSettled fetches the author's most recent comment, re-fetching
 // until it settles or the attempt budget runs out (a failed or abandoned
 // upload). Declaring no attachment settles on the first fetch.
-func getLastCommentSettled(tid, username string) ([]map[string]any, error) {
+// Also returns how many declared attachments are still missing on return.
+// Note: Meta() decodes raw JSON, hence the float64 number assertions.
+func getLastCommentSettled(tid, username string) ([]map[string]any, int, error) {
 	interval := time.Duration(ViperPositiveInt("notify.upload_poll_interval_ms", 1500)) * time.Millisecond
 	attempts := ViperPositiveInt("notify.upload_poll_attempts", 30)
 	// A lying client can only delay its own email, up to the budget.
@@ -63,7 +65,7 @@ func getLastCommentSettled(tid, username string) ([]map[string]any, error) {
 	for i := 0; ; i++ {
 		m, err := db.GetDB().Meta("getLastComment", args)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		var msg string
 		var expected, nfiles float64
@@ -72,8 +74,9 @@ func getLastCommentSettled(tid, username string) ([]map[string]any, error) {
 			expected, _ = m[0]["expected_attachments"].(float64)
 			nfiles, _ = m[0]["n_files"].(float64)
 		}
-		if attachmentsSettled(msg, min(int(expected), maxExpected), int(nfiles)) || i >= attempts {
-			return m, nil
+		want := min(int(expected), maxExpected)
+		if attachmentsSettled(msg, want, int(nfiles)) || i >= attempts {
+			return m, max(want-int(nfiles), 0), nil
 		}
 		time.Sleep(interval)
 	}
@@ -216,7 +219,7 @@ func PushEventNotifications(notif model.EventNotif) error {
 	// Add mentions and set tension data; settle in-flight uploads first.
 	var m []map[string]any
 	if notif.HasEvent(model.TensionEventCommentPushed) || notif.HasEvent(model.TensionEventCreated) {
-		m, err = getLastCommentSettled(notif.Tid, notif.Uctx.Username)
+		m, notif.MissingAttachments, err = getLastCommentSettled(notif.Tid, notif.Uctx.Username)
 	} else {
 		m, err = db.GetDB().Meta("getLastComment", map[string]string{"tid": notif.Tid, "username": notif.Uctx.Username})
 	}

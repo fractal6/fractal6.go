@@ -300,6 +300,23 @@ func renderAttachmentFooter(files []emailFile) string {
 	return b.String()
 }
 
+// renderMissingAttachmentsHint warns the recipient that n declared attachments
+// were still not uploaded when the notifier gave up waiting for them.
+func renderMissingAttachmentsHint(n int) string {
+	if n <= 0 {
+		return ""
+	}
+	plural := ""
+	if n > 1 {
+		plural = "s"
+	}
+	return fmt.Sprintf(
+		`<div style="margin-top:0.5em;color:#666;font-size:small"><i>%d attachment%s could not be included `+
+			`in this email (upload not finished on time).</i></div>`,
+		n, plural,
+	)
+}
+
 // htmlEscape is a tiny escape for filenames in the footer link text. The
 // filenames pass through safeFilename() at upload time so they're already
 // fairly tame, but a paranoid escape avoids opening an XSS hole if the

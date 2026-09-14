@@ -169,3 +169,15 @@ func ids(files []emailFile) []string {
 	}
 	return out
 }
+
+func TestRenderMissingAttachmentsHint(t *testing.T) {
+	if got := renderMissingAttachmentsHint(0); got != "" {
+		t.Errorf("expected empty hint, got %q", got)
+	}
+	if got := renderMissingAttachmentsHint(1); !strings.Contains(got, "1 attachment could not") {
+		t.Errorf("singular hint not rendered: %q", got)
+	}
+	if got := renderMissingAttachmentsHint(3); !strings.Contains(got, "3 attachments could not") {
+		t.Errorf("plural hint not rendered: %q", got)
+	}
+}
