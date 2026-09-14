@@ -30,10 +30,9 @@ Every `File` row has exactly one anchor, picked from the populated form fields:
 | `userid` | user avatar | public | self |
 | `orgaid` | org avatar | node visibility | coordinator |
 
-Deletion is uploader-only for all kinds. `File.tension` is denormalised alongside
-`File.comment` so read auth is a single DQL hop; a contract comment's files carry the
-contract's tension there, so they follow the same visibility and the same cascade. Avatars are replace-on-upload: the
-previous row is dropped and its S3 object GC'd asynchronously.
+Deletion is uploader-only. `File.tension` is denormalised alongside `File.comment` so
+read auth is a single DQL hop (contract comments carry the contract's tension).
+Avatars are replace-on-upload; the previous S3 object is GC'd asynchronously.
 
 Mutations on `File` are root-only in the GraphQL schema — all writes go through the
 REST endpoints, which own the auth checks and persist via internal DQL. `queryFile` /
@@ -47,19 +46,18 @@ presigned URL), `DELETE /file/<id>`. Misses and unauthorised reads both return 4
 so existence never leaks. Handlers take an injected `*storage.Client`; when
 `[storage]` is unset they return 503 instead of panicking.
 
-`initStorage` also registers the client process-wide (`storage.SetGlobal`) so
-non-handler callers — the cascade-delete wrappers in `db/dql_mutations.go` and the
-email attachment builder — reach it without a parameter chain. **Both binaries must
-call it**: the api server for `/file/*`, the notifier daemon for email attachments.
-`storage.Global()` returns nil when `[storage]` is unset and every caller nil-checks.
+`initStorage` also registers the client process-wide (`storage.SetGlobal`) for
+non-handler callers (cascade deletes, email attachment builder). **Both binaries must
+call it** — api server for `/file/*`, notifier for email attachments;
+`storage.Global()` is nil when `[storage]` is unset and every caller nil-checks.
 
 ### Upload validation
 
-Client-supplied metadata is not trusted: the Content-Type is re-sniffed server-side,
-inline rendering is an explicit allowlist (SVG and HTML are forced to
-`Content-Disposition: attachment`), size is capped, and every client-supplied uid
-goes through `db.ValidateUids` before reaching a DQL `uid()` root — an unvalidated id
-would let a caller widen a query or a delete. See `web/handlers/files.go`.
+Client-supplied metadata is not trusted: Content-Type is re-sniffed server-side,
+inline rendering is an explicit allowlist (SVG and HTML forced to
+`Content-Disposition: attachment`), size is capped, and every client-supplied uid goes
+through `db.ValidateUids` before reaching a DQL `uid()` root — an unvalidated id would
+let a caller widen a query or a delete. See `web/handlers/files.go`.
 
 ## Storage layout
 
@@ -71,90 +69,59 @@ random prefix against guessing and collisions.
 
 ## Inline screenshot pasting
 
-On paste the frontend embeds `![alt](<unique-filename>)` in the message and uploads
-the bytes *after* the carrier comment exists. The upload handler finds the bare
-filename token in `Comment.message`, rewrites it to `/file/<id>` and flips
-`File.embedded=true`. Code regions (fences, inline backticks) are masked before
-matching.
+On paste the frontend embeds `![alt](<unique-filename>)` in the message and uploads the
+bytes *after* the carrier comment exists. The upload handler finds the bare filename
+token in `Comment.message` (code regions masked), rewrites it to `/file/<id>` and flips
+`File.embedded=true`.
 
 The rewrite is a read-modify-write: concurrent uploads to the same comment race on
-`Comment.message` (last write wins). Both `File` rows persist; only the inline URL
-substitution can be lost, and the UI renders orphaned `embedded` files as regular
-attachment chips. Frontends should serialise per-comment uploads and use unique
-filenames.
+`Comment.message` (last write wins). Only the inline URL substitution can be lost; the
+UI renders orphaned `embedded` files as regular attachment chips.
 
 ## Email notifications
 
-Notification emails ship the comment's files in the Postal payload, since a mail
-client's anonymous fetch can't satisfy `/file/<id>` for Private/Secret orgs. Embedded
-images within the caps become RFC 2392 inline attachments (`cid:` src rewrite,
-allowlisted in the bluemonday policy); everything else ships as a plain attachment
-plus a footer link. Per-file, total and count caps live under `notify.*` in
-`config.toml`; anything dropped falls back to an absolute `/file/<id>` URL.
-
-Attachments are fetched once per notification and shared across recipients, so S3
-traffic doesn't scale with recipient count.
+A mail client's anonymous fetch can't satisfy `/file/<id>` for Private/Secret orgs, so
+notification emails ship the comment's files in the Postal payload: embedded images
+become RFC 2392 inline attachments (`cid:` rewrite, allowlisted in the bluemonday
+policy), everything else a plain attachment plus a footer link. Caps live under
+`notify.*` in `config.toml`; anything dropped falls back to an absolute `/file/<id>`
+URL. Attachments are fetched once per notification and shared across recipients.
 
 ### Upload settle poll
 
-The notifier daemon can fire while browser uploads are still in flight. The author
-declares how many attachments are coming in `Comment.expected_attachments` (never
-which — an integer carries no authority; capped by
-`notify.inbound_attachment_max_count`). Uploads still go through `POST /file/upload`
-after the comment exists.
-
-`getLastCommentSettled` (`graph/notifications.go`) fetches first: settled when that
-many `File` rows are anchored on the comment and no bare `![](paste.png)` token
-remains (the count proves the rows exist, the token that the rewrite landed).
-Declaring nothing settles on the first read, no delay. Otherwise it re-polls every
-`notify.upload_poll_interval_ms` up to `notify.upload_poll_attempts` times (1.5s × 30
-≈ 45s); past the budget the email degrades as with no poll at all, and the count of
-still-missing files is carried on `EventNotif.MissingAttachments` to render a hint
-line at the end of the email body (`renderMissingAttachmentsHint`).
+The notifier can fire while browser uploads are still in flight. The author declares
+*how many* attachments are coming in `Comment.expected_attachments` (never which — an
+integer carries no authority). `getLastCommentSettled` (`graph/notifications.go`)
+re-polls until that many `File` rows are anchored and no bare `![](paste.png)` token
+remains, bounded by `notify.upload_poll_*`. Declaring nothing settles on the first
+read, no delay. Past the budget the email degrades and renders a hint line from
+`EventNotif.MissingAttachments`.
 
 ### Inbound email replies
 
-`POST /notifications` (`web/handlers/mailer.go`) turns an email reply into a tension
-or contract Comment, `POST /mailing` an email into a new Tension; all three then run
-`processInboundAttachments` on the comment they just wrote. That anchor is exact:
-`AddTensionComment` / `AddContractComment` return the new uid; `POST /mailing` uses
-`AddGraph` to return both the tension and its inline body comment IDs from the insert.
-Attachment handling uses these IDs directly, without selecting a comment by timestamp.
+`POST /notifications` turns an email reply into a tension or contract Comment,
+`POST /mailing` an email into a new Tension (`web/handlers/mailer.go`); both then run
+`processInboundAttachments` on the exact comment uid returned by the insert.
+`POST /mailing` reuses `graph.CreateTensionHook` with the attachment step as its
+`attach` callback, so inbound tensions leave the same trace as app ones; contract
+replies are gated by `graph.CanCommentContract`.
 
-The tension path is the app's: `POST /mailing` builds an `AddTensionInput` with
-user/node references, inserts, then runs `graph.CreateTensionHook` exactly like
-`addTensionHook`, passing the attachment step
-as the hook's `attach` callback so it lands after auth and before the search index and
-notification. Contract replies are gated by `graph.CanCommentContract`, shared with
-`updateContractHook`.
+MUAs re-attach the quoted notification's inline images, so `dropKnownAttachments`
+fingerprints `(safe filename, size)` against the tension's existing files first —
+otherwise a re-sent image wins the pairing and lands in the wrong comment. Remaining
+`cid:` refs resolve in three passes (quoted-back CIDs, filename, document order);
+leftovers become plain paperclips. See `web/handlers/cid.go`.
 
-MUAs re-attach the quoted notification's inline images, and Postal ships attachments
-with no Content-ID, so those look exactly like a fresh paste. They are dropped first
-(`dropKnownAttachments`, fingerprint `(safe filename, size)` against
-`GetTensionFileFingerprints`, which covers the tension's comments and its contracts')
-— otherwise they get re-persisted and win the document-order pairing, putting the
-*previous* image in the new comment. A deliberate re-send of a byte-identical file is
-dropped too.
-
-`cid:` references are then resolved in three passes: quoted-back outbound CIDs
-(rewrite only), filename heuristic, then document-order pairing. Unmatched refs are
-dropped; unmatched attachments are persisted as plain paperclips. All decisions roll
-up into a single `EmbedCommentMessage` upsert.
-
-Sequential inbound processing finishes before publication. Inbound comments declare no
-`expected_attachments`, so the notifier settles on its first read and skips polling;
-contract notifications already fetch immediately. Settling means processing is done,
-not that every attachment succeeded. Every attachment failure is logged and skipped
-— the comment itself always commits. Authorship trusts `From:`,
-gated by Postal's webhook signature. `POST /file/upload` still anchors on tension
-comments only; the app's contract comment editor has attachments disabled.
+Inbound processing is sequential and finishes before publication, so the notifier never
+polls for it. Attachment failures are logged and skipped — the comment always commits.
+Authorship trusts `From:`, gated by Postal's webhook signature. `POST /file/upload`
+anchors on tension comments only; contract comment attachments are disabled in the app.
 
 ## Deployment and operations
 
 Self-hosted Garage: Ansible role at `contrib/ansible/roles/garage/`. Dev fixtures
 (keys, ports) live in `docker-compose.dev.yml` and `contrib/garage/garage.toml`;
-inspect a running instance with the `garage` CLI (admin plane) or `mc` / `aws`
-(object listing).
+inspect a running instance with the `garage` CLI (admin plane) or `mc` / `aws`.
 
 Two config traps, both in the `[storage]` block:
 
@@ -170,12 +137,12 @@ Known ceilings:
 - **Crash-orphan leak**: a death between the S3 `Put` and the DB insert orphans the
   bytes with no GC. Bounded, no broken links; sweep by key prefix if it ever matters.
 - **No revocation**: a captured presigned URL stays valid until its TTL expires
-  (`presign_ttl_sec`, 2h by default — a wide window; rotating the credentials is the
-  only way to kill outstanding URLs, and it kills all of them).
+  (`presign_ttl_sec`, 2h by default); only credential rotation kills outstanding URLs,
+  and it kills all of them.
 - **No byte-access audit**: the backend sees the presigned request, not the user. Swap
   the redirect in `FileGet` for a proxy stream if that changes.
 - **Inbound dedup depth**: the fingerprint set covers the 20 newest comments only; an
-  image quoted from further back mispairs as it did before the dedup existed.
+  image quoted from further back mispairs.
 - **Cascade-delete GC** is fire-and-forget (`deleteStorageKeysAsync`), driven by the
-  `Delete*Deep` wrappers; with storage unset the DQL still drops the `File` nodes and
-  the objects are left orphaned.
+  `Delete*Deep` wrappers; with storage unset the `File` nodes still drop and the
+  objects are left orphaned.
