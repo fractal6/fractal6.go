@@ -64,103 +64,26 @@ func CreateOrga(w http.ResponseWriter, r *http.Request) {
 	}
 
 	nameid := form.Nameid
-	nidOwner := nameid + "##" + "@" + uctx.Username
-	isPersonal := true
-	var userCanJoin bool
-	var guestCanCreateTension bool = true
-	var isTemplateTensionOnly bool = false
-	var isPinnedTensionfetchRecursively bool = false
 	visibility := model.NodeVisibilityPublic
-	mode := model.NodeModeCoordinated
 
 	if form.Visibility != nil && form.Visibility.IsValid() {
 		visibility = *form.Visibility
 	}
 	form.Visibility = &visibility
 
-	if visibility == model.NodeVisibilityPublic {
-		userCanJoin = true
-	} else {
-		userCanJoin = false
-	}
-
 	// Check plan
 	ok, err := auth.CanNewOrga(*uctx, form)
-	if err != nil || !ok {
-		http.Error(w, err.Error(), 400)
-		return
-	}
-
-	// Create the new node
-	nodeInput := model.AddNodeInput{
-		// Form
-		Name:       form.Name,
-		Nameid:     nameid,
-		Rootnameid: nameid,
-		About:      form.About,
-		// Default
-		Type:       model.NodeTypeCircle,
-		IsRoot:     true,
-		IsPersonal: &isPersonal,
-		Watchers:   []*model.UserRef{{Username: &uctx.Username}},
-		// Permission
-		Visibility:                      visibility,
-		Mode:                            mode,
-		Rights:                          0,
-		IsArchived:                      false,
-		UserCanJoin:                     &userCanJoin,
-		GuestCanCreateTension:           &guestCanCreateTension,
-		IsTemplateTensionOnly:           &isTemplateTensionOnly,
-		IsPinnedTensionfetchRecursively: &isPinnedTensionfetchRecursively,
-		// Common
-		CreatedAt: Now(),
-		CreatedBy: &model.UserRef{Username: &uctx.Username},
-	}
-	// Set Owner
-	owner := StructMap[model.NodeRef](nodeInput)
-	t := model.NodeTypeRole
-	rt := model.RoleTypeOwner
-	n := string(rt)
-	_root := false
-	owner.Type = &t
-	owner.Nameid = &nidOwner
-	owner.Name = &n
-	owner.RoleType = &rt
-	owner.IsRoot = &_root
-	owner.About = nil
-	owner.Watchers = nil
-	nodeInput.Children = []*model.NodeRef{&owner}
-	// Gql mutation
-	nodeID, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-
-	// Add the root control tension
-	about := form.About
-	mandate := &model.MandateRef{Purpose: form.Purpose}
-	tensionInput := graph.MakeNewRootTension(nameid, nodeInput, about, mandate)
-	tid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "tension", tensionInput)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
+	if !ok {
+		http.Error(w, "permission denied: cannot create organisation", 403)
 		return
 	}
 
-	// Link the source blob and backend-owned governed node.
-	bid := db.GetDB().GetLastBlobId(tid)
-	if bid == nil {
-		http.Error(w, "root tension blob not found", 500)
-		return
-	}
-	err = db.GetDB().LinkGovernedNode(tid, nodeID, *bid)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
-		return
-	}
-
-	// Add the Owner role to the user
-	err = db.GetDB().AddUserRole(uctx.Username, nidOwner)
+	// Create the root organisation
+	_, err = graph.CreateRootOrga(uctx, form, visibility, &model.MandateRef{Purpose: form.Purpose})
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return

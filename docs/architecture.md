@@ -21,7 +21,7 @@ fractal6.go/
 │   ├── auth/           Dgraph @auth rule templates
 │   └── gqlast.py       Schema parser + directive propagation
 ├── web/             HTTP layer (JWT, handlers, sessions, email, fileserver)
-├── tools/           Shared utilities
+├── internal/        Shared utilities, storage, i18n, orgimport (spreadsheet -> org)
 └── main.go
 ```
 
@@ -239,7 +239,7 @@ At startup both binaries run `checkServices` (`cmd/health.go`), which pings Dgra
 | Change email rendering or the `<details>` extension | [markdown rendering](markdown.md) |
 | Touch tension or project text search | [text search](search.md) |
 | Work on contribution heatmaps | [activity tracking](activity-heatmap.md) |
-| Import an organisation from a spreadsheet | [org import](import-orga.md) |
+| Import an organisation from a spreadsheet | `internal/orgimport/` — [org import](import-orga.md) |
 | Add or serve a new language | [i18n](i18n.md) |
 | Run integration tests | [integration tests](integration-tests.md) |
 | Pick up technical debt | [refactor backlog](refactor.md) |

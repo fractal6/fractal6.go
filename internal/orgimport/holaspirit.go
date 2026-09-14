@@ -18,7 +18,7 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package handlers
+package orgimport
 
 import (
 	"fmt"

@@ -1,7 +1,7 @@
 # Import Organisation from Spreadsheet
 
-Create an organisation from a spreadsheet export of another platform (HolaSpirit,
-Glassfrog).
+Create an organisation from a spreadsheet export of another platform (HolaSpirit only
+for now).
 
 `POST /auth/createorga/spreadsheet` takes a multipart form with the file plus the
 usual org creation fields (name, nameid, visibility, about) and an optional `format`
@@ -14,10 +14,14 @@ capped at 10 MB and 10k rows per sheet.
 ## Where things live
 
 ```
-web/handlers/import.go             ImportNode types, HTTP handler, org builder
-web/handlers/import_readers.go     xlsx/csv readers + HTML-to-markdown converter
-web/handlers/import_holaspirit.go  HolaSpirit adapter: sheets -> ImportNode tree
+web/handlers/import.go              HTTP handler: auth, form parsing, validation
+internal/orgimport/orgimport.go     ImportNode types, format dispatch, org builder
+internal/orgimport/readers.go       xlsx/csv readers
+internal/orgimport/holaspirit.go    HolaSpirit adapter: sheets -> ImportNode tree
 ```
+
+A new source platform is a new adapter file in `internal/orgimport/` plus a case in
+`ParseByFormat` (and a sheet signature in `DetectSourceFormat` for auto-detection).
 
 Dependencies: `excelize/v2` (xlsx), `bluemonday` (sanitisation), `x/net/html` (markdown
 conversion), stdlib `encoding/csv`.
@@ -26,8 +30,9 @@ conversion), stdlib `encoding/csv`.
 
 The handler authenticates and parses the form, the reader turns the file into
 `sheet -> rows`, a format adapter parses that into an `ImportNode` tree, and the
-builder persists it: root node + owner role (same path as `CreateOrga`), then RoleExt
-templates, then circles and roles created recursively with a governance tension each.
+builder persists it: root node, control tension and owner role via `graph.CreateRootOrga`
+(shared with `CreateOrga`), then RoleExt templates, then circles and roles created
+recursively with a governance tension each.
 Every governance tension stores a complete Node fragment and then links
 `Node.source` / `Tension.governed_node` for the Node it just created.
 

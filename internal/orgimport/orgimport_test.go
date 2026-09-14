@@ -1,148 +1,13 @@
-package handlers
+package orgimport
 
 import (
 	"strings"
 	"testing"
 
+	"github.com/xuri/excelize/v2"
+
 	"fractale/fractal6.go/graph/model"
-	"fractale/fractal6.go/internal/tools"
 )
-
-func TestHtmlToMarkdown(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:     "empty string",
-			input:    "",
-			expected: "",
-		},
-		{
-			name:     "plain text",
-			input:    "hello world",
-			expected: "hello world",
-		},
-		{
-			name:     "paragraph",
-			input:    "<p>hello world</p>",
-			expected: "hello world",
-		},
-		{
-			name:     "bold",
-			input:    "<p><strong>bold text</strong></p>",
-			expected: "**bold text**",
-		},
-		{
-			name:     "italic",
-			input:    "<p><em>italic text</em></p>",
-			expected: "*italic text*",
-		},
-		{
-			name:     "link",
-			input:    `<a href="https://example.com">click here</a>`,
-			expected: "[click here](https://example.com)",
-		},
-		{
-			name:     "data-mention link stripped",
-			input:    `<a data-mention="60993e048b3bea14f250e5f4|role">Outils numériques</a>`,
-			expected: "Outils numériques",
-		},
-		{
-			name:     "unordered list",
-			input:    "<ul><li>item 1</li><li>item 2</li></ul>",
-			expected: "- item 1\n- item 2",
-		},
-		{
-			name:     "br becomes line break",
-			input:    "line1<br />line2",
-			expected: "line1  \nline2",
-		},
-		{
-			name:     "nested bold in paragraph",
-			input:    "<p>This is <strong>important</strong> text</p>",
-			expected: "This is **important** text",
-		},
-		{
-			name:     "inline code",
-			input:    "<p>Use <code>fmt.Println</code> here</p>",
-			expected: "Use `fmt.Println` here",
-		},
-		{
-			name:     "fenced code block",
-			input:    "<pre><code>func main() {\n  fmt.Println(\"hi\")\n}</code></pre>",
-			expected: "```\nfunc main() {\n  fmt.Println(\"hi\")\n}\n```",
-		},
-		{
-			name:     "strikethrough del",
-			input:    "<p><del>removed</del></p>",
-			expected: "~~removed~~",
-		},
-		{
-			name:     "strikethrough s",
-			input:    "<p><s>struck</s></p>",
-			expected: "~~struck~~",
-		},
-		{
-			name:     "blockquote",
-			input:    "<blockquote><p>quoted text</p></blockquote>",
-			expected: "> quoted text",
-		},
-		{
-			name:     "horizontal rule",
-			input:    "<p>above</p><hr><p>below</p>",
-			expected: "above\n\n---\n\nbelow",
-		},
-		{
-			name:     "image",
-			input:    `<img src="https://example.com/img.png" alt="logo">`,
-			expected: "![logo](https://example.com/img.png)",
-		},
-		{
-			name:     "h5",
-			input:    "<h5>Title Five</h5>",
-			expected: "##### Title Five",
-		},
-		{
-			name:     "h6",
-			input:    "<h6>Title Six</h6>",
-			expected: "###### Title Six",
-		},
-		{
-			name:     "ordered list",
-			input:    "<ol><li>first</li><li>second</li></ol>",
-			expected: "1. first\n2. second",
-		},
-		{
-			name:     "nested unordered list",
-			input:    "<ul><li>a<ul><li>a1</li><li>a2</li></ul></li><li>b</li></ul>",
-			expected: "- a\n  - a1\n  - a2\n- b",
-		},
-		{
-			name:     "simple table",
-			input:    "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>",
-			expected: "| Name | Age |\n| --- | --- |\n| Alice | 30 |",
-		},
-		{
-			name:     "details with summary",
-			input:    "<details><summary>More info</summary><p>Hidden content</p></details>",
-			expected: "<details>\n<summary>More info</summary>\n\nHidden content\n\n</details>",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := tools.HTMLToMarkdown(tt.input)
-			if err != nil {
-				t.Fatalf("tools.HTMLToMarkdown(%q): unexpected error: %v", tt.input, err)
-			}
-			if got != tt.expected {
-				t.Errorf("tools.HTMLToMarkdown(%q):\n  got:  %q\n  want: %q", tt.input, got, tt.expected)
-			}
-		})
-	}
-}
 
 func TestParseHolaSpirit(t *testing.T) {
 	// In HolaSpirit exports, each circle has two different IDs:
@@ -368,17 +233,51 @@ func TestReadCSV(t *testing.T) {
 func TestReadSpreadsheetCSV(t *testing.T) {
 	csvData := "A,B,C\n1,2,3\n"
 
-	sheets, err := readSpreadsheet(strings.NewReader(csvData), "mysheet.csv")
+	sheets, err := ReadSpreadsheet(strings.NewReader(csvData), "mysheet.csv")
 	if err != nil {
-		t.Fatalf("readSpreadsheet(.csv) error: %v", err)
+		t.Fatalf("ReadSpreadsheet(.csv) error: %v", err)
 	}
 	if _, ok := sheets["mysheet"]; !ok {
 		t.Error("expected sheet named 'mysheet'")
 	}
 }
 
+func TestReadSpreadsheetXLSX(t *testing.T) {
+	f := excelize.NewFile()
+	if err := f.SetSheetName(f.GetSheetName(0), "Circles & Roles"); err != nil {
+		t.Fatalf("SetSheetName() error: %v", err)
+	}
+	for cell, value := range map[string]string{"A1": "Circle ID", "B1": "Circle", "A2": "circle1", "B2": "Engineering"} {
+		if err := f.SetCellValue("Circles & Roles", cell, value); err != nil {
+			t.Fatalf("SetCellValue(%s) error: %v", cell, err)
+		}
+	}
+	buf, err := f.WriteToBuffer()
+	if err != nil {
+		t.Fatalf("WriteToBuffer() error: %v", err)
+	}
+
+	sheets, err := ReadSpreadsheet(buf, "orga.xlsx")
+	if err != nil {
+		t.Fatalf("ReadSpreadsheet(.xlsx) error: %v", err)
+	}
+	rows, ok := sheets["Circles & Roles"]
+	if !ok {
+		t.Fatalf("expected sheet named 'Circles & Roles', got %v", sheets)
+	}
+	if len(rows) != 2 {
+		t.Fatalf("expected 2 rows (1 header + 1 data), got %d", len(rows))
+	}
+	if rows[0][0] != "Circle ID" {
+		t.Errorf("header[0] = %q, want 'Circle ID'", rows[0][0])
+	}
+	if rows[1][1] != "Engineering" {
+		t.Errorf("row1[1] = %q, want 'Engineering'", rows[1][1])
+	}
+}
+
 func TestReadSpreadsheetUnsupported(t *testing.T) {
-	_, err := readSpreadsheet(strings.NewReader(""), "file.txt")
+	_, err := ReadSpreadsheet(strings.NewReader(""), "file.txt")
 	if err == nil {
 		t.Error("expected error for unsupported format")
 	}
@@ -389,13 +288,13 @@ func TestDetectSourceFormat(t *testing.T) {
 		"Circles & Roles": {},
 		"Policies":        {},
 	}
-	if got := detectSourceFormat(sheets); got != "holaspirit" {
-		t.Errorf("detectSourceFormat() = %q, want 'holaspirit'", got)
+	if got := DetectSourceFormat(sheets); got != "holaspirit" {
+		t.Errorf("DetectSourceFormat() = %q, want 'holaspirit'", got)
 	}
 
 	empty := map[string][][]string{}
-	if got := detectSourceFormat(empty); got != "" {
-		t.Errorf("detectSourceFormat(empty) = %q, want ''", got)
+	if got := DetectSourceFormat(empty); got != "" {
+		t.Errorf("DetectSourceFormat(empty) = %q, want ''", got)
 	}
 }
 

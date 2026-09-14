@@ -283,6 +283,85 @@ func PushNode(username string, tension *model.Tension, bid *string, node *model.
 // Internals
 //
 
+// CreateRootOrga creates a root organisation: the root node with its owner role child,
+// the root control tension linked to the node, and the owner role of the user.
+// Returns the root node id.
+func CreateRootOrga(uctx *model.UserCtx, form model.OrgaForm, visibility model.NodeVisibility, mandate *model.MandateRef) (string, error) {
+	nameid := form.Nameid
+	nidOwner := codec.MemberIdCodec(nameid, uctx.Username)
+	isPersonal := true
+	userCanJoin := visibility == model.NodeVisibilityPublic
+	guestCanCreateTension := true
+	isTemplateTensionOnly := false
+	isPinnedTensionfetchRecursively := false
+
+	nodeInput := model.AddNodeInput{
+		// Form
+		Name:       form.Name,
+		Nameid:     nameid,
+		Rootnameid: nameid,
+		About:      form.About,
+		// Default
+		Type:       model.NodeTypeCircle,
+		IsRoot:     true,
+		IsPersonal: &isPersonal,
+		Watchers:   []*model.UserRef{{Username: &uctx.Username}},
+		// Permission
+		Visibility:                      visibility,
+		Mode:                            model.NodeModeCoordinated,
+		Rights:                          0,
+		IsArchived:                      false,
+		UserCanJoin:                     &userCanJoin,
+		GuestCanCreateTension:           &guestCanCreateTension,
+		IsTemplateTensionOnly:           &isTemplateTensionOnly,
+		IsPinnedTensionfetchRecursively: &isPinnedTensionfetchRecursively,
+		// Common
+		CreatedAt: Now(),
+		CreatedBy: &model.UserRef{Username: &uctx.Username},
+	}
+	// Set Owner
+	owner := StructMap[model.NodeRef](nodeInput)
+	t := model.NodeTypeRole
+	rt := model.RoleTypeOwner
+	n := string(rt)
+	_root := false
+	owner.Type = &t
+	owner.Nameid = &nidOwner
+	owner.Name = &n
+	owner.RoleType = &rt
+	owner.IsRoot = &_root
+	owner.About = nil
+	owner.Watchers = nil
+	nodeInput.Children = []*model.NodeRef{&owner}
+	nodeID, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "node", nodeInput)
+	if err != nil {
+		return "", fmt.Errorf("creating root node: %w", err)
+	}
+
+	// Add the root control tension
+	tensionInput := MakeNewRootTension(nameid, nodeInput, form.About, mandate)
+	tid, err := db.GetDB().Add(db.GetDB().GetRootUctx(), "tension", tensionInput)
+	if err != nil {
+		return "", fmt.Errorf("creating root tension: %w", err)
+	}
+
+	// Link the source blob and backend-owned governed node.
+	bid := db.GetDB().GetLastBlobId(tid)
+	if bid == nil {
+		return "", fmt.Errorf("linking source: no blob found for tension %s", tid)
+	}
+	if err := db.GetDB().LinkGovernedNode(tid, nodeID, *bid); err != nil {
+		return "", fmt.Errorf("linking root governance: %w", err)
+	}
+
+	// Add the Owner role to the user
+	if err := db.GetDB().AddUserRole(uctx.Username, nidOwner); err != nil {
+		return "", fmt.Errorf("adding owner role: %w", err)
+	}
+
+	return nodeID, nil
+}
+
 // MakeNewRootTension build the tension that manage a root node. Authors will be suscribed.
 func MakeNewRootTension(rootnameid string, node model.AddNodeInput, about *string, mandate *model.MandateRef) model.AddTensionInput {
 	now := Now()

@@ -18,7 +18,7 @@
  * along with Fractale.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package handlers
+package orgimport
 
 import (
 	"encoding/csv"
@@ -74,8 +74,8 @@ func readCSV(file io.Reader, filename string) (map[string][][]string, error) {
 	return map[string][][]string{sheetName: rows}, nil
 }
 
-// readSpreadsheet dispatches to the appropriate reader based on file extension.
-func readSpreadsheet(file io.Reader, filename string) (map[string][][]string, error) {
+// ReadSpreadsheet dispatches to the appropriate reader based on file extension.
+func ReadSpreadsheet(file io.Reader, filename string) (map[string][][]string, error) {
 	ext := strings.ToLower(filepath.Ext(filename))
 	switch ext {
 	case ".xlsx":
