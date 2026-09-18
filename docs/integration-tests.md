@@ -57,6 +57,7 @@ JWT keys.
 - `graph/` — business hooks against Dgraph. `integration_contract_event_test.go`
   covers authorization-only checks and pending/canceled/accepted invitation processing,
   including membership changes and contract/vote deduplication-key cleanup.
+  `integration_move_test.go` covers the Moved action: descendant guard and node renaming.
 - `web/handlers/` — end-to-end through a real chi router with JWT middleware. Shared
   helpers (`doRequest`, `loginAs`, …) live in `integration_test.go`; auth, org, import
   and `/file/*` suites sit alongside. `integration_mailer_test.go` exercises signed

@@ -303,13 +303,6 @@ var dqlQueries map[string]string = map[string]string{
 	"exists": `{
         all(func: eq({{.fieldName}}, "{{.value}}")) {{.filter}} { uid }
     }`,
-	"isChild": `{
-        var(func: eq(Node.nameid, "{{.parent}}")) @recurse {
-            uid
-            u as Node.children @filter(eq(Node.nameid, "{{.child}}"))
-        }
-        all(func: uid(u)) { uid }
-    }`,
 	// Get multiple objects
 	"getChildren": `{
         all(func: eq(Node.nameid, "{{.nameid}}"))  {

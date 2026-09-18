@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -313,20 +314,15 @@ func (dg Dgraph) GetProjectsIn(nameids []string, _ string) ([]ProjectFull, error
 	return fetchByNameids[ProjectFull](dg, "getProjectsByNameids", nameids, nil)
 }
 
-// IsChild returns true is a node parent has the given child.
+// IsChild returns true if child is a descendant of parent, at any depth.
+// Walks up the ancestors of child (bounded by the tree depth) rather than down
+// the whole subtree of parent.
 func (dg Dgraph) IsChild(parent, child string) (bool, error) {
-	res, err := dg.QueryDql("isChild", map[string]string{
-		"parent": parent,
-		"child":  child,
-	})
+	parents, err := dg.GetParents(child)
 	if err != nil {
 		return false, err
 	}
-	r, err := unmarshalDqlResp(res)
-	if err != nil {
-		return false, err
-	}
-	return len(r.All) > 0, nil
+	return slices.Contains(parents, parent), nil
 }
 
 // Returns the uids of the objects if found.

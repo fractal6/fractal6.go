@@ -110,6 +110,30 @@ func TestIsChild_Integration(t *testing.T) {
 		}
 	})
 
+	// Descendants below the first level must be caught too, else a circle can be
+	// moved into its own grandchild and cycle the tree (see MoveTension).
+	t.Run("deep_descendant", func(t *testing.T) {
+		t.Parallel()
+		isChild, err := GetDB().IsChild("sec-org", "sec-org#secret-circle#:coordo")
+		if err != nil {
+			t.Fatalf("IsChild returned error: %v", err)
+		}
+		if !isChild {
+			t.Error("IsChild(sec-org, sec-org#secret-circle#:coordo) = false, want true")
+		}
+	})
+
+	t.Run("self", func(t *testing.T) {
+		t.Parallel()
+		isChild, err := GetDB().IsChild("test-org", "test-org")
+		if err != nil {
+			t.Fatalf("IsChild returned error: %v", err)
+		}
+		if isChild {
+			t.Error("IsChild(test-org, test-org) = true, want false")
+		}
+	})
+
 	t.Run("not_child", func(t *testing.T) {
 		t.Parallel()
 		isChild, err := GetDB().IsChild("test-org", "nonexistent#")
