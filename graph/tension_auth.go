@@ -400,16 +400,12 @@ func AnyCoordoDual(em EventMap, uctx *model.UserCtx, tension *model.Tension, eve
 	}
 
 	// Fetch tension target/Dual
-	tid2, _ := db.GetDB().GetByEq("Node.nameid", nameidNew, "Node.source", "Blob.tension", "uid")
-	if tid2 == nil {
-		return false, nil, fmt.Errorf("tension source not found.")
-	}
-	tension2, err := db.GetDB().GetTensionHook(tid2.(string), false, nil)
+	tension2, err := db.GetDB().GetTensionHookBySource(nameidNew)
 	if err != nil {
 		return false, nil, err
 	}
 	if tension2 == nil {
-		return false, nil, fmt.Errorf("target tension fetch failed.")
+		return false, nil, fmt.Errorf("tension source not found.")
 	}
 
 	// Target (new destination)

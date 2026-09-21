@@ -377,13 +377,13 @@ func (dg Dgraph) GetByUid(uid string, path ...string) (any, error) {
 
 // GetByEq fetches a value at `path` under nodes matching predicate=value.
 func (dg Dgraph) GetByEq(predicate, value string, path ...string) (any, error) {
-	return dg.runPathQuery(fmt.Sprintf(`eq(%s, "%s")`, predicate, value), "", path)
+	return dg.runPathQuery(fmt.Sprintf(`eq(%s, %s)`, predicate, strconv.Quote(value)), "", path)
 }
 
 // GetByEqFiltered is GetByEq with an extra @filter(eq(filterPred, filterValue)).
 func (dg Dgraph) GetByEqFiltered(predicate, value, filterPred, filterValue string, path ...string) (any, error) {
-	filter := fmt.Sprintf(`@filter(eq(%s, "%s"))`, filterPred, filterValue)
-	return dg.runPathQuery(fmt.Sprintf(`eq(%s, "%s")`, predicate, value), filter, path)
+	filter := fmt.Sprintf(`@filter(eq(%s, %s))`, filterPred, strconv.Quote(filterValue))
+	return dg.runPathQuery(fmt.Sprintf(`eq(%s, %s)`, predicate, strconv.Quote(value)), filter, path)
 }
 
 func (dg Dgraph) runPathQuery(root, filter string, path []string) (any, error) {
@@ -562,6 +562,28 @@ func (dg Dgraph) GetTensionHook(tid string, withBlob bool, bid *string) (*model.
 		return nil, err
 	}
 	return &obj, err
+}
+
+// GetTensionHookBySource returns the tension hook of the node's source blob
+// (Node.nameid -> Node.source -> Blob.tension) in a single read.
+func (dg Dgraph) GetTensionHookBySource(nameid string) (*model.Tension, error) {
+	v, err := dg.GetByEq("Node.nameid", nameid, "Node.source", "Blob.tension", tensionHookPayload)
+	if err != nil {
+		return nil, err
+	}
+	m, ok := v.(map[string]any)
+	if !ok {
+		return nil, nil
+	}
+	obj, err := DecodeDql[model.Tension](m)
+	if err != nil {
+		return nil, err
+	}
+	// DQL returns a uid-only object for a non-existent tension.
+	if obj.Receiver == nil {
+		return nil, nil
+	}
+	return &obj, nil
 }
 
 // Returns the contract hook content

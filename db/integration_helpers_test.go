@@ -28,6 +28,7 @@ package db_test
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 
 	. "fractale/fractal6.go/db"
@@ -402,6 +403,44 @@ func TestGetByEq_SubSub_Integration(t *testing.T) {
 		}
 		if val != nil {
 			t.Errorf("expected nil for nonexistent node, got %v", val)
+		}
+	})
+}
+
+func TestGetTensionHookBySource_Integration(t *testing.T) {
+	t.Parallel()
+
+	t.Run("found", func(t *testing.T) {
+		t.Parallel()
+		got, err := GetDB().GetTensionHookBySource("test-org")
+		if err != nil {
+			t.Fatalf("GetTensionHookBySource returned error: %v", err)
+		}
+		if got == nil {
+			t.Fatal("expected a tension for test-org source")
+		}
+		// Equivalent to the two-read path it replaces.
+		uid, err := GetDB().GetByEq("Node.nameid", "test-org", "Node.source", "Blob.tension", "uid")
+		if err != nil {
+			t.Fatalf("GetByEq returned error: %v", err)
+		}
+		want, err := GetDB().GetTensionHook(uid.(string), false, nil)
+		if err != nil {
+			t.Fatalf("GetTensionHook returned error: %v", err)
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("GetTensionHookBySource = %+v, want %+v", got, want)
+		}
+	})
+
+	t.Run("not_found", func(t *testing.T) {
+		t.Parallel()
+		got, err := GetDB().GetTensionHookBySource("nonexistent-org")
+		if err != nil {
+			t.Fatalf("GetTensionHookBySource returned error: %v", err)
+		}
+		if got != nil {
+			t.Errorf("expected nil for nonexistent node, got %+v", got)
 		}
 	})
 }

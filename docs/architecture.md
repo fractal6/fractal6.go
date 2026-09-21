@@ -120,6 +120,8 @@ Two interfaces to Dgraph live side by side in `db/`:
 
 `db/gql.go` builds every GraphQL request from four `text/template` shapes: `rawQuery` (deprecated raw passthrough), `query` (declares only the arguments actually provided), `add` (list input) and `mutation` (single input, for update and delete). `QueryGraph` / `AddGraph` / `UpdateGraph` / `DeleteGraph` take the requested payload graph and decode into the caller's data: they back the bridges below. `Query` / `Add` / `AddMany` / `Update` / `Delete` are shortcuts over them for internal callers that only need vertex ids. An empty payload means `@auth` filtered the result — a missing one means the request was refused.
 
+The gRPC connection and its dgo client are created once per `Dgraph` instance (`db/dgraph.go`, reconnect backoff capped at 5s) and reused by every DQL call. `runDqlTxn` opens a fresh transaction per operation — read-only when there is no mutation, auto-commit otherwise — bounded by `dqlTimeout`. Both the DQL and GraphQL paths retry transient "Please retry" errors through `withRetry`. `Ping` (startup healthcheck) hits `/health` and runs a trivial DQL read. `Close()` releases the connection.
+
 DQL templates use Go `text/template` substitution (`{{.nameid}}`). Generic helpers: `db.Meta[T]`, `db.Gamma[T]`, and `First[T]` / `DecodeDql[T]` (in `internal/tools/dql_decode.go`).
 
 DQL responses are passed through `tools.CleanDqlMap`, which strips the type prefix from every key (`File.storageKey` → `storageKey`, `uid` → `id`). Decoders must target the cleaned name — using the raw predicate silently yields empty values instead of an error.

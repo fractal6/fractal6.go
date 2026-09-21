@@ -29,7 +29,6 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -44,6 +43,7 @@ import (
 	"github.com/dgraph-io/dgo/v200"
 	"github.com/dgraph-io/dgo/v200/protos/api"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"fractale/fractal6.go/graph/codec"
@@ -61,11 +61,18 @@ var (
 // Database client
 var db_dg *Dgraph
 
+// dqlTimeout bounds every DQL attempt (var so tests can shorten it).
+var dqlTimeout = 30 * time.Second
+
 // Draph database clients
 type Dgraph struct {
 	// HTTP/Graphql and GPRC/DQL client address
 	gqlAddr  string
 	grpcAddr string
+	// Shared gRPC connection and dgo client, reused across operations.
+	// Both are nil for HTTP-only instances (grpcAddr empty).
+	conn *grpc.ClientConn
+	dgc  *dgo.Dgraph
 }
 
 type DgraphClaims struct {
@@ -97,6 +104,15 @@ type DqlRespCount struct {
 type GqlRes struct {
 	Data   model.JsonAtom   `json:"data"`
 	Errors []model.JsonAtom `json:"errors"` // message, locations, path, extensions
+}
+
+// Err returns the GraphQL errors as a single error, or nil.
+func (r *GqlRes) Err() error {
+	if r.Errors == nil {
+		return nil
+	}
+	b, _ := json.Marshal(r.Errors)
+	return &GraphQLError{string(b)}
 }
 
 type GraphQLError struct {
@@ -159,16 +175,43 @@ func GetDB() *Dgraph {
 	return db_dg
 }
 
-// NewDgraph build a client for the given endpoints.
+// NewDgraph build a client for the given endpoints. The gRPC connection is
+// created once and reused (grpc.NewClient is lazy: no I/O until the first RPC).
 func NewDgraph(gqlAddr, grpcAddr string) *Dgraph {
-	return &Dgraph{
+	dg := &Dgraph{
 		gqlAddr:  gqlAddr,
 		grpcAddr: grpcAddr,
 	}
+	if grpcAddr != "" {
+		conn, err := grpc.NewClient(grpcAddr,
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			// Cap reconnect backoff (default 120s) so an alpha restart is picked up quickly.
+			grpc.WithConnectParams(grpc.ConnectParams{Backoff: backoff.Config{
+				BaseDelay: time.Second, Multiplier: 1.6, Jitter: 0.2, MaxDelay: 5 * time.Second,
+			}}),
+		)
+		if err != nil {
+			log.Fatal("While trying to dial gRPC: ", err)
+		}
+		dg.conn = conn
+		dg.dgc = dgo.NewDgraphClient(api.NewDgraphClient(conn))
+	}
+	return dg
+}
+
+// Close releases the shared gRPC connection.
+func (dg *Dgraph) Close() error {
+	if dg.conn == nil {
+		return nil
+	}
+	conn := dg.conn
+	dg.conn, dg.dgc = nil, nil
+	return conn.Close()
 }
 
 // SetTestDB overrides the global db_dg singleton for integration tests.
 func SetTestDB(gqlAddr, grpcAddr string) {
+	db_dg.Close()
 	db_dg = NewDgraph(gqlAddr, grpcAddr)
 }
 
@@ -201,14 +244,11 @@ func initDB() *Dgraph {
 		// fmt.Println("Dgraph Grpc addr:", grpcAddr)
 	}
 
-	return &Dgraph{
-		gqlAddr:  dgraphApiAddr,
-		grpcAddr: grpcAddr,
-	}
+	return NewDgraph(dgraphApiAddr, grpcAddr)
 }
 
 // Ping checks the Dgraph alpha is up: /health on the HTTP/GraphQL port, plus a
-// TCP dial on the gRPC port used for DQL. Startup healthcheck, see cmd/health.go.
+// trivial read-only DQL query over gRPC. Startup healthcheck, see cmd/health.go.
 func (dg Dgraph) Ping(ctx context.Context) error {
 	u, err := url.Parse(dg.gqlAddr)
 	if err != nil {
@@ -228,12 +268,12 @@ func (dg Dgraph) Ping(ctx context.Context) error {
 		return fmt.Errorf("dgraph: %s /health: %s", u.Host, resp.Status)
 	}
 
-	var d net.Dialer
-	conn, err := d.DialContext(ctx, "tcp", dg.grpcAddr)
-	if err != nil {
+	if dg.dgc == nil {
+		return fmt.Errorf("dgraph: no grpc client configured")
+	}
+	if _, err := dg.dgc.NewReadOnlyTxn().Query(ctx, "{ q(func: uid(0x1)) { uid } }"); err != nil {
 		return fmt.Errorf("dgraph: grpc %s unreachable: %w", dg.grpcAddr, err)
 	}
-	conn.Close()
 	return nil
 }
 
@@ -266,38 +306,6 @@ func (dg Dgraph) getDqlQuery(op string, m map[string]string) string {
 		panic("unknonw DQL query op: " + op)
 	}
 	return q
-}
-
-// Get the grpc Dgraph client.
-func (dg Dgraph) getDgraphClient() (dgClient *dgo.Dgraph, cancelFunc func()) {
-	conn, err := grpc.NewClient(dg.grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal("While trying to dial gRPC: ", err)
-	}
-
-	dgClient = dgo.NewDgraphClient(api.NewDgraphClient(conn))
-	// ctx := context.Background()
-
-	//// Perform login call. If the Dgraph cluster does not have ACL and
-	//// enterprise features enabled, this call should be skipped.
-	//for {
-	//	// Keep retrying until we succeed or receive a non-retriable error.
-	//	err = dgClient.Login(ctx, "groot", "password")
-	//	if err == nil || !strings.Contains(err.Error(), "Please retry") {
-	//		break
-	//	}
-	//	time.Sleep(time.Second)
-	//}
-	//if err != nil {
-	//	log.Fatalf("While trying to login %v", err.Error())
-	//}
-
-	cancelFunc = func() {
-		if err := conn.Close(); err != nil {
-			log.Printf("Error while closing connection:%v", err)
-		}
-	}
-	return
 }
 
 func (dg Dgraph) GetRootUctx() model.UserCtx {
@@ -408,21 +416,22 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
 	return dg.runDqlTxn(q, nil)
 }
 
-// runDqlTxn executes a query block plus optional mutations in a fresh
-// auto-commit txn. Pass nil/empty mutations for a read-only query. Wrapped
-// in withDqlRetry so transient conflicts/snapshot-staleness are invisible
-// to callers. Same retry contract as QueryGql for the GraphQL path.
+// runDqlTxn executes a query block plus optional mutations in a fresh txn:
+// read-only (no Zero ts allocation) when there is no mutation, auto-commit
+// otherwise. Each attempt is bounded by dqlTimeout and retried on transient
+// conflicts via withRetry. Same retry contract as QueryGql for the GraphQL path.
 func (dg Dgraph) runDqlTxn(query string, mutations []*api.Mutation) (*api.Response, error) {
-	return withDqlRetry(func() (*api.Response, error) {
-		dgc, cancel := dg.getDgraphClient()
+	if dg.dgc == nil {
+		return nil, fmt.Errorf("dgraph: no grpc client configured")
+	}
+	return withRetry(func() (*api.Response, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), dqlTimeout)
 		defer cancel()
-		ctx := context.Background()
-		txn := dgc.NewTxn()
-		defer txn.Discard(ctx)
-
 		if len(mutations) == 0 {
-			return txn.Query(ctx, query)
+			return dg.dgc.NewReadOnlyTxn().Query(ctx, query)
 		}
+		txn := dg.dgc.NewTxn()
+		defer txn.Discard(ctx)
 		return txn.Do(ctx, &api.Request{
 			Query:     query,
 			Mutations: mutations,
@@ -443,21 +452,20 @@ func isDgraphConflict(err error) bool {
 	return strings.Contains(err.Error(), "Please retry")
 }
 
-// withDqlRetry runs fn under the same retry policy as the GraphQL path:
-// up to 10 attempts, 10-100ms jittered backoff, only on isDgraphConflict.
-// Logs once when retries fire so contention shows up in observability
-// instead of being silently swallowed.
-func withDqlRetry(fn func() (*api.Response, error)) (*api.Response, error) {
+// withRetry runs fn up to 10 times with a 10-100ms jittered backoff while it
+// returns an isDgraphConflict error. Shared by the DQL and GraphQL paths. Logs
+// once when retries fire so contention shows up instead of being silently swallowed.
+func withRetry[T any](fn func() (T, error)) (T, error) {
 	const maxAttempts = 10
 	var (
-		res *api.Response
+		res T
 		err error
 	)
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		res, err = fn()
 		if !isDgraphConflict(err) {
 			if attempt > 0 {
-				fmt.Printf("dql: succeeded after %d retries\n", attempt)
+				fmt.Printf("dgraph: succeeded after %d retries\n", attempt)
 			}
 			return res, err
 		}
@@ -498,41 +506,20 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 	queryName := reqInput["QueryName"]
 	q := dg.getGqlQuery(op, reqInput)
 
-	// Send the dgraph request and follow the results
-	res := &GqlRes{}
-	// fmt.Println("request ->", string(q))
-	err := dg.postql(uctx, []byte(q), res)
-	// fmt.Println("response ->", res)
-
-	// Check if error contains the transaction aborted message
-	// @DEBUG: solve the issue https://discuss.hypermode.com/t/transactions-in-graphql/6861/10
-	if res.Errors != nil {
-		gqlErr, _ := json.Marshal(res.Errors)
-		if strings.Contains(string(gqlErr), "Please retry") {
-			// Retry up to 10 times
-			for i := 0; i < 10; i++ {
-				// Random sleep between 10 and 100 ms
-				sleepTime := time.Duration(10+rand.Intn(91)) * time.Millisecond
-				time.Sleep(sleepTime)
-
-				// Retry the request
-				res = &GqlRes{}
-				err = dg.postql(uctx, []byte(q), res)
-
-				// If success or different error, stop retrying
-				if res.Errors == nil {
-					break
-				}
-				gqlErr, _ = json.Marshal(res.Errors)
-				if !strings.Contains(string(gqlErr), "Please retry") {
-					break
-				}
-			}
+	// Send the dgraph request. Transaction aborts surface as GraphQL errors
+	// (res.Err()), which withRetry treats like any other conflict.
+	// @DEBUG: see https://discuss.hypermode.com/t/transactions-in-graphql/6861/10
+	res, err := withRetry(func() (*GqlRes, error) {
+		res := &GqlRes{}
+		// fmt.Println("request ->", string(q))
+		if err := dg.postql(uctx, []byte(q), res); err != nil {
+			return nil, err
 		}
-	}
-
-	if err != nil {
-		return err
+		// fmt.Println("response ->", res)
+		return res, res.Err()
+	})
+	if res == nil {
+		return err // transport error
 	}
 
 	switch v := data.(type) {
@@ -550,10 +537,5 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 		}
 	}
 
-	if res.Errors != nil {
-		err, _ := json.Marshal(res.Errors)
-		// return fmt.Errorf(string(err))
-		return &GraphQLError{string(err)}
-	}
-	return err
+	return err // GraphQL errors, if any
 }
