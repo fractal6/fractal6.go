@@ -21,6 +21,15 @@ func ExtractSlice[T any](a any, data *[]T) error {
 	return json.Unmarshal(raw, data)
 }
 
+// Deref returns the pointed value, or the zero value if p is nil.
+func Deref[T any](p *T) T {
+	if p == nil {
+		var zero T
+		return zero
+	}
+	return *p
+}
+
 // DerefSlice converts a slice of pointers []*T into a slice of values []T.
 func DerefSlice[T any](ptrs []*T) []T {
 	result := make([]T, len(ptrs))

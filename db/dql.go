@@ -695,7 +695,7 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 		op = "getTensionInt"
 	case "ext":
 		op = "getTensionExt"
-	case "all":
+	case "all", "export":
 		op = "getTensionAll"
 	default:
 		panic("Unknow type (tension query)")
@@ -706,9 +706,14 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 		payload = tensionLightPayload
 	}
 
-	if type_ == "all" {
+	if type_ == "all" || type_ == "export" {
 		payload += `
            Tension.assignees { User.username User.name }`
+	}
+	if type_ == "export" {
+		payload += `
+           Tension.project_statuses { ProjectColumn.project { Project.name } }
+           Tension.comments (orderasc: Post.createdAt, first: 1) { Post.message }`
 	}
 
 	(*maps)["payload"] = payload

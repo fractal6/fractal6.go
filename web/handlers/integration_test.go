@@ -165,6 +165,7 @@ func buildTestRouter() chi.Router {
 			r.Post("/ext", TensionsHandler("ext"))
 			r.Post("/all", TensionsHandler("all"))
 			r.Post("/count", TensionsCount)
+			r.Post("/export", TensionsExport)
 		})
 	})
 

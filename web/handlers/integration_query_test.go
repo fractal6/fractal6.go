@@ -27,6 +27,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+	"time"
+
+	"github.com/xuri/excelize/v2"
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph/model"
@@ -186,12 +189,14 @@ func TestTensionListsExposeDerivedGovernanceState(t *testing.T) {
 			t as var(func: eq(Tension.receiverid, "` + key + `")) {
 				b as Tension.blobs { f as Blob.node }
 				n as Tension.governed_node
+				c as Tension.comments
 			}
 		}`,
 		M: []db.X{{D: `uid(root) <Node.tensions_in> uid(t) .
 			uid(emitter) <Node.tensions_out> uid(t) .
 			uid(f) * * .
 			uid(b) * * .
+			uid(c) * * .
 			uid(t) * * .
 			uid(n) * * .
 			uid(emitter) * * .`}},
@@ -216,6 +221,10 @@ func TestTensionListsExposeDerivedGovernanceState(t *testing.T) {
 			_:draft <Tension.emitter> _:emitter .
 			_:draft <Post.createdBy> uid(author) .
 			_:draft <Post.createdAt> "2099-01-03T00:00:00Z" .
+			_:draft <Tension.comments> _:draftComment .
+			_:draftComment <dgraph.type> "Comment" .
+			_:draftComment <Post.createdAt> "2099-01-03T00:00:00Z" .
+			_:draftComment <Post.message> "REST draft body" .
 			_:draft <Tension.blobs> _:draftBlob .
 			_:draftBlob <dgraph.type> "Blob" .
 			_:draftBlob <Post.createdAt> "2099-01-03T00:00:00Z" .
@@ -298,5 +307,33 @@ func TestTensionListsExposeDerivedGovernanceState(t *testing.T) {
 			*archived.Type != model.NodeTypeRole || !*archived.IsArchived {
 			t.Errorf("/%s archived derivation inputs missing: %+v", mode, archived)
 		}
+	}
+
+	// xlsx export: same query, first comment exposed as the message column
+	rr := doRequest("POST", "/q/tensions/export", query)
+	requireStatus(t, rr, http.StatusOK)
+	if ct := rr.Header().Get("Content-Type"); ct != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
+		t.Fatalf("export content-type: %q", ct)
+	}
+	if cd := rr.Header().Get("Content-Disposition"); cd != "attachment; filename=tensions_"+time.Now().Format("20060102")+".xlsx" {
+		t.Errorf("export content-disposition: %q", cd)
+	}
+	f, err := excelize.OpenReader(bytes.NewReader(rr.Body.Bytes()))
+	if err != nil {
+		t.Fatalf("opening export: %v", err)
+	}
+	defer f.Close()
+	rows, err := f.GetRows("Tensions")
+	if err != nil {
+		t.Fatalf("reading export sheet: %v", err)
+	}
+	var draftRow []string
+	for _, row := range rows[1:] {
+		if len(row) > 1 && row[1] == "REST draft role" {
+			draftRow = row
+		}
+	}
+	if len(draftRow) < 12 || draftRow[11] != "REST draft body" || draftRow[2] != "Test Org" || draftRow[6] != "testuser" {
+		t.Errorf("export draft row: %v", draftRow)
 	}
 }

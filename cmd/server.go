@@ -81,7 +81,7 @@ func RunServer() {
 		AllowedOrigins: allowedOrigins,
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		// AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		// ExposedHeaders:   []string{"Link"},
+		ExposedHeaders:   []string{"Content-Disposition", "Retry-After"}, // xlsx export filename, rate limiting
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	})
@@ -203,6 +203,7 @@ func RunServer() {
 				r.Post("/ext", handle6.TensionsHandler("ext"))
 				r.Post("/all", handle6.TensionsHandler("all"))
 				r.Post("/count", handle6.TensionsCount)
+				r.Post("/export", handle6.TensionsExport)
 			})
 		})
 	})
