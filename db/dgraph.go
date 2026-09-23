@@ -419,12 +419,12 @@ func (dg Dgraph) QueryDql(op string, maps map[string]string) (*api.Response, err
 // runDqlTxn executes a query block plus optional mutations in a fresh txn:
 // read-only (no Zero ts allocation) when there is no mutation, auto-commit
 // otherwise. Each attempt is bounded by dqlTimeout and retried on transient
-// conflicts via withRetry. Same retry contract as QueryGql for the GraphQL path.
+// conflicts via dgraphRetry. Same retry contract as QueryGql for the GraphQL path.
 func (dg Dgraph) runDqlTxn(query string, mutations []*api.Mutation) (*api.Response, error) {
 	if dg.dgc == nil {
 		return nil, fmt.Errorf("dgraph: no grpc client configured")
 	}
-	return withRetry(func() (*api.Response, error) {
+	return Retry(dgraphRetry, func() (*api.Response, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), dqlTimeout)
 		defer cancel()
 		if len(mutations) == 0 {
@@ -452,26 +452,12 @@ func isDgraphConflict(err error) bool {
 	return strings.Contains(err.Error(), "Please retry")
 }
 
-// withRetry runs fn up to 10 times with a 10-100ms jittered backoff while it
-// returns an isDgraphConflict error. Shared by the DQL and GraphQL paths. Logs
-// once when retries fire so contention shows up instead of being silently swallowed.
-func withRetry[T any](fn func() (T, error)) (T, error) {
-	const maxAttempts = 10
-	var (
-		res T
-		err error
-	)
-	for attempt := 0; attempt < maxAttempts; attempt++ {
-		res, err = fn()
-		if !isDgraphConflict(err) {
-			if attempt > 0 {
-				fmt.Printf("dgraph: succeeded after %d retries\n", attempt)
-			}
-			return res, err
-		}
-		time.Sleep(time.Duration(10+rand.Intn(91)) * time.Millisecond)
-	}
-	return res, err
+// dgraphRetry: up to 10 attempts with a 10-100ms jittered backoff on isDgraphConflict. Shared by the DQL and GraphQL paths.
+var dgraphRetry = RetryPolicy{
+	Name:     "dgraph",
+	Attempts: 10,
+	Delay:    func(int) time.Duration { return time.Duration(10+rand.Intn(91)) * time.Millisecond },
+	RetryIf:  isDgraphConflict,
 }
 
 // UpsertDql runs an upsert template (QueryMut + variable map): formats
@@ -507,9 +493,9 @@ func (dg Dgraph) QueryGql(uctx model.UserCtx, op string, reqInput map[string]str
 	q := dg.getGqlQuery(op, reqInput)
 
 	// Send the dgraph request. Transaction aborts surface as GraphQL errors
-	// (res.Err()), which withRetry treats like any other conflict.
+	// (res.Err()), which dgraphRetry treats like any other conflict.
 	// @DEBUG: see https://discuss.hypermode.com/t/transactions-in-graphql/6861/10
-	res, err := withRetry(func() (*GqlRes, error) {
+	res, err := Retry(dgraphRetry, func() (*GqlRes, error) {
 		res := &GqlRes{}
 		// fmt.Println("request ->", string(q))
 		if err := dg.postql(uctx, []byte(q), res); err != nil {

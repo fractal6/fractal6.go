@@ -20,7 +20,7 @@
 
 // Postal answers HTTP 200 even for refused messages, carrying the failure in
 // the JSON body's status field; these tests pin sendPostal's handling of both
-// transport-level and body-level errors.
+// transport-level and body-level errors, and the retry on 5xx.
 
 package email
 
@@ -28,37 +28,50 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestSendPostalStatusHandling(t *testing.T) {
-	var respCode int
-	var respBody string
+	type resp struct {
+		code int
+		body string
+	}
+	var resps []resp // served in order, the last one repeats
+	calls := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(respCode)
-		w.Write([]byte(respBody))
+		r0 := resps[min(calls, len(resps)-1)]
+		calls++
+		w.WriteHeader(r0.code)
+		w.Write([]byte(r0.body))
 	}))
 	defer srv.Close()
 
 	oldUrl, oldSecret := emailUrl, emailSecret
 	SetTestConfig(srv.URL, "test-secret")
 	defer SetTestConfig(oldUrl, oldSecret)
+	oldDelay := postalRetry.Delay
+	postalRetry.Delay = func(int) time.Duration { return 0 }
+	defer func() { postalRetry.Delay = oldDelay }()
 
+	ok := resp{200, `{"status":"success"}`}
 	cases := []struct {
-		name    string
-		code    int
-		body    string
-		wantErr bool
+		name      string
+		resps     []resp
+		wantErr   bool
+		wantCalls int
 	}{
-		{"success", 200, `{"status":"success"}`, false},
-		{"no-status-in-body", 200, `{}`, false},
-		{"postal-error-behind-200", 200, `{"status":"error","data":{"code":"ValidationError","message":"bad rcpt"}}`, true},
-		{"http-error", 500, `boom`, true},
+		{"success", []resp{ok}, false, 1},
+		{"no-status-in-body", []resp{{200, `{}`}}, false, 1},
+		{"postal-error-behind-200", []resp{{200, `{"status":"error","data":{"code":"ValidationError","message":"bad rcpt"}}`}}, true, 1},
+		{"5xx-then-success", []resp{{500, `boom`}, ok}, false, 2},
+		{"5xx-exhausted", []resp{{500, `boom`}}, true, 3},
+		{"4xx-no-retry", []resp{{401, `nope`}}, true, 1},
 	}
 	for _, c := range cases {
-		respCode, respBody = c.code, c.body
+		resps, calls = c.resps, 0
 		err := sendPostal([]byte(`{"to":["x@y.z"]}`))
-		if (err != nil) != c.wantErr {
-			t.Errorf("%s: err=%v, wantErr=%v", c.name, err, c.wantErr)
+		if (err != nil) != c.wantErr || calls != c.wantCalls {
+			t.Errorf("%s: err=%v calls=%d, wantErr=%v wantCalls=%d", c.name, err, calls, c.wantErr, c.wantCalls)
 		}
 	}
 }

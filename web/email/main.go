@@ -25,6 +25,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -157,10 +158,27 @@ func Ping(ctx context.Context) error {
 	return nil
 }
 
-// sendPostal POSTs a JSON payload to the mailer API. Postal replies HTTP 200
-// even for refused messages, with {"status": "error", ...} in the body, so
-// the body-level status is checked too (absent status — e.g. test mocks — passes).
+// errPostalTransient marks network and 5xx failures, retried by postalRetry.
+var errPostalTransient = errors.New("postal: transient")
+
+// postalRetry: 3 attempts (2s, 5s waits) on transient failures. A 5xx may have been queued anyway, so a retry can rarely duplicate.
+var postalRetry = tools.RetryPolicy{
+	Name:     "postal",
+	Attempts: 3,
+	Delay:    func(attempt int) time.Duration { return []time.Duration{2 * time.Second, 5 * time.Second}[attempt] },
+	RetryIf:  func(err error) bool { return errors.Is(err, errPostalTransient) },
+}
+
+// sendPostal POSTs a JSON payload to the mailer API, retrying transient failures.
 func sendPostal(body []byte) error {
+	_, err := tools.Retry(postalRetry, func() (struct{}, error) { return struct{}{}, sendPostalOnce(body) })
+	return err
+}
+
+// sendPostalOnce does a single POST. Postal replies HTTP 200 even for refused
+// messages, with {"status": "error", ...} in the body, so the body-level status
+// is checked too (absent status — e.g. test mocks — passes).
+func sendPostalOnce(body []byte) error {
 	req, err := http.NewRequest("POST", emailUrl, bytes.NewBuffer(body))
 	if err != nil {
 		return err
@@ -170,10 +188,13 @@ func sendPostal(body []byte) error {
 
 	resp, err := mailerHTTPClient.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %w", errPostalTransient, err)
 	}
 	defer resp.Body.Close()
 	raw, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+	if resp.StatusCode >= 500 {
+		return fmt.Errorf("%w: %s: %s", errPostalTransient, resp.Status, strings.TrimSpace(string(raw)))
+	}
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("postal: %s: %s", resp.Status, strings.TrimSpace(string(raw)))
 	}
