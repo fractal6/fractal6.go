@@ -29,6 +29,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -84,6 +85,13 @@ var sanitizer = func() *bluemonday.Policy {
 	p.AllowURLSchemes("cid", "http", "https", "mailto")
 	return p
 }()
+
+// Link attribute blocks `[x](url){target="_blank"}` (frontend syntax) are meaningless in
+// email: strip them from the rendered HTML (code spans never produce `</a>{`).
+// A block with no known attribute stays literal, as in the frontend.
+var linkAttrBlockRe = regexp.MustCompile(`</a>\{[^{}]*\b(?i:target|title|class|rel)\s*=\s*&quot;[^{}]*\}`)
+
+func stripLinkAttrs(s string) string { return linkAttrBlockRe.ReplaceAllString(s, "</a>") }
 
 var (
 	emailSecret     string
@@ -401,7 +409,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif, 
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			rendered := rewriteFileImgs(buf.String(), att.inlineByID)
+			rendered := rewriteFileImgs(stripLinkAttrs(buf.String()), att.inlineByID)
 			payload = sanitizer.Sanitize(rendered)
 		}
 
@@ -490,7 +498,7 @@ func SendEventNotificationEmail(ui model.UserNotifInfo, notif model.EventNotif, 
 			if err = md.Convert([]byte(message), &buf); err != nil {
 				return err
 			}
-			rendered := rewriteFileImgs(buf.String(), att.inlineByID)
+			rendered := rewriteFileImgs(stripLinkAttrs(buf.String()), att.inlineByID)
 			comment = sanitizer.Sanitize(rendered)
 		}
 
@@ -694,7 +702,7 @@ func SendContractNotificationEmail(ui model.UserNotifInfo, notif model.ContractN
 		if err = md.Convert([]byte(notif.Msg), &buf); err != nil {
 			return err
 		}
-		rendered := rewriteFileImgs(buf.String(), att.inlineByID)
+		rendered := rewriteFileImgs(stripLinkAttrs(buf.String()), att.inlineByID)
 		payload += sanitizer.Sanitize(rendered)
 	} else {
 		payload += "<br><br>"

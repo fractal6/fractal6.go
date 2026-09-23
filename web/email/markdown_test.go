@@ -95,3 +95,17 @@ func TestMarkdown_DetailsBlockStillWorks(t *testing.T) {
 		t.Errorf("details block broken\ngot: %s", got)
 	}
 }
+
+// Frontend link attribute blocks are stripped; unknown-only blocks and code spans stay literal.
+func TestMarkdown_StripLinkAttrs(t *testing.T) {
+	cases := map[string]string{
+		`see [x](https://a.b){target="_blank" title="T"} end`: `<a href="https://a.b">x</a> end`,
+		`see [x](https://a.b){foo="bar"} end`:                 `<a href="https://a.b">x</a>{foo=&quot;bar&quot;} end`,
+		"code `[x](https://a.b){target=\"_blank\"}`":          `<code>[x](https://a.b){target=&quot;_blank&quot;}</code>`,
+	}
+	for in, want := range cases {
+		if got := stripLinkAttrs(renderMD(t, in)); !strings.Contains(got, want) {
+			t.Errorf("input %q: expected %q\ngot: %s", in, want, got)
+		}
+	}
+}
