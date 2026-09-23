@@ -110,9 +110,18 @@ func FileServer(r chi.Router, publicUri string, location string, cacheControl st
 				Path:   "/",
 				MaxAge: 7776000,
 			})
-			// Hack to by bypass (301 - Not Modified) state.
+			// Strip leading slashes/backslashes: "/fr//evil.com" must not become an open redirect to "//evil.com".
+			rest := strings.TrimPrefix(strings.TrimPrefix(r.URL.EscapedPath(), publicUri), lang)
+			target := publicUri + strings.TrimLeft(rest, "/\\")
+			// Cache-bust the target: both lang shells share the same URL, a 304 would serve the old lang.
 			rand := strconv.FormatInt(time.Now().Unix(), 10)
-			http.Redirect(w, r, strings.TrimPrefix(r.RequestURI+"?"+rand, "/"+lang), 301)
+			if r.URL.RawQuery != "" {
+				target += "?" + r.URL.RawQuery + "&" + rand
+			} else {
+				target += "?" + rand
+			}
+			// 302: the redirect sets a cookie and must hit the server every time (a 301 is cached).
+			http.Redirect(w, r, target, http.StatusFound)
 		} else {
 			// Serve the index.html from asked or preferred Lang
 			// 1. use user setting if logged.
