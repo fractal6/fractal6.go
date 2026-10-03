@@ -1,9 +1,11 @@
 # Markdown Rendering
 
-The backend renders markdown only for **email notifications** — the frontend does its
-own. Everything lives in `web/email/main.go`.
+The frontend renders its own markdown. The backend converts in both directions for email:
 
-## Pipeline
+- **Outbound** (notifications): markdown -> HTML, `web/email/main.go`.
+- **Inbound** (email replies, Holaspirit import): HTML -> markdown, `internal/tools/markdown.go`.
+
+## Outbound pipeline
 
 goldmark converts markdown to HTML, then bluemonday sanitises it.
 
@@ -28,3 +30,14 @@ Postal attachments plus a footer link list.
 
 The inbound direction (email replies carrying `cid:` refs) is resolved in
 `web/handlers/cid.go`. See [file storage](file-storage.md) for both flows.
+
+## Inbound pipeline
+
+`decodeInboundEmail` (`web/handlers/mailer.go`) prefers Postal's `html_body` over the
+wrapped plain body, then:
+
+1. `HTMLToMarkdown`: bluemonday allowlist, then a walk of the HTML tree. Whitespace is
+   collapsed like a browser (outside `<pre>`), so client source indentation never becomes
+   an indented code block.
+2. `StripEmailQuote` (`internal/tools/string.go`): drops the quote header, the Fractale
+   footer and the signature.

@@ -78,6 +78,36 @@ func TestHtmlToMarkdown(t *testing.T) {
 			expected: "line1  \nline2",
 		},
 		{
+			name:     "source indentation dropped at line start",
+			input:    "line1<br>\n    line2\n    wrapped",
+			expected: "line1  \nline2 wrapped",
+		},
+		{
+			name:     "nbsp preserved",
+			input:    "a&nbsp;&nbsp;b",
+			expected: "a\u00a0\u00a0b",
+		},
+		{
+			name:     "whitespace-only lines collapsed",
+			input:    "a<br><br><br><br>b",
+			expected: "a\n\nb",
+		},
+		{
+			name:     "emphasis edge whitespace moved outside markers",
+			input:    "x<b>\n  bold\n  </b> y <i> it</i>",
+			expected: "x **bold** y *it*",
+		},
+		{
+			name:     "nested emphasis edge whitespace",
+			input:    "x<b>\n  <i>both</i>\n</b>y",
+			expected: "x ***both*** y",
+		},
+		{
+			name:     "whitespace-only emphasis untouched",
+			input:    "x<b> </b>y",
+			expected: "x** **y",
+		},
+		{
 			name:     "nested bold in paragraph",
 			input:    "<p>This is <strong>important</strong> text</p>",
 			expected: "This is **important** text",

@@ -275,9 +275,9 @@ func TestStripEmailQuote(t *testing.T) {
 	}
 }
 
-// TestStripEmailQuote_GmailHTML exercises the real notifier path:
-// raw Gmail reply HTML -> HTMLToMarkdown -> StripEmailQuote.
-func TestStripEmailQuote_GmailHTML(t *testing.T) {
+// TestStripEmailQuote_HTML exercises the real notifier path:
+// raw reply HTML (Gmail, Thunderbird) -> HTMLToMarkdown -> StripEmailQuote.
+func TestStripEmailQuote_HTML(t *testing.T) {
 	tests := []struct {
 		name     string
 		html     string
@@ -302,6 +302,55 @@ func TestStripEmailQuote_GmailHTML(t *testing.T) {
 				`<blockquote class="gmail_quote">Hi @maud.srd, short message.<br>— <br>You are receiving this because you have been mentionned.</blockquote>` +
 				`</div>`,
 			expected: "Yes, it's fine.",
+		},
+		{
+			// Source indentation must not survive: 4+ leading spaces is a markdown code block.
+			name: "thunderbird indented html reply",
+			html: `<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body style="padding-bottom: 1px;">
+    Okay, first line of the reply...<br>
+    <br>
+    Meanwhile, the thing is waiting for review, visible
+    here :
+<a class="moz-txt-link-freetext" href="https://example.com/apps/1">https://example.com/apps/1</a><br>
+    <br>
+    We should get an email, then you should be able to test
+    it.<br>
+    <br>
+    bob<br>
+    <br>
+    <div class="moz-cite-prefix">On 10/2/26 11:25 PM, @alice
+      wrote:<br>
+    </div>
+    <blockquote type="cite" cite="mid:xxx@example.com">
+      <meta charset="utf-8">
+      <p>original message that was
+        wrapped by the client</p>
+      <div
+style="margin-top:1em;color:#666;font-size:small">Attachments:<br>
+        <a href="https://example.com/file/0x1"
+          moz-do-not-send="true">screenshot.png</a> (330.6 KB)<br>
+      </div>
+      —
+      <div style="color:#666;font-size:small">You are receiving this
+        because you are subscribed to this tension.<br>
+        <a href="https://example.com/tension/org/0x2?eid=0x3"
+          moz-do-not-send="true">View it on Fractale</a>, reply to this
+        email directly, or <a
+href="https://example.com/tension/org/0x2?unsubscribe=email"
+          moz-do-not-send="true">unsubscribe</a>.</div>
+    </blockquote>
+    <br>
+  </body>
+</html>`,
+			expected: "Okay, first line of the reply...\n\n" +
+				"Meanwhile, the thing is waiting for review, visible here : [https://example.com/apps/1](https://example.com/apps/1)\n\n" +
+				"We should get an email, then you should be able to test it.\n\n" +
+				"bob",
 		},
 	}
 

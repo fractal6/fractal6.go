@@ -22,6 +22,7 @@ package tools
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -50,6 +51,12 @@ var mdSanitizer = func() *bluemonday.Policy {
 	return p
 }()
 
+// reHTMLSpace matches ASCII whitespace runs (not &nbsp;), collapsed to one space like a browser does.
+var reHTMLSpace = regexp.MustCompile(`\s+`)
+
+// reBlankLines matches 2+ line breaks with whitespace-only lines in between (e.g. from <br><br>).
+var reBlankLines = regexp.MustCompile(`[ \t]*\n(?:[ \t]*\n)+`)
+
 // HTMLToMarkdown converts HTML content to markdown.
 // Handles: p, br, strong/b, em/i, a, ul/ol/li, h1-h6, blockquote,
 // pre/code, del/s, hr, img, table, details/summary, and nested lists.
@@ -62,13 +69,39 @@ func HTMLToMarkdown(s string) (string, error) {
 	if err != nil {
 		return "", LogErr("HTMLToMarkdown", err)
 	}
+	hoistEmphasisSpaces(doc)
 	var buf strings.Builder
 	renderNode(&buf, doc, "")
-	result := buf.String()
-	for strings.Contains(result, "\n\n\n") {
-		result = strings.ReplaceAll(result, "\n\n\n", "\n\n")
-	}
+	result := reBlankLines.ReplaceAllString(buf.String(), "\n\n")
 	return strings.TrimSpace(result), nil
+}
+
+// hoistEmphasisSpaces moves edge whitespace out of emphasis elements: "** x **" is not emphasis in markdown.
+func hoistEmphasisSpaces(n *html.Node) {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		hoistEmphasisSpaces(c)
+	}
+	if n.Type != html.ElementNode {
+		return
+	}
+	switch n.Data {
+	case "strong", "b", "em", "i", "del", "s":
+	default:
+		return
+	}
+	// A whitespace-only edge text is hoisted only if other content remains inside.
+	if f := n.FirstChild; f != nil && f.Type == html.TextNode {
+		if t := strings.TrimLeft(f.Data, " \t\r\n\f"); len(t) < len(f.Data) && (t != "" || f.NextSibling != nil) {
+			f.Data = t
+			n.Parent.InsertBefore(&html.Node{Type: html.TextNode, Data: " "}, n)
+		}
+	}
+	if l := n.LastChild; l != nil && l.Type == html.TextNode {
+		if t := strings.TrimRight(l.Data, " \t\r\n\f"); len(t) < len(l.Data) && (t != "" || l.PrevSibling != nil) {
+			l.Data = t
+			n.Parent.InsertBefore(&html.Node{Type: html.TextNode, Data: " "}, n.NextSibling)
+		}
+	}
 }
 
 // collectText renders a node's children into a temporary buffer and returns the result.
@@ -93,7 +126,11 @@ func renderNode(buf *strings.Builder, n *html.Node, listPrefix string) {
 	case html.TextNode:
 		text := n.Data
 		if !isInsidePre(n) {
-			text = strings.ReplaceAll(text, "\n", " ")
+			text = reHTMLSpace.ReplaceAllString(text, " ")
+			// Collapse across nodes too; leading spaces at line start would make an indented code block.
+			if s := buf.String(); s == "" || strings.HasSuffix(s, "\n") || strings.HasSuffix(s, " ") {
+				text = strings.TrimLeft(text, " ")
+			}
 		}
 		buf.WriteString(text)
 		return
