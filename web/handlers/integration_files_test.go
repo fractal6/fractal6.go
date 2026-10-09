@@ -32,6 +32,7 @@ package handlers_test
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -619,8 +620,8 @@ func TestAvatarUserReplaceFlow(t *testing.T) {
 	}
 
 	// Anonymous GET succeeds — user avatars are public.
-	if g := getFile(t, first.ID, nil); g.Code != http.StatusFound {
-		t.Errorf("anonymous GET first avatar: status %d, want 302", g.Code)
+	if g := getFile(t, first.ID, nil); g.Code != http.StatusOK {
+		t.Errorf("anonymous GET first avatar: status %d, want 200", g.Code)
 	}
 
 	// Second upload — replaces the first.
@@ -650,6 +651,80 @@ func TestAvatarUserReplaceFlow(t *testing.T) {
 	}
 }
 
+// User avatars are streamed with an immutable cache header and exposed as avatar.id on the
+// uctx (tokenack, not the JWT cookie) and on REST users (/q/members/sub).
+func TestAvatarUser_ServedAndExposed(t *testing.T) {
+	jwt := loginAs(testutil.TestUser, testutil.TestPassword)
+	rr := uploadFile(t, uploadOpts{
+		Userid: testutil.TestUser, Filename: "av.png",
+		DeclaredContentType: "image/png", Body: pngBytes(),
+	}, jwt)
+	requireStatus(t, rr, http.StatusOK)
+	av := decodeUpload(t, rr)
+	defer purgeFile(t, av.ID, storageKeyOf(t, av.ID))
+
+	g := getFile(t, av.ID, nil)
+	requireStatus(t, g, http.StatusOK)
+	if !bytes.Equal(g.Body.Bytes(), pngBytes()) {
+		t.Errorf("avatar body mismatch: got %d bytes", g.Body.Len())
+	}
+	for h, want := range map[string]string{
+		"Content-Type":           "image/png",
+		"Cache-Control":          "public, max-age=31536000, immutable",
+		"X-Content-Type-Options": "nosniff",
+	} {
+		if got := g.Header().Get(h); got != want {
+			t.Errorf("%s = %q, want %q", h, got, want)
+		}
+	}
+
+	// tokenack carries avatar.id, the refreshed cookie doesn't.
+	tk := doRequest("POST", "/auth/tokenack", nil, jwt)
+	requireStatus(t, tk, http.StatusOK)
+	var uctx model.UserCtx
+	if err := json.Unmarshal(tk.Body.Bytes(), &uctx); err != nil {
+		t.Fatalf("decode tokenack: %v", err)
+	}
+	if uctx.Avatar == nil || uctx.Avatar.ID == nil || *uctx.Avatar.ID != av.ID {
+		t.Errorf("tokenack avatar = %+v, want id %s", uctx.Avatar, av.ID)
+	}
+	for _, c := range tk.Result().Cookies() {
+		if c.Name != "jwt" {
+			continue
+		}
+		parts := strings.Split(tools.Unpack64(c.Value), ".")
+		if len(parts) != 3 {
+			t.Fatalf("malformed jwt cookie")
+		}
+		claims, err := base64.RawURLEncoding.DecodeString(parts[1])
+		if err != nil {
+			t.Fatalf("decode jwt claims: %v", err)
+		}
+		if strings.Contains(string(claims), av.ID) {
+			t.Errorf("jwt cookie must not carry the avatar: %s", claims)
+		}
+	}
+
+	m := doRequest("POST", "/q/members/sub", map[string]any{"nameid": "test-org", "include_self": true}, jwt)
+	requireStatus(t, m, http.StatusOK)
+	var members []model.Node
+	if err := json.Unmarshal(m.Body.Bytes(), &members); err != nil {
+		t.Fatalf("decode members: %v", err)
+	}
+	found := false
+	for _, n := range members {
+		if u := n.FirstLink; u != nil && u.Username == testutil.TestUser {
+			found = true
+			if u.Avatar == nil || u.Avatar.ID != av.ID {
+				t.Errorf("member %s avatar = %+v, want id %s", n.Nameid, u.Avatar, av.ID)
+			}
+		}
+	}
+	if !found {
+		t.Errorf("%s not found in /q/members/sub", testutil.TestUser)
+	}
+}
+
 func TestAvatarUserUpload_AsOtherUser_403(t *testing.T) {
 	jwt := loginAs(testutil.TestUser2, testutil.TestPassword2)
 	rr := uploadFile(t, uploadOpts{
@@ -670,9 +745,11 @@ func TestAvatarNodeFollowsVisibility(t *testing.T) {
 	pub := decodeUpload(t, rr)
 	defer purgeFile(t, pub.ID, storageKeyOf(t, pub.ID))
 
-	// Public node → anonymous GET succeeds.
-	if g := getFile(t, pub.ID, nil); g.Code != http.StatusFound {
-		t.Errorf("anon GET public-org avatar: status %d, want 302", g.Code)
+	// Public node → anonymous GET succeeds, streamed and cached by the browser only.
+	g := getFile(t, pub.ID, nil)
+	requireStatus(t, g, http.StatusOK)
+	if got := g.Header().Get("Cache-Control"); got != "private, max-age=31536000, immutable" {
+		t.Errorf("Cache-Control = %q, want private, max-age=31536000, immutable", got)
 	}
 
 	// Private root: testuser2 is Owner on sec-org → may upload.
@@ -691,9 +768,27 @@ func TestAvatarNodeFollowsVisibility(t *testing.T) {
 	}
 	// Member testuser sees it (Member of sec-org).
 	memberJWT := loginAs(testutil.TestUser, testutil.TestPassword)
-	if g := getFile(t, priv.ID, memberJWT); g.Code != http.StatusFound {
-		t.Errorf("member GET private-org avatar: status %d, want 302", g.Code)
+	if g := getFile(t, priv.ID, memberJWT); g.Code != http.StatusOK {
+		t.Errorf("member GET private-org avatar: status %d, want 200", g.Code)
 	}
+}
+
+// Org avatars are managed by the org's current coordinators, not by the uploader.
+func TestAvatarNodeDelete_CoordinatorsOnly(t *testing.T) {
+	// Uploaded by testuser, plain Member of sec-org (e.g. a former coordinator). DB row only.
+	fid, err := db.GetDB().ReplaceNodeAvatar("sec-org", testutil.TestUser, "logo.png", "image/png",
+		"orgas/sec-org/test-delete-rights-logo.png", int64(len(pngBytes())), time.Now().UTC().Format(time.RFC3339))
+	if err != nil {
+		t.Fatalf("ReplaceNodeAvatar: %v", err)
+	}
+	defer purgeFile(t, fid, "")
+
+	uploaderJWT := loginAs(testutil.TestUser, testutil.TestPassword)
+	requireStatus(t, doRequest("DELETE", "/file/"+fid, nil, uploaderJWT), http.StatusNotFound)
+
+	// testuser2 is Owner of sec-org, not the uploader.
+	ownerJWT := loginAs(testutil.TestUser2, testutil.TestPassword2)
+	requireStatus(t, doRequest("DELETE", "/file/"+fid, nil, ownerJWT), http.StatusNoContent)
 }
 
 func TestAvatarNodeUpload_AsNonCoordo_403(t *testing.T) {
@@ -731,6 +826,14 @@ func TestUploadAnchorValidation(t *testing.T) {
 		Cid: cid, Filename: "x.png", DeclaredContentType: "image/png", Body: pngBytes(),
 	}, jwt)
 	requireStatus(t, rr, http.StatusBadRequest)
+
+	// orgaid must be a root: circle or role → 400 (a role used to panic in UserHasCoordoRole).
+	for _, nid := range []string{"test-org#circle", "test-org##@" + testutil.TestUser} {
+		rr = uploadFile(t, uploadOpts{
+			Orgaid: nid, Filename: "x.png", DeclaredContentType: "image/png", Body: pngBytes(),
+		}, jwt)
+		requireStatus(t, rr, http.StatusBadRequest)
+	}
 }
 
 func TestUploadRejectsCrossTension(t *testing.T) {

@@ -157,7 +157,7 @@ func SubMembers(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, []model.Node{})
 		return
 	}
-	data, err := db.GetDB().GetMembersIn(visible, "User.name User.username")
+	data, err := db.GetDB().GetMembersIn(visible, "User.name User.username User.avatar { uid }")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

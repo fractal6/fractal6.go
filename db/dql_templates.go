@@ -274,7 +274,7 @@ var dqlQueries map[string]string = map[string]string{
             Project.name
             Project.description
             Project.nodes { Node.nameid Node.name Node.visibility }
-            Project.collaborators { User.username User.name }
+            Project.collaborators { User.username User.name User.avatar { uid } }
         }
     }`,
 	"getTensionHook": `{

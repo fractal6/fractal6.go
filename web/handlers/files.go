@@ -25,9 +25,9 @@
 // one anchor triple is set per upload; the handler picks the auth path from
 // the populated triple.
 //
-// Bytes never travel through Fractale: every read goes through GET /file/<id>,
-// which re-authorises against the populated anchor and 302-redirects to a
-// short-lived presigned URL. See docs/file-storage.md.
+// Every read goes through GET /file/<id>, which re-authorises against the
+// populated anchor and 302-redirects to a short-lived presigned URL, except
+// avatars (user and org), streamed with an immutable cache header. See docs/file-storage.md.
 package handlers
 
 import (
@@ -36,16 +36,23 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"image"
+	// Blank imports register the formats image.DecodeConfig reads in validateAvatar (webp: below).
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	_ "golang.org/x/image/webp" // registers webp for image.DecodeConfig (validateAvatar)
 
 	"fractale/fractal6.go/db"
 	"fractale/fractal6.go/graph"
@@ -85,6 +92,16 @@ var inlineSafeContentTypes = map[string]bool{
 	"application/pdf": true,
 	"text/plain":      true,
 }
+
+// avatarContentTypes is the avatar upload allowlist; avatars with these types are streamed on GET.
+var avatarContentTypes = map[string]bool{
+	"image/png":  true,
+	"image/jpeg": true,
+	"image/gif":  true,
+	"image/webp": true,
+}
+
+const maxAvatarSide = 1024
 
 // --- anchor parsing ---
 
@@ -148,6 +165,10 @@ func resolveAnchor(r *http.Request) (uploadAnchor, int, error) {
 	case userid != "":
 		return uploadAnchor{Kind: db.KindUser, Username: userid}, 0, nil
 	default:
+		// Only root nodes carry an org avatar (a nameid with '#' is a circle or a role).
+		if strings.Contains(orgaid, "#") {
+			return uploadAnchor{}, http.StatusBadRequest, fmt.Errorf("orgaid must be a root nameid")
+		}
 		return uploadAnchor{Kind: db.KindNode, Rootnameid: orgaid}, 0, nil
 	}
 }
@@ -195,6 +216,30 @@ func FileGetHandler(cli *storage.Client) http.HandlerFunc {
 
 		if cli == nil {
 			http.Error(w, "storage not configured", http.StatusServiceUnavailable)
+			return
+		}
+
+		// Avatars are immutable per id (replace = new id): stream them so browsers keep them a year.
+		// No shared cache in front: it would keep serving deleted avatars.
+		if (fa.Kind == db.KindUser || fa.Kind == db.KindNode) && avatarContentTypes[fa.ContentType] {
+			body, size, err := cli.GetObject(r.Context(), fa.StorageKey)
+			if err != nil {
+				http.Error(w, "storage read failed: "+err.Error(), http.StatusBadGateway)
+				return
+			}
+			defer body.Close()
+			w.Header().Set("Content-Type", fa.ContentType)
+			w.Header().Set("Content-Length", strconv.FormatInt(size, 10))
+			cache := "public, max-age=31536000, immutable"
+			if fa.Kind == db.KindNode {
+				// Visibility-gated: browser only. A browser that has it keeps it after losing access (accepted).
+				cache = "private, max-age=31536000, immutable"
+			}
+			w.Header().Set("Cache-Control", cache)
+			w.Header().Set("X-Content-Type-Options", "nosniff")
+			if _, err := io.Copy(w, body); err != nil {
+				log.Printf("Warning: avatar stream %s: %v", fileid, err)
+			}
 			return
 		}
 
@@ -289,6 +334,15 @@ func FileUploadHandler(cli *storage.Client) http.HandlerFunc {
 		contentType := http.DetectContentType(sniffBuf[:n])
 		safeName := safeFilename(header.Filename)
 
+		if anchor.Kind == db.KindUser || anchor.Kind == db.KindNode {
+			ct, status, err := validateAvatar(file, header.Size)
+			if err != nil {
+				http.Error(w, err.Error(), status)
+				return
+			}
+			contentType = ct
+		}
+
 		switch anchor.Kind {
 		case db.KindComment:
 			handleCommentUpload(w, r, cli, uctx, anchor, file, header, safeName, contentType)
@@ -300,6 +354,27 @@ func FileUploadHandler(cli *storage.Client) http.HandlerFunc {
 			http.Error(w, "unknown anchor kind", http.StatusBadRequest)
 		}
 	}
+}
+
+// validateAvatar accepts only small png/jpeg/gif/webp images: avatars are served from the API
+// origin (HTML/SVG would be same-origin XSS) and decoded by every viewer (pixel bombs).
+// Reads the image header only and rewinds file. Returns the content type from the decoded format.
+func validateAvatar(file io.ReadSeeker, size int64) (string, int, error) {
+	if size > int64(tools.ViperPositiveInt("storage.max_avatar_bytes", 512*1024)) {
+		return "", http.StatusRequestEntityTooLarge, errors.New("avatar too large")
+	}
+	cfg, format, err := image.DecodeConfig(file)
+	if _, serr := file.Seek(0, io.SeekStart); serr != nil {
+		return "", http.StatusInternalServerError, fmt.Errorf("cannot rewind upload: %v", serr)
+	}
+	contentType := "image/" + format
+	if err != nil || !avatarContentTypes[contentType] {
+		return "", http.StatusBadRequest, errors.New("avatar must be a png, jpeg, gif or webp image")
+	}
+	if cfg.Width > maxAvatarSide || cfg.Height > maxAvatarSide {
+		return "", http.StatusBadRequest, fmt.Errorf("avatar must be at most %dx%d px", maxAvatarSide, maxAvatarSide)
+	}
+	return contentType, 0, nil
 }
 
 // --- per-anchor upload paths ---
@@ -489,8 +564,8 @@ func handleNodeAvatarUpload(w http.ResponseWriter, r *http.Request, cli *storage
 
 // --- delete ---
 
-// FileDeleteHandler returns the DELETE /file/<id> handler. Uploader-only
-// across all anchor kinds; same 404-instead-of-403 policy as FileGet.
+// FileDeleteHandler returns the DELETE /file/<id> handler. Uploader-only, except org
+// avatars (current coordinators of the org); same 404-instead-of-403 policy as FileGet.
 // DB-first: db.DeleteFile drops the row then GCs the object async.
 func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -521,7 +596,16 @@ func FileDeleteHandler(cli *storage.Client) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		if fa == nil || fa.UploaderUsername != uctx.Username {
+		if fa == nil {
+			http.NotFound(w, r)
+			return
+		}
+		allowed := fa.UploaderUsername == uctx.Username
+		if fa.Kind == db.KindNode {
+			// Org avatars belong to the org, not to whoever uploaded them.
+			allowed = auth.UserHasCoordoRole(uctx, fa.NodeNameid) >= 0
+		}
+		if !allowed {
 			http.NotFound(w, r)
 			return
 		}

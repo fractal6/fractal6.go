@@ -6,6 +6,10 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/binary"
+	"image"
+	"image/png"
 	"net/http"
 	"net/url"
 	"strings"
@@ -125,6 +129,58 @@ func TestContentDispositionFor(t *testing.T) {
 		got := contentDispositionFor(c.ct, c.name)
 		if got != c.want {
 			t.Errorf("contentDispositionFor(%q, %q) = %q, want %q", c.ct, c.name, got, c.want)
+		}
+	}
+}
+
+func TestValidateAvatar(t *testing.T) {
+	pngOf := func(w, h int) []byte {
+		var b bytes.Buffer
+		if err := png.Encode(&b, image.NewGray(image.Rect(0, 0, w, h))); err != nil {
+			t.Fatal(err)
+		}
+		return b.Bytes()
+	}
+	// Lossless WebP header only (VP8L): a few bytes declaring w x h.
+	webpOf := func(w, h int) []byte {
+		var b bytes.Buffer
+		b.WriteString("RIFF")
+		_ = binary.Write(&b, binary.LittleEndian, uint32(4+8+6))
+		b.WriteString("WEBPVP8L")
+		_ = binary.Write(&b, binary.LittleEndian, uint32(6))
+		b.WriteByte(0x2f)
+		_ = binary.Write(&b, binary.LittleEndian, uint32(w-1)|uint32(h-1)<<14)
+		b.WriteByte(0)
+		return b.Bytes()
+	}
+	cases := []struct {
+		name   string
+		body   []byte
+		size   int64 // 0 = len(body)
+		status int
+		ct     string
+	}{
+		{"png ok", pngOf(256, 256), 0, 0, "image/png"},
+		{"webp ok", webpOf(256, 256), 0, 0, "image/webp"},
+		{"max side ok", pngOf(1024, 1), 0, 0, "image/png"},
+		{"too wide", pngOf(1025, 1), 0, http.StatusBadRequest, ""},
+		{"webp pixel bomb", webpOf(16383, 16383), 0, http.StatusBadRequest, ""},
+		{"html", []byte("<html><script>alert(1)</script></html>"), 0, http.StatusBadRequest, ""},
+		{"svg", []byte(`<svg xmlns="http://www.w3.org/2000/svg"/>`), 0, http.StatusBadRequest, ""},
+		{"too large", pngOf(1, 1), 512*1024 + 1, http.StatusRequestEntityTooLarge, ""},
+	}
+	for _, c := range cases {
+		size := c.size
+		if size == 0 {
+			size = int64(len(c.body))
+		}
+		r := bytes.NewReader(c.body)
+		ct, status, err := validateAvatar(r, size)
+		if status != c.status || ct != c.ct || (err == nil) != (c.status == 0) {
+			t.Errorf("%s: got (%q, %d, %v), want (%q, %d)", c.name, ct, status, err, c.ct, c.status)
+		}
+		if pos, _ := r.Seek(0, 1); c.status != http.StatusRequestEntityTooLarge && pos != 0 {
+			t.Errorf("%s: reader not rewound (pos %d)", c.name, pos)
 		}
 	}
 }

@@ -25,6 +25,7 @@ var userCtxPayload string = `{
     User.username
     User.password
     User.lang
+    User.avatar { uid }
     User.rights {expand(_all_)}
     User.roles {
         Node.nameid

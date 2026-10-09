@@ -33,6 +33,7 @@ type UserCtx struct {
 	Lang     Lang       `json:"lang"`
 	Rights   UserRights `json:"rights"`
 	Roles    []*Node    `json:"roles"`
+	Avatar   *FileRef   `json:"avatar,omitempty"` // not stored in the JWT (see NewUserCookie)
 	// Used to refresh the client version if outdated
 	ClientVersion string `json:"client_version"`
 	// Used to refresh the token if outdated

@@ -143,7 +143,7 @@ type Node @auth(
   events_history(query: String): [Event!] @meta(f:"getNodeHistory", k:["nameid"])
   activity(from: String, to: String): [Activity!] @meta(f:"getNodeActivity", k:["rootnameid"])
 
-  # Org avatar (root nodes only by convention) — replace-on-upload via
+  # Org avatar (root nodes only) — replace-on-upload via
   # REST /file/upload?orgaid=… Visibility follows the node's @auth.
   avatar: File @x_ro @hasInverse(field: node)
 
@@ -432,7 +432,7 @@ type File @auth(
   comment: Comment           # comment attachment
   tension: Tension           # denormalised parent tension uid (always co-set with comment)
   user: User                 # user avatar
-  node: Node                 # node (root org) avatar — not enforced root-only yet
+  node: Node                 # org avatar (root nodes only)
 
   # True if referenced inline in comment.message (![alt](/file/<id>)).
   embedded: Boolean

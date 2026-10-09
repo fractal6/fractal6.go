@@ -708,7 +708,7 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 
 	if type_ == "all" || type_ == "export" {
 		payload += `
-           Tension.assignees { User.username User.name }`
+           Tension.assignees { User.username User.name User.avatar { uid } }`
 	}
 	if type_ == "export" {
 		payload += `

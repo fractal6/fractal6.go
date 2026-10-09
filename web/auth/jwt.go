@@ -158,6 +158,8 @@ func NewUserToken(userCtx model.UserCtx) (string, error) {
 func NewUserCookie(userCtx model.UserCtx) (*http.Cookie, error) {
 	// Erase growing value
 	userCtx.Roles = nil
+	// Avatar changes on upload: the frontend reads it fresh from tokenack
+	userCtx.Avatar = nil
 	// Ignore internal Hit value
 	userCtx.Hit = 0
 
