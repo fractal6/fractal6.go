@@ -42,11 +42,12 @@ run_notifier:
 	while true; do $(GO_WATCH) | entr -rcc go run main.go notifier; sleep 0.5; done
 
 build:
-	go build $(GOFLAGS) -o $(BINARY) main.go
+	go build $(GOFLAGS) -ldflags "-X $(MOD)/cmd.buildVersion=$(RELEASE_VERSION)" -o $(BINARY) main.go
 
 prod:
 	go build -trimpath $(GOFLAGS_PROD) \
 		-ldflags "-X $(MOD)/cmd.buildMode=PROD \
+		-X $(MOD)/cmd.buildVersion=$(RELEASE_VERSION) \
 		-X $(MOD)/cmd.buildBranch=$(BRANCH_NAME) \
 		-X $(MOD)/web/auth.buildMode=PROD \
 		-X $(MOD)/db.buildMode=PROD \

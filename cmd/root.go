@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	//"fmt"
@@ -32,6 +33,8 @@ import (
 )
 
 var (
+	buildVersion = "dev" // set via -ldflags at build time
+
 	rootCmd = &cobra.Command{
 		Use:   "f6",
 		Short: "Fractale - Self-organisation for humans",
@@ -59,6 +62,14 @@ var (
 		},
 	}
 
+	versionCmd = &cobra.Command{
+		Use:   "version",
+		Short: "print the version",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(buildVersion)
+		},
+	}
+
 	genToken = &cobra.Command{
 		Use:   "token [username]",
 		Short: "Generate JWT tokens",
@@ -79,6 +90,7 @@ func init() {
 	// Cli init
 	rootCmd.AddCommand(apiCmd)
 	rootCmd.AddCommand(notifierCmd)
+	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(genToken)
 	rootCmd.AddCommand(addUser)
 	rootCmd.AddCommand(delUser)
