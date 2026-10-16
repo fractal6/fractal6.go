@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"mime"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -99,13 +100,27 @@ const (
 	maxExportTensions = 10000
 )
 
-var tensionExportHeader = []any{"id", "title", "receiver", "status", "type", "createdAt", "createdBy", "labels", "assignees", "projects", "n_comments", "message"}
+// exportCol is a sheet column: header, width and word wrap (long text).
+type exportCol struct {
+	name  string
+	width float64
+	wrap  bool
+}
 
-// Column widths, in the tensionExportHeader order.
-var tensionExportWidths = []float64{14, 60, 26, 10, 12, 22, 16, 24, 20, 20, 12, 80}
+var tensionExportCols = []exportCol{
+	{"id", 14, false}, {"title", 60, true}, {"receiver", 26, false}, {"status", 10, false},
+	{"type", 12, false}, {"createdAt", 22, false}, {"createdBy", 16, false}, {"labels", 24, false},
+	{"assignees", 20, false}, {"projects", 20, false}, {"n_comments", 12, false}, {"message", 80, true},
+}
 
-// Long text columns get word wrap, title and message.
-var tensionExportWrapCols = []string{"B", "L"}
+// Last published blob node columns, only added when an exported tension has one.
+var nodeExportCols = []exportCol{
+	{"node.nameid", 26, false}, {"node.name", 26, false}, {"node.about", 40, true},
+	{"node.mandate.purpose", 60, true}, {"node.mandate.responsabilities", 60, true}, {"node.mandate.domains", 60, true},
+	{"node.mandate.policies", 60, true}, {"node.mandate.rules", 60, true},
+	{"node.skills", 24, false}, {"node.visibility", 12, false}, {"node.mode", 14, false}, {"node.type", 10, false},
+	{"node.first_link", 16, false}, {"node.role_ext", 14, false}, {"node.role_type", 14, false}, {"node.color", 10, false},
+}
 
 const exportRowHeight = 15
 
@@ -176,18 +191,35 @@ func tensionTerm(q db.TensionQuery) string {
 	return lexicon["Tension"]
 }
 
+// blobNode returns the node of the tension last (published) blob, nil if none.
+func blobNode(t model.TensionRef) *model.NodeFragmentRef {
+	if len(t.Blobs) == 0 || t.Blobs[0] == nil {
+		return nil
+	}
+	return t.Blobs[0].Node
+}
+
 // buildTensionsXlsx renders the tensions in a single sheet workbook.
 func buildTensionsXlsx(tensions []model.TensionRef, sheet string) (*bytes.Buffer, error) {
+	cols := tensionExportCols
+	if slices.ContainsFunc(tensions, func(t model.TensionRef) bool { return blobNode(t) != nil }) {
+		cols = slices.Concat(tensionExportCols, nodeExportCols)
+	}
+	header := make([]any, len(cols))
+	for i, c := range cols {
+		header[i] = c.name
+	}
+
 	f := excelize.NewFile()
 	defer f.Close()
 	// Lexicon terms may violate xlsx sheet name rules (31 chars, no :\/?*[]): keep the default name then
 	if err := f.SetSheetName(f.GetSheetName(0), sheet); err != nil {
 		sheet = f.GetSheetName(0)
 	}
-	if err := f.SetSheetRow(sheet, "A1", &tensionExportHeader); err != nil {
+	if err := f.SetSheetRow(sheet, "A1", &header); err != nil {
 		return nil, err
 	}
-	if err := styleTensionsSheet(f, sheet); err != nil {
+	if err := styleTensionsSheet(f, sheet, cols); err != nil {
 		return nil, err
 	}
 
@@ -223,6 +255,15 @@ func buildTensionsXlsx(tensions []model.TensionRef, sheet string) (*bytes.Buffer
 			strings.Join(labels, ", "), strings.Join(assignees, ", "), strings.Join(projects, ", "),
 			Deref(t.NComments), message,
 		}
+		if n := blobNode(t); n != nil {
+			m := Deref(n.Mandate)
+			row = append(row,
+				Deref(n.Nameid), Deref(n.Name), Deref(n.About),
+				Deref(m.Purpose), Deref(m.Responsabilities), Deref(m.Domains), Deref(m.Policies), Deref(m.Rules),
+				strings.Join(n.Skills, ", "), string(Deref(n.Visibility)), string(Deref(n.Mode)), string(Deref(n.Type)),
+				Deref(n.FirstLink), Deref(n.RoleExt), string(Deref(n.RoleType)), Deref(n.Color),
+			)
+		}
 		if err := f.SetSheetRow(sheet, fmt.Sprintf("A%d", i+2), &row); err != nil {
 			return nil, err
 		}
@@ -237,25 +278,26 @@ func buildTensionsXlsx(tensions []model.TensionRef, sheet string) (*bytes.Buffer
 
 // styleTensionsSheet sets the column widths and turns the first row into a
 // bold, frozen and filterable header.
-func styleTensionsSheet(f *excelize.File, sheet string) error {
-	lastCol, err := excelize.ColumnNumberToName(len(tensionExportHeader))
+func styleTensionsSheet(f *excelize.File, sheet string, cols []exportCol) error {
+	lastCol, err := excelize.ColumnNumberToName(len(cols))
 	if err != nil {
 		return err
-	}
-	for i, width := range tensionExportWidths {
-		col, err := excelize.ColumnNumberToName(i + 1)
-		if err != nil {
-			return err
-		}
-		if err := f.SetColWidth(sheet, col, col, width); err != nil {
-			return err
-		}
 	}
 	wrapStyle, err := f.NewStyle(&excelize.Style{Alignment: &excelize.Alignment{WrapText: true, Vertical: "top"}})
 	if err != nil {
 		return err
 	}
-	for _, col := range tensionExportWrapCols {
+	for i, c := range cols {
+		col, err := excelize.ColumnNumberToName(i + 1)
+		if err != nil {
+			return err
+		}
+		if err := f.SetColWidth(sheet, col, col, c.width); err != nil {
+			return err
+		}
+		if !c.wrap {
+			continue
+		}
 		if err := f.SetColStyle(sheet, col, wrapStyle); err != nil {
 			return err
 		}

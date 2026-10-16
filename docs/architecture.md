@@ -184,7 +184,8 @@ POST /q/project_templates/{top,sub}
 POST /q/projects/sub
 POST /q/tensions/{light,int,ext,all}
 POST /q/tensions/count
-POST /q/tensions/export                 Same query/auth as above, returns a xlsx attachment (250MB cap, sheet/filename use Node.lexicon)
+POST /q/tensions/export                 Same query/auth as above, returns a xlsx attachment (250MB cap, sheet/filename use Node.lexicon).
+                                        node.* columns (incl. mandate) from the last published blob, only if any tension has one
 
 # File attachments / avatars
 POST   /file/upload                    Multipart; one of (tid+cid)|userid|orgaid

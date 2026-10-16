@@ -26,6 +26,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"slices"
 	"testing"
 	"time"
 
@@ -187,13 +188,14 @@ func TestTensionListsExposeDerivedGovernanceState(t *testing.T) {
 			root as var(func: eq(Node.nameid, "test-org"))
 			emitter as var(func: eq(Node.nameid, "` + key + `-emitter"))
 			t as var(func: eq(Tension.receiverid, "` + key + `")) {
-				b as Tension.blobs { f as Blob.node }
+				b as Tension.blobs { f as Blob.node { m as NodeFragment.mandate } }
 				n as Tension.governed_node
 				c as Tension.comments
 			}
 		}`,
 		M: []db.X{{D: `uid(root) <Node.tensions_in> uid(t) .
 			uid(emitter) <Node.tensions_out> uid(t) .
+			uid(m) * * .
 			uid(f) * * .
 			uid(b) * * .
 			uid(c) * * .
@@ -231,6 +233,18 @@ func TestTensionListsExposeDerivedGovernanceState(t *testing.T) {
 			_:draftBlob <Blob.node> _:draftFragment .
 			_:draftFragment <dgraph.type> "NodeFragment" .
 			_:draftFragment <NodeFragment.type_> "Role" .
+			_:draftFragment <NodeFragment.name> "REST draft fragment" .
+			_:draft <Tension.blobs> _:pushedBlob .
+			_:pushedBlob <dgraph.type> "Blob" .
+			_:pushedBlob <Post.createdAt> "2099-01-02T00:00:00Z" .
+			_:pushedBlob <Blob.pushedFlag> "2099-01-02T00:00:00Z" .
+			_:pushedBlob <Blob.node> _:pushedFragment .
+			_:pushedFragment <dgraph.type> "NodeFragment" .
+			_:pushedFragment <NodeFragment.type_> "Role" .
+			_:pushedFragment <NodeFragment.name> "REST pushed fragment" .
+			_:pushedFragment <NodeFragment.mandate> _:pushedMandate .
+			_:pushedMandate <dgraph.type> "Mandate" .
+			_:pushedMandate <Mandate.purpose> "REST pushed purpose" .
 
 			_:active <dgraph.type> "Tension" .
 			_:active <Tension.title> "REST active circle" .
@@ -335,5 +349,15 @@ func TestTensionListsExposeDerivedGovernanceState(t *testing.T) {
 	}
 	if len(draftRow) < 12 || draftRow[11] != "REST draft body" || draftRow[2] != "Test Org" || draftRow[6] != "testuser" {
 		t.Errorf("export draft row: %v", draftRow)
+	}
+	// node.* columns come from the last published blob, not the newer draft one
+	cell := func(name string) string {
+		if i := slices.Index(rows[0], name); i >= 0 && i < len(draftRow) {
+			return draftRow[i]
+		}
+		return ""
+	}
+	if cell("node.name") != "REST pushed fragment" || cell("node.mandate.purpose") != "REST pushed purpose" || cell("node.type") != "Role" {
+		t.Errorf("export draft node columns: header %v, row %v", rows[0], draftRow)
 	}
 }

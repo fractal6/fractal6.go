@@ -665,10 +665,24 @@ const tensionListPayload = `uid
         Tension.type_
         Tension.labels { uid Label.name Label.color }
         Tension.governed_node { uid Node.nameid Node.type_ Node.isArchived }
+        n_comments: count(Tension.comments)`
+
+// Last blob node type, for the list views draft state.
+const tensionBlobPayload = `
         Tension.blobs (orderdesc: Post.createdAt, first: 1) {
             Blob.node { NodeFragment.type_ }
-        }
-        n_comments: count(Tension.comments)`
+        }`
+
+// Last published blob node, for the export node.* columns.
+const tensionExportBlobPayload = `
+        Tension.blobs (orderdesc: Post.createdAt, first: 1) @filter(has(Blob.pushedFlag)) {
+            Blob.node {
+                NodeFragment.nameid NodeFragment.name NodeFragment.about NodeFragment.skills
+                NodeFragment.visibility NodeFragment.mode NodeFragment.type_ NodeFragment.first_link
+                NodeFragment.role_ext NodeFragment.role_type NodeFragment.color
+                NodeFragment.mandate { Mandate.purpose Mandate.responsabilities Mandate.domains Mandate.policies Mandate.rules }
+            }
+        }`
 
 const tensionLightPayload = `uid
         Tension.title
@@ -701,9 +715,13 @@ func (dg Dgraph) GetTensions(q TensionQuery, type_ string) ([]model.TensionRef, 
 		panic("Unknow type (tension query)")
 	}
 
-	payload = tensionListPayload
-	if isLight {
+	switch {
+	case isLight:
 		payload = tensionLightPayload
+	case type_ == "export":
+		payload = tensionListPayload + tensionExportBlobPayload
+	default:
+		payload = tensionListPayload + tensionBlobPayload
 	}
 
 	if type_ == "all" || type_ == "export" {
