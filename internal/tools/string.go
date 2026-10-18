@@ -245,7 +245,7 @@ func FindTensions(msg string) []string {
 }
 
 // reEmailQuoteHeader matches quote headers from common clients across
-// languages: EN (Gmail/Apple Mail), FR, DE, ES. Group 1 captures anything
+// languages: EN (Gmail/Apple Mail), FR, DE, ES, IT. Group 1 captures anything
 // before the header on the same line — usually blank or ">"-quoted, but can
 // be real reply text when the client didn't break the line. The line must
 // end with ":" (typical header terminator), with optional content between
@@ -255,9 +255,10 @@ var reEmailQuoteHeader = re.MustCompile(`(?im)^(.*?)(?:(?:` +
 	`|Le\s[^\n]{1,300}?a\s+[eé]crit` + // FR: "Le lun. ... a écrit :"
 	`|Am\s[^\n]{1,300}?schrieb` + // DE: "Am 27.03.2026 schrieb Alice:"
 	`|El\s[^\n]{1,300}?escribi[oó]` + // ES: "El lun., 27 mar. ... escribió:"
+	`|Il\s[^\n]{1,300}?ha\s+scritto` + // IT: "Il giorno lun 27 mar 2026 ... ha scritto:"
 	`)[^\n]*:` +
 	// Outlook divider: "-----Original Message-----" and localized variants.
-	`|-{2,}\s*(?:Original Message|Message d'origine|Urspr[uü]ngliche Nachricht|Mensaje original)\s*-{2,}` +
+	`|-{2,}\s*(?:Original Message|Message d'origine|Urspr[uü]ngliche Nachricht|Mensaje original|Messaggio originale)\s*-{2,}` +
 	`)\s*$`)
 
 // reEmailSignature matches the standard "-- " signature delimiter.

@@ -229,6 +229,16 @@ func TestStripEmailQuote(t *testing.T) {
 			expected: "Mi respuesta.",
 		},
 		{
+			name:     "italian quote at end",
+			input:    "La mia risposta.\n\nIl giorno lun 27 mar 2026 alle ore 10:00 Alice <alice@example.com> ha scritto:\n> Messaggio\n> seconda riga",
+			expected: "La mia risposta.",
+		},
+		{
+			name:     "italian outlook divider",
+			input:    "La mia risposta.\n\n-----Messaggio originale-----\nDa: Alice\nOggetto: test",
+			expected: "La mia risposta.",
+		},
+		{
 			name:     "quote header directly after reply without blank line",
 			input:    "My reply.\nOn Mon, 27 Mar 2026, Alice <alice@example.com> wrote:\n> quoted line\n> second line",
 			expected: "My reply.",
