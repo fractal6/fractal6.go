@@ -13,8 +13,7 @@ $(eval RELEASE_VERSION=$(shell git tag -l --sort=-creatordate | head -n 1))
 NAME := fractal6.go
 RELEASE_NAME := fractal6-amd64
 RELEASE_DIR := releases/$(BRANCH_NAME)/$(RELEASE_VERSION)
-#LANGS := $(shell ls public/index.* | sed -n  "s/.*index\.\([a-z]*\)\.html/\1/p" )
-LANGS := $(shell find  public -maxdepth 1  -type d  -printf '%P\n' | xargs | tr " " "_")
+LANGS := en_fr_it_es
 
 
 .PHONY: build prod vendor \
