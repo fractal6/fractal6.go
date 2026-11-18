@@ -1,0 +1,8 @@
+[project]
+name = "fractal6-go"
+version = "1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "docopt-ng==0.9.0",
+    "tatsu==5.12.1",
+]

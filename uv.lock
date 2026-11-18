@@ -1,0 +1,36 @@
+version = 1
+revision = 3
+requires-python = ">=3.13"
+
+[[package]]
+name = "docopt-ng"
+version = "0.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/50/8d6806cf13138127692ae6ff79ddeb4e25eb3b0bcc3c1bd033e7e04531a9/docopt_ng-0.9.0.tar.gz", hash = "sha256:91c6da10b5bb6f2e9e25345829fb8278c78af019f6fc40887ad49b060483b1d7", size = 32264, upload-time = "2023-05-30T20:46:25.064Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6c/4a/c3b77fc1a24510b08918b43a473410c0168f6e657118807015f1f1edceea/docopt_ng-0.9.0-py3-none-any.whl", hash = "sha256:bfe4c8b03f9fca424c24ee0b4ffa84bf7391cb18c29ce0f6a8227a3b01b81ff9", size = 16689, upload-time = "2023-05-30T20:46:45.294Z" },
+]
+
+[[package]]
+name = "fractal6-go"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "docopt-ng" },
+    { name = "tatsu" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "docopt-ng", specifier = "==0.9.0" },
+    { name = "tatsu", specifier = "==5.12.1" },
+]
+
+[[package]]
+name = "tatsu"
+version = "5.12.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f6/e0/bfaf1cd529c07f94d5b4acd483b1b8bc904726d62029238a8acc8f50ae09/tatsu-5.12.1.tar.gz", hash = "sha256:57a6da442f71f07cac4fc99c5f997e2559e340b9e5177449dc35b751e18e3405", size = 131189, upload-time = "2024-05-02T16:00:29.586Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/31/7d/daad9ce582ce159bb1d15b3591185571817c912cd6b82763db7183043dee/TatSu-5.12.1-py3-none-any.whl", hash = "sha256:97073bcf496a54adc6c87043cfd70c177a5f5f95c09c3ba0cfea43286ea728e1", size = 79942, upload-time = "2024-05-02T16:00:26.374Z" },
+]
